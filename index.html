@@ -1,567 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Interior Door Takeoff</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
-<link rel="icon" href="icon-192.png">
-
-<!-- iPhone full-screen / PWA friendly -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Door Takeoff">
-<meta name="theme-color" content="#0A2E4E">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BFS Interior Door Takeoff</title>
 
 <style>
-  :root{
---btn-font: 16px;
-    --btn-pad-y: 6px;
-    --btn-pad-x: 8px;
-    --cell-pad: 6px;
-    --qty-min: 16px;
-    --btn-size: 34px;
 
-  }
-
-  body{
-    font-family:system-ui,Arial,sans-serif;
-    margin:0;
-    background:#fff;
-    color:#111;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right)
-             env(safe-area-inset-bottom) env(safe-area-inset-left);
-  }
-
-  .sheet{border:3px solid #000;border-radius:6px;overflow:auto;margin:10px}
-
-  .topbar{
-    display:grid;grid-template-columns:auto 1fr auto 1fr;gap:6px;align-items:center;
-    padding:10px;border-bottom:3px solid #000;background:#f6f6f6;font-weight:800
-  }
-  .topbar input{width:100%;font-size:16px;padding:7px}
-
-  .title{
-    padding:8px;text-align:center;font-size:20px;font-weight:900;border-bottom:3px solid #000
-  }
-
-  table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
-  th,td{border:1px solid #444;padding:var(--cell-pad);text-align:center;vertical-align:middle}
-  th:first-child, td:first-child{text-align:left;padding-left:8px}
-  th{background:#e9e9e9;font-weight:900}
-  .subhdr{font-size:12px;background:#f2f2f2;font-weight:900}
-
-  .btn{
-    font-size:var(--btn-font);
-    padding:var(--btn-pad-y) var(--btn-pad-x);
-    border:2px solid #666;
-    border-radius:8px;
-    background:#fff;
-    line-height:1;
-    min-width:var(--btn-size);
-    min-height:var(--btn-size);
-    touch-action:manipulation;
-  }
-  .btn:active{transform:scale(0.98);background:#f0f0f0}
-
-  .qty{
-    min-width:var(--qty-min);
-    display:inline-block;
-    font-weight:900;
-    font-size:16px;
-    padding:0 4px;
-  }
-
-  .section{border-top:3px solid #000}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0}
-  .block{border-right:3px solid #000}
-  .block:last-child{border-right:none}
-
-  .stairs{
-    padding:10px;border-top:3px solid #000;border-bottom:3px solid #000;background:#f6f6f6;
-    font-weight:900;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:15px
-  }
-
-  .notes{padding:10px}
-  textarea{width:100%;height:80px;font-size:14px;padding:8px}
-
-  .summaryWrap{padding:10px;border-top:3px solid #000;background:#fff}
-  #summaryText{width:100%;height:180px;font-size:14px;padding:8px;white-space:pre-wrap}
-
-  .actions{
-    display:flex;gap:10px;flex-wrap:wrap;padding:10px;border-top:3px solid #000;background:#fafafa
-  }
-  .actions button{
-    font-size:15px;padding:10px 12px;border-radius:8px;border:2px solid #666;background:#fff;
-    min-height:44px;  /* iOS recommended tap target */
-  }
-
-  .hint{font-size:12px;color:#666;margin-top:6px}
-
-  /* Sticky header rows for easier field use */
-  thead th{
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-
-  @media (max-width:900px){ table{font-size:13px} }
-  @media (max-width:700px){
-    .grid2{grid-template-columns:1fr}
-    .block{border-right:none;border-bottom:3px solid #000}
-    .block:last-child{border-bottom:none}
-  }
-
+/* ===== Basic Reset and Body Style ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f4f4;
+  padding: 20px;
+  color: #222;
 }
 
-/* Sticky table headers while scrolling */
-table thead tr:nth-child(1) th{
-  position: sticky;
-  top: 0;
-  background: #e9e9e9;
-  z-index: 3;
-}
-table thead tr:nth-child(2) th{
-  position: sticky;
-  top: 32px;
-  background: #f7f7f7;
-  z-index: 2;
+/* ===== Container Styles ===== */
+.container {
+  max-width: 900px;
+  margin: 0 auto 50px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px #0002;
 }
 
-/* Thicker LH/RH divider for singles */
-.thick-divider{border-right:3px solid #000 !important;}
-
-
-.btnrow{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  flex-wrap:nowrap;
-  white-space:nowrap;
-}
-.btnrow .qty{
-  min-width:var(--qty-min);
-  display:inline-block;
-  font-weight:900;
-  font-size:14px;
-  line-height:1;
-  padding:0 2px;
-}
-.btnrow .btn{
-  min-width:34px;
-  min-height:34px;
-  padding:6px 8px;
+/* ===== Headings ===== */
+h1, h2, h3 {
+  margin-bottom: 16px;
+  font-weight: 700;
+  color: #003366;
 }
 
-
-
-/* Narrow first (size) column */
-th.sizecol, td.sizecol { width: 60px; max-width: 60px; }
-
-
-
-/* LH vs RH visual grouping */
-th.lh-group, td.lh-group{ background:#f7fbff; }
-th.rh-group, td.rh-group{ background:#fff9f0; }
-th.lh-end, td.lh-end{ border-right:4px solid #111 !important; }
-
-/* Sticky table headers in each section */
-table thead th{
-  position: sticky;
-  top: 0;
-  z-index: 3;
-}
-table thead tr.subhdr th{
-  top: 32px; /* sits under first header row */
-  z-index: 2;
-}
-
-/* Keep section titles visible when scrolling */
-.section-title{
-  position: sticky;
-  top: 0;
-  z-index: 4;
-  background: #0A2E4E;
+/* Title above each table-section */
+.section-title {
+  margin-top: 40px;
+  margin-bottom: 6px;
+  padding: 8px 12px;
+  background: #003366;
   color: #fff;
-  padding: 6px 8px;
-  border-radius: 6px 6px 0 0;
+  border-radius: 5px 5px 0 0;
+  font-size: 1.1rem;
 }
 
-@media (max-width: 600px){
-  :root{
+/* ===== Form Inputs ===== */
+label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-block;
+  margin: 12px 0 6px 0;
+}
+input[type="text"], textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+/* ===== Table Styles ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+th, td {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+/* Sticky table headers */
+table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #fafafa;
+}
+table .subhdr th {
+  position: sticky;
+  top: 28px;
+  z-index: 2;
+  background: #f0f0f0;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  background: #003366;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  font-size: var(--btn-font);
+  cursor: pointer;
+  transition: 150ms;
+}
+
+.btn:hover {
+  background: #0055a5;
+}
+.btn:active {
+  background: #001f3d;
+}
+
+.btnrow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.qty {
+  font-size: 14px;
+  min-width: var(--qty-min);
+}
+
+/* ===== Reset Button ===== */
+#resetBtn {
+  background: #cc0000;
+}
+#resetBtn:hover {
+  background: #e60000;
+}
+
+/* ===== Column Shading (NO BADGES) ===== */
+th.lh-group, td.lh-group {
+  background: #eaf3ff !important;  /* blue LH */
+}
+th.rh-group, td.rh-group {
+  background: #fff2d9 !important;  /* yellow RH */
+}
+th.lh-end, td.lh-end {
+  border-right: 4px solid #111 !important;
+}
+
+/* ===== Responsive Mobile Tuning ===== */
+:root {
+  --btn-size: 34px;
+  --btn-font: 16px;
+  --btn-pad-y: 6px;
+  --btn-pad-x: 8px;
+  --qty-min: 16px;
+}
+
+.btn {
+  min-width: var(--btn-size);
+  min-height: var(--btn-size);
+}
+
+@media (max-width: 600px) {
+  :root {
     --btn-size: 30px;
     --btn-font: 15px;
     --btn-pad-y: 4px;
     --btn-pad-x: 6px;
     --qty-min: 14px;
-    --cell-pad: 4px;
   }
-  th, td{padding:3px 2px;}
 }
 
 </style>
 </head>
+
 <body>
-<div class="sheet">
+<div class="container">
+<h1>BFS Interior Door Takeoff</h1>
 
-  <div class="topbar">
-    <div>Customer:</div><input id="customer" placeholder="Type customer"/>
-    <div>Lot#:</div><input id="lot" placeholder="Type lot #"/>
-  </div>
-  <div class="title">Interior Door Takeoff</div>
+<label for="customer">Customer:</label>
+<input type="text" id="customer" placeholder="Enter customer name" />
 
-  <div class="grid2">
-    <div class="block">
-      <table id="tbl68"></table>
-    </div>
-    <div>
-      <table id="tbl80"></table>
-    </div>
-  </div>
+<label for="lot">Lot #:</label>
+<input type="text" id="lot" placeholder="Enter lot number" />
 
-  <div class="grid2 section">
-    <div class="block">
-      <table id="dblTbl"></table>
-    </div>
-    <div>
-      <table id="tastTbl"></table>
-    </div>
-  </div>
+<label for="notes">Notes (field):</label>
+<textarea id="notes" rows="3" placeholder="Enter field notes"></textarea>
 
-  <div class="stairs">
-    <div>Pull-Down Stairs:</div>
-    <div>22-1/2"</div>
-    <button class="btn" onclick="bump('stairs|22.5',-1)">−</button>
-    <span class="qty" id="stairs225">0</span>
-    <button class="btn" onclick="bump('stairs|22.5',1)">+</button>
+<button id="generateBtn" class="btn" onclick="generateSummary()">Generate Summary Text</button>
 
-    <div style="margin-left:6px;">25"</div>
-    <button class="btn" onclick="bump('stairs|25',-1)">−</button>
-    <span class="qty" id="stairs25">0</span>
-    <button class="btn" onclick="bump('stairs|25',1)">+</button>
-  </div>
+<label for="summaryText">Summary Text (copy/paste):</label>
+<textarea id="summaryText" rows="8"></textarea>
 
-  <div class="notes">
-    <div style="font-weight:900;margin-bottom:4px;font-size:15px;">NOTES (field):</div>
-    <textarea id="notes" placeholder="Anything special..."></textarea>
-    <div class="hint">Tip: tap “Generate Summary Text”, then copy/paste into your app’s notes.</div>
-  </div>
+<button id="resetBtn" class="btn" onclick="resetAll()">Reset All</button>
 
-  <div class="summaryWrap">
-    <div style="font-weight:900;margin-bottom:6px;font-size:15px;">SUMMARY TEXT (copy/paste):</div>
-    <textarea id="summaryText"  placeholder="Tap Generate Summary Text..."></textarea>
-    <div class="actions" style="border-top:0;padding:8px 0 0;background:#fff">
-      <button onclick="generateSummary()">Generate Summary Text</button>
-      <button onclick="copySummary()">Copy Summary</button>
-      <button onclick="exportSummaryTXT()">Export Summary (.txt)</button>
-    </div>
-  </div>
-
-  <div class="actions">
-    <button onclick="resetAll()">Reset All</button>
-  </div>
-</div>
+<!-- ================= JS START ================= -->
 
 <script>
-/*** EASY EDIT SECTION ***/
-const widths = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-const dblSizes  = ["4/0 DBL","4/8 DBL","5/0 DBL","6/0 DBL"];
-const tastSizes = ["4/0 T-AST","4/8 T-AST","5/0 T-AST","6/0 T-AST"];
-/*** END EASY EDIT SECTION ***/
-
-const stateKey="doorTakeoffStateCompactV7";
-let state = JSON.parse(localStorage.getItem(stateKey)||"{}");
-
-const singleKinds = [
-  {key:"unit", label:"Unit"},
-  {key:"slab", label:"Slab only"}
-];
-
-const doubleKinds = [
-  {key:"unit", label:"Unit"},
-  {key:"french", label:"French door"}
-];
-
-function kSingle(height,width,hand,kind){ return `single|${height}|${width}|${hand}|${kind}`; }
-function kSingleJamb(height,width,hand){ return `singlejamb|${height}|${width}|${hand}`; }
-
-function kDouble(group,label,hand,kind){ return `${group}|${label}|${hand}|${kind}`; }
-function kDoubleJamb(group,label,hand){ return `${group}jamb|${label}|${hand}`; }
-
-function ensure(){
-  widths.forEach(w=>{
-    ["6/8","8/0"].forEach(h=>{
-      ["LH","RH"].forEach(hand=>{
-        singleKinds.forEach(k=>{
-          const key=kSingle(h,w,hand,k.key);
-          if(state[key]==null) state[key]=0;
-        });
-        const jambKey=kSingleJamb(h,w,hand);
-        if(state[jambKey]==null) state[jambKey]=0;
-      });
-    });
-  });
-
-  ["double","tast"].forEach(group=>{
-    const labels = group==="double" ? dblSizes : tastSizes;
-    labels.forEach(l=>{
-      ["LH","RH"].forEach(hand=>{
-        doubleKinds.forEach(k=>{
-          const key=kDouble(group,l,hand,k.key);
-          if(state[key]==null) state[key]=0;
-        });
-        const jambKey=kDoubleJamb(group,l,hand);
-        if(state[jambKey]==null) state[jambKey]=0;
-      });
-    });
-  });
-
-  ["stairs|22.5","stairs|25"].forEach(s=>{ if(state[s]==null) state[s]=0; });
-  state.customer ??= "";
-  state.lot ??= "";
-  state.notes ??= "";
-}
-ensure();
-
-function renderTastDoubles(tblId,labels,group,title){
-  let html=`
-    <thead>
-      <tr>
-        <th style="width:60px;">${title}</th>
-        <th colspan="2" class="lh-end">LH</th>
-        <th colspan="2">RH</th>
-      </tr>
-      <tr class="subhdr">
-        <th></th>
-        <th class="lh-group">Unit</th><th class="lh-group lh-end">French</th>
-        <th class="rh-group">Unit</th><th class="rh-group">French</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-  labels.forEach(l=>{
-    html+=`<tr><td class="sizecol">${l}</td>`;
-    ["LH","RH"].forEach(hand=>{
-      doubleKinds.forEach((k,idx)=>{
-        const cls = (hand==="LH" && idx===1) ? ' class="lh-group lh-end"' : (hand==="LH" ? ' class="lh-group"' : ' class="rh-group"');
-        html+=`<td${cls}>${cellButtons(kDouble(group,l,hand,k.key))}</td>`;
-      });
-    });
-    html+=`</tr>`;
-  });
-  html+=`</tbody>`;
-  document.getElementById(tblId).innerHTML=html;
+/* ===== Global State ===== */
+let state = {};
+if (localStorage.getItem('BFSdoorState')) {
+  try { state = JSON.parse(localStorage.getItem('BFSdoorState')); }
+  catch(e) { state = {}; }
 }
 
-
-function save(){
-  state.customer=document.getElementById("customer").value.trim();
-  state.lot=document.getElementById("lot").value.trim();
-  state.notes=document.getElementById("notes").value;
-  localStorage.setItem(stateKey, JSON.stringify(state));
+function save() {
+  localStorage.setItem('BFSdoorState', JSON.stringify(state));
 }
 
-function bump(key,delta){
-  state[key]=Math.max(0,(state[key]||0)+delta);
-  document.getElementById("customer").value="";
-document.getElementById("lot").value="";
-document.getElementById("notes").value="";
-document.getElementById("summaryText").value="";
-save(); render();
+/* ===== Reset All ===== */
+function resetAll() {
+  state = {};
+  document.getElementById("customer").value = "";
+  document.getElementById("lot").value = "";
+  document.getElementById("notes").value = "";
+  document.getElementById("summaryText").value = "";
+  save();
+  render();
 }
 
-function cellButtons(key){
-  const v=state[key]||0;
+/* ===== Increment/Decrement ===== */
+function bump(key, delta) {
+  state[key] = Math.max(0, (state[key] || 0) + delta);
+  save();
+  render();
+}
+
+/* ===== Key Format ===== */
+function kSingle(height, width, hand, type) {
+  return `${height}_${width}_${hand}_${type}`;
+}
+function kDouble(group, size, hand, type) {
+  return `${group}_${size}_${hand}_${type}`;
+}
+
+/* ===== cellButtons Rendering ===== */
+function cellButtons(key) {
   return `
     <div class="btnrow">
-      <button class="btn" onclick="bump('${key}',-1)">−</button>
-      <span class="qty">${v}</span>
-      <button class="btn" onclick="bump('${key}',1)">+</button>
+      <button class="btn" onclick="bump('${key}', -1)">–</button>
+      <div class="qty">${state[key] || 0}</div>
+      <button class="btn" onclick="bump('${key}', 1)">+</button>
     </div>
   `;
 }
 
-function renderSingles(tblId,height){
-  let html=`
-    <thead>
-      <tr>
-        <th style="width:60px;">Door ${height}</th>
-        <th colspan="2">LH</th>
-        <th colspan="2">RH</th>
-      </tr>
-      <tr class="subhdr">
-        <th></th>
-        <th class="thick-divider">Unit</th><th class="thick-divider">Slab</th>
-        <th class="rh-group">Unit</th><th class="rh-group">Slab</th>
-      </tr>
-    </thead>
-    <tbody>
+/* ===== Render Singles (6/8, 8/0) ===== */
+function renderSingles(height, widths) {
+  let html = `
+    <div class="section-title">Door ${height}</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60px;">Size</th>
+          <th colspan="2" class="lh-group lh-end">LH</th>
+          <th colspan="2" class="rh-group">RH</th>
+        </tr>
+        <tr class="subhdr">
+          <th></th>
+          <th class="lh-group lh-end">Unit</th>
+          <th class="lh-group lh-end">Slab</th>
+          <th class="rh-group">Unit</th>
+          <th class="rh-group">Slab</th>
+        </tr>
+      </thead>
+      <tbody>
   `;
-  widths.forEach(w=>{
-    html+=`<tr><td>${w}</td>`;
-    // LH
-    singleKinds.forEach(k=>{
-      html+=`<td class="thick-divider">${cellButtons(kSingle(height,w,"LH",k.key))}</td>`;
-    });
-    // RH
-    singleKinds.forEach(k=>{
-      html+=`<td>${cellButtons(kSingle(height,w,"RH",k.key))}</td>`;
-    });
-    html+=`</tr>`;
-  });
-  html+=`</tbody>`;
-  document.getElementById(tblId).innerHTML=html;
-}
 
-function renderDoubles(tblId,labels,group,title){
-  let html=`
-    <thead>
+  widths.forEach(w => {
+    html += `
       <tr>
-        <th style="width:60px;">${title}</th>
-        <th colspan="2">Counts</th>
+        <td>${w}</td>
+        <td class="lh-group lh-end">${cellButtons(kSingle(height, w, "LH", "unit"))}</td>
+        <td class="lh-group lh-end">${cellButtons(kSingle(height, w, "LH", "slab"))}</td>
+        <td class="rh-group">${cellButtons(kSingle(height, w, "RH", "unit"))}</td>
+        <td class="rh-group">${cellButtons(kSingle(height, w, "RH", "slab"))}</td>
       </tr>
-      <tr class="subhdr">
-        <th></th>
-        <th class="rh-group">Unit</th><th class="rh-group">French</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-  labels.forEach(l=>{
-    html+=`<tr><td class="sizecol">${l}</td>`;
-    doubleKinds.forEach(k=>{
-      html+=`<td>${cellButtons(kDouble(group,l,"NA",k.key))}</td>`;
-    });
-    html+=`</tr>`;
+    `;
   });
-  html+=`</tbody>`;
-  document.getElementById(tblId).innerHTML=html;
+
+  html += `</tbody></table>`;
+  return html;
 }
 
-function render(){
-  renderSingles("tbl68","6/8");
-  renderSingles("tbl80","8/0");
-  renderDoubles("dblTbl",dblSizes,"double","DBL");
-  renderTastDoubles("tastTbl",tastSizes,"tast","T-Ast");
+/* ===== Render Doubles (DBL) ===== */
+function renderDoubles(group, sizes) {
+  let html = `
+    <div class="section-title">${group}</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60px;">Size</th>
+          <th class="lh-group">Unit</th>
+          <th class="rh-group">French</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
-  document.getElementById("stairs225").textContent = state["stairs|22.5"]||0;
-  document.getElementById("stairs25").textContent  = state["stairs|25"]||0;
-  document.getElementById("customer").value = state.customer||"";
-  document.getElementById("lot").value = state.lot ||"";
-  document.getElementById("notes").value = state.notes||"";
+  sizes.forEach(size => {
+    html += `
+      <tr>
+        <td>${size}</td>
+        <td class="lh-group">${cellButtons(kDouble(group, size, "NA", "unit"))}</td>
+        <td class="rh-group">${cellButtons(kDouble(group, size, "NA", "french"))}</td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+  return html;
 }
+
+/* ===== Render T-Astragal Doubles ===== */
+function renderTastDoubles(sizes) {
+  let html = `
+    <div class="section-title">T-Astragal</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60px;">Size</th>
+          <th colspan="2" class="lh-group lh-end">LH</th>
+          <th colspan="2" class="rh-group">RH</th>
+        </tr>
+        <tr class="subhdr">
+          <th></th>
+          <th class="lh-group lh-end">Unit</th>
+          <th class="lh-group lh-end">French</th>
+          <th class="rh-group">Unit</th>
+          <th class="rh-group">French</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  sizes.forEach(size => {
+    html += `
+      <tr>
+        <td>${size}</td>
+        <td class="lh-group lh-end">${cellButtons(kDouble("T-Astragal", size, "LH", "unit"))}</td>
+        <td class="lh-group lh-end">${cellButtons(kDouble("T-Astragal", size, "LH", "french"))}</td>
+        <td class="rh-group">${cellButtons(kDouble("T-Astragal", size, "RH", "unit"))}</td>
+        <td class="rh-group">${cellButtons(kDouble("T-Astragal", size, "RH", "french"))}</td>
+      </tr>
+    `;
+  });
+
+  html += `</tbody></table>`;
+  return html;
+}
+
+/* ===== Generate Summary ===== */
+function generateSummary() {
+  let cust = document.getElementById("customer").value;
+  let lot = document.getElementById("lot").value;
+  let notes = document.getElementById("notes").value;
+
+  let s = `Customer: ${cust}\nLot #: ${lot}\n\n`;
+
+  Object.keys(state).forEach(k => {
+    if (state[k] > 0) s += `${k}: ${state[k]}\n`;
+  });
+
+  if (notes.trim() !== "") {
+    s += `\nNOTES:\n${notes}\n`;
+  }
+
+  document.getElementById("summaryText").value = s;
+}
+
+/* ===== Render Entire App ===== */
+function render() {
+  let root = document.querySelector(".container");
+  let headerSection = root.innerHTML.split("<!-- ================= JS START ================= -->")[0];
+  root.innerHTML = headerSection + '<!-- ================= JS START ================= -->';
+
+  root.insertAdjacentHTML("beforeend", renderSingles("6/8", ["1/6","2/0","2/4","2/6","2/8","3/0"]));
+  root.insertAdjacentHTML("beforeend", renderSingles("8/0", ["1/6","2/0","2/4","2/6","2/8","3/0"]));
+  root.insertAdjacentHTML("beforeend", renderDoubles("DBL", ["3/0","4/0","5/0"]));
+  root.insertAdjacentHTML("beforeend", renderTastDoubles(["3/0","4/0","5/0"]));
+}
+
 render();
 
-document.getElementById("customer").addEventListener("input", save);
-document.getElementById("lot").addEventListener("input", save);
-document.getElementById("notes").addEventListener("input", save);
-
-function resetAll(){
-  if(!confirm("Reset all counts?")) return;
-  Object.keys(state).forEach(k=>{
-    if(k.startsWith("single|")||k.startsWith("double|")||k.startsWith("tast|")||
-       k.startsWith("singlejamb|")||k.startsWith("doublejamb|")||k.startsWith("tastjamb|")||
-       k.startsWith("stairs|"))
-      state[k]=0;
-  });
-  document.getElementById("customer").value="";
-document.getElementById("lot").value="";
-document.getElementById("notes").value="";
-document.getElementById("summaryText").value="";
-save(); render();
-}
-
-function generateSummary(){
-  save();
-  const cust = state.customer || "Customer";
-  const lot = state.lot || "Lot";
-  let lines = [];
-  lines.push(`INTERIOR DOOR TAKEOFF`);
-  lines.push(`Customer: ${cust}`);
-  lines.push(`Lot#: ${lot}`);
-  lines.push(``);
-
-  ["6/8","8/0"].forEach(h=>{
-    let sectionLines=[];
-    widths.forEach(w=>{
-      ["LH","RH"].forEach(hand=>{
-        let parts=[];
-        singleKinds.forEach(k=>{
-          const q=state[kSingle(h,w,hand,k.key)]||0;
-          if(q>0) parts.push(`${k.label} ${q}`);
-        });
-        if(parts.length){
-          sectionLines.push(`  ${w} ${hand}: ${parts.join(", ")}`);
-        }
-      });
-    });
-    if(sectionLines.length){
-      lines.push(`== Singles ${h} ==`);
-      lines.push(...sectionLines);
-      lines.push(``);
-    }
-  });
-
-  function doubleSummary(group, labels, title){
-  let sectionLines=[];
-  labels.forEach(l=>{
-    let parts=[];
-    doubleKinds.forEach(k=>{
-      const q=state[kDouble(group,l,"NA",k.key)]||0;
-      if(q>0) parts.push(`${k.label} ${q}`);
-    });
-    if(parts.length){
-      sectionLines.push(`  ${l}: ${parts.join(", ")}`);
-    }
-  });
-  if(sectionLines.length){
-    lines.push(`== ${title} ==`);
-    lines.push(...sectionLines);
-    lines.push(``);
-  }
-}
-  doubleSummary("double", dblSizes, "DBL");
-  doubleSummary("tast", tastSizes, "T-Ast");
-
-  const s225=state["stairs|22.5"]||0, s25=state["stairs|25"]||0;
-  if(s225||s25){
-    let stairParts=[];
-    if(s225>0) stairParts.push(`22-1/2" ${s225}`);
-    if(s25>0) stairParts.push(`25" ${s25}`);
-    lines.push(`Pull-Down Stairs: ${stairParts.join(", ")}`);
-    lines.push(``);
-  }
-
-  if(state.notes?.trim()){
-    lines.push(`NOTES:`);
-    lines.push(state.notes.trim());
-  }
-
-  document.getElementById("summaryText").value = lines.join("\n");
-}
-
-function copySummary(){
-  const ta=document.getElementById("summaryText");
-  if(!ta.value.trim()) generateSummary();
-  ta.select();
-  ta.setSelectionRange(0, 999999);
-  document.execCommand("copy");
-}
-
-function exportSummaryTXT(){
-  if(!document.getElementById("summaryText").value.trim()) generateSummary();
-  const text=document.getElementById("summaryText").value;
-  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const cust=(state.customer||"Customer").replace(/[^a-z0-9-_ ]/gi,"").trim().replace(/\s+/g,"_");
-  const lot=(state.lot||"Lot").replace(/[^a-z0-9-_ ]/gi,"").trim().replace(/\s+/g,"_");
-  const filename=`${cust}_${lot}_InteriorDoorTakeoff.txt`;
-  const a=document.createElement("a");
-  a.href=url; a.download=filename; a.click();
-  URL.revokeObjectURL(url);
-}
 </script>
+
+</div>
 </body>
 </html>
