@@ -7,7 +7,7 @@
 
 <style>
 
-/* ===== Basic Reset and Body Style ===== */
+/* ===== Basic Reset ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -20,7 +20,7 @@ body {
   color: #222;
 }
 
-/* ===== Container Styles ===== */
+/* ===== Container ===== */
 .container {
   max-width: 900px;
   margin: 0 auto 50px auto;
@@ -37,7 +37,6 @@ h1, h2, h3 {
   color: #003366;
 }
 
-/* Title above each table-section */
 .section-title {
   margin-top: 40px;
   margin-bottom: 6px;
@@ -48,7 +47,6 @@ h1, h2, h3 {
   font-size: 1.1rem;
 }
 
-/* ===== Form Inputs ===== */
 label {
   font-size: 0.95rem;
   font-weight: 600;
@@ -64,7 +62,7 @@ input[type="text"], textarea {
   font-size: 1rem;
 }
 
-/* ===== Table Styles ===== */
+/* ===== Tables ===== */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -78,7 +76,6 @@ th, td {
   text-align: center;
 }
 
-/* Sticky table headers */
 table thead th {
   position: sticky;
   top: 0;
@@ -93,6 +90,14 @@ table .subhdr th {
 }
 
 /* ===== Buttons ===== */
+:root {
+  --btn-size: 34px;
+  --btn-font: 16px;
+  --btn-pad-y: 6px;
+  --btn-pad-x: 8px;
+  --qty-min: 16px;
+}
+
 .btn {
   background: #003366;
   color: #fff;
@@ -101,15 +106,11 @@ table .subhdr th {
   padding: var(--btn-pad-y) var(--btn-pad-x);
   font-size: var(--btn-font);
   cursor: pointer;
-  transition: 150ms;
+  min-width: var(--btn-size);
+  min-height: var(--btn-size);
 }
-
-.btn:hover {
-  background: #0055a5;
-}
-.btn:active {
-  background: #001f3d;
-}
+.btn:hover { background: #0055a5; }
+.btn:active { background: #001f3d; }
 
 .btnrow {
   display: flex;
@@ -124,7 +125,7 @@ table .subhdr th {
   min-width: var(--qty-min);
 }
 
-/* ===== Reset Button ===== */
+/* Reset button */
 #resetBtn {
   background: #cc0000;
 }
@@ -132,29 +133,15 @@ table .subhdr th {
   background: #e60000;
 }
 
-/* ===== Column Shading (NO BADGES) ===== */
+/* LH / RH background colors */
 th.lh-group, td.lh-group {
-  background: #eaf3ff !important;  /* blue LH */
+  background: #eaf3ff !important;
 }
 th.rh-group, td.rh-group {
-  background: #fff2d9 !important;  /* yellow RH */
+  background: #fff2d9 !important;
 }
 th.lh-end, td.lh-end {
   border-right: 4px solid #111 !important;
-}
-
-/* ===== Responsive Mobile Tuning ===== */
-:root {
-  --btn-size: 34px;
-  --btn-font: 16px;
-  --btn-pad-y: 6px;
-  --btn-pad-x: 8px;
-  --qty-min: 16px;
-}
-
-.btn {
-  min-width: var(--btn-size);
-  min-height: var(--btn-size);
 }
 
 @media (max-width: 600px) {
@@ -172,28 +159,29 @@ th.lh-end, td.lh-end {
 
 <body>
 <div class="container">
+
 <h1>BFS Interior Door Takeoff</h1>
 
+<!-- ===== TOP SECTION — Customer & Lot ONLY ===== -->
 <label for="customer">Customer:</label>
 <input type="text" id="customer" placeholder="Enter customer name" />
 
 <label for="lot">Lot #:</label>
 <input type="text" id="lot" placeholder="Enter lot number" />
 
-<label for="notes">Notes (field):</label>
-<textarea id="notes" rows="3" placeholder="Enter field notes"></textarea>
 
-<button id="generateBtn" class="btn" onclick="generateSummary()">Generate Summary Text</button>
+<!-- ===== DOOR TABLES WILL BE INSERTED HERE BY JS ===== -->
 
-<label for="summaryText">Summary Text (copy/paste):</label>
-<textarea id="summaryText" rows="8"></textarea>
+<!-- THE NOTES & SUMMARY SECTION WILL BE MOVED TO BOTTOM -->
 
-<button id="resetBtn" class="btn" onclick="resetAll()">Reset All</button>
 
 <!-- ================= JS START ================= -->
-
 <script>
-/* ===== Global State ===== */
+
+/* =======================================================
+   =============== STATE MANAGEMENT ======================
+   ======================================================= */
+
 let state = {};
 if (localStorage.getItem('BFSdoorState')) {
   try { state = JSON.parse(localStorage.getItem('BFSdoorState')); }
@@ -204,7 +192,6 @@ function save() {
   localStorage.setItem('BFSdoorState', JSON.stringify(state));
 }
 
-/* ===== Reset All ===== */
 function resetAll() {
   state = {};
   document.getElementById("customer").value = "";
@@ -215,14 +202,12 @@ function resetAll() {
   render();
 }
 
-/* ===== Increment/Decrement ===== */
 function bump(key, delta) {
   state[key] = Math.max(0, (state[key] || 0) + delta);
   save();
   render();
 }
 
-/* ===== Key Format ===== */
 function kSingle(height, width, hand, type) {
   return `${height}_${width}_${hand}_${type}`;
 }
@@ -230,7 +215,6 @@ function kDouble(group, size, hand, type) {
   return `${group}_${size}_${hand}_${type}`;
 }
 
-/* ===== cellButtons Rendering ===== */
 function cellButtons(key) {
   return `
     <div class="btnrow">
@@ -241,7 +225,11 @@ function cellButtons(key) {
   `;
 }
 
-/* ===== Render Singles (6/8, 8/0) ===== */
+
+/* =======================================================
+   =============== RENDER SECTIONS ========================
+   ======================================================= */
+
 function renderSingles(height, widths) {
   let html = `
     <div class="section-title">Door ${height}</div>
@@ -279,7 +267,7 @@ function renderSingles(height, widths) {
   return html;
 }
 
-/* ===== Render Doubles (DBL) ===== */
+
 function renderDoubles(group, sizes) {
   let html = `
     <div class="section-title">${group}</div>
@@ -308,7 +296,7 @@ function renderDoubles(group, sizes) {
   return html;
 }
 
-/* ===== Render T-Astragal Doubles ===== */
+
 function renderTastDoubles(sizes) {
   let html = `
     <div class="section-title">T-Astragal</div>
@@ -346,7 +334,11 @@ function renderTastDoubles(sizes) {
   return html;
 }
 
-/* ===== Generate Summary ===== */
+
+/* =======================================================
+   ================= SUMMARY GENERATION ===================
+   ======================================================= */
+
 function generateSummary() {
   let cust = document.getElementById("customer").value;
   let lot = document.getElementById("lot").value;
@@ -365,16 +357,40 @@ function generateSummary() {
   document.getElementById("summaryText").value = s;
 }
 
-/* ===== Render Entire App ===== */
+
+/* =======================================================
+   ===================== RENDER PAGE ======================
+   ======================================================= */
+
 function render() {
   let root = document.querySelector(".container");
-  let headerSection = root.innerHTML.split("<!-- ================= JS START ================= -->")[0];
-  root.innerHTML = headerSection + '<!-- ================= JS START ================= -->';
 
-  root.insertAdjacentHTML("beforeend", renderSingles("6/8", ["1/6","2/0","2/4","2/6","2/8","3/0"]));
-  root.insertAdjacentHTML("beforeend", renderSingles("8/0", ["1/6","2/0","2/4","2/6","2/8","3/0"]));
-  root.insertAdjacentHTML("beforeend", renderDoubles("DBL", ["3/0","4/0","5/0"]));
-  root.insertAdjacentHTML("beforeend", renderTastDoubles(["3/0","4/0","5/0"]));
+  let content = `
+    <h1>BFS Interior Door Takeoff</h1>
+
+    <label for="customer">Customer:</label>
+    <input type="text" id="customer" placeholder="Enter customer name" value="${document.getElementById("customer")?.value || ''}" />
+
+    <label for="lot">Lot #:</label>
+    <input type="text" id="lot" placeholder="Enter lot number" value="${document.getElementById("lot")?.value || ''}" />
+
+    ${renderSingles("6/8", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
+    ${renderSingles("8/0", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
+    ${renderDoubles("DBL", ["3/0","4/0","5/0"])}
+    ${renderTastDoubles(["3/0","4/0","5/0"])}
+
+    <label for="notes">Notes (field):</label>
+    <textarea id="notes" rows="3">${document.getElementById("notes")?.value || ''}</textarea>
+
+    <button id="generateBtn" class="btn" onclick="generateSummary()">Generate Summary Text</button>
+
+    <label for="summaryText">Summary Text (copy/paste):</label>
+    <textarea id="summaryText" rows="8">${document.getElementById("summaryText")?.value || ''}</textarea>
+
+    <button id="resetBtn" class="btn" onclick="resetAll()">Reset All</button>
+  `;
+
+  root.innerHTML = content;
 }
 
 render();
