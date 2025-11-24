@@ -170,9 +170,7 @@ th.lh-end, td.lh-end {
 <input type="text" id="lot" placeholder="Enter lot number" />
 
 
-<!-- ===== DOOR TABLES WILL BE INSERTED HERE BY JS ===== -->
-
-<!-- THE NOTES & SUMMARY SECTION WILL BE MOVED TO BOTTOM -->
+<!-- ========== DOOR TABLES (JS inserts content here via render()) ========== -->
 
 
 <!-- ================= JS START ================= -->
@@ -335,26 +333,103 @@ function renderTastDoubles(sizes) {
 }
 
 
+/* ===== Pull-Down Stairs ===== */
+function renderPullDownStairs() {
+  return `
+    <div class="section-title">Pull-Down Stairs</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Size</th>
+          <th class="lh-group">Qty</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>22-1/2"</td>
+          <td class="lh-group">${cellButtons("PDS_22.5")}</td>
+        </tr>
+        <tr>
+          <td>25"</td>
+          <td class="lh-group">${cellButtons("PDS_25")}</td>
+        </tr>
+      </tbody>
+    </table>
+  `;
+}
+
+
 /* =======================================================
    ================= SUMMARY GENERATION ===================
    ======================================================= */
 
 function generateSummary() {
-  let cust = document.getElementById("customer").value;
-  let lot = document.getElementById("lot").value;
-  let notes = document.getElementById("notes").value;
+  const cust = document.getElementById("customer").value.trim();
+  const lot  = document.getElementById("lot").value.trim();
+  const notes = document.getElementById("notes").value.trim();
 
-  let s = `Customer: ${cust}\nLot #: ${lot}\n\n`;
+  const sections = {
+    "6/8 Doors": [],
+    "8/0 Doors": [],
+    "DBL Doors": [],
+    "T-Ast Doors": [],
+    "Pull-Down Stairs": []
+  };
 
-  Object.keys(state).forEach(k => {
-    if (state[k] > 0) s += `${k}: ${state[k]}\n`;
+  Object.entries(state).forEach(([key, qty]) => {
+    if (!qty || qty <= 0) return;
+    if (key.startsWith("6/8_")) sections["6/8 Doors"].push([key, qty]);
+    else if (key.startsWith("8/0_")) sections["8/0 Doors"].push([key, qty]);
+    else if (key.startsWith("DBL_")) sections["DBL Doors"].push([key, qty]);
+    else if (key.startsWith("T-Astragal_")) sections["T-Ast Doors"].push([key, qty]);
+    else if (key.startsWith("PDS_")) sections["Pull-Down Stairs"].push([key, qty]);
   });
 
-  if (notes.trim() !== "") {
-    s += `\nNOTES:\n${notes}\n`;
+  const fmtSingles = (key, qty) => {
+    const [height, width, hand, type] = key.split("_");
+    const typeLabel = (type === "unit") ? "Unit" : "Slab";
+    return `${width} ${hand} ${typeLabel}: ${qty}`;
+  };
+
+  const fmtDbl = (key, qty) => {
+    const parts = key.split("_");
+    const group = parts[0];
+    const size  = parts[1];
+    const hand  = parts[2];
+    const type  = parts[3];
+    const typeLabel = (type === "unit") ? "Unit" : "French";
+    if (group === "DBL") return `${size} ${typeLabel}: ${qty}`;
+    return `${size} ${hand} ${typeLabel}: ${qty}`; // T-Astragal
+  };
+
+  const fmtPDS = (key, qty) => {
+    if (key === "PDS_22.5") return `22-1/2": ${qty}`;
+    if (key === "PDS_25") return `25": ${qty}`;
+    return `${key}: ${qty}`;
+  };
+
+  let s = "";
+  if (cust) s += `Customer: ${cust}\n`;
+  if (lot)  s += `Lot #: ${lot}\n`;
+  if (cust || lot) s += "\n";
+
+  Object.entries(sections).forEach(([title, items]) => {
+    if (!items.length) return;
+    s += `${title}\n`;
+    s += `${"-".repeat(title.length)}\n`;
+    items.forEach(([key, qty]) => {
+      if (key.startsWith("6/8_") || key.startsWith("8/0_")) s += fmtSingles(key, qty) + "\n";
+      else if (key.startsWith("DBL_") || key.startsWith("T-Astragal_")) s += fmtDbl(key, qty) + "\n";
+      else if (key.startsWith("PDS_")) s += fmtPDS(key, qty) + "\n";
+    });
+    s += "\n";
+  });
+
+  if (notes) {
+    s += `NOTES\n-----\n${notes}\n`;
   }
 
-  document.getElementById("summaryText").value = s;
+  document.getElementById("summaryText").value = s.trim();
 }
 
 
@@ -376,8 +451,9 @@ function render() {
 
     ${renderSingles("6/8", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
     ${renderSingles("8/0", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
-    ${renderDoubles("DBL", ["3/0","4/0","5/0"])}
-    ${renderTastDoubles(["3/0","4/0","5/0"])}
+    ${renderDoubles("DBL", ["3/0","4/0","4/8","5/0","5/4","6/0"])}
+    ${renderTastDoubles(["3/0","4/0","4/8","5/0","5/4","6/0"])}
+    ${renderPullDownStairs()}
 
     <label for="notes">Notes (field):</label>
     <textarea id="notes" rows="3">${document.getElementById("notes")?.value || ''}</textarea>
