@@ -112,7 +112,8 @@
   }
 
 @media (max-width:600px){
-  .topbar{grid-template-columns:auto 1fr; gap:8px;}
+  .topbar{grid-template-columns:auto 1fr; gap:8px;  th, td{padding:3px 2px;}
+}
 }
 
 /* Sticky table headers while scrolling */
@@ -137,13 +138,46 @@ table thead tr:nth-child(2) th{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  gap:5px;
   flex-wrap:nowrap;
+  white-space:nowrap;
+}
+  flex-wrap:nowrap;
+  white-space:nowrap;
 }
 .btnrow .btn{
-  min-width:34px;
-  min-height:34px;
-  padding:6px 8px;
+  min-width:32px;
+  min-height:32px;
+  padding:4px 6px;
+  font-size:17px;
+  line-height:1;
+.btnrow .qty{
+  display:inline-block;
+  min-width:16px;
+  text-align:center;
+  font-weight:900;
+  font-size:15px;
+  line-height:1;
+  flex:0 0 auto;
+}
+.btnrow .btn{
+  min-width:32px;
+  min-height:32px;
+  padding:4px 6px;
+  font-size:17px;
+  line-height:1;
+  border-radius:7px;
+  box-sizing:border-box;
+  flex:0 0 auto;
+}
+.btnrow .qty{
+  display:inline-block;
+  min-width:16px;
+  text-align:center;
+  font-weight:900;
+  font-size:15px;
+  line-height:1;
+  flex:0 0 auto;
 }
 
 </style>
@@ -310,11 +344,8 @@ function save(){
 
 function bump(key,delta){
   state[key]=Math.max(0,(state[key]||0)+delta);
-  document.getElementById("customer").value="";
-document.getElementById("lot").value="";
-document.getElementById("notes").value="";
-document.getElementById("summaryText").value="";
-save(); render();
+  save();
+  render();
 }
 
 function cellButtons(key){
