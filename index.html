@@ -16,11 +16,13 @@
 
 <style>
   :root{
-    --btn-font: 16px;
-    --btn-pad-y: 8px;
-    --btn-pad-x: 12px;
+--btn-font: 16px;
+    --btn-pad-y: 6px;
+    --btn-pad-x: 8px;
     --cell-pad: 6px;
-    --qty-min: 18px;
+    --qty-min: 16px;
+    --btn-size: 34px;
+
   }
 
   body{
@@ -57,8 +59,8 @@
     border-radius:8px;
     background:#fff;
     line-height:1;
-    min-width:32px;
-    min-height:32px;
+    min-width:var(--btn-size);
+    min-height:var(--btn-size);
     touch-action:manipulation;
   }
   .btn:active{transform:scale(0.98);background:#f0f0f0}
@@ -111,8 +113,6 @@
     .block:last-child{border-bottom:none}
   }
 
-@media (max-width:600px){
-  .topbar{grid-template-columns:auto 1fr; gap:8px;}
 }
 
 /* Sticky table headers while scrolling */
@@ -137,18 +137,22 @@ table thead tr:nth-child(2) th{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  gap:4px;
   flex-wrap:nowrap;
+  white-space:nowrap;
+}
+.btnrow .qty{
+  min-width:var(--qty-min);
+  display:inline-block;
+  font-weight:900;
+  font-size:14px;
+  line-height:1;
+  padding:0 2px;
 }
 .btnrow .btn{
-  min-width:32px;
-  min-height:32px;
-  padding:4px 6px;
-  font-size:17px;
-  line-height:1;
-  border-radius:7px;
-  box-sizing:border-box;
-  flex:0 0 auto;
+  min-width:34px;
+  min-height:34px;
+  padding:6px 8px;
 }
 
 
@@ -183,6 +187,18 @@ table thead tr.subhdr th{
   color: #fff;
   padding: 6px 8px;
   border-radius: 6px 6px 0 0;
+}
+
+@media (max-width: 600px){
+  :root{
+    --btn-size: 30px;
+    --btn-font: 15px;
+    --btn-pad-y: 4px;
+    --btn-pad-x: 6px;
+    --qty-min: 14px;
+    --cell-pad: 4px;
+  }
+  th, td{padding:3px 2px;}
 }
 
 </style>
