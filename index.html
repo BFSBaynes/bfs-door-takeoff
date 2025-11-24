@@ -4,12 +4,15 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <title>Interior Door Takeoff</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 
 <!-- iPhone full-screen / PWA friendly -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Door Takeoff">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0A2E4E">
 
 <style>
   :root{
@@ -128,6 +131,20 @@ table thead tr:nth-child(2) th{
 
 /* Thicker LH/RH divider for singles */
 .thick-divider{border-right:3px solid #000 !important;}
+
+
+.btnrow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:nowrap;
+}
+.btnrow .btn{
+  min-width:34px;
+  min-height:34px;
+  padding:6px 8px;
+}
 
 </style>
 </head>
@@ -303,9 +320,11 @@ save(); render();
 function cellButtons(key){
   const v=state[key]||0;
   return `
-    <button class="btn" onclick="bump('${key}',-1)">−</button>
-    <span class="qty">${v}</span>
-    <button class="btn" onclick="bump('${key}',1)">+</button>
+    <div class="btnrow">
+      <button class="btn" onclick="bump('${key}',-1)">−</button>
+      <span class="qty">${v}</span>
+      <button class="btn" onclick="bump('${key}',1)">+</button>
+    </div>
   `;
 }
 
