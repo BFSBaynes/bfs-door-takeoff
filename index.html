@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Interior Door Takeoff</title>
+
+<!-- iPhone full-screen / PWA friendly -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Door Takeoff">
+<meta name="theme-color" content="#0A2E4E">
+
+<style>
+  :root{
+    --btn-font: 16px;
+    --btn-pad-y: 8px;
+    --btn-pad-x: 12px;
+    --cell-pad: 6px;
+    --qty-min: 18px;
+  }
+
+  body{
+    font-family:system-ui,Arial,sans-serif;
+    margin:0;
+    background:#fff;
+    color:#111;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+             env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .sheet{border:3px solid #000;border-radius:6px;overflow:auto;margin:10px}
+
+  .topbar{
+    display:grid;grid-template-columns:auto 1fr auto 1fr;gap:6px;align-items:center;
+    padding:10px;border-bottom:3px solid #000;background:#f6f6f6;font-weight:800
+  }
+  .topbar input{width:100%;font-size:16px;padding:7px}
+
+  .title{
+    padding:8px;text-align:center;font-size:20px;font-weight:900;border-bottom:3px solid #000
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+  th,td{border:1px solid #444;padding:var(--cell-pad);text-align:center;vertical-align:middle}
+  th:first-child, td:first-child{text-align:left;padding-left:8px}
+  th{background:#e9e9e9;font-weight:900}
+  .subhdr{font-size:12px;background:#f2f2f2;font-weight:900}
+
+  .btn{
+    font-size:var(--btn-font);
+    padding:var(--btn-pad-y) var(--btn-pad-x);
+    border:2px solid #666;
+    border-radius:8px;
+    background:#fff;
+    line-height:1;
+    min-width:40px;
+    min-height:40px;
+    touch-action:manipulation;
+  }
+  .btn:active{transform:scale(0.98);background:#f0f0f0}
+
+  .qty{
+    min-width:var(--qty-min);
+    display:inline-block;
+    font-weight:900;
+    font-size:16px;
+    padding:0 4px;
+  }
+
+  .section{border-top:3px solid #000}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .block{border-right:3px solid #000}
+  .block:last-child{border-right:none}
+
+  .stairs{
+    padding:10px;border-top:3px solid #000;border-bottom:3px solid #000;background:#f6f6f6;
+    font-weight:900;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:15px
+  }
+
+  .notes{padding:10px}
+  textarea{width:100%;height:80px;font-size:14px;padding:8px}
+
+  .summaryWrap{padding:10px;border-top:3px solid #000;background:#fff}
+  #summaryText{width:100%;height:180px;font-size:14px;padding:8px;white-space:pre-wrap}
+
+  .actions{
+    display:flex;gap:10px;flex-wrap:wrap;padding:10px;border-top:3px solid #000;background:#fafafa
+  }
+  .actions button{
+    font-size:15px;padding:10px 12px;border-radius:8px;border:2px solid #666;background:#fff;
+    min-height:44px;  /* iOS recommended tap target */
+  }
+
+  .hint{font-size:12px;color:#666;margin-top:6px}
+
+  /* Sticky header rows for easier field use */
+  thead th{
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  @media (max-width:900px){ table{font-size:13px} }
+  @media (max-width:700px){
+    .grid2{grid-template-columns:1fr}
+    .block{border-right:none;border-bottom:3px solid #000}
+    .block:last-child{border-bottom:none}
+  }
+</style>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="application-name" content="BFS Door Takeoff">
+</head>
+<body>
+<div class="sheet">
+
+  <div class="topbar">
+    <div>Customer:</div><input id="customer" placeholder="Type customer"/>
+    <div>Lot#:</div><input id="lot" placeholder="Type lot #"/>
+  </div>
+  <div class="title">Interior Door Takeoff</div>
+
+  <div class="grid2">
+    <div class="block">
+      <table id="tbl68"></table>
+    </div>
+    <div>
+      <table id="tbl80"></table>
+    </div>
+  </div>
+
+  <div class="grid2 section">
+    <div class="block">
+      <table id="dblTbl"></table>
+    </div>
+    <div>
+      <table id="tastTbl"></table>
+    </div>
+  </div>
+
+  <div class="stairs">
+    <div>Pull-Down Stairs:</div>
+    <div>22-1/2"</div>
+    <button class="btn" onclick="bump('stairs|22.5',-1)">−</button>
+    <span class="qty" id="stairs225">0</span>
+    <button class="btn" onclick="bump('stairs|22.5',1)">+</button>
+
+    <div style="margin-left:6px;">25"</div>
+    <button class="btn" onclick="bump('stairs|25',-1)">−</button>
+    <span class="qty" id="stairs25">0</span>
+    <button class="btn" onclick="bump('stairs|25',1)">+</button>
+  </div>
+
+  <div class="notes">
+    <div style="font-weight:900;margin-bottom:4px;font-size:15px;">NOTES (field):</div>
+    <textarea id="notes" placeholder="Anything special..."></textarea>
+    <div class="hint">Tip: tap “Generate Summary Text”, then copy/paste into your app’s notes.</div>
+  </div>
+
+  <div class="summaryWrap">
+    <div style="font-weight:900;margin-bottom:6px;font-size:15px;">SUMMARY TEXT (copy/paste):</div>
+    <textarea id="summaryText" readonly placeholder="Tap Generate Summary Text..."></textarea>
+    <div class="actions" style="border-top:0;padding:8px 0 0;background:#fff">
+      <button onclick="generateSummary()">Generate Summary Text</button>
+      <button onclick="copySummary()">Copy Summary</button>
+      <button onclick="exportSummaryTXT()">Export Summary (.txt)</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="resetAll()">Reset All</button>
+  </div>
+</div>
+
+<script>
+/*** EASY EDIT SECTION ***/
+const widths = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
+const dblSizes  = ["4/0 DBL","4/8 DBL","5/0 DBL","6/0 DBL"];
+const tastSizes = ["4/0 T-AST","4/8 T-AST","5/0 T-AST","6/0 T-AST"];
+/*** END EASY EDIT SECTION ***/
+
+const stateKey="doorTakeoffStateCompactV7";
+let state = JSON.parse(localStorage.getItem(stateKey)||"{}");
+
+const singleKinds = [
+  {key:"hollow", label:"Hollow core"},
+  {key:"solid",  label:"Solid core"},
+  {key:"slab",   label:"Slab only"}
+];
+
+const doubleKinds = [
+  {key:"hollow", label:"Hollow core"},
+  {key:"solid",  label:"Solid core"},
+  {key:"french", label:"French door"}
+];
+
+function kSingle(height,width,hand,kind){ return `single|${height}|${width}|${hand}|${kind}`; }
+function kSingleJamb(height,width,hand){ return `singlejamb|${height}|${width}|${hand}`; }
+
+function kDouble(group,label,hand,kind){ return `${group}|${label}|${hand}|${kind}`; }
+function kDoubleJamb(group,label,hand){ return `${group}jamb|${label}|${hand}`; }
+
+function ensure(){
+  widths.forEach(w=>{
+    ["6/8","8/0"].forEach(h=>{
+      ["LH","RH"].forEach(hand=>{
+        singleKinds.forEach(k=>{
+          const key=kSingle(h,w,hand,k.key);
+          if(state[key]==null) state[key]=0;
+        });
+        const jambKey=kSingleJamb(h,w,hand);
+        if(state[jambKey]==null) state[jambKey]=0;
+      });
+    });
+  });
+
+  ["double","tast"].forEach(group=>{
+    const labels = group==="double" ? dblSizes : tastSizes;
+    labels.forEach(l=>{
+      ["LH","RH"].forEach(hand=>{
+        doubleKinds.forEach(k=>{
+          const key=kDouble(group,l,hand,k.key);
+          if(state[key]==null) state[key]=0;
+        });
+        const jambKey=kDoubleJamb(group,l,hand);
+        if(state[jambKey]==null) state[jambKey]=0;
+      });
+    });
+  });
+
+  ["stairs|22.5","stairs|25"].forEach(s=>{ if(state[s]==null) state[s]=0; });
+  state.customer ??= "";
+  state.lot ??= "";
+  state.notes ??= "";
+}
+ensure();
+
+function save(){
+  state.customer=document.getElementById("customer").value.trim();
+  state.lot=document.getElementById("lot").value.trim();
+  state.notes=document.getElementById("notes").value;
+  localStorage.setItem(stateKey, JSON.stringify(state));
+}
+
+function bump(key,delta){
+  state[key]=Math.max(0,(state[key]||0)+delta);
+  save(); render();
+}
+
+function cellButtons(key){
+  const v=state[key]||0;
+  return `
+    <button class="btn" onclick="bump('${key}',-1)">−</button>
+    <span class="qty">${v}</span>
+    <button class="btn" onclick="bump('${key}',1)">+</button>
+  `;
+}
+
+function renderSingles(tblId,height){
+  let html=`
+    <thead>
+      <tr>
+        <th style="width:76px;">Door ${height}</th>
+        <th colspan="4">LH</th>
+        <th colspan="4">RH</th>
+      </tr>
+      <tr class="subhdr">
+        <th></th>
+        <th>Hollow</th><th>Solid</th><th>Slab</th><th>6-9/16</th>
+        <th>Hollow</th><th>Solid</th><th>Slab</th><th>6-9/16</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+  widths.forEach(w=>{
+    html+=`<tr><td>${w}</td>`;
+    ["LH","RH"].forEach(hand=>{
+      singleKinds.forEach(k=>{
+        html+=`<td>${cellButtons(kSingle(height,w,hand,k.key))}</td>`;
+      });
+      html+=`<td>${cellButtons(kSingleJamb(height,w,hand))}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody>`;
+  document.getElementById(tblId).innerHTML=html;
+}
+
+function renderDoubles(tblId,labels,group,title){
+  let html=`
+    <thead>
+      <tr>
+        <th style="width:96px;">${title}</th>
+        <th colspan="4">LH</th>
+        <th colspan="4">RH</th>
+      </tr>
+      <tr class="subhdr">
+        <th></th>
+        <th>Hollow</th><th>Solid</th><th>French</th><th>6-9/16</th>
+        <th>Hollow</th><th>Solid</th><th>French</th><th>6-9/16</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+  labels.forEach(l=>{
+    html+=`<tr><td>${l}</td>`;
+    ["LH","RH"].forEach(hand=>{
+      doubleKinds.forEach(k=>{
+        html+=`<td>${cellButtons(kDouble(group,l,hand,k.key))}</td>`;
+      });
+      html+=`<td>${cellButtons(kDoubleJamb(group,l,hand))}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody>`;
+  document.getElementById(tblId).innerHTML=html;
+}
+
+function render(){
+  renderSingles("tbl68","6/8");
+  renderSingles("tbl80","8/0");
+  renderDoubles("dblTbl",dblSizes,"double","Double Doors");
+  renderDoubles("tastTbl",tastSizes,"tast","Double Doors w/ T-Astragal");
+
+  document.getElementById("stairs225").textContent = state["stairs|22.5"]||0;
+  document.getElementById("stairs25").textContent  = state["stairs|25"]||0;
+  document.getElementById("customer").value = state.customer||"";
+  document.getElementById("lot").value = state.lot ||"";
+  document.getElementById("notes").value = state.notes||"";
+}
+render();
+
+document.getElementById("customer").addEventListener("input", save);
+document.getElementById("lot").addEventListener("input", save);
+document.getElementById("notes").addEventListener("input", save);
+
+function resetAll(){
+  if(!confirm("Reset all counts?")) return;
+  Object.keys(state).forEach(k=>{
+    if(k.startsWith("single|")||k.startsWith("double|")||k.startsWith("tast|")||
+       k.startsWith("singlejamb|")||k.startsWith("doublejamb|")||k.startsWith("tastjamb|")||
+       k.startsWith("stairs|"))
+      state[k]=0;
+  });
+  save(); render();
+}
+
+function generateSummary(){
+  save();
+  const cust = state.customer || "Customer";
+  const lot = state.lot || "Lot";
+  let lines = [];
+  lines.push(`INTERIOR DOOR TAKEOFF`);
+  lines.push(`Customer: ${cust}`);
+  lines.push(`Lot#: ${lot}`);
+  lines.push(``);
+
+  ["6/8","8/0"].forEach(h=>{
+    let sectionLines=[];
+    widths.forEach(w=>{
+      ["LH","RH"].forEach(hand=>{
+        let parts=[];
+        singleKinds.forEach(k=>{
+          const q=state[kSingle(h,w,hand,k.key)]||0;
+          if(q>0) parts.push(`${k.label} ${q}`);
+        });
+        const jamb = state[kSingleJamb(h,w,hand)]||0;
+        if(jamb>0) parts.push(`6-9/16 jamb ${jamb}`);
+        if(parts.length){
+          sectionLines.push(`  ${w} ${hand}: ${parts.join(", ")}`);
+        }
+      });
+    });
+    if(sectionLines.length){
+      lines.push(`== Singles ${h} ==`);
+      lines.push(...sectionLines);
+      lines.push(``);
+    }
+  });
+
+  function doubleSummary(group, labels, title){
+    let sectionLines=[];
+    labels.forEach(l=>{
+      ["LH","RH"].forEach(hand=>{
+        let parts=[];
+        doubleKinds.forEach(k=>{
+          const q=state[kDouble(group,l,hand,k.key)]||0;
+          if(q>0) parts.push(`${k.label} ${q}`);
+        });
+        const jamb = state[kDoubleJamb(group,l,hand)]||0;
+        if(jamb>0) parts.push(`6-9/16 jamb ${jamb}`);
+        if(parts.length){
+          sectionLines.push(`  ${l} ${hand}: ${parts.join(", ")}`);
+        }
+      });
+    });
+    if(sectionLines.length){
+      lines.push(`== ${title} ==`);
+      lines.push(...sectionLines);
+      lines.push(``);
+    }
+  }
+  doubleSummary("double", dblSizes, "Double Doors");
+  doubleSummary("tast", tastSizes, "Double Doors w/ T-Astragal");
+
+  const s225=state["stairs|22.5"]||0, s25=state["stairs|25"]||0;
+  if(s225||s25){
+    let stairParts=[];
+    if(s225>0) stairParts.push(`22-1/2" ${s225}`);
+    if(s25>0) stairParts.push(`25" ${s25}`);
+    lines.push(`Pull-Down Stairs: ${stairParts.join(", ")}`);
+    lines.push(``);
+  }
+
+  if(state.notes?.trim()){
+    lines.push(`NOTES:`);
+    lines.push(state.notes.trim());
+  }
+
+  document.getElementById("summaryText").value = lines.join("\n");
+}
+
+function copySummary(){
+  const ta=document.getElementById("summaryText");
+  if(!ta.value.trim()) generateSummary();
+  ta.select();
+  ta.setSelectionRange(0, 999999);
+  document.execCommand("copy");
+}
+
+function exportSummaryTXT(){
+  if(!document.getElementById("summaryText").value.trim()) generateSummary();
+  const text=document.getElementById("summaryText").value;
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const cust=(state.customer||"Customer").replace(/[^a-z0-9-_ ]/gi,"").trim().replace(/\s+/g,"_");
+  const lot=(state.lot||"Lot").replace(/[^a-z0-9-_ ]/gi,"").trim().replace(/\s+/g,"_");
+  const filename=`${cust}_${lot}_InteriorDoorTakeoff.txt`;
+  const a=document.createElement("a");
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js");
+    });
+  }
+</script>
+</body>
+</html>
