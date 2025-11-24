@@ -57,8 +57,8 @@
     border-radius:8px;
     background:#fff;
     line-height:1;
-    min-width:32px;
-    min-height:32px;
+    min-width:40px;
+    min-height:40px;
     touch-action:manipulation;
   }
   .btn:active{transform:scale(0.98);background:#f0f0f0}
@@ -112,8 +112,7 @@
   }
 
 @media (max-width:600px){
-  .topbar{grid-template-columns:auto 1fr; gap:8px;  th, td{padding:3px 2px;}
-}
+  .topbar{grid-template-columns:auto 1fr; gap:8px;}
 }
 
 /* Sticky table headers while scrolling */
@@ -138,46 +137,47 @@ table thead tr:nth-child(2) th{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:5px;
+  gap:6px;
   flex-wrap:nowrap;
-  white-space:nowrap;
-}
-  flex-wrap:nowrap;
-  white-space:nowrap;
 }
 .btnrow .btn{
-  min-width:32px;
-  min-height:32px;
-  padding:4px 6px;
-  font-size:17px;
-  line-height:1;
-.btnrow .qty{
-  display:inline-block;
-  min-width:16px;
-  text-align:center;
-  font-weight:900;
-  font-size:15px;
-  line-height:1;
-  flex:0 0 auto;
+  min-width:34px;
+  min-height:34px;
+  padding:6px 8px;
 }
-.btnrow .btn{
-  min-width:32px;
-  min-height:32px;
-  padding:4px 6px;
-  font-size:17px;
-  line-height:1;
-  border-radius:7px;
-  box-sizing:border-box;
-  flex:0 0 auto;
+
+
+
+/* Narrow first (size) column */
+th.sizecol, td.sizecol { width: 60px; max-width: 60px; }
+
+
+
+/* LH vs RH visual grouping */
+th.lh-group, td.lh-group{ background:#f7fbff; }
+th.rh-group, td.rh-group{ background:#fff9f0; }
+th.lh-end, td.lh-end{ border-right:4px solid #111 !important; }
+
+/* Sticky table headers in each section */
+table thead th{
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
-.btnrow .qty{
-  display:inline-block;
-  min-width:16px;
-  text-align:center;
-  font-weight:900;
-  font-size:15px;
-  line-height:1;
-  flex:0 0 auto;
+table thead tr.subhdr th{
+  top: 32px; /* sits under first header row */
+  z-index: 2;
+}
+
+/* Keep section titles visible when scrolling */
+.section-title{
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: #0A2E4E;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px 6px 0 0;
 }
 
 </style>
@@ -308,23 +308,23 @@ function renderTastDoubles(tblId,labels,group,title){
   let html=`
     <thead>
       <tr>
-        <th style="width:80px;">${title}</th>
+        <th style="width:60px;">${title}</th>
         <th colspan="2" class="lh-end">LH</th>
         <th colspan="2">RH</th>
       </tr>
       <tr class="subhdr">
         <th></th>
-        <th>Unit</th><th class="lh-end">French</th>
-        <th>Unit</th><th>French</th>
+        <th class="lh-group">Unit</th><th class="lh-group lh-end">French</th>
+        <th class="rh-group">Unit</th><th class="rh-group">French</th>
       </tr>
     </thead>
     <tbody>
   `;
   labels.forEach(l=>{
-    html+=`<tr><td>${l}</td>`;
+    html+=`<tr><td class="sizecol">${l}</td>`;
     ["LH","RH"].forEach(hand=>{
       doubleKinds.forEach((k,idx)=>{
-        const cls = (hand==="LH" && idx===1) ? ' class="lh-end"' : "";
+        const cls = (hand==="LH" && idx===1) ? ' class="lh-group lh-end"' : (hand==="LH" ? ' class="lh-group"' : ' class="rh-group"');
         html+=`<td${cls}>${cellButtons(kDouble(group,l,hand,k.key))}</td>`;
       });
     });
@@ -344,8 +344,11 @@ function save(){
 
 function bump(key,delta){
   state[key]=Math.max(0,(state[key]||0)+delta);
-  save();
-  render();
+  document.getElementById("customer").value="";
+document.getElementById("lot").value="";
+document.getElementById("notes").value="";
+document.getElementById("summaryText").value="";
+save(); render();
 }
 
 function cellButtons(key){
@@ -370,7 +373,7 @@ function renderSingles(tblId,height){
       <tr class="subhdr">
         <th></th>
         <th class="thick-divider">Unit</th><th class="thick-divider">Slab</th>
-        <th>Unit</th><th>Slab</th>
+        <th class="rh-group">Unit</th><th class="rh-group">Slab</th>
       </tr>
     </thead>
     <tbody>
@@ -395,18 +398,18 @@ function renderDoubles(tblId,labels,group,title){
   let html=`
     <thead>
       <tr>
-        <th style="width:80px;">${title}</th>
+        <th style="width:60px;">${title}</th>
         <th colspan="2">Counts</th>
       </tr>
       <tr class="subhdr">
         <th></th>
-        <th>Unit</th><th>French</th>
+        <th class="rh-group">Unit</th><th class="rh-group">French</th>
       </tr>
     </thead>
     <tbody>
   `;
   labels.forEach(l=>{
-    html+=`<tr><td>${l}</td>`;
+    html+=`<tr><td class="sizecol">${l}</td>`;
     doubleKinds.forEach(k=>{
       html+=`<td>${cellButtons(kDouble(group,l,"NA",k.key))}</td>`;
     });
@@ -419,8 +422,8 @@ function renderDoubles(tblId,labels,group,title){
 function render(){
   renderSingles("tbl68","6/8");
   renderSingles("tbl80","8/0");
-  renderDoubles("dblTbl",dblSizes,"double","Double Doors");
-  renderTastDoubles("tastTbl",tastSizes,"tast","Double Doors w/ T-Astragal");
+  renderDoubles("dblTbl",dblSizes,"double","DBL");
+  renderTastDoubles("tastTbl",tastSizes,"tast","T-Ast");
 
   document.getElementById("stairs225").textContent = state["stairs|22.5"]||0;
   document.getElementById("stairs25").textContent  = state["stairs|25"]||0;
@@ -498,8 +501,8 @@ function generateSummary(){
     lines.push(``);
   }
 }
-  doubleSummary("double", dblSizes, "Double Doors");
-  doubleSummary("tast", tastSizes, "Double Doors w/ T-Astragal");
+  doubleSummary("double", dblSizes, "DBL");
+  doubleSummary("tast", tastSizes, "T-Ast");
 
   const s225=state["stairs|22.5"]||0, s25=state["stairs|25"]||0;
   if(s225||s25){
