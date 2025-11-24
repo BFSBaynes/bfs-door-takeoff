@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Door Takeoff">
-<meta name="theme-color" content="#0A2E4E">
+<meta name="theme-color" content="#ffffff">
 
 <style>
   :root{
@@ -107,12 +107,29 @@
     .block{border-right:none;border-bottom:3px solid #000}
     .block:last-child{border-bottom:none}
   }
-</style>
 
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="application-name" content="BFS Door Takeoff">
+@media (max-width:600px){
+  .topbar{grid-template-columns:auto 1fr; gap:8px;}
+}
+
+/* Sticky table headers while scrolling */
+table thead tr:nth-child(1) th{
+  position: sticky;
+  top: 0;
+  background: #e9e9e9;
+  z-index: 3;
+}
+table thead tr:nth-child(2) th{
+  position: sticky;
+  top: 32px;
+  background: #f7f7f7;
+  z-index: 2;
+}
+
+/* Thicker LH/RH divider for singles */
+.thick-divider{border-right:3px solid #000 !important;}
+
+</style>
 </head>
 <body>
 <div class="sheet">
@@ -162,7 +179,7 @@
 
   <div class="summaryWrap">
     <div style="font-weight:900;margin-bottom:6px;font-size:15px;">SUMMARY TEXT (copy/paste):</div>
-    <textarea id="summaryText" readonly placeholder="Tap Generate Summary Text..."></textarea>
+    <textarea id="summaryText"  placeholder="Tap Generate Summary Text..."></textarea>
     <div class="actions" style="border-top:0;padding:8px 0 0;background:#fff">
       <button onclick="generateSummary()">Generate Summary Text</button>
       <button onclick="copySummary()">Copy Summary</button>
@@ -186,14 +203,12 @@ const stateKey="doorTakeoffStateCompactV7";
 let state = JSON.parse(localStorage.getItem(stateKey)||"{}");
 
 const singleKinds = [
-  {key:"hollow", label:"Hollow core"},
-  {key:"solid",  label:"Solid core"},
-  {key:"slab",   label:"Slab only"}
+  {key:"unit", label:"Unit"},
+  {key:"slab", label:"Slab only"}
 ];
 
 const doubleKinds = [
-  {key:"hollow", label:"Hollow core"},
-  {key:"solid",  label:"Solid core"},
+  {key:"unit", label:"Unit"},
   {key:"french", label:"French door"}
 ];
 
@@ -238,6 +253,37 @@ function ensure(){
 }
 ensure();
 
+function renderTastDoubles(tblId,labels,group,title){
+  let html=`
+    <thead>
+      <tr>
+        <th style="width:80px;">${title}</th>
+        <th colspan="2" class="lh-end">LH</th>
+        <th colspan="2">RH</th>
+      </tr>
+      <tr class="subhdr">
+        <th></th>
+        <th>Unit</th><th class="lh-end">French</th>
+        <th>Unit</th><th>French</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+  labels.forEach(l=>{
+    html+=`<tr><td>${l}</td>`;
+    ["LH","RH"].forEach(hand=>{
+      doubleKinds.forEach((k,idx)=>{
+        const cls = (hand==="LH" && idx===1) ? ' class="lh-end"' : "";
+        html+=`<td${cls}>${cellButtons(kDouble(group,l,hand,k.key))}</td>`;
+      });
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody>`;
+  document.getElementById(tblId).innerHTML=html;
+}
+
+
 function save(){
   state.customer=document.getElementById("customer").value.trim();
   state.lot=document.getElementById("lot").value.trim();
@@ -247,7 +293,11 @@ function save(){
 
 function bump(key,delta){
   state[key]=Math.max(0,(state[key]||0)+delta);
-  save(); render();
+  document.getElementById("customer").value="";
+document.getElementById("lot").value="";
+document.getElementById("notes").value="";
+document.getElementById("summaryText").value="";
+save(); render();
 }
 
 function cellButtons(key){
@@ -263,25 +313,27 @@ function renderSingles(tblId,height){
   let html=`
     <thead>
       <tr>
-        <th style="width:76px;">Door ${height}</th>
-        <th colspan="4">LH</th>
-        <th colspan="4">RH</th>
+        <th style="width:60px;">Door ${height}</th>
+        <th colspan="2">LH</th>
+        <th colspan="2">RH</th>
       </tr>
       <tr class="subhdr">
         <th></th>
-        <th>Hollow</th><th>Solid</th><th>Slab</th><th>6-9/16</th>
-        <th>Hollow</th><th>Solid</th><th>Slab</th><th>6-9/16</th>
+        <th class="thick-divider">Unit</th><th class="thick-divider">Slab</th>
+        <th>Unit</th><th>Slab</th>
       </tr>
     </thead>
     <tbody>
   `;
   widths.forEach(w=>{
     html+=`<tr><td>${w}</td>`;
-    ["LH","RH"].forEach(hand=>{
-      singleKinds.forEach(k=>{
-        html+=`<td>${cellButtons(kSingle(height,w,hand,k.key))}</td>`;
-      });
-      html+=`<td>${cellButtons(kSingleJamb(height,w,hand))}</td>`;
+    // LH
+    singleKinds.forEach(k=>{
+      html+=`<td class="thick-divider">${cellButtons(kSingle(height,w,"LH",k.key))}</td>`;
+    });
+    // RH
+    singleKinds.forEach(k=>{
+      html+=`<td>${cellButtons(kSingle(height,w,"RH",k.key))}</td>`;
     });
     html+=`</tr>`;
   });
@@ -293,25 +345,20 @@ function renderDoubles(tblId,labels,group,title){
   let html=`
     <thead>
       <tr>
-        <th style="width:96px;">${title}</th>
-        <th colspan="4">LH</th>
-        <th colspan="4">RH</th>
+        <th style="width:80px;">${title}</th>
+        <th colspan="2">Counts</th>
       </tr>
       <tr class="subhdr">
         <th></th>
-        <th>Hollow</th><th>Solid</th><th>French</th><th>6-9/16</th>
-        <th>Hollow</th><th>Solid</th><th>French</th><th>6-9/16</th>
+        <th>Unit</th><th>French</th>
       </tr>
     </thead>
     <tbody>
   `;
   labels.forEach(l=>{
     html+=`<tr><td>${l}</td>`;
-    ["LH","RH"].forEach(hand=>{
-      doubleKinds.forEach(k=>{
-        html+=`<td>${cellButtons(kDouble(group,l,hand,k.key))}</td>`;
-      });
-      html+=`<td>${cellButtons(kDoubleJamb(group,l,hand))}</td>`;
+    doubleKinds.forEach(k=>{
+      html+=`<td>${cellButtons(kDouble(group,l,"NA",k.key))}</td>`;
     });
     html+=`</tr>`;
   });
@@ -323,7 +370,7 @@ function render(){
   renderSingles("tbl68","6/8");
   renderSingles("tbl80","8/0");
   renderDoubles("dblTbl",dblSizes,"double","Double Doors");
-  renderDoubles("tastTbl",tastSizes,"tast","Double Doors w/ T-Astragal");
+  renderTastDoubles("tastTbl",tastSizes,"tast","Double Doors w/ T-Astragal");
 
   document.getElementById("stairs225").textContent = state["stairs|22.5"]||0;
   document.getElementById("stairs25").textContent  = state["stairs|25"]||0;
@@ -345,7 +392,11 @@ function resetAll(){
        k.startsWith("stairs|"))
       state[k]=0;
   });
-  save(); render();
+  document.getElementById("customer").value="";
+document.getElementById("lot").value="";
+document.getElementById("notes").value="";
+document.getElementById("summaryText").value="";
+save(); render();
 }
 
 function generateSummary(){
@@ -367,8 +418,6 @@ function generateSummary(){
           const q=state[kSingle(h,w,hand,k.key)]||0;
           if(q>0) parts.push(`${k.label} ${q}`);
         });
-        const jamb = state[kSingleJamb(h,w,hand)]||0;
-        if(jamb>0) parts.push(`6-9/16 jamb ${jamb}`);
         if(parts.length){
           sectionLines.push(`  ${w} ${hand}: ${parts.join(", ")}`);
         }
@@ -382,27 +431,23 @@ function generateSummary(){
   });
 
   function doubleSummary(group, labels, title){
-    let sectionLines=[];
-    labels.forEach(l=>{
-      ["LH","RH"].forEach(hand=>{
-        let parts=[];
-        doubleKinds.forEach(k=>{
-          const q=state[kDouble(group,l,hand,k.key)]||0;
-          if(q>0) parts.push(`${k.label} ${q}`);
-        });
-        const jamb = state[kDoubleJamb(group,l,hand)]||0;
-        if(jamb>0) parts.push(`6-9/16 jamb ${jamb}`);
-        if(parts.length){
-          sectionLines.push(`  ${l} ${hand}: ${parts.join(", ")}`);
-        }
-      });
+  let sectionLines=[];
+  labels.forEach(l=>{
+    let parts=[];
+    doubleKinds.forEach(k=>{
+      const q=state[kDouble(group,l,"NA",k.key)]||0;
+      if(q>0) parts.push(`${k.label} ${q}`);
     });
-    if(sectionLines.length){
-      lines.push(`== ${title} ==`);
-      lines.push(...sectionLines);
-      lines.push(``);
+    if(parts.length){
+      sectionLines.push(`  ${l}: ${parts.join(", ")}`);
     }
+  });
+  if(sectionLines.length){
+    lines.push(`== ${title} ==`);
+    lines.push(...sectionLines);
+    lines.push(``);
   }
+}
   doubleSummary("double", dblSizes, "Double Doors");
   doubleSummary("tast", tastSizes, "Double Doors w/ T-Astragal");
 
@@ -443,13 +488,6 @@ function exportSummaryTXT(){
   a.href=url; a.download=filename; a.click();
   URL.revokeObjectURL(url);
 }
-</script>
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./service-worker.js");
-    });
-  }
 </script>
 </body>
 </html>
