@@ -170,10 +170,9 @@ th.lh-end, td.lh-end {
 <input type="text" id="lot" placeholder="Enter lot number" />
 
 
-<!-- ========== DOOR TABLES (JS inserts content here via render()) ========== -->
-
-
-<!-- ================= JS START ================= -->
+<!-- ============================================================
+     JS START — This will insert all door tables + bottom section
+     ============================================================ -->
 <script>
 
 /* =======================================================
@@ -359,8 +358,12 @@ function renderPullDownStairs() {
 }
 
 
+
+
+
+
 /* =======================================================
-   ================= SUMMARY GENERATION ===================
+   ========== SUMMARY GENERATION WITH SORTING =============
    ======================================================= */
 
 function generateSummary() {
@@ -385,6 +388,35 @@ function generateSummary() {
     else if (key.startsWith("PDS_")) sections["Pull-Down Stairs"].push([key, qty]);
   });
 
+  const sizeOrderSingles = ["1/6","2/0","2/4","2/6","2/8","3/0"];
+  const handOrder = ["LH","RH"];
+  const typeOrderSingles = ["unit","slab"];
+
+  const sizeOrderDoubles = ["3/0","4/0","4/8","5/0","5/4","6/0"];
+  const typeOrderDoubles = ["unit","french"];
+
+  function sortSingles(a,b){
+    const [ha,wa,handA,typeA] = a[0].split("_");
+    const [hb,wb,handB,typeB] = b[0].split("_");
+    return (
+      sizeOrderSingles.indexOf(wa) - sizeOrderSingles.indexOf(wb) ||
+      handOrder.indexOf(handA) - handOrder.indexOf(handB) ||
+      typeOrderSingles.indexOf(typeA) - typeOrderSingles.indexOf(typeB)
+    );
+  }
+
+  function sortDoubles(a,b,withHand){
+    const pa=a[0].split("_"), pb=b[0].split("_");
+    const sizeA=pa[1], sizeB=pb[1];
+    const handA=pa[2], handB=pb[2];
+    const typeA=pa[3], typeB=pb[3];
+    return (
+      sizeOrderDoubles.indexOf(sizeA) - sizeOrderDoubles.indexOf(sizeB) ||
+      (withHand ? handOrder.indexOf(handA) - handOrder.indexOf(handB) : 0) ||
+      typeOrderDoubles.indexOf(typeA) - typeOrderDoubles.indexOf(typeB)
+    );
+  }
+
   const fmtSingles = (key, qty) => {
     const [height, width, hand, type] = key.split("_");
     const typeLabel = (type === "unit") ? "Unit" : "Slab";
@@ -399,7 +431,7 @@ function generateSummary() {
     const type  = parts[3];
     const typeLabel = (type === "unit") ? "Unit" : "French";
     if (group === "DBL") return `${size} ${typeLabel}: ${qty}`;
-    return `${size} ${hand} ${typeLabel}: ${qty}`; // T-Astragal
+    return `${size} ${hand} ${typeLabel}: ${qty}`;
   };
 
   const fmtPDS = (key, qty) => {
@@ -415,6 +447,15 @@ function generateSummary() {
 
   Object.entries(sections).forEach(([title, items]) => {
     if (!items.length) return;
+
+    if (title === "6/8 Doors" || title === "8/0 Doors") {
+      items.sort(sortSingles);
+    } else if (title === "DBL Doors") {
+      items.sort((a,b)=>sortDoubles(a,b,false));
+    } else if (title === "T-Ast Doors") {
+      items.sort((a,b)=>sortDoubles(a,b,true));
+    }
+
     s += `${title}\n`;
     s += `${"-".repeat(title.length)}\n`;
     items.forEach(([key, qty]) => {
@@ -433,21 +474,57 @@ function generateSummary() {
 }
 
 
+
+/* =======================================================
+   ================= COPY SUMMARY BUTTON ==================
+   ======================================================= */
+
+function copySummary(){
+  const ta = document.getElementById("summaryText");
+  const text = ta.value || "";
+
+  if(!text.trim()){
+    alert("Summary text is empty.");
+    return;
+  }
+
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+
+  navigator.clipboard?.writeText(text).then(()=>{
+    alert("Summary copied to clipboard!");
+  }).catch(()=>{
+    try{
+      document.execCommand("copy");
+      alert("Summary copied to clipboard!");
+    }catch(e){
+      alert("Copy failed. Please press and hold to copy manually.");
+    }
+  });
+}
+
+
+
+
 /* =======================================================
    ===================== RENDER PAGE ======================
    ======================================================= */
 
 function render() {
+
   let root = document.querySelector(".container");
 
   let content = `
     <h1>BFS Interior Door Takeoff</h1>
 
     <label for="customer">Customer:</label>
-    <input type="text" id="customer" placeholder="Enter customer name" value="${document.getElementById("customer")?.value || ''}" />
+    <input type="text" id="customer" placeholder="Enter customer name"
+      value="${document.getElementById("customer")?.value || ''}" />
 
     <label for="lot">Lot #:</label>
-    <input type="text" id="lot" placeholder="Enter lot number" value="${document.getElementById("lot")?.value || ''}" />
+    <input type="text" id="lot" placeholder="Enter lot number"
+      value="${document.getElementById("lot")?.value || ''}" />
 
     ${renderSingles("6/8", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
     ${renderSingles("8/0", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
@@ -462,6 +539,8 @@ function render() {
 
     <label for="summaryText">Summary Text (copy/paste):</label>
     <textarea id="summaryText" rows="8">${document.getElementById("summaryText")?.value || ''}</textarea>
+
+    <button id="copyBtn" class="btn" onclick="copySummary()">Copy Summary Text</button>
 
     <button id="resetBtn" class="btn" onclick="resetAll()">Reset All</button>
   `;
