@@ -158,6 +158,17 @@ th.lh-end, td.lh-end {
   border-top: 1px solid #ccc;
 }
 
+/* Bottom button row for Generate + Copy side by side */
+.bottom-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0 14px 0;
+}
+.bottom-button-row .btn {
+  flex: 1 1 150px;
+}
+
 @media (max-width: 600px) {
   :root {
     --btn-size: 30px;
@@ -373,17 +384,8 @@ function renderPullDownStairs() {
 
 
 /* =======================================================
-   ========== SUMMARY GENERATION WITH SORTING =============
+   ========= SUMMARY GENERATION WITH SORTING ==============
    ======================================================= */
-
-function cleanEncodedText(raw) {
-  if (!raw) return "";
-  // Fix common URL encodings just in case something upstream encoded it
-  return raw
-    .replace(/%0A/gi, "\n")
-    .replace(/%20/g, " ")
-    .replace(/%23/g, "#");
-}
 
 function generateSummary() {
   const cust  = document.getElementById("customer").value.trim();
@@ -407,12 +409,12 @@ function generateSummary() {
     else if (key.startsWith("PDS_")) sections["Pull-Down Stairs"].push([key, qty]);
   });
 
-  const sizeOrderSingles   = ["1/6","2/0","2/4","2/6","2/8","3/0"];
-  const handOrder          = ["LH","RH"];
-  const typeOrderSingles   = ["unit","slab"];
+  const sizeOrderSingles = ["1/6","2/0","2/4","2/6","2/8","3/0"];
+  const handOrder        = ["LH","RH"];
+  const typeOrderSingles = ["unit","slab"];
 
-  const sizeOrderDoubles   = ["3/0","4/0","4/8","5/0","5/4","6/0"];
-  const typeOrderDoubles   = ["unit","french"];
+  const sizeOrderDoubles = ["3/0","4/0","4/8","5/0","5/4","6/0"];
+  const typeOrderDoubles = ["unit","french"];
 
   function sortSingles(a,b) {
     const [ha,wa,handA,typeA] = a[0].split("_");
@@ -486,19 +488,44 @@ function generateSummary() {
         s += fmtPDS(key, qty) + "\n";
       }
     });
-    s += "\n"; // blank line between sections (your choice 3A)
+    s += "\n"; // blank line between sections
   });
 
   if (notes) {
     s += `NOTES\n-----\n${notes}\n`;
   }
 
-  // Clean any encoded bits just in case
-  const cleaned = cleanEncodedText(s.trim());
-
   const ta = document.getElementById("summaryText");
-  ta.value = cleaned;
+  ta.value = s.trim();
   fixSafariTextarea();
+}
+
+
+/* =======================================================
+   ======= AGGRESSIVE DECODE FOR %xx ENCODINGS ===========
+   ======================================================= */
+
+function fullyDecodePercentText(str) {
+  if (!str) return "";
+
+  // Try decoding the whole string as URI first
+  try {
+    const decoded = decodeURIComponent(str);
+    if (decoded && decoded.indexOf("\uFFFD") === -1) {
+      return decoded;
+    }
+  } catch (e) {
+    // fall through if it fails
+  }
+
+  // Fallback: decode each %NN sequence individually
+  return str.replace(/%[0-9A-Fa-f]{2}/g, (match) => {
+    try {
+      return decodeURIComponent(match);
+    } catch {
+      return "";
+    }
+  });
 }
 
 
@@ -515,21 +542,14 @@ function copySummary() {
     return;
   }
 
-  // If it still looks URL-encoded (%20, %0A, etc), decode it
-  if (/%[0-9A-Fa-f]{2}/.test(text)) {
-    try {
-      const decoded = decodeURIComponent(text);
-      if (decoded && decoded.indexOf("\uFFFD") === -1) {
-        text = decoded;
-      }
-    } catch (e) {
-      // if decoding fails, keep original
-    }
-  }
+  // HARD CLEAN: remove URL-style encodings
+  text = fullyDecodePercentText(text);
+  // Strip any remaining %NN patterns just in case
+  text = text.replace(/%[0-9A-Fa-f]{2}/g, "");
 
-  // Ensure textarea reflects the clean version
+  // Update textarea so you see the clean version
   ta.value = text;
-  fixSafariTextarea();
+  ta.textContent = text;
 
   // iOS-safe selection
   ta.focus();
@@ -565,7 +585,7 @@ function copySummary() {
 function fixSafariTextarea() {
   const ta = document.getElementById("summaryText");
   if (!ta) return;
-  // Force the internal text node to match .value so Safari treats it as plain text
+  // Force text node = value so Safari treats it as plain text
   ta.textContent = ta.value;
 }
 
@@ -600,19 +620,18 @@ function render() {
     <label for="notes">Notes (field):</label>
     <textarea id="notes" rows="3">${document.getElementById("notes")?.value || ''}</textarea>
 
-    <button id="generateBtn" class="btn" onclick="generateSummary()">Generate Summary Text</button>
+    <div class="bottom-button-row">
+      <button id="generateBtn" class="btn" onclick="generateSummary()">Generate Summary</button>
+      <button id="copyBtn" class="btn" onclick="copySummary()">Copy Summary</button>
+    </div>
 
     <label for="summaryText">Summary Text (copy/paste):</label>
     <textarea id="summaryText" rows="8">${document.getElementById("summaryText")?.value || ''}</textarea>
-
-    <button id="copyBtn" class="btn" onclick="copySummary()">Copy Summary Text</button>
 
     <button id="resetBtn" class="btn" onclick="resetAll()">Reset All</button>
   `;
 
   root.innerHTML = content;
-
-  // Make sure textarea is always plain text (for Safari)
   fixSafariTextarea();
 }
 
