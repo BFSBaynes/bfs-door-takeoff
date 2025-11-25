@@ -497,96 +497,28 @@ function generateSummary() {
 
   const ta = document.getElementById("summaryText");
   ta.value = s.trim();
-  fixSafariTextarea();
 }
 
 
 /* =======================================================
-   ======= AGGRESSIVE DECODE FOR %xx ENCODINGS ===========
-   ======================================================= */
-
-function fullyDecodePercentText(str) {
-  if (!str) return "";
-
-  // Try decoding the whole string as URI first
-  try {
-    const decoded = decodeURIComponent(str);
-    if (decoded && decoded.indexOf("\uFFFD") === -1) {
-      return decoded;
-    }
-  } catch (e) {
-    // fall through if it fails
-  }
-
-  // Fallback: decode each %NN sequence individually
-  return str.replace(/%[0-9A-Fa-f]{2}/g, (match) => {
-    try {
-      return decodeURIComponent(match);
-    } catch {
-      return "";
-    }
-  });
-}
-
-
-/* =======================================================
-   ================= COPY SUMMARY BUTTON ==================
+   ============== COPY SUMMARY (SELECT ONLY) =============
    ======================================================= */
 
 function copySummary() {
   const ta = document.getElementById("summaryText");
-  let text = ta.value || "";
+  const text = ta.value || "";
 
   if (!text.trim()) {
     alert("Summary text is empty.");
     return;
   }
 
-  // HARD CLEAN: remove URL-style encodings
-  text = fullyDecodePercentText(text);
-  // Strip any remaining %NN patterns just in case
-  text = text.replace(/%[0-9A-Fa-f]{2}/g, "");
-
-  // Update textarea so you see the clean version
-  ta.value = text;
-  ta.textContent = text;
-
-  // iOS-safe selection
+  // Just select the text and let the user press Copy
   ta.focus();
   ta.select();
   ta.setSelectionRange(0, text.length);
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Summary copied to clipboard!");
-    }).catch(() => {
-      try {
-        document.execCommand("copy");
-        alert("Summary copied to clipboard!");
-      } catch (e) {
-        alert("Copy failed. Please press and hold to copy manually.");
-      }
-    });
-  } else {
-    try {
-      document.execCommand("copy");
-      alert("Summary copied to clipboard!");
-    } catch (e) {
-      alert("Copy failed. Please press and hold to copy manually.");
-    }
-  }
-}
-
-
-/* =======================================================
-   ============= SAFARI / TEXTAREA HELPERS ===============
-   ======================================================= */
-
-function fixSafariTextarea() {
-  const ta = document.getElementById("summaryText");
-  if (!ta) return;
-  // Force text node = value so Safari treats it as plain text
-  ta.textContent = ta.value;
+  alert("Summary selected. Tap 'Copy' on your phone, then paste into your text/app.");
 }
 
 
@@ -632,7 +564,6 @@ function render() {
   `;
 
   root.innerHTML = content;
-  fixSafariTextarea();
 }
 
 render();
