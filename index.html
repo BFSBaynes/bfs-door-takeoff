@@ -144,6 +144,13 @@ th.lh-end, td.lh-end {
   border-right: 4px solid #111 !important;
 }
 
+/* Bottom divider */
+.bottom-divider {
+  margin: 20px 0 10px 0;
+  border: 0;
+  border-top: 1px solid #ccc;
+}
+
 @media (max-width: 600px) {
   :root {
     --btn-size: 30px;
@@ -358,10 +365,6 @@ function renderPullDownStairs() {
 }
 
 
-
-
-
-
 /* =======================================================
    ========== SUMMARY GENERATION WITH SORTING =============
    ======================================================= */
@@ -474,37 +477,59 @@ function generateSummary() {
 }
 
 
-
 /* =======================================================
    ================= COPY SUMMARY BUTTON ==================
    ======================================================= */
 
 function copySummary(){
   const ta = document.getElementById("summaryText");
-  const text = ta.value || "";
+  let text = ta.value || "";
 
-  if(!text.trim()){
+  if (!text.trim()) {
     alert("Summary text is empty.");
     return;
   }
 
+  // If it looks URL-encoded (%20, %0A, etc), try to decode it first
+  if (/%[0-9A-Fa-f]{2}/.test(text)) {
+    try {
+      const decoded = decodeURIComponent(text);
+      if (decoded && decoded.indexOf("\uFFFD") === -1) {
+        text = decoded;
+      }
+    } catch (e) {
+      // if decoding fails, keep original
+    }
+  }
+
+  // Update textarea so you see the clean version
+  ta.value = text;
+
+  // iOS-safe selection
   ta.focus();
   ta.select();
   ta.setSelectionRange(0, text.length);
 
-  navigator.clipboard?.writeText(text).then(()=>{
-    alert("Summary copied to clipboard!");
-  }).catch(()=>{
-    try{
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Summary copied to clipboard!");
+    }).catch(() => {
+      try {
+        document.execCommand("copy");
+        alert("Summary copied to clipboard!");
+      } catch (e) {
+        alert("Copy failed. Please press and hold to copy manually.");
+      }
+    });
+  } else {
+    try {
       document.execCommand("copy");
       alert("Summary copied to clipboard!");
-    }catch(e){
+    } catch (e) {
       alert("Copy failed. Please press and hold to copy manually.");
     }
-  });
+  }
 }
-
-
 
 
 /* =======================================================
@@ -531,6 +556,8 @@ function render() {
     ${renderDoubles("DBL", ["3/0","4/0","4/8","5/0","5/4","6/0"])}
     ${renderTastDoubles(["3/0","4/0","4/8","5/0","5/4","6/0"])}
     ${renderPullDownStairs()}
+
+    <hr class="bottom-divider" />
 
     <label for="notes">Notes (field):</label>
     <textarea id="notes" rows="3">${document.getElementById("notes")?.value || ''}</textarea>
