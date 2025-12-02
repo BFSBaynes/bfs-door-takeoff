@@ -31,7 +31,7 @@ body {
 }
 
 /* ===== Headings ===== */
-h1, h2, h3 {
+h1 {
   margin-bottom: 16px;
   font-weight: 700;
   color: #003366;
@@ -85,13 +85,13 @@ th, td {
 /* Sticky column headers adjusted for sticky section title */
 table thead th {
   position: sticky;
-  top: 32px;         /* below section title */
+  top: 32px;  
   z-index: 3;
   background: #fafafa;
 }
 table .subhdr th {
   position: sticky;
-  top: 60px;         /* second header row */
+  top: 60px;
   z-index: 2;
   background: #f0f0f0;
 }
@@ -132,7 +132,7 @@ table .subhdr th {
   min-width: var(--qty-min);
 }
 
-/* Reset button */
+/* Reset btn */
 #resetBtn {
   background: #cc0000;
 }
@@ -151,14 +151,14 @@ th.lh-end, td.lh-end {
   border-right: 4px solid #111 !important;
 }
 
-/* Bottom divider before notes/summary */
+/* Bottom divider */
 .bottom-divider {
   margin: 20px 0 10px 0;
   border: 0;
   border-top: 1px solid #ccc;
 }
 
-/* Bottom button row for Generate + Copy side by side */
+/* Bottom button row */
 .bottom-button-row {
   display: flex;
   flex-wrap: wrap;
@@ -187,7 +187,6 @@ th.lh-end, td.lh-end {
 
 <h1>BFS Interior Door Takeoff</h1>
 
-<!-- ===== TOP SECTION — Customer & Lot ONLY ===== -->
 <label for="customer">Customer:</label>
 <input type="text" id="customer" placeholder="Enter customer name" />
 
@@ -195,23 +194,20 @@ th.lh-end, td.lh-end {
 <input type="text" id="lot" placeholder="Enter lot number" />
 
 
-<!-- ============================================================
-     JS START — This will insert all door tables + bottom section
-     ============================================================ -->
 <script>
 
-/* =======================================================
-   =============== STATE MANAGEMENT ======================
-   ======================================================= */
+/* =========================================================
+   State Management
+   ========================================================= */
 
 let state = {};
-if (localStorage.getItem('BFSdoorState')) {
-  try { state = JSON.parse(localStorage.getItem('BFSdoorState')); }
-  catch(e) { state = {}; }
+if (localStorage.getItem("BFSdoorState")) {
+  try { state = JSON.parse(localStorage.getItem("BFSdoorState")); }
+  catch { state = {}; }
 }
 
 function save() {
-  localStorage.setItem('BFSdoorState', JSON.stringify(state));
+  localStorage.setItem("BFSdoorState", JSON.stringify(state));
 }
 
 function resetAll() {
@@ -230,12 +226,8 @@ function bump(key, delta) {
   render();
 }
 
-function kSingle(height, width, hand, type) {
-  return `${height}_${width}_${hand}_${type}`;
-}
-function kDouble(group, size, hand, type) {
-  return `${group}_${size}_${hand}_${type}`;
-}
+function kSingle(h, w, hand, type) { return `${h}_${w}_${hand}_${type}`; }
+function kDouble(group, size, hand, type) { return `${group}_${size}_${hand}_${type}`; }
 
 function cellButtons(key) {
   return `
@@ -248,9 +240,9 @@ function cellButtons(key) {
 }
 
 
-/* =======================================================
-   =============== RENDER SECTIONS ========================
-   ======================================================= */
+/* =========================================================
+   Render Sections
+   ========================================================= */
 
 function renderSingles(height, widths) {
   let html = `
@@ -272,23 +264,20 @@ function renderSingles(height, widths) {
       </thead>
       <tbody>
   `;
-
-  widths.forEach(w => {
-    html += `
+  widths.forEach(w=>{
+    html+=`
       <tr>
         <td>${w}</td>
-        <td class="lh-group lh-end">${cellButtons(kSingle(height, w, "LH", "unit"))}</td>
-        <td class="lh-group lh-end">${cellButtons(kSingle(height, w, "LH", "slab"))}</td>
-        <td class="rh-group">${cellButtons(kSingle(height, w, "RH", "unit"))}</td>
-        <td class="rh-group">${cellButtons(kSingle(height, w, "RH", "slab"))}</td>
+        <td class="lh-group lh-end">${cellButtons(kSingle(height,w,"LH","unit"))}</td>
+        <td class="lh-group lh-end">${cellButtons(kSingle(height,w,"LH","slab"))}</td>
+        <td class="rh-group">${cellButtons(kSingle(height,w,"RH","unit"))}</td>
+        <td class="rh-group">${cellButtons(kSingle(height,w,"RH","slab"))}</td>
       </tr>
     `;
   });
-
-  html += `</tbody></table>`;
+  html+=`</tbody></table>`;
   return html;
 }
-
 
 function renderDoubles(group, sizes) {
   let html = `
@@ -303,21 +292,18 @@ function renderDoubles(group, sizes) {
       </thead>
       <tbody>
   `;
-
-  sizes.forEach(size => {
-    html += `
+  sizes.forEach(size=>{
+    html+=`
       <tr>
         <td>${size}</td>
-        <td class="lh-group">${cellButtons(kDouble(group, size, "NA", "unit"))}</td>
-        <td class="rh-group">${cellButtons(kDouble(group, size, "NA", "french"))}</td>
+        <td class="lh-group">${cellButtons(kDouble(group,size,"NA","unit"))}</td>
+        <td class="rh-group">${cellButtons(kDouble(group,size,"NA","french"))}</td>
       </tr>
     `;
   });
-
-  html += `</tbody></table>`;
+  html+=`</tbody></table>`;
   return html;
 }
-
 
 function renderTastDoubles(sizes) {
   let html = `
@@ -339,25 +325,21 @@ function renderTastDoubles(sizes) {
       </thead>
       <tbody>
   `;
-
-  sizes.forEach(size => {
-    html += `
+  sizes.forEach(size=>{
+    html+=`
       <tr>
         <td>${size}</td>
-        <td class="lh-group lh-end">${cellButtons(kDouble("T-Astragal", size, "LH", "unit"))}</td>
-        <td class="lh-group lh-end">${cellButtons(kDouble("T-Astragal", size, "LH", "french"))}</td>
-        <td class="rh-group">${cellButtons(kDouble("T-Astragal", size, "RH", "unit"))}</td>
-        <td class="rh-group">${cellButtons(kDouble("T-Astragal", size, "RH", "french"))}</td>
+        <td class="lh-group lh-end">${cellButtons(kDouble("T-Astragal",size,"LH","unit"))}</td>
+        <td class="lh-group lh-end">${cellButtons(kDouble("T-Astragal",size,"LH","french"))}</td>
+        <td class="rh-group">${cellButtons(kDouble("T-Astragal",size,"RH","unit"))}</td>
+        <td class="rh-group">${cellButtons(kDouble("T-Astragal",size,"RH","french"))}</td>
       </tr>
     `;
   });
-
-  html += `</tbody></table>`;
+  html+=`</tbody></table>`;
   return html;
 }
 
-
-/* ===== Pull-Down Stairs ===== */
 function renderPullDownStairs() {
   return `
     <div class="section-title">Pull-Down Stairs</div>
@@ -369,188 +351,164 @@ function renderPullDownStairs() {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>22-1/2"</td>
-          <td class="lh-group">${cellButtons("PDS_22.5")}</td>
-        </tr>
-        <tr>
-          <td>25"</td>
-          <td class="lh-group">${cellButtons("PDS_25")}</td>
-        </tr>
+        <tr><td>22-1/2"</td><td class="lh-group">${cellButtons("PDS_22.5")}</td></tr>
+        <tr><td>25"</td><td class="lh-group">${cellButtons("PDS_25")}</td></tr>
       </tbody>
     </table>
   `;
 }
 
 
-/* =======================================================
-   ========= SUMMARY GENERATION WITH SORTING ==============
-   ======================================================= */
+/* =========================================================
+   Summary Generation
+   ========================================================= */
 
-function generateSummary() {
-  const cust  = document.getElementById("customer").value.trim();
-  const lot   = document.getElementById("lot").value.trim();
-  const notes = document.getElementById("notes").value.trim();
+function generateSummary(){
+  const cust=document.getElementById("customer").value.trim();
+  const lot=document.getElementById("lot").value.trim();
+  const notes=document.getElementById("notes").value.trim();
 
-  const sections = {
-    "6/8 Doors": [],
-    "8/0 Doors": [],
-    "DBL Doors": [],
-    "T-Ast Doors": [],
-    "Pull-Down Stairs": []
+  const sections={
+    "6/8 Doors":[],
+    "8/0 Doors":[],
+    "DBL Doors":[],
+    "T-Ast Doors":[],
+    "Pull-Down Stairs":[]
   };
 
-  Object.entries(state).forEach(([key, qty]) => {
-    if (!qty || qty <= 0) return;
-    if (key.startsWith("6/8_")) sections["6/8 Doors"].push([key, qty]);
-    else if (key.startsWith("8/0_")) sections["8/0 Doors"].push([key, qty]);
-    else if (key.startsWith("DBL_")) sections["DBL Doors"].push([key, qty]);
-    else if (key.startsWith("T-Astragal_")) sections["T-Ast Doors"].push([key, qty]);
-    else if (key.startsWith("PDS_")) sections["Pull-Down Stairs"].push([key, qty]);
+  Object.entries(state).forEach(([k,v])=>{
+    if(!v||v<=0)return;
+    if(k.startsWith("6/8_"))sections["6/8 Doors"].push([k,v]);
+    else if(k.startsWith("8/0_"))sections["8/0 Doors"].push([k,v]);
+    else if(k.startsWith("DBL_"))sections["DBL Doors"].push([k,v]);
+    else if(k.startsWith("T-Astragal_"))sections["T-Ast Doors"].push([k,v]);
+    else if(k.startsWith("PDS_"))sections["Pull-Down Stairs"].push([k,v]);
   });
 
-  const sizeOrderSingles = ["1/6","2/0","2/4","2/6","2/8","3/0"];
-  const handOrder        = ["LH","RH"];
-  const typeOrderSingles = ["unit","slab"];
+  const sizeOrderSingles=["1/6","2/0","2/4","2/6","2/8","3/0"];
+  const handOrder=["LH","RH"];
+  const typeOrderSingles=["unit","slab"];
 
-  const sizeOrderDoubles = ["3/0","4/0","4/8","5/0","5/4","6/0"];
-  const typeOrderDoubles = ["unit","french"];
+  const sizeOrderDoubles=["3/0","4/0","4/8","5/0","5/4","6/0"];
+  const typeOrderDoubles=["unit","french"];
 
-  function sortSingles(a,b) {
-    const [ha,wa,handA,typeA] = a[0].split("_");
-    const [hb,wb,handB,typeB] = b[0].split("_");
-    return (
-      sizeOrderSingles.indexOf(wa) - sizeOrderSingles.indexOf(wb) ||
-      handOrder.indexOf(handA) - handOrder.indexOf(handB) ||
-      typeOrderSingles.indexOf(typeA) - typeOrderSingles.indexOf(typeB)
-    );
+  function sortSingles(a,b){
+    const [ha,wa,ha2,ta]=a[0].split("_");
+    const [hb,wb,hb2,tb]=b[0].split("_");
+    return sizeOrderSingles.indexOf(wa)-sizeOrderSingles.indexOf(wb)
+       || handOrder.indexOf(ha2)-handOrder.indexOf(hb2)
+       || typeOrderSingles.indexOf(ta)-typeOrderSingles.indexOf(tb);
   }
 
-  function sortDoubles(a,b,withHand) {
-    const pa = a[0].split("_"), pb = b[0].split("_");
-    const sizeA = pa[1], sizeB = pb[1];
-    const handA = pa[2], handB = pb[2];
-    const typeA = pa[3], typeB = pb[3];
-    return (
-      sizeOrderDoubles.indexOf(sizeA) - sizeOrderDoubles.indexOf(sizeB) ||
-      (withHand ? handOrder.indexOf(handA) - handOrder.indexOf(handB) : 0) ||
-      typeOrderDoubles.indexOf(typeA) - typeOrderDoubles.indexOf(typeB)
-    );
+  function sortDoubles(a,b,withHand){
+    const pa=a[0].split("_");
+    const pb=b[0].split("_");
+    const sA=pa[1], sB=pb[1];
+    const hA=pa[2], hB=pb[2];
+    const tA=pa[3], tB=pb[3];
+
+    return sizeOrderDoubles.indexOf(sA)-sizeOrderDoubles.indexOf(sB)
+      || (withHand?handOrder.indexOf(hA)-handOrder.indexOf(hB):0)
+      || typeOrderDoubles.indexOf(tA)-typeOrderDoubles.indexOf(tB);
   }
 
-  const fmtSingles = (key, qty) => {
-    const [height, width, hand, type] = key.split("_");
-    const typeLabel = (type === "unit") ? "Unit" : "Slab";
-    return `${width} ${hand} ${typeLabel}: ${qty}`;
+  const fmtSingles=(k,q)=>{
+    const [,w,h,t]=k.split("_");
+    return `${w} ${h} ${t==="unit"?"Unit":"Slab"}: ${q}`;
   };
 
-  const fmtDbl = (key, qty) => {
-    const parts = key.split("_");
-    const group = parts[0];
-    const size  = parts[1];
-    const hand  = parts[2];
-    const type  = parts[3];
-    const typeLabel = (type === "unit") ? "Unit" : "French";
-    if (group === "DBL") return `${size} ${typeLabel}: ${qty}`;
-    return `${size} ${hand} ${typeLabel}: ${qty}`;
+  const fmtDbl=(k,q)=>{
+    const p=k.split("_");
+    const group=p[0], size=p[1], hand=p[2], t=p[3];
+    const label=t==="unit"?"Unit":"French";
+    if(group==="DBL")return `${size} ${label}: ${q}`;
+    return `${size} ${hand} ${label}: ${q}`;
   };
 
-  const fmtPDS = (key, qty) => {
-    if (key === "PDS_22.5") return `22-1/2": ${qty}`;
-    if (key === "PDS_25")  return `25": ${qty}`;
-    return `${key}: ${qty}`;
+  const fmtPDS=(k,q)=>{
+    if(k==="PDS_22.5")return `22-1/2": ${q}`;
+    if(k==="PDS_25")return `25": ${q}`;
+    return `${k}: ${q}`;
   };
 
-  let s = "";
-  if (cust) s += `Customer: ${cust}\n`;
-  if (lot)  s += `Lot #: ${lot}\n`;
-  if (cust || lot) s += "\n";
+  let s="";
+  if(cust)s+=`Customer: ${cust}\n`;
+  if(lot)s+=`Lot #: ${lot}\n`;
+  if(cust||lot)s+="\n";
 
-  Object.entries(sections).forEach(([title, items]) => {
-    if (!items.length) return;
+  Object.entries(sections).forEach(([title,items])=>{
+    if(!items.length)return;
 
-    if (title === "6/8 Doors" || title === "8/0 Doors") {
-      items.sort(sortSingles);
-    } else if (title === "DBL Doors") {
-      items.sort((a,b)=>sortDoubles(a,b,false));
-    } else if (title === "T-Ast Doors") {
-      items.sort((a,b)=>sortDoubles(a,b,true));
-    }
+    if(title==="6/8 Doors"||title==="8/0 Doors")items.sort(sortSingles);
+    else if(title==="DBL Doors")items.sort((a,b)=>sortDoubles(a,b,false));
+    else if(title==="T-Ast Doors")items.sort((a,b)=>sortDoubles(a,b,true));
 
-    s += `${title}\n`;
-    s += `${"-".repeat(title.length)}\n`;
-    items.forEach(([key, qty]) => {
-      if (key.startsWith("6/8_") || key.startsWith("8/0_")) {
-        s += fmtSingles(key, qty) + "\n";
-      } else if (key.startsWith("DBL_") || key.startsWith("T-Astragal_")) {
-        s += fmtDbl(key, qty) + "\n";
-      } else if (key.startsWith("PDS_")) {
-        s += fmtPDS(key, qty) + "\n";
-      }
+    s+=`${title}\n${"-".repeat(title.length)}\n`;
+    items.forEach(([k,q])=>{
+      if(k.startsWith("6/8_")||k.startsWith("8/0_"))s+=fmtSingles(k,q)+"\n";
+      else if(k.startsWith("DBL_")||k.startsWith("T-Astragal_"))s+=fmtDbl(k,q)+"\n";
+      else if(k.startsWith("PDS_"))s+=fmtPDS(k,q)+"\n";
     });
-    s += "\n"; // blank line between sections
+    s+="\n";
   });
 
-  if (notes) {
-    s += `NOTES\n-----\n${notes}\n`;
+  if(notes){
+    s+=`NOTES\n-----\n${notes}\n`;
   }
 
-  const ta = document.getElementById("summaryText");
-  ta.value = s.trim();
+  document.getElementById("summaryText").value=s.trim();
 }
 
 
-/* =======================================================
-   ============== COPY SUMMARY (SELECT ONLY) =============
-   ======================================================= */
+/* =========================================================
+   New iPhone Safe Copy (SELECT ONLY)
+   ========================================================= */
 
-function copySummary() {
-  const ta = document.getElementById("summaryText");
-  const text = ta.value || "";
+function copySummary(){
+  const ta=document.getElementById("summaryText");
+  const text=ta.value||"";
 
-  if (!text.trim()) {
+  if(!text.trim()){
     alert("Summary text is empty.");
     return;
   }
 
-  // Just select the text and let the user press Copy
   ta.focus();
-  ta.select();
-  ta.setSelectionRange(0, text.length);
 
-  alert("Summary selected. Tap 'Copy' on your phone, then paste into your text/app.");
+  setTimeout(()=>{
+    ta.select();
+    ta.setSelectionRange(0,text.length);
+    alert("Summary selected. Tap 'Copy' in the popup, then paste it where you need.");
+  },0);
 }
 
 
-/* =======================================================
-   ===================== RENDER PAGE ======================
-   ======================================================= */
+/* =========================================================
+   Render Entire Page
+   ========================================================= */
 
-function render() {
+function render(){
+  const root=document.querySelector(".container");
 
-  let root = document.querySelector(".container");
-
-  let content = `
+  let content=`
     <h1>BFS Interior Door Takeoff</h1>
 
     <label for="customer">Customer:</label>
-    <input type="text" id="customer" placeholder="Enter customer name"
-      value="${document.getElementById("customer")?.value || ''}" />
+    <input type="text" id="customer" value="${document.getElementById("customer")?.value||""}" />
 
     <label for="lot">Lot #:</label>
-    <input type="text" id="lot" placeholder="Enter lot number"
-      value="${document.getElementById("lot")?.value || ''}" />
+    <input type="text" id="lot" value="${document.getElementById("lot")?.value||""}" />
 
-    ${renderSingles("6/8", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
-    ${renderSingles("8/0", ["1/6","2/0","2/4","2/6","2/8","3/0"])}
-    ${renderDoubles("DBL", ["3/0","4/0","4/8","5/0","5/4","6/0"])}
+    ${renderSingles("6/8",["1/6","2/0","2/4","2/6","2/8","3/0"])}
+    ${renderSingles("8/0",["1/6","2/0","2/4","2/6","2/8","3/0"])}
+    ${renderDoubles("DBL",["3/0","4/0","4/8","5/0","5/4","6/0"])}
     ${renderTastDoubles(["3/0","4/0","4/8","5/0","5/4","6/0"])}
     ${renderPullDownStairs()}
 
     <hr class="bottom-divider" />
 
     <label for="notes">Notes (field):</label>
-    <textarea id="notes" rows="3">${document.getElementById("notes")?.value || ''}</textarea>
+    <textarea id="notes" rows="3">${document.getElementById("notes")?.value||""}</textarea>
 
     <div class="bottom-button-row">
       <button id="generateBtn" class="btn" onclick="generateSummary()">Generate Summary</button>
@@ -558,12 +516,12 @@ function render() {
     </div>
 
     <label for="summaryText">Summary Text (copy/paste):</label>
-    <textarea id="summaryText" rows="8">${document.getElementById("summaryText")?.value || ''}</textarea>
+    <textarea id="summaryText" rows="8">${document.getElementById("summaryText")?.value||""}</textarea>
 
     <button id="resetBtn" class="btn" onclick="resetAll()">Reset All</button>
   `;
 
-  root.innerHTML = content;
+  root.innerHTML=content;
 }
 
 render();
