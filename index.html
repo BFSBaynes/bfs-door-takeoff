@@ -461,25 +461,42 @@ function generateSummary(){
 
 
 /* =========================================================
-   New iPhone Safe Copy (SELECT ONLY)
+   Copy Summary – automatic copy, no popup
    ========================================================= */
 
 function copySummary(){
-  const ta=document.getElementById("summaryText");
-  const text=ta.value||"";
+  const ta = document.getElementById("summaryText");
+  const text = ta.value || "";
 
-  if(!text.trim()){
-    alert("Summary text is empty.");
+  if (!text.trim()) {
+    // nothing to copy
     return;
   }
 
+  // focus first so iOS knows the active element
   ta.focus();
 
-  setTimeout(()=>{
+  // let the browser finish focusing, then select + copy
+  setTimeout(() => {
     ta.select();
-    ta.setSelectionRange(0,text.length);
-    alert("Summary selected. Tap 'Copy' in the popup, then paste it where you need.");
-  },0);
+    ta.setSelectionRange(0, text.length);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {
+        try {
+          document.execCommand("copy");
+        } catch (e) {
+          // worst case: user can still tap "Copy" manually
+        }
+      });
+    } else {
+      try {
+        document.execCommand("copy");
+      } catch (e) {
+        // fallback: user taps Copy manually
+      }
+    }
+  }, 0);
 }
 
 
