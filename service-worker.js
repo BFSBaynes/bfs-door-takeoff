@@ -1,4 +1,4 @@
-const CACHE_NAME = "door-takeoff-v83"; // Bumped to 56
+const CACHE_NAME = "door-takeoff-v84"; // Bumped to 56
 const ASSETS = [
   "./",
   "./index.html",
