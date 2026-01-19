@@ -10,24 +10,46 @@
     :root{ --navy:#0A2E4E; --bg:#f4f7f9; --cardRadius:12px; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; }
     body{ margin:0; background: var(--bg); padding: 10px; padding-bottom: 40px; }
+    
+    /* Header Styles */
     .header-card { background:#fff; border-radius: var(--cardRadius); padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { color: var(--navy); margin: 0 0 15px 0; font-size: 24px; text-align: center; font-weight: 800; }
     label { font-weight: 700; font-size: 13px; color: #666; display: block; margin-bottom: 4px; }
     input, textarea { width:100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 12px; outline: none; }
-    .section-title { background: var(--navy); color: #fff; padding: 12px; font-weight: 700; margin: 10px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    
+    /* Sticky Section Headers */
+    .section-title { 
+      background: var(--navy); 
+      color: #fff; 
+      padding: 12px; 
+      font-weight: 700; 
+      margin: 10px 0; 
+      position: -webkit-sticky; 
+      position: sticky; 
+      top: 0; 
+      z-index: 100; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    }
+    
+    /* Door Row Layout */
     .door-row { background: #fff; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .size-label { font-weight: 800; font-size: 16px; width: 45px; flex-shrink: 0; color: var(--navy); }
     .controls-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; flex-grow: 1; }
+    
+    /* Counter Styles */
     .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px; border: 1px solid #eee; border-radius: 8px; }
     .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: #888; text-align: center; }
     .btn-wrap { display: flex; align-items: center; gap: 4px; }
     .btn { width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; touch-action: manipulation; }
     .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; }
+    
+    /* Action Buttons */
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
     .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
     .primary { background: var(--navy); color: white; }
     .secondary { background: #e2e8f0; color: var(--navy); }
-    #summary { background: #fff; height: 200px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid #eee; }
+    #summary { background: #fff; height: 220px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid #eee; }
+    .version-tag { text-align:center; color:#ccc; font-size:10px; margin-top:20px; }
   </style>
 </head>
 <body>
@@ -36,8 +58,10 @@
   <h1>Elevate Trim</h1>
   <label>Customer</label>
   <input id="customer" type="text" placeholder="e.g. Pulte">
+  
   <label>Subdivision</label>
   <input id="subdivision" type="text" placeholder="e.g. Huxley">
+
   <label>Lot #</label>
   <input id="lot" type="text" placeholder="e.g. 140">
 </div>
@@ -50,10 +74,13 @@
     <button class="actionBtn secondary" onclick="copySummary()">Copy to Clipboard</button>
   </div>
   <textarea id="summary" readonly placeholder="Final summary for AppWright..."></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all?')) location.reload()">Reset All</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
+<div class="version-tag">Version 1.0.56 - Huxley Sorting Fix</div>
+
 <script>
+  // Strictly defined size arrays to control sorting order
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const state = {};
@@ -66,20 +93,29 @@
   function renderSection(title, prefix, sizes, types) {
     let html = `<div class="section-title">${title}</div>`;
     sizes.forEach(size => {
-      html += `<div class="door-row"><div class="size-label">${size}</div><div class="controls-grid">`;
+      html += `<div class="door-row">
+        <div class="size-label">${size}</div>
+        <div class="controls-grid">`;
+      
       types.forEach(type => {
         let key = `${prefix}-${size}-${type}`;
-        html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">
-          <button class="btn" onclick="update('${key}', -1)">-</button>
-          <span class="qty" id="qty-${key}">0</span>
-          <button class="btn" onclick="update('${key}', 1)">+</button>
-        </div></div>`;
+        html += `
+          <div class="counter-box">
+            <label>${type}</label>
+            <div class="btn-wrap">
+              <button class="btn" onclick="update('${key}', -1)">-</button>
+              <span class="qty" id="qty-${key}">0</span>
+              <button class="btn" onclick="update('${key}', 1)">+</button>
+            </div>
+          </div>`;
       });
+      
       html += `</div></div>`;
     });
     return html;
   }
 
+  // Render the interface
   document.getElementById('app-content').innerHTML = 
     renderSection("6/8 Doors", "68", doorSizes, ["LH", "RH", "SLAB"]) +
     renderSection("8/0 Doors", "80", doorSizes, ["LH", "RH", "SLAB"]) +
@@ -89,9 +125,11 @@
     const cust = document.getElementById('customer').value;
     const sub = document.getElementById('subdivision').value;
     const lot = document.getElementById('lot').value;
+    
     let output = `TAKEOFF: ${cust} ${sub} ${lot}\n------------------\n`;
     let entries = [];
     
+    // Explicitly process sections and sizes in the correct sequence
     const sections = [
       { prefix: "68", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
       { prefix: "80", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
@@ -122,11 +160,11 @@
     alert("Copied for AppWright!");
   }
 
-  // Register the Service Worker for Offline Mode
+  // Register Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log("Offline Mode Active"))
-      .catch((err) => console.error("Offline Mode Failed", err));
+      .then(() => console.log("Service Worker Active"))
+      .catch((err) => console.log("Service Worker Failed", err));
   }
 </script>
 </body>
