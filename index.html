@@ -8,29 +8,68 @@
   <title>Elevate Trim - BFS</title>
   <style>
     :root{ --navy:#0A2E4E; --bg:#f4f7f9; --cardRadius:12px; }
-    *{ box-sizing:border-box; font-family: -apple-system, sans-serif; }
+    *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
     body{ margin:0; background: var(--bg); padding: 10px; padding-bottom: 40px; }
-    .header-card { background:#fff; border-radius: var(--cardRadius); padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    
+    /* Global Card Style for "Visual Polish" */
+    .header-card, .door-row { 
+      background:#fff; 
+      border-radius: var(--cardRadius); 
+      padding: 15px; 
+      margin-bottom: 10px; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05); 
+      border: 1px solid #e2e8f0;
+    }
+    
     h1 { color: var(--navy); margin: 0 0 15px 0; font-size: 24px; text-align: center; font-weight: 800; }
-    label { font-weight: 700; font-size: 13px; color: #666; display: block; margin-bottom: 4px; }
-    input, textarea { width:100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 12px; outline: none; }
-    .section-title { background: var(--navy); color: #fff; padding: 12px; font-weight: 700; margin: 10px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .door-row { background: #fff; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .size-label { font-weight: 800; font-size: 14px; width: 75px; flex-shrink: 0; color: var(--navy); }
-    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 6px; flex-grow: 1; }
-    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px; border: 1px solid #eee; border-radius: 8px; }
-    .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: #888; text-align: center; }
-    .btn-wrap { display: flex; align-items: center; gap: 4px; }
-    .btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; touch-action: manipulation; }
-    .qty { font-weight: 800; font-size: 14px; min-width: 12px; text-align: center; }
-    .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .clear-link { font-size: 11px; color: #b91c1c; text-decoration: none; font-weight: 700; }
+    label { font-weight: 700; font-size: 13px; color: #64748b; display: block; margin-bottom: 4px; text-transform: uppercase; }
+    
+    input, textarea { width:100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; margin-bottom: 12px; outline: none; }
+    
+    .section-title { 
+      background: var(--navy); 
+      color: #fff; 
+      padding: 14px; 
+      font-weight: 700; 
+      margin: 20px -10px 12px -10px; 
+      position: sticky; 
+      top: 0; 
+      z-index: 100; 
+    }
+
+    .door-row { display: flex; align-items: center; gap: 12px; }
+    .size-label { font-weight: 800; font-size: 15px; width: 85px; flex-shrink: 0; color: var(--navy); }
+    
+    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; flex-grow: 1; }
+    
+    .counter-box { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      background: #f8fafc; 
+      padding: 6px; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 10px; 
+    }
+    .counter-box label { font-size: 10px; margin-bottom: 6px; color: #94a3b8; }
+    
+    .btn-wrap { display: flex; align-items: center; gap: 8px; }
+    .btn { 
+      width: 32px; height: 32px; 
+      border-radius: 50%; border: 0; 
+      background: var(--navy); color: white; 
+      font-weight: bold; font-size: 18px; 
+      cursor: pointer; touch-action: manipulation; 
+    }
+    .qty { font-weight: 800; font-size: 16px; min-width: 20px; text-align: center; color: var(--navy); }
+    
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
+    .actionBtn { padding: 16px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
     .primary { background: var(--navy); color: white; }
     .secondary { background: #e2e8f0; color: var(--navy); }
-    #summary { background: #fff; height: 220px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid #eee; }
-    .version-tag { text-align:center; color:#ccc; font-size:10px; margin-top:20px; }
+    
+    #summary { background: #fff; height: 250px; margin-top: 10px; font-family: monospace; font-size: 14px; border: 2px solid #e2e8f0; width:100%; padding:10px; }
+    .version-tag { text-align:center; color:#94a3b8; font-size:11px; margin-top:30px; }
   </style>
 </head>
 <body>
@@ -39,30 +78,27 @@
   <h1>Elevate Trim</h1>
   <label>Customer</label>
   <input id="customer" type="text" placeholder="e.g. Pulte">
-  <label>Subdivision</label>
-  <input id="subdivision" type="text" placeholder="e.g. Huxley">
-  <label>Lot #</label>
-  <input id="lot" type="text" placeholder="e.g. 104">
+  <label>Subdivision/Lot</label>
+  <div style="display:flex; gap:10px;">
+    <input id="subdivision" type="text" placeholder="Huxley" style="flex:2;">
+    <input id="lot" type="text" placeholder="104" style="flex:1;">
+  </div>
 </div>
 
 <div id="app-content"></div>
 
 <div class="header-card" style="margin-top:20px;">
-  <div class="notes-header">
-    <label style="margin-bottom: 0;">Special Notes</label>
-    <a href="#" class="clear-link" onclick="document.getElementById('notes').value=''; return false;">Clear Notes</a>
-  </div>
-  <textarea id="notes" style="height: 80px;" placeholder="e.g. Deliver to back porch..."></textarea>
-  
+  <label>Special Notes</label>
+  <textarea id="notes" style="height: 80px;" placeholder="e.g. Stair parts in garage..."></textarea>
   <div class="actions">
     <button class="actionBtn primary" onclick="generateSummary()">Generate Takeoff</button>
     <button class="actionBtn secondary" onclick="copySummary()">Copy to Clipboard</button>
   </div>
-  <textarea id="summary" readonly placeholder="Final summary for AppWright..."></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
+  <textarea id="summary" readonly></textarea>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.65 - Smooth Rail Fix</div>
+<div class="version-tag">Version 1.0.66 - Global Polish & Rail Fix</div>
 
 <script>
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
@@ -72,168 +108,83 @@
   
   const state = {};
 
+  // FIXED: Explicitly targeting IDs for the UI update
   function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
-    const el = document.getElementById(`qty-${key}`);
-    if(el) { el.innerText = state[key]; }
+    const display = document.getElementById(`qty-${key}`);
+    if (display) display.innerText = state[key];
   }
 
-  function toggleFT(key) {
-    state[key] = !state[key];
-  }
-
-  function renderSection(title, prefix, sizes, types) {
-    let html = `<div class="section-title">${title}</div>`;
-    sizes.forEach(size => {
-      html += `<div class="door-row">
-        <div class="size-label">${size}</div>
-        <div class="controls-grid">`;
-      types.forEach(type => {
-        let key = `${prefix}-${size}-${type}`;
-        html += `<div class="counter-box"><label>${type}</label>
-          <div class="btn-wrap">
-            <button class="btn" onclick="update('${key}', -1)">-</button>
-            <span class="qty" id="qty-${key}">0</span>
-            <button class="btn" onclick="update('${key}', 1)">+</button>
-          </div>
-        </div>`;
-      });
-      html += `</div></div>`;
-    });
-    return html;
-  }
-
-  function renderAttic(sizes) {
-    let html = `<div class="section-title">Attic Access</div>`;
-    sizes.forEach(size => {
-      html += `<div class="door-row">
-        <div class="size-label">${size}</div>
-        <div class="controls-grid">
-          <div class="counter-box"><label>QTY</label>
-            <div class="btn-wrap">
-              <button class="btn" onclick="update('AA-${size}-QTY', -1)">-</button>
-              <span class="qty" id="qty-AA-${size}-QTY">0</span>
-              <button class="btn" onclick="update('AA-${size}-QTY', 1)">+</button>
-            </div>
-          </div>
-          <div class="counter-box"><label>FT</label>
-            <input type="checkbox" style="width:20px;height:20px;" onchange="toggleFT('AA-${size}-FT')">
-          </div>
+  function renderRow(label, prefix, types) {
+    let html = `<div class="door-row">
+      <div class="size-label">${label}</div>
+      <div class="controls-grid">`;
+    types.forEach(type => {
+      let key = `${prefix}-${type}`;
+      html += `<div class="counter-box">
+        <label>${type}</label>
+        <div class="btn-wrap">
+          <button class="btn" onclick="update('${key}', -1)">-</button>
+          <span class="qty" id="qty-${key}">0</span>
+          <button class="btn" onclick="update('${key}', 1)">+</button>
         </div>
       </div>`;
     });
+    html += `</div></div>`;
     return html;
   }
 
-  let mainHtml = renderSection("6/8 Doors", "68", doorSizes, ["LH", "RH", "SLAB"]) +
-                 renderSection("8/0 Doors", "80", doorSizes, ["LH", "RH", "SLAB"]) +
-                 renderSection("Double Doors", "DBL", dblSizes, ["DBL", "T-AST", "FRENCH"]) +
-                 renderAttic(atticSizes);
+  let contentHtml = `<div class="section-title">6/8 Doors</div>`;
+  doorSizes.forEach(s => contentHtml += renderRow(s, `68-${s}`, ["LH", "RH", "SLAB"]));
 
-  // Smooth Stair Section
-  mainHtml += `<div class="section-title">Stair / Rail</div>`;
-  mainHtml += renderSection("Handrail", "HR", railLengths, ["OPEN", "WALL"]);
-  
-  // Custom Parts Grid
-  const parts = ["Newels", "Balusters", "Rosettes", "Brackets"];
-  parts.forEach(item => {
-    mainHtml += `<div class="door-row">
-      <div class="size-label">${item}</div>
-      <div class="controls-grid">
-        <div class="counter-box" style="background:#f8fafc;"><label>QTY</label>
-          <div class="btn-wrap">
-            <button class="btn" onclick="update('ST-${item}', -1)">-</button>
-            <span class="qty" id="qty-ST-${item}">0</span>
-            <button class="btn" onclick="update('ST-${item}', 1)">+</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  });
+  contentHtml += `<div class="section-title">8/0 Doors</div>`;
+  doorSizes.forEach(s => contentHtml += renderRow(s, `80-${s}`, ["LH", "RH", "SLAB"]));
 
-  // Shoes
-  mainHtml += `<div class="door-row">
-    <div class="size-label">Shoes</div>
-    <div class="controls-grid">
-      <div class="counter-box" style="background:#f8fafc;"><label>FLAT</label>
-        <div class="btn-wrap">
-          <button class="btn" onclick="update('ST-Shoes-Flat', -1)">-</button>
-          <span class="qty" id="qty-ST-Shoes-Flat">0</span>
-          <button class="btn" onclick="update('ST-Shoes-Flat', 1)">+</button>
-        </div>
-      </div>
-      <div class="counter-box" style="background:#f8fafc;"><label>ANGLED</label>
-        <div class="btn-wrap">
-          <button class="btn" onclick="update('ST-Shoes-Angle', -1)">-</button>
-          <span class="qty" id="qty-ST-Shoes-Angle">0</span>
-          <button class="btn" onclick="update('ST-Shoes-Angle', 1)">+</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
+  contentHtml += `<div class="section-title">Double Doors</div>`;
+  dblSizes.forEach(s => contentHtml += renderRow(s, `DBL-${s}`, ["DBL", "T-AST"]));
 
-  document.getElementById('app-content').innerHTML = mainHtml;
+  contentHtml += `<div class="section-title">Attic Access</div>`;
+  atticSizes.forEach(s => contentHtml += renderRow(s, `AA-${s}`, ["QTY"]));
+
+  contentHtml += `<div class="section-title">Handrail (Open vs Wall)</div>`;
+  railLengths.forEach(s => contentHtml += renderRow(s, `HR-${s}`, ["OPEN", "WALL"]));
+
+  contentHtml += `<div class="section-title">Stair Hardware & Parts</div>`;
+  contentHtml += renderRow("Posts", "ST", ["Newels", "Rosettes", "Brackets"]);
+  contentHtml += renderRow("Balusters", "ST", ["Balusters"]);
+  contentHtml += renderRow("Shoes", "ST-Shoes", ["FLAT", "ANGLE"]);
+
+  document.getElementById('app-content').innerHTML = contentHtml;
 
   function generateSummary() {
-    const cust = document.getElementById('customer').value;
-    const sub = document.getElementById('subdivision').value;
-    const lot = document.getElementById('lot').value;
-    const notes = document.getElementById('notes').value;
-    let output = `TAKEOFF: ${cust} ${sub} ${lot}\n------------------\n`;
-    let entries = [];
-    
-    // Doors
-    const sections = [
-      { prefix: "68", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
-      { prefix: "80", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
-      { prefix: "DBL", sizes: dblSizes, types: ["DBL", "T-AST", "FRENCH"] }
-    ];
-    sections.forEach(sec => {
-      sec.sizes.forEach(size => {
-        sec.types.forEach(type => {
-          let key = `${sec.prefix}-${size}-${type}`;
-          if (state[key] > 0) entries.push(`${size}${(sec.prefix === "80") ? " 8/0" : ""} ${type} - ${state[key]}`);
-        });
-      });
-    });
+    let out = `TAKEOFF: ${document.getElementById('customer').value} ${document.getElementById('subdivision').value} ${document.getElementById('lot').value}\n------------------\n`;
+    let items = [];
 
-    // Attic
-    atticSizes.forEach(size => {
-      if (state[`AA-${size}-QTY`] > 0) {
-        entries.push(`${size}${state[`AA-${size}-FT`] ? ' FT' : ''} - ${state[`AA-${size}-QTY`]}`);
+    // All logic keys are now standardized prefix-type
+    Object.keys(state).forEach(key => {
+      if (state[key] > 0) {
+        let parts = key.split('-');
+        let display = "";
+        if(key.startsWith('HR')) display = `${parts[1]} ${parts[2]} Rail`;
+        else if(key.startsWith('68')) display = `${parts[1]} 6/8 ${parts[2]}`;
+        else if(key.startsWith('80')) display = `${parts[1]} 8/0 ${parts[2]}`;
+        else if(key.startsWith('ST-Shoes')) display = `Shoes (${parts[2]})`;
+        else display = `${parts[1]} ${parts[2] || ""}`;
+        
+        items.push(`${display} - ${state[key]}`);
       }
     });
 
-    // Railing
-    railLengths.forEach(len => {
-      if (state[`HR-${len}-OPEN`] > 0) entries.push(`${len} Open Rail - ${state[`HR-${len}-OPEN`]}`);
-      if (state[`HR-${len}-WALL`] > 0) entries.push(`${len} Wall Rail - ${state[`HR-${len}-WALL`]}`);
-    });
-
-    // Parts
-    ["Newels", "Balusters", "Rosettes", "Brackets"].forEach(p => {
-      if (state[`ST-${p}`] > 0) entries.push(`${p} - ${state[`ST-${p}`]}`);
-    });
-    if (state['ST-Shoes-Flat'] > 0) entries.push(`Shoes (Flat) - ${state['ST-Shoes-Flat']}`);
-    if (state['ST-Shoes-Angle'] > 0) entries.push(`Shoes (Angled) - ${state['ST-Shoes-Angle']}`);
-    
-    output += entries.length > 0 ? entries.join("\n") : "No items selected.";
-    if (notes.trim() !== "") output += `\n------------------\nNOTES: ${notes}`;
-    document.getElementById('summary').value = output;
+    out += items.length ? items.join("\n") : "No items selected.";
+    if (document.getElementById('notes').value) out += `\n------------------\nNOTES: ${document.getElementById('notes').value}`;
+    document.getElementById('summary').value = out;
   }
 
   function copySummary() {
     const ta = document.getElementById("summary");
     ta.select();
-    ta.setSelectionRange(0, 99999);
     document.execCommand("copy");
-    alert("Copied for AppWright!");
-  }
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log("Service Worker Active"))
-      .catch((err) => console.log("Service Worker Failed", err));
+    alert("Copied!");
   }
 </script>
 </body>
