@@ -3,179 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Elevate Trim - BFS Takeoff</title>
+  <title>Elevate Trim - BFS</title>
   <style>
     :root{
       --navy:#0A2E4E;
-      --navy2:#123C66;
-      --border:#d7d7d7;
-      --text:#111;
       --bg:#f4f7f9;
-      --lhTint:#EAF2FF;
-      --rhTint:#FFF2D9;
-      --btnSize:36px;
-      --cardRadius:16px;
-      --shadow: 0 4px 12px rgba(0,0,0,.1);
+      --cardRadius:12px;
     }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; }
-    body{ margin:0; background: var(--bg); padding: 10px; padding-bottom: 50px; }
-    .card{ background:#fff; border-radius: var(--cardRadius); box-shadow: var(--shadow); padding: 15px; max-width: 800px; margin: auto; }
-    h1{ color: var(--navy); font-size: 28px; margin-bottom: 15px; text-align: center; }
-    .fields{ display: grid; gap: 10px; margin-bottom: 20px; }
-    label{ font-weight: 700; font-size: 14px; color: #555; }
-    input, textarea{ width:100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
-    .section{ margin-top: 20px; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
-    .sectionTitle{ background: var(--navy); color:#fff; padding: 10px; font-weight: 700; }
-    .tableWrap{ overflow-x: auto; }
-    table{ width: 100%; border-collapse: collapse; min-width: 600px; }
-    th, td{ border: 1px solid #eee; padding: 8px; text-align: center; }
-    th{ background: #f8f8f8; font-size: 12px; }
-    .lhCol{ background: var(--lhTint); }
-    .rhCol{ background: var(--rhTint); }
-    .counter{ display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn{ width: var(--btnSize); height: var(--btnSize); border-radius: 50%; border: 0; background: var(--navy); color:#fff; font-size: 20px; font-weight: bold; cursor: pointer; }
-    .qty{ font-weight: 800; font-size: 18px; min-width: 20px; }
-    .actions{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-    .actionBtn{ padding: 15px; border: 0; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 16px; }
-    .primary{ background: var(--navy); color: #fff; }
-    .secondary{ background: #e2e8f0; color: var(--navy); }
-    .danger{ background: #fee2e2; color: #b91c1c; grid-column: span 2; }
-    #summary{ background: #f9f9f9; height: 150px; font-family: monospace; font-size: 14px; margin-top: 10px; }
-    .toast{ position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; display: none; }
+    body{ margin:0; background: var(--bg); padding: 10px; padding-bottom: 40px; }
+    
+    .header-card { background:#fff; border-radius: var(--cardRadius); padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { color: var(--navy); margin: 0 0 15px 0; font-size: 24px; text-align: center; }
+    
+    label { font-weight: 700; font-size: 13px; color: #666; display: block; margin-bottom: 4px; }
+    input, textarea { width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; margin-bottom: 10px; }
+
+    .section-title { background: var(--navy); color: #fff; padding: 10px; border-radius: 8px; font-weight: 700; margin: 20px 0 10px 0; }
+    
+    /* New Mobile Stacked Layout */
+    .door-row { 
+      background: #fff; 
+      border-radius: 10px; 
+      padding: 12px; 
+      margin-bottom: 8px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .size-label { font-weight: 800; font-size: 18px; width: 50px; }
+    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 1; }
+    
+    .counter-box { display: flex; flex-direction: column; align-items: center; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #eee; }
+    .counter-box label { font-size: 10px; margin-bottom: 4px; text-transform: uppercase; }
+    
+    .btn-wrap { display: flex; align-items: center; gap: 10px; }
+    .btn { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; }
+    .qty { font-weight: 800; font-size: 16px; min-width: 15px; text-align: center; }
+
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
+    .primary { background: var(--navy); color: white; }
+    .secondary { background: #e2e8f0; color: var(--navy); }
+    
+    #summary { background: #fff; height: 180px; margin-top: 10px; font-family: monospace; }
   </style>
 </head>
 <body>
 
-<div class="card">
+<div class="header-card">
   <h1>Elevate Trim</h1>
-
-  <div class="fields">
-    <div><label>Customer</label><input id="customer" type="text" placeholder="e.g. Pulte"></div>
-    <div><label>Lot # / Job Address</label><input id="lot" type="text" placeholder="e.g. 1405 Rowboat Rd"></div>
-  </div>
-
-  <div id="tables-container"></div>
-
-  <div class="actions">
-    <button class="actionBtn primary" onclick="generateSummary()">Generate Takeoff</button>
-    <button class="actionBtn secondary" onclick="copySummary()">Copy for AppWright</button>
-    <button class="actionBtn danger" onclick="resetAll()">Reset All Data</button>
-  </div>
-
-  <div style="margin-top:20px;">
-    <label>AppWright Format Output:</label>
-    <textarea id="summary" readonly></textarea>
-  </div>
+  <label>Customer</label>
+  <input id="customer" type="text" placeholder="Pulte">
+  <label>Lot # / Job Address</label>
+  <input id="lot" type="text" placeholder="1405 Rowboat Rd">
 </div>
 
-<div id="toast" class="toast">Copied to Clipboard!</div>
+<div id="app-content"></div>
+
+<div class="header-card" style="margin-top:20px;">
+  <div class="actions">
+    <button class="actionBtn primary" onclick="generateSummary()">Generate Takeoff</button>
+    <button class="actionBtn secondary" onclick="copySummary()">Copy to Clipboard</button>
+  </div>
+  <textarea id="summary" readonly placeholder="Your summary will appear here..."></textarea>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="location.reload()">Reset All</button>
+</div>
 
 <script>
-  const sizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
+  const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","6/0"];
   const state = {};
 
-  function updateQty(key, delta) {
+  function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     document.getElementById(`qty-${key}`).innerText = state[key];
   }
 
-  function createTable(title, idPrefix, typeList, hasHand) {
-    let html = `<div class="section"><div class="sectionTitle">${title}</div><div class="tableWrap"><table><tr><th>Size</th>`;
-    if(hasHand) html += `<th>LH Unit</th><th>LH Slab</th><th>RH Unit</th><th>RH Slab</th>`;
-    else html += `<th>Unit</th><th>French/Other</th>`;
-    html += `</tr>`;
-
-    typeList.forEach(size => {
-      html += `<tr><td>${size}</td>`;
-      if(hasHand) {
-        ['LHU','LHS','RHU','RHS'].forEach(type => {
-          let key = `${idPrefix}-${size}-${type}`;
-          html += `<td class="${type.includes('LH')?'lhCol':'rhCol'}"><div class="counter">
-            <button class="btn" onclick="updateQty('${key}', -1)">-</button>
-            <span class="qty" id="qty-${key}">0</span>
-            <button class="btn" onclick="updateQty('${key}', 1)">+</button>
-          </div></td>`;
+  function renderSection(title, prefix, sizes, isSingle) {
+    let html = `<div class="section-title">${title}</div>`;
+    sizes.forEach(size => {
+      html += `<div class="door-row">
+        <div class="size-label">${size}</div>
+        <div class="controls-grid">`;
+      
+      if(isSingle) {
+        ['LH', 'RH'].forEach(hand => {
+          let key = `${prefix}-${size}-${hand}`;
+          html += `
+            <div class="counter-box">
+              <label>${hand}</label>
+              <div class="btn-wrap">
+                <button class="btn" onclick="update('${key}', -1)">-</button>
+                <span class="qty" id="qty-${key}">0</span>
+                <button class="btn" onclick="update('${key}', 1)">+</button>
+              </div>
+            </div>`;
         });
       } else {
-        ['U','F'].forEach(type => {
-          let key = `${idPrefix}-${size}-${type}`;
-          html += `<td><div class="counter">
-            <button class="btn" onclick="updateQty('${key}', -1)">-</button>
-            <span class="qty" id="qty-${key}">0</span>
-            <button class="btn" onclick="updateQty('${key}', 1)">+</button>
-          </div></td>`;
-        });
+        let key = `${prefix}-${size}-DBL`;
+        html += `
+          <div class="counter-box" style="grid-column: span 2;">
+            <label>Double</label>
+            <div class="btn-wrap">
+              <button class="btn" onclick="update('${key}', -1)">-</button>
+              <span class="qty" id="qty-${key}">0</span>
+              <button class="btn" onclick="update('${key}', 1)">+</button>
+            </div>
+          </div>`;
       }
-      html += `</tr>`;
+      html += `</div></div>`;
     });
-    html += `</table></div></div>`;
     return html;
   }
 
-  document.getElementById('tables-container').innerHTML =
-    createTable("6/8 Doors", "68", sizes, true) +
-    createTable("8/0 Doors", "80", sizes, true) +
-    createTable("Double Doors", "DBL", dblSizes, false);
+  document.getElementById('app-content').innerHTML = 
+    renderSection("6/8 Doors", "68", doorSizes, true) +
+    renderSection("8/0 Doors", "80", doorSizes, true) +
+    renderSection("Double Doors", "DBL", dblSizes, false);
 
- function generateSummary() {
+  function generateSummary() {
     const cust = document.getElementById('customer').value;
     const lot = document.getElementById('lot').value;
-    
-    // Header
-    let output = `TAKEOFF: ${cust} ${lot}\n`;
-    output += `------------------\n`;
+    let output = `TAKEOFF: ${cust} ${lot}\n------------------\n`;
     
     let entries = [];
-    for (let key in state) {
+    // Sort keys to keep sizes organized
+    Object.keys(state).sort().forEach(key => {
       if (state[key] > 0) {
-        let parts = key.split('-'); // parts: [section, size, type]
-        let section = parts[0];     // e.g., "68"
-        let size = parts[1];        // e.g., "1/8"
-        let typeCode = parts[2];    // e.g., "LHU"
-        
-        let displayType = "";
-        
-        // Convert technical codes to your preferred shorthand
-        if (typeCode === "LHU" || typeCode === "LHS") displayType = "LH";
-        else if (typeCode === "RHU" || typeCode === "RHS") displayType = "RH";
-        else if (typeCode === "U" || typeCode === "F") displayType = "DBL";
-
-        // Create the line: 1/8 LH - 2
-        entries.push(`${size} ${displayType} - ${state[key]}`);
+        let [prefix, size, type] = key.split('-');
+        entries.push(`${size} ${type} - ${state[key]}`);
       }
-    }
+    });
     
-    if (entries.length > 0) {
-      output += entries.join("\n");
-    } else {
-      output += "No items selected.";
-    }
-    
-    document.getElementById('summary').value = output;
-  }
-    }
-
-    output += entries.length > 0 ? entries.join(". ") + "." : "No items selected.";
+    output += entries.length > 0 ? entries.join("\n") : "No items selected.";
     document.getElementById('summary').value = output;
   }
 
   function copySummary() {
-    const copyText = document.getElementById("summary");
-    copyText.select();
+    const ta = document.getElementById("summary");
+    ta.select();
+    ta.setSelectionRange(0, 99999);
     document.execCommand("copy");
-    const toast = document.getElementById("toast");
-    toast.style.display = "block";
-    setTimeout(() => { toast.style.display = "none"; }, 2000);
-  }
-
-  function resetAll() {
-    if(confirm("Are you sure? This clears all counts.")){
-      location.reload();
-    }
+    alert("Copied for AppWright!");
   }
 </script>
+
 </body>
 </html>
-
-
