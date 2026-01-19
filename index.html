@@ -75,7 +75,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.83 - Stair Order Reorg</div>
+<div class="version-tag">Version 1.0.84 - Reordered Hardware</div>
 
 <script>
   const state = {};
@@ -124,7 +124,7 @@
   html += `<div class="section-title stair-title">Handrail</div>`;
   railLengths.forEach(s => html += renderRow(s, "HR", ["OPEN", "WALL"]));
 
-  // Reordered Stair Hardware based on user request
+  // Brackets first as requested
   html += `<div class="section-title stair-title">Stair Hardware</div>`;
   html += renderRow("Brackets", "ST", ["QTY"]);
   html += renderRow("Newels", "ST", ["QTY"]);
@@ -160,6 +160,7 @@
                 let sizeDisplay = rawSize.replace('-', '/');
                 let type = parts[2];
                 
+                // Fixed Sort: 1/10 comes after 1/8
                 let sortVal = 0;
                 if(rawSize.includes('-')) {
                     let s = rawSize.split('-');
@@ -169,25 +170,17 @@
                 }
 
                 let text = "";
-                if (sec.id === 'HR') {
-                    text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
-                } else if (sec.id === 'STSH') {
-                    text = `Shoe (${type}) - ${state[key]}`;
-                } else if (sec.id === 'ST') {
-                    // This handles Newels, Brackets, etc.
-                    text = `${parts[1]} - ${state[key]}`;
-                } else if (sec.id === '80' || sec.id === 'DBL80') {
-                    text = `${sizeDisplay} 8/0 ${type} - ${state[key]}`;
-                } else {
-                    text = `${sizeDisplay} ${type} - ${state[key]}`;
-                }
+                if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
+                else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
+                else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}`;
+                else if (sec.id === '80' || sec.id === 'DBL80') text = `${sizeDisplay} 8/0 ${type} - ${state[key]}`;
+                else text = `${sizeDisplay} ${type} - ${state[key]}`;
                 
                 entries.push({ sortVal, text, type, label: parts[1] });
             }
         });
 
         if(entries.length > 0) {
-            // Logic to keep stair hardware in the specific order defined in renderRow
             if(sec.id === 'ST') {
               const hardwareOrder = ["Brackets", "Newels", "Rosettes", "Balusters"];
               entries.sort((a, b) => hardwareOrder.indexOf(a.label) - hardwareOrder.indexOf(b.label));
@@ -200,7 +193,6 @@
 
     const notes = document.getElementById('notes').value;
     if(notes) out += "----------------------------\nNOTES: " + notes;
-    
     document.getElementById('summary').value = out;
   }
 
