@@ -16,7 +16,6 @@
     label { font-weight: 700; font-size: 10px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     
-    /* 3-Box Header Layout */
     .input-row { display: flex; gap: 8px; }
     .input-group { flex: 1; }
     .lot-group { width: 85px; }
@@ -40,7 +39,9 @@
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
-    #summary { background: #fff; height: 500px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.5; color: #000; }
+    /* Massive Summary Box */
+    #summary { background: #fff; height: 550px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
+    
     .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
   </style>
 </head>
@@ -75,7 +76,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.79 - Fixed Labels & Header</div>
+<div class="version-tag">Version 1.0.80 - Fixed All Labels</div>
 
 <script>
   const state = {};
@@ -92,7 +93,7 @@
       <div class="size-label">${label}</div>
       <div class="controls-grid">`;
     types.forEach(type => {
-      let key = prefix + '-' + label.replace(/'/g, "").replace(/\//g, "-") + '-' + type;
+      let key = prefix + '_' + label.replace(/\//g, "-") + '_' + type;
       html += `<div class="counter-box"><label>${type}</label>
         <div class="btn-wrap">
           <button class="btn" onclick="update('${key}', -1)">−</button>
@@ -129,7 +130,7 @@
   html += renderRow("Rosettes", "ST", ["QTY"]);
   html += renderRow("Brackets", "ST", ["QTY"]);
   html += renderRow("Balusters", "ST", ["QTY"]);
-  html += renderRow("Shoes", "ST-SH", ["FLAT", "ANGLE"]);
+  html += renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]);
 
   document.getElementById('app-content').innerHTML = html;
 
@@ -138,57 +139,42 @@
     const sub = document.getElementById('subdivision').value || "N/A";
     const lot = document.getElementById('lot').value || "N/A";
     
-    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n------------------\n`;
+    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n----------------------------\n`;
     
-    const order = ['68', 'DBL68', '80', 'DBL80', 'HR', 'ST', 'ST-SH'];
-    let outputSections = {};
-    order.forEach(o => outputSections[o] = []);
+    const sections = [
+        {id: '68', head: '--- 6/8 SINGLE ---'},
+        {id: 'DBL68', head: '--- 6/8 DOUBLE ---'},
+        {id: '80', head: '--- 8/0 SINGLE ---'},
+        {id: 'DBL80', head: '--- 8/0 DOUBLE ---'},
+        {id: 'HR', head: '--- HANDRAIL ---'},
+        {id: 'ST', head: '--- STAIR HARDWARE ---'},
+        {id: 'STSH', head: '--- SHOES ---'}
+    ];
 
-    Object.keys(state).forEach(key => {
-      if(state[key] > 0) {
-        let p = key.split('-');
-        let section = p[0];
-        let size = p[1].replace('-', '/');
-        let type = p[2];
-        let entry = "";
+    sections.forEach(sec => {
+        let entries = [];
+        Object.keys(state).forEach(key => {
+            if(state[key] > 0 && key.startsWith(sec.id + '_')) {
+                let parts = key.split('_');
+                let size = parts[1].replace('-', '/');
+                let type = parts[2]; // This captures LH, RH, FRENCH, FLAT, etc.
 
-        // Explicit Label Logic
-        if(section === '68') {
-            entry = `${size} ${type} - ${state[key]}`;
-        } else if(section === '80') {
-            entry = `${size} 8/0 ${type} - ${state[key]}`;
-        } else if(section === 'DBL68') {
-            entry = `${size} ${type} - ${state[key]}`;
-        } else if(section === 'DBL80') {
-            entry = `${size} 8/0 ${type} - ${state[key]}`;
-        } else if(section === 'HR') {
-            entry = `${p[1]}' ${type} Rail - ${state[key]}`;
-        } else if(section === 'ST-SH') {
-            entry = `Shoe (${type}) - ${state[key]}`;
-        } else if(section === 'ST') {
-            entry = `${p[1]} - ${state[key]}`;
+                if (sec.id === 'HR') entries.push(`${size} ${type} Rail - ${state[key]}`);
+                else if (sec.id === 'STSH') entries.push(`Shoe (${type}) - ${state[key]}`);
+                else if (sec.id === 'ST') entries.push(`${parts[1]} - ${state[key]}`);
+                else if (sec.id === '80' || sec.id === 'DBL80') entries.push(`${size} 8/0 ${type} - ${state[key]}`);
+                else entries.push(`${size} ${type} - ${state[key]}`);
+            }
+        });
+
+        if(entries.length > 0) {
+            out += sec.head + "\n" + entries.join("\n") + "\n\n";
         }
-        
-        if (entry) outputSections[section].push(entry);
-      }
     });
 
-    let finalEntries = [];
-    order.forEach(sec => {
-      if(outputSections[sec].length > 0) {
-        let header = sec === '68' ? "--- 6/8 SINGLE ---" : 
-                     sec === '80' ? "--- 8/0 SINGLE ---" : 
-                     sec === 'DBL68' ? "--- 6/8 DOUBLE ---" :
-                     sec === 'DBL80' ? "--- 8/0 DOUBLE ---" : "--- HARDWARE ---";
-        
-        finalEntries.push(header);
-        finalEntries = finalEntries.concat(outputSections[sec]);
-        finalEntries.push(""); 
-      }
-    });
-
-    out += finalEntries.length ? finalEntries.join("\n") : "Nothing selected.";
-    if(document.getElementById('notes').value) out += "\n------------------\nNOTES: " + document.getElementById('notes').value;
+    const notes = document.getElementById('notes').value;
+    if(notes) out += "----------------------------\nNOTES: " + notes;
+    
     document.getElementById('summary').value = out;
   }
 
