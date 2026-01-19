@@ -62,7 +62,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.64 - Improved Rail Grid</div>
+<div class="version-tag">Version 1.0.65 - Smooth Rail Fix</div>
 
 <script>
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
@@ -74,9 +74,8 @@
 
   function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
-    if(document.getElementById(`qty-${key}`)) {
-      document.getElementById(`qty-${key}`).innerText = state[key];
-    }
+    const el = document.getElementById(`qty-${key}`);
+    if(el) { el.innerText = state[key]; }
   }
 
   function toggleFT(key) {
@@ -104,7 +103,6 @@
     return html;
   }
 
-  // Doors & Attic (Keeping Attic unique for the FT checkbox)
   function renderAttic(sizes) {
     let html = `<div class="section-title">Attic Access</div>`;
     sizes.forEach(size => {
@@ -132,16 +130,17 @@
                  renderSection("Double Doors", "DBL", dblSizes, ["DBL", "T-AST", "FRENCH"]) +
                  renderAttic(atticSizes);
 
-  // New Rail Section
+  // Smooth Stair Section
   mainHtml += `<div class="section-title">Stair / Rail</div>`;
   mainHtml += renderSection("Handrail", "HR", railLengths, ["OPEN", "WALL"]);
   
-  // Single QTY parts
-  ["Newels", "Balusters", "Rosettes"].forEach(item => {
+  // Custom Parts Grid
+  const parts = ["Newels", "Balusters", "Rosettes", "Brackets"];
+  parts.forEach(item => {
     mainHtml += `<div class="door-row">
       <div class="size-label">${item}</div>
       <div class="controls-grid">
-        <div class="counter-box"><label>QTY</label>
+        <div class="counter-box" style="background:#f8fafc;"><label>QTY</label>
           <div class="btn-wrap">
             <button class="btn" onclick="update('ST-${item}', -1)">-</button>
             <span class="qty" id="qty-ST-${item}">0</span>
@@ -156,14 +155,14 @@
   mainHtml += `<div class="door-row">
     <div class="size-label">Shoes</div>
     <div class="controls-grid">
-      <div class="counter-box"><label>FLAT</label>
+      <div class="counter-box" style="background:#f8fafc;"><label>FLAT</label>
         <div class="btn-wrap">
           <button class="btn" onclick="update('ST-Shoes-Flat', -1)">-</button>
           <span class="qty" id="qty-ST-Shoes-Flat">0</span>
           <button class="btn" onclick="update('ST-Shoes-Flat', 1)">+</button>
         </div>
       </div>
-      <div class="counter-box"><label>ANGLED</label>
+      <div class="counter-box" style="background:#f8fafc;"><label>ANGLED</label>
         <div class="btn-wrap">
           <button class="btn" onclick="update('ST-Shoes-Angle', -1)">-</button>
           <span class="qty" id="qty-ST-Shoes-Angle">0</span>
@@ -183,13 +182,12 @@
     let output = `TAKEOFF: ${cust} ${sub} ${lot}\n------------------\n`;
     let entries = [];
     
-    // Process Doors/Attic
+    // Doors
     const sections = [
       { prefix: "68", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
       { prefix: "80", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
       { prefix: "DBL", sizes: dblSizes, types: ["DBL", "T-AST", "FRENCH"] }
     ];
-    
     sections.forEach(sec => {
       sec.sizes.forEach(size => {
         sec.types.forEach(type => {
@@ -199,24 +197,25 @@
       });
     });
 
+    // Attic
     atticSizes.forEach(size => {
       if (state[`AA-${size}-QTY`] > 0) {
         entries.push(`${size}${state[`AA-${size}-FT`] ? ' FT' : ''} - ${state[`AA-${size}-QTY`]}`);
       }
     });
 
-    // Process Handrail Grid
+    // Railing
     railLengths.forEach(len => {
       if (state[`HR-${len}-OPEN`] > 0) entries.push(`${len} Open Rail - ${state[`HR-${len}-OPEN`]}`);
       if (state[`HR-${len}-WALL`] > 0) entries.push(`${len} Wall Rail - ${state[`HR-${len}-WALL`]}`);
     });
 
-    // Process Parts
-    if (state['ST-Newels'] > 0) entries.push(`Newels - ${state['ST-Newels']}`);
-    if (state['ST-Balusters'] > 0) entries.push(`Balusters - ${state['ST-Balusters']}`);
+    // Parts
+    ["Newels", "Balusters", "Rosettes", "Brackets"].forEach(p => {
+      if (state[`ST-${p}`] > 0) entries.push(`${p} - ${state[`ST-${p}`]}`);
+    });
     if (state['ST-Shoes-Flat'] > 0) entries.push(`Shoes (Flat) - ${state['ST-Shoes-Flat']}`);
     if (state['ST-Shoes-Angle'] > 0) entries.push(`Shoes (Angled) - ${state['ST-Shoes-Angle']}`);
-    if (state['ST-Rosettes'] > 0) entries.push(`Rosettes - ${state['ST-Rosettes']}`);
     
     output += entries.length > 0 ? entries.join("\n") : "No items selected.";
     if (notes.trim() !== "") output += `\n------------------\nNOTES: ${notes}`;
