@@ -1,165 +1,58 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <title>Elevate Trim - BFS</title>
-  <style>
-    :root{ --navy:#0A2E4E; --bg:#f4f7f9; --accent: #1e40af; }
-    *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; }
-    
-    .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-    h1 { color: var(--navy); margin: 0 0 12px 0; font-size: 18px; text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-    label { font-weight: 700; font-size: 10px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; }
-    input, textarea { width:100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
-    
-    .input-row { display: flex; gap: 8px; }
-    .input-group { flex: 1; }
-    .lot-group { width: 85px; }
-
-    /* User-Friendly Color Coding for Sections */
-    .section-title { background: var(--navy); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 12px; margin: 15px -8px 8px -8px; position: sticky; top: 0; z-index: 100; text-transform: uppercase; }
-    .stair-title { background: #334155; } /* Dark grey for hardware to distinguish from doors */
-
-    .door-row { background: #fff; border-radius: 6px; padding: 5px 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
-    .size-label { font-weight: 800; font-size: 11px; width: 55px; flex-shrink: 0; color: var(--navy); }
-    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(52px, 1fr)); gap: 3px; flex-grow: 1; }
-    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 2px; border: 1px solid #f1f5f9; border-radius: 4px; }
-    .counter-box label { font-size: 7px; margin-bottom: 1px; color: #94a3b8; font-weight: 900; }
-    
-    .btn-wrap { display: flex; align-items: center; gap: 3px; }
-    .btn { width: 26px; height: 26px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-    .btn:active { background: var(--accent); transform: scale(0.9); }
-    
-    .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
-    
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    #summary { background: #fff; height: 160px; margin-top: 8px; font-family: monospace; font-size: 12px; border: 1px solid #cbd5e1; width:100%; border-radius:4px; padding:8px; }
-    .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
-  </style>
-</head>
-<body>
-
-<div class="header-card">
-  <h1>Elevate Trim</h1>
-  <label>Customer</label>
-  <input id="customer" type="text" placeholder="e.g. Pulte">
-  <div class="input-row">
-    <div class="input-group"><label>Subdivision</label><input id="subdivision" type="text" placeholder="e.g. Huxley"></div>
-    <div class="lot-group"><label>Lot #</label><input id="lot" type="text" placeholder="104"></div>
-  </div>
-</div>
-
-<div id="app-content"></div>
-
-<div class="header-card" style="margin-top:15px;">
-  <label>Notes & Summary</label>
-  <textarea id="notes" placeholder="Special instructions..."></textarea>
-  <div class="actions">
-    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate</button>
-    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy</button>
-  </div>
-  <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset App</button>
-</div>
-
-<div class="version-tag">Version 1.0.74 - 8/0 Doubles & UX Polish</div>
-
-<script>
-  const state = {};
-
-  function update(key, delta) {
-    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(8);
-    state[key] = Math.max(0, (state[key] || 0) + delta);
-    const el = document.getElementById('qty-' + key);
-    if(el) el.innerText = state[key];
-  }
-
-  function renderRow(label, prefix, types) {
-    let html = `<div class="door-row">
-      <div class="size-label">${label}</div>
-      <div class="controls-grid">`;
-    types.forEach(type => {
-      let key = prefix + '-' + label.replace(/'/g, "").replace(/\//g, "-") + '-' + type;
-      html += `<div class="counter-box"><label>${type}</label>
-        <div class="btn-wrap">
-          <button class="btn" onclick="update('${key}', -1)">−</button>
-          <span class="qty" id="qty-${key}">0</span>
-          <button class="btn" onclick="update('${key}', 1)">+</button>
-        </div>
-      </div>`;
-    });
-    html += `</div></div>`;
-    return html;
-  }
-
-  const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "10'", "12'", "14'", "16'", "18'"];
-
-  let html = `<div class="section-title">6/8 Doors</div>`;
-  doorSizes.forEach(s => html += renderRow(s, "68", ["LH", "RH", "SLAB"]));
-
-  html += `<div class="section-title">8/0 Doors</div>`;
-  doorSizes.forEach(s => html += renderRow(s, "80", ["LH", "RH", "SLAB"]));
-
-  html += `<div class="section-title">6/8 Double Doors</div>`;
-  dblSizes.forEach(s => html += renderRow(s, "DBL68", ["DBL", "T-AST", "FRENCH"]));
-
-  html += `<div class="section-title">8/0 Double Doors</div>`;
-  dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST", "FRENCH"]));
-
-  html += `<div class="section-title">Handrail (Open vs Wall)</div>`;
-  railLengths.forEach(s => html += renderRow(s, "HR", ["OPEN", "WALL"]));
-
-  html += `<div class="section-title stair-title">Stair Hardware</div>`;
-  html += renderRow("Newels", "ST", ["QTY"]);
-  html += renderRow("Rosettes", "ST", ["QTY"]);
-  html += renderRow("Brackets", "ST", ["QTY"]);
-  html += renderRow("Balusters", "ST", ["QTY"]);
-  html += renderRow("Shoes", "ST-SH", ["FLAT", "ANGLE"]);
-
-  document.getElementById('app-content').innerHTML = html;
-
-  function generateSummary() {
+function generateSummary() {
     const cust = document.getElementById('customer').value || "N/A";
     const sub = document.getElementById('subdivision').value || "N/A";
     const lot = document.getElementById('lot').value || "N/A";
     
     let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n------------------\n`;
-    let entries = [];
+    
+    // Define the preferred order for sections
+    const order = ['68', '80', 'DBL68', 'DBL80', 'HR', 'ST', 'ST-SH'];
+    let outputSections = {};
+    order.forEach(o => outputSections[o] = []);
+
     Object.keys(state).forEach(key => {
       if(state[key] > 0) {
         let p = key.split('-');
-        let d = "";
+        let section = p[0];
         let size = p[1].replace('-', '/');
-        
-        if(p[0] === '68') d = `${size} 6/8 ${p[2]}`;
-        else if(p[0] === '80') d = `${size} 8/0 ${p[2]}`;
-        else if(p[0] === 'DBL68') d = `${size} 6/8 ${p[2]}`;
-        else if(p[0] === 'DBL80') d = `${size} 8/0 ${p[2]}`;
-        else if(p[0] === 'HR') d = `${p[1]}' ${p[2]} Rail`;
-        else if(p[0] === 'ST-SH') d = `Shoes (${p[2]})`;
-        else d = `${p[1]} ${p[2] === 'QTY' ? '' : p[2]}`;
-        
-        entries.push(`${d.trim()} - ${state[key]}`);
+        let type = p[2];
+        let entry = "";
+
+        if(section === '68' || section === '80') {
+            entry = `${size} ${type} - ${state[key]}`;
+        } else if(section.startsWith('DBL')) {
+            let height = section === 'DBL68' ? '6/8' : '8/0';
+            entry = `${size} ${height} ${type} - ${state[key]}`;
+        } else if(section === 'HR') {
+            entry = `${p[1]}' ${type} Rail - ${state[key]}`;
+        } else if(section === 'ST-SH') {
+            entry = `Shoes (${type}) - ${state[key]}`;
+        } else {
+            entry = `${p[1]} - ${state[key]}`;
+        }
+        outputSections[section].push(entry);
       }
     });
-    out += entries.length ? entries.join("\n") : "No items selected.";
-    if(document.getElementById('notes').value) out += "\n------------------\nNOTES: " + document.getElementById('notes').value;
+
+    let finalEntries = [];
+    order.forEach(sec => {
+      if(outputSections[sec].length > 0) {
+        // Add a header for clarity between major groups
+        let header = sec === '68' ? "--- 6/8 DOORS ---" : 
+                     sec === '80' ? "--- 8/0 DOORS ---" : 
+                     sec.startsWith('DBL') ? "--- DOUBLES ---" : "--- HARDWARE ---";
+        
+        // Prevent duplicate headers
+        if (finalEntries.indexOf(header) === -1) finalEntries.push(header);
+        finalEntries = finalEntries.concat(outputSections[sec]);
+      }
+    });
+
+    out += finalEntries.length ? finalEntries.join("\n") : "No items selected.";
+    
+    if(document.getElementById('notes').value) {
+        out += "\n------------------\nNOTES: " + document.getElementById('notes').value;
+    }
+    
     document.getElementById('summary').value = out;
   }
-
-  function copySummary() {
-    const s = document.getElementById("summary");
-    s.select();
-    document.execCommand("copy");
-    alert("Copied to Clipboard!");
-  }
-</script>
-</body>
-</html>
