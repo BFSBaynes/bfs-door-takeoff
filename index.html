@@ -63,12 +63,13 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.60 - Clear Notes Added</div>
+<div class="version-tag">Version 1.0.61 - Added Stair Rail Parts</div>
 
 <script>
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const atticSizes = ["22x54", "25x54", "Scuttle"];
+  const stairParts = ["Handrail", "Newels", "Balusters", "Shoes", "Rosettes"];
   const state = {};
 
   function update(key, delta) {
@@ -109,7 +110,8 @@
     renderSection("6/8 Doors", "68", doorSizes, ["LH", "RH", "SLAB"]) +
     renderSection("8/0 Doors", "80", doorSizes, ["LH", "RH", "SLAB"]) +
     renderSection("Double Doors", "DBL", dblSizes, ["DBL", "T-AST", "FRENCH"]) +
-    renderSection("Attic Access", "AA", atticSizes, ["QTY", "FT"]);
+    renderSection("Attic Access", "AA", atticSizes, ["QTY", "FT"]) +
+    renderSection("Stair / Rail", "ST", stairParts, ["QTY", "FLAT", "ANGLE"]);
 
   function generateSummary() {
     const cust = document.getElementById('customer').value;
@@ -124,7 +126,8 @@
       { prefix: "68", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
       { prefix: "80", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
       { prefix: "DBL", sizes: dblSizes, types: ["DBL", "T-AST", "FRENCH"] },
-      { prefix: "AA", sizes: atticSizes, types: ["QTY", "FT"] }
+      { prefix: "AA", sizes: atticSizes, types: ["QTY", "FT"] },
+      { prefix: "ST", sizes: stairParts, types: ["QTY", "FLAT", "ANGLE"] }
     ];
     
     sections.forEach(sec => {
@@ -136,6 +139,15 @@
             let label = state[ftKey] ? `${size} FT` : `${size}`;
             entries.push(`${label} - ${state[qtyKey]}`);
           }
+        } else if (sec.prefix === "ST") {
+          sec.types.forEach(type => {
+            let key = `ST-${size}-${type}`;
+            if (state[key] > 0) {
+              let suffix = (type !== "QTY") ? ` (${type})` : "";
+              let unit = (size === "Handrail" && type === "QTY") ? "FT" : "";
+              entries.push(`${size}${suffix} - ${state[key]}${unit}`);
+            }
+          });
         } else {
           sec.types.forEach(type => {
             let key = `${sec.prefix}-${size}-${type}`;
