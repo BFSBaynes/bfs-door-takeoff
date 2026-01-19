@@ -47,6 +47,9 @@
 <div id="app-content"></div>
 
 <div class="header-card" style="margin-top:20px;">
+  <label>Special Notes</label>
+  <textarea id="notes" style="height: 80px;" placeholder="e.g. Deliver to back porch..."></textarea>
+  
   <div class="actions">
     <button class="actionBtn primary" onclick="generateSummary()">Generate Takeoff</button>
     <button class="actionBtn secondary" onclick="copySummary()">Copy to Clipboard</button>
@@ -55,7 +58,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.58 - Attic FT Checkbox</div>
+<div class="version-tag">Version 1.0.59 - Added Notes Field</div>
 
 <script>
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
@@ -72,7 +75,7 @@
     state[key] = !state[key];
   }
 
-  function renderSection(title, prefix, sizes, types, isAttic = false) {
+  function renderSection(title, prefix, sizes, types) {
     let html = `<div class="section-title">${title}</div>`;
     sizes.forEach(size => {
       html += `<div class="door-row">
@@ -107,6 +110,8 @@
     const cust = document.getElementById('customer').value;
     const sub = document.getElementById('subdivision').value;
     const lot = document.getElementById('lot').value;
+    const notes = document.getElementById('notes').value;
+    
     let output = `TAKEOFF: ${cust} ${sub} ${lot}\n------------------\n`;
     let entries = [];
     
@@ -139,6 +144,11 @@
     });
     
     output += entries.length > 0 ? entries.join("\n") : "No items selected.";
+    
+    if (notes.trim() !== "") {
+      output += `\n------------------\nNOTES: ${notes}`;
+    }
+
     document.getElementById('summary').value = output;
   }
 
