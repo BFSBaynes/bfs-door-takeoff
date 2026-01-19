@@ -21,7 +21,6 @@
     .input-group { flex: 1; }
     .lot-group { width: 85px; }
 
-    /* STICKY HEADER FIX: Added background-clip and higher z-index */
     .section-title { 
       background: var(--navy); 
       color: #fff; 
@@ -93,7 +92,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.88 - Sticky Headers & Simplified Doubles</div>
+<div class="version-tag">Version 1.0.89 - Updated Handrail Sizes</div>
 
 <script>
   const state = { fireRated: false };
@@ -130,7 +129,7 @@
 
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "10'", "12'", "14'", "16'", "18'"];
+  const railLengths = ["8'", "10'", "16'", "18'"];
 
   let html = `<div class="section-title">6/8 Doors</div>`;
   doorSizes.forEach(s => html += renderRow(s, "68", ["LH", "RH", "SLAB"]));
