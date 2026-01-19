@@ -7,7 +7,7 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Elevate Trim - BFS</title>
   <style>
-    :root{ --navy:#0A2E4E; --bg:#f4f7f9; --accent: #1e40af; }
+    :root{ --navy:#0A2E4E; --bg:#f4f7f9; --accent: #1e40af; --slate: #334155; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; }
     
@@ -20,8 +20,10 @@
     .input-group { flex: 1; }
     .lot-group { width: 85px; }
 
-    .section-title { background: var(--navy); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 12px; margin: 15px -8px 8px -8px; position: sticky; top: 0; z-index: 100; text-transform: uppercase; }
-    .stair-title { background: #334155; }
+    /* Section Styling */
+    .section-title { background: var(--navy); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 12px; margin: 15px -8px 8px -8px; position: sticky; top: 0; z-index: 100; text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.1); }
+    .double-title { background: var(--slate); } /* Visual distinction for Doubles */
+    .stair-title { background: #475569; }
 
     .door-row { background: #fff; border-radius: 6px; padding: 5px 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
     .size-label { font-weight: 800; font-size: 11px; width: 55px; flex-shrink: 0; color: var(--navy); }
@@ -31,13 +33,13 @@
     
     .btn-wrap { display: flex; align-items: center; gap: 3px; }
     .btn { width: 26px; height: 26px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-    .btn:active { background: var(--accent); transform: scale(0.9); }
+    .btn:active { background: var(--accent); transform: scale(0.95); }
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
     
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    #summary { background: #fff; height: 200px; margin-top: 8px; font-family: monospace; font-size: 12px; border: 1px solid #cbd5e1; width:100%; border-radius:4px; padding:8px; }
+    #summary { background: #fff; height: 220px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 13px; border: 1px solid #cbd5e1; width:100%; border-radius:4px; padding:8px; line-height: 1.4; }
     .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
   </style>
 </head>
@@ -66,7 +68,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset App</button>
 </div>
 
-<div class="version-tag">Version 1.0.76 - Takeoff Label Logic</div>
+<div class="version-tag">Version 1.0.77 - Final Formatting Fix</div>
 
 <script>
   const state = {};
@@ -100,19 +102,20 @@
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "10'", "12'", "14'", "16'", "18'"];
 
+  // Layout order changed per user request
   let html = `<div class="section-title">6/8 Doors</div>`;
   doorSizes.forEach(s => html += renderRow(s, "68", ["LH", "RH", "SLAB"]));
+
+  html += `<div class="section-title double-title">6/8 Double Doors</div>`;
+  dblSizes.forEach(s => html += renderRow(s, "DBL68", ["DBL", "T-AST", "FRENCH"]));
 
   html += `<div class="section-title">8/0 Doors</div>`;
   doorSizes.forEach(s => html += renderRow(s, "80", ["LH", "RH", "SLAB"]));
 
-  html += `<div class="section-title">6/8 Double Doors</div>`;
-  dblSizes.forEach(s => html += renderRow(s, "DBL68", ["DBL", "T-AST", "FRENCH"]));
-
-  html += `<div class="section-title">8/0 Double Doors</div>`;
+  html += `<div class="section-title double-title">8/0 Double Doors</div>`;
   dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST", "FRENCH"]));
 
-  html += `<div class="section-title">Handrail (Open vs Wall)</div>`;
+  html += `<div class="section-title stair-title">Handrail (Open vs Wall)</div>`;
   railLengths.forEach(s => html += renderRow(s, "HR", ["OPEN", "WALL"]));
 
   html += `<div class="section-title stair-title">Stair Hardware</div>`;
@@ -131,7 +134,7 @@
     
     let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n------------------\n`;
     
-    const order = ['68', '80', 'DBL68', 'DBL80', 'HR', 'ST', 'ST-SH'];
+    const order = ['68', 'DBL68', '80', 'DBL80', 'HR', 'ST', 'ST-SH'];
     let outputSections = {};
     order.forEach(o => outputSections[o] = []);
 
@@ -139,6 +142,7 @@
       if(state[key] > 0) {
         let p = key.split('-');
         let section = p[0];
+        // Ensure size always uses the / formatting
         let size = p[1].replace('-', '/');
         let type = p[2];
         let entry = "";
@@ -147,9 +151,10 @@
             entry = `${size} ${type} - ${state[key]}`;
         } else if(section === '80') {
             entry = `${size} 8/0 ${type} - ${state[key]}`;
-        } else if(section.startsWith('DBL')) {
-            let heightLabel = section === 'DBL80' ? ' 8/0' : '';
-            entry = `${size}${heightLabel} ${type} - ${state[key]}`;
+        } else if(section === 'DBL68') {
+            entry = `${size} ${type} - ${state[key]}`;
+        } else if(section === 'DBL80') {
+            entry = `${size} 8/0 ${type} - ${state[key]}`;
         } else if(section === 'HR') {
             entry = `${p[1]}' ${type} Rail - ${state[key]}`;
         } else if(section === 'ST-SH') {
@@ -166,14 +171,15 @@
       if(outputSections[sec].length > 0) {
         let header = sec === '68' ? "--- 6/8 SINGLE ---" : 
                      sec === '80' ? "--- 8/0 SINGLE ---" : 
-                     sec.startsWith('DBL') ? "--- DOUBLE DOORS ---" : "--- STAIR/RAIL ---";
+                     sec === 'DBL68' ? "--- 6/8 DOUBLE ---" :
+                     sec === 'DBL80' ? "--- 8/0 DOUBLE ---" : "--- STAIR/RAIL ---";
         
         if (finalEntries.indexOf(header) === -1) finalEntries.push(header);
         finalEntries = finalEntries.concat(outputSections[sec]);
       }
     });
 
-    out += finalEntries.length ? finalEntries.join("\n") : "No items selected.";
+    out += finalEntries.length ? finalEntries.join("\n") : "No selections made.";
     if(document.getElementById('notes').value) out += "\n------------------\nNOTES: " + document.getElementById('notes').value;
     document.getElementById('summary').value = out;
   }
