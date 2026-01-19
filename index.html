@@ -23,6 +23,7 @@
     .btn-wrap { display: flex; align-items: center; gap: 4px; }
     .btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; touch-action: manipulation; }
     .qty { font-weight: 800; font-size: 14px; min-width: 12px; text-align: center; }
+    .ft-check { width: 20px; height: 20px; cursor: pointer; margin: 5px 0; }
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
     .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
     .primary { background: var(--navy); color: white; }
@@ -54,7 +55,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.57 - Attic Access Update</div>
+<div class="version-tag">Version 1.0.58 - Attic FT Checkbox</div>
 
 <script>
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
@@ -67,7 +68,11 @@
     document.getElementById(`qty-${key}`).innerText = state[key];
   }
 
-  function renderSection(title, prefix, sizes, types) {
+  function toggleFT(key) {
+    state[key] = !state[key];
+  }
+
+  function renderSection(title, prefix, sizes, types, isAttic = false) {
     let html = `<div class="section-title">${title}</div>`;
     sizes.forEach(size => {
       html += `<div class="door-row">
@@ -75,11 +80,17 @@
         <div class="controls-grid">`;
       types.forEach(type => {
         let key = `${prefix}-${size}-${type}`;
-        html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">
-          <button class="btn" onclick="update('${key}', -1)">-</button>
-          <span class="qty" id="qty-${key}">0</span>
-          <button class="btn" onclick="update('${key}', 1)">+</button>
-        </div></div>`;
+        html += `<div class="counter-box"><label>${type}</label>`;
+        if (type === "FT") {
+          html += `<input type="checkbox" class="ft-check" onchange="toggleFT('${key}')">`;
+        } else {
+          html += `<div class="btn-wrap">
+            <button class="btn" onclick="update('${key}', -1)">-</button>
+            <span class="qty" id="qty-${key}">0</span>
+            <button class="btn" onclick="update('${key}', 1)">+</button>
+          </div>`;
+        }
+        html += `</div>`;
       });
       html += `</div></div>`;
     });
@@ -108,14 +119,22 @@
     
     sections.forEach(sec => {
       sec.sizes.forEach(size => {
-        sec.types.forEach(type => {
-          let key = `${sec.prefix}-${size}-${type}`;
-          if (state[key] > 0) {
-            let heightDisplay = (sec.prefix === "80") ? " 8/0" : "";
-            let itemLabel = (sec.prefix === "AA") ? (type === "FT" ? `${size} FT` : `${size}`) : `${size}${heightDisplay} ${type}`;
-            entries.push(`${itemLabel} - ${state[key]}`);
+        if (sec.prefix === "AA") {
+          let qtyKey = `AA-${size}-QTY`;
+          let ftKey = `AA-${size}-FT`;
+          if (state[qtyKey] > 0) {
+            let label = state[ftKey] ? `${size} FT` : `${size}`;
+            entries.push(`${label} - ${state[qtyKey]}`);
           }
-        });
+        } else {
+          sec.types.forEach(type => {
+            let key = `${sec.prefix}-${size}-${type}`;
+            if (state[key] > 0) {
+              let heightDisplay = (sec.prefix === "80") ? " 8/0" : "";
+              entries.push(`${size}${heightDisplay} ${type} - ${state[key]}`);
+            }
+          });
+        }
       });
     });
     
