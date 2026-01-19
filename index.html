@@ -16,6 +16,7 @@
     label { font-weight: 700; font-size: 10px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     
+    /* 3-Box Header Layout */
     .input-row { display: flex; gap: 8px; }
     .input-group { flex: 1; }
     .lot-group { width: 85px; }
@@ -39,9 +40,7 @@
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
-    /* Bigger Summary Box */
-    #summary { background: #fff; height: 450px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.5; color: #000; }
-    
+    #summary { background: #fff; height: 500px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.5; color: #000; }
     .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
   </style>
 </head>
@@ -49,8 +48,18 @@
 
 <div class="header-card">
   <h1>Elevate Trim</h1>
-  <label>Job Site / Lot Info</label>
-  <input id="jobInfo" type="text" placeholder="e.g. Pulte Huxley 104">
+  <label>Customer</label>
+  <input id="customer" type="text" placeholder="e.g. Pulte">
+  <div class="input-row">
+    <div class="input-group">
+      <label>Subdivision</label>
+      <input id="subdivision" type="text" placeholder="e.g. Huxley">
+    </div>
+    <div class="lot-group">
+      <label>Lot #</label>
+      <input id="lot" type="text" placeholder="104">
+    </div>
+  </div>
 </div>
 
 <div id="app-content"></div>
@@ -66,7 +75,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.78 - Detailed Takeoff + Large View</div>
+<div class="version-tag">Version 1.0.79 - Fixed Labels & Header</div>
 
 <script>
   const state = {};
@@ -125,8 +134,11 @@
   document.getElementById('app-content').innerHTML = html;
 
   function generateSummary() {
-    const info = document.getElementById('jobInfo').value || "N/A";
-    let out = `TAKEOFF: ${info}\n------------------\n`;
+    const cust = document.getElementById('customer').value || "N/A";
+    const sub = document.getElementById('subdivision').value || "N/A";
+    const lot = document.getElementById('lot').value || "N/A";
+    
+    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n------------------\n`;
     
     const order = ['68', 'DBL68', '80', 'DBL80', 'HR', 'ST', 'ST-SH'];
     let outputSections = {};
@@ -140,7 +152,7 @@
         let type = p[2];
         let entry = "";
 
-        // DESCRIPTIVE LOGIC
+        // Explicit Label Logic
         if(section === '68') {
             entry = `${size} ${type} - ${state[key]}`;
         } else if(section === '80') {
@@ -152,11 +164,12 @@
         } else if(section === 'HR') {
             entry = `${p[1]}' ${type} Rail - ${state[key]}`;
         } else if(section === 'ST-SH') {
-            entry = `Shoes (${type}) - ${state[key]}`;
-        } else {
+            entry = `Shoe (${type}) - ${state[key]}`;
+        } else if(section === 'ST') {
             entry = `${p[1]} - ${state[key]}`;
         }
-        outputSections[section].push(entry);
+        
+        if (entry) outputSections[section].push(entry);
       }
     });
 
@@ -170,7 +183,7 @@
         
         finalEntries.push(header);
         finalEntries = finalEntries.concat(outputSections[sec]);
-        finalEntries.push(""); // Add spacing between groups
+        finalEntries.push(""); 
       }
     });
 
