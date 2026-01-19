@@ -39,7 +39,6 @@
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
-    /* Massive Summary Box */
     #summary { background: #fff; height: 550px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
     
     .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
@@ -76,7 +75,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.80 - Fixed All Labels</div>
+<div class="version-tag">Version 1.0.81 - Sorted Takeoff</div>
 
 <script>
   const state = {};
@@ -156,19 +155,28 @@
         Object.keys(state).forEach(key => {
             if(state[key] > 0 && key.startsWith(sec.id + '_')) {
                 let parts = key.split('_');
-                let size = parts[1].replace('-', '/');
-                let type = parts[2]; // This captures LH, RH, FRENCH, FLAT, etc.
+                let rawSize = parts[1]; // e.g. "1-6" or "8'"
+                let sizeDisplay = rawSize.replace('-', '/');
+                let type = parts[2];
+                
+                // Numerical sort value
+                let sortVal = parseFloat(rawSize.replace('-', '.').replace("'", ""));
 
-                if (sec.id === 'HR') entries.push(`${size} ${type} Rail - ${state[key]}`);
-                else if (sec.id === 'STSH') entries.push(`Shoe (${type}) - ${state[key]}`);
-                else if (sec.id === 'ST') entries.push(`${parts[1]} - ${state[key]}`);
-                else if (sec.id === '80' || sec.id === 'DBL80') entries.push(`${size} 8/0 ${type} - ${state[key]}`);
-                else entries.push(`${size} ${type} - ${state[key]}`);
+                let text = "";
+                if (sec.id === 'HR') text = `${sizeDisplay} ${type} Rail - ${state[key]}`;
+                else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
+                else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}`;
+                else if (sec.id === '80' || sec.id === 'DBL80') text = `${sizeDisplay} 8/0 ${type} - ${state[key]}`;
+                else text = `${sizeDisplay} ${type} - ${state[key]}`;
+                
+                entries.push({ sortVal, text, type });
             }
         });
 
         if(entries.length > 0) {
-            out += sec.head + "\n" + entries.join("\n") + "\n\n";
+            // Sort by size (sortVal), then by hand (LH before RH)
+            entries.sort((a, b) => a.sortVal - b.sortVal || a.type.localeCompare(b.type));
+            out += sec.head + "\n" + entries.map(e => e.text).join("\n") + "\n\n";
         }
     });
 
