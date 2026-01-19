@@ -1,4 +1,4 @@
-const CACHE_NAME = "door-takeoff-v49";
+const CACHE_NAME = "door-takeoff-v50";
 const ASSETS = [
   "./",
   "./index.html",
