@@ -11,7 +11,6 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
     body{ margin:0; background: var(--bg); padding: 10px; padding-bottom: 40px; }
     
-    /* Global Card Style for "Visual Polish" */
     .header-card, .door-row { 
       background:#fff; 
       border-radius: var(--cardRadius); 
@@ -40,7 +39,7 @@
     .door-row { display: flex; align-items: center; gap: 12px; }
     .size-label { font-weight: 800; font-size: 15px; width: 85px; flex-shrink: 0; color: var(--navy); }
     
-    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; flex-grow: 1; }
+    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(75px, 1fr)); gap: 8px; flex-grow: 1; }
     
     .counter-box { 
       display: flex; 
@@ -55,10 +54,10 @@
     
     .btn-wrap { display: flex; align-items: center; gap: 8px; }
     .btn { 
-      width: 32px; height: 32px; 
+      width: 34px; height: 34px; 
       border-radius: 50%; border: 0; 
       background: var(--navy); color: white; 
-      font-weight: bold; font-size: 18px; 
+      font-weight: bold; font-size: 20px; 
       cursor: pointer; touch-action: manipulation; 
     }
     .qty { font-weight: 800; font-size: 16px; min-width: 20px; text-align: center; color: var(--navy); }
@@ -89,30 +88,27 @@
 
 <div class="header-card" style="margin-top:20px;">
   <label>Special Notes</label>
-  <textarea id="notes" style="height: 80px;" placeholder="e.g. Stair parts in garage..."></textarea>
+  <textarea id="notes" style="height: 80px;" placeholder="e.g. Deliver to back porch..."></textarea>
   <div class="actions">
     <button class="actionBtn primary" onclick="generateSummary()">Generate Takeoff</button>
     <button class="actionBtn secondary" onclick="copySummary()">Copy to Clipboard</button>
   </div>
   <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all?')) location.reload()">Reset All</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.66 - Global Polish & Rail Fix</div>
+<div class="version-tag">Version 1.0.67 - Logic Fix & UI Cleanup</div>
 
 <script>
-  const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const atticSizes = ["22x54", "25x54", "Scuttle"];
-  const railLengths = ["8'", "10'", "12'", "14'", "16'", "18'"];
-  
   const state = {};
 
-  // FIXED: Explicitly targeting IDs for the UI update
+  // FIXED: Logic now strictly uses the key to find the element
   function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     const display = document.getElementById(`qty-${key}`);
-    if (display) display.innerText = state[key];
+    if (display) {
+      display.innerText = state[key];
+    }
   }
 
   function renderRow(label, prefix, types) {
@@ -120,7 +116,8 @@
       <div class="size-label">${label}</div>
       <div class="controls-grid">`;
     types.forEach(type => {
-      let key = `${prefix}-${type}`;
+      // Logic key: Prefix + Label + Type (e.g., HR-8'-OPEN)
+      let key = `${prefix}-${label}-${type}`;
       html += `<div class="counter-box">
         <label>${type}</label>
         <div class="btn-wrap">
@@ -134,25 +131,31 @@
     return html;
   }
 
+  const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
+  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
+  const railLengths = ["8'", "10'", "12'", "14'", "16'", "18'"];
+
   let contentHtml = `<div class="section-title">6/8 Doors</div>`;
-  doorSizes.forEach(s => contentHtml += renderRow(s, `68-${s}`, ["LH", "RH", "SLAB"]));
+  doorSizes.forEach(s => contentHtml += renderRow(s, "68", ["LH", "RH", "SLAB"]));
 
   contentHtml += `<div class="section-title">8/0 Doors</div>`;
-  doorSizes.forEach(s => contentHtml += renderRow(s, `80-${s}`, ["LH", "RH", "SLAB"]));
+  doorSizes.forEach(s => contentHtml += renderRow(s, "80", ["LH", "RH", "SLAB"]));
 
   contentHtml += `<div class="section-title">Double Doors</div>`;
-  dblSizes.forEach(s => contentHtml += renderRow(s, `DBL-${s}`, ["DBL", "T-AST"]));
+  dblSizes.forEach(s => contentHtml += renderRow(s, "DBL", ["DBL", "T-AST"]));
 
   contentHtml += `<div class="section-title">Attic Access</div>`;
-  atticSizes.forEach(s => contentHtml += renderRow(s, `AA-${s}`, ["QTY"]));
+  ["22x54", "25x54", "Scuttle"].forEach(s => contentHtml += renderRow(s, "AA", ["QTY"]));
 
   contentHtml += `<div class="section-title">Handrail (Open vs Wall)</div>`;
-  railLengths.forEach(s => contentHtml += renderRow(s, `HR-${s}`, ["OPEN", "WALL"]));
+  railLengths.forEach(s => contentHtml += renderRow(s, "HR", ["OPEN", "WALL"]));
 
-  contentHtml += `<div class="section-title">Stair Hardware & Parts</div>`;
-  contentHtml += renderRow("Posts", "ST", ["Newels", "Rosettes", "Brackets"]);
-  contentHtml += renderRow("Balusters", "ST", ["Balusters"]);
-  contentHtml += renderRow("Shoes", "ST-Shoes", ["FLAT", "ANGLE"]);
+  contentHtml += `<div class="section-title">Stair Hardware</div>`;
+  contentHtml += renderRow("Newels", "ST", ["QTY"]);
+  contentHtml += renderRow("Rosettes", "ST", ["QTY"]);
+  contentHtml += renderRow("Brackets", "ST", ["QTY"]);
+  contentHtml += renderRow("Balusters", "ST", ["QTY"]);
+  contentHtml += renderRow("Shoes", "ST-SH", ["FLAT", "ANGLE"]);
 
   document.getElementById('app-content').innerHTML = contentHtml;
 
@@ -160,18 +163,18 @@
     let out = `TAKEOFF: ${document.getElementById('customer').value} ${document.getElementById('subdivision').value} ${document.getElementById('lot').value}\n------------------\n`;
     let items = [];
 
-    // All logic keys are now standardized prefix-type
     Object.keys(state).forEach(key => {
       if (state[key] > 0) {
         let parts = key.split('-');
         let display = "";
-        if(key.startsWith('HR')) display = `${parts[1]} ${parts[2]} Rail`;
-        else if(key.startsWith('68')) display = `${parts[1]} 6/8 ${parts[2]}`;
-        else if(key.startsWith('80')) display = `${parts[1]} 8/0 ${parts[2]}`;
-        else if(key.startsWith('ST-Shoes')) display = `Shoes (${parts[2]})`;
-        else display = `${parts[1]} ${parts[2] || ""}`;
         
-        items.push(`${display} - ${state[key]}`);
+        if(parts[0] === 'HR') display = `${parts[1]} ${parts[2]} Rail`;
+        else if(parts[0] === '68') display = `${parts[1]} 6/8 ${parts[2]}`;
+        else if(parts[0] === '80') display = `${parts[1]} 8/0 ${parts[2]}`;
+        else if(parts[0] === 'ST' && parts[1] === 'Shoes') display = `Shoes (${parts[2]})`;
+        else display = `${parts[1]} ${parts[2] === 'QTY' ? '' : parts[2]}`;
+        
+        items.push(`${display.trim()} - ${state[key]}`);
       }
     });
 
