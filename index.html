@@ -75,7 +75,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.81 - Sorted Takeoff</div>
+<div class="version-tag">Version 1.0.82 - Fixed 1/10 Sort & Rail Buttons</div>
 
 <script>
   const state = {};
@@ -92,7 +92,7 @@
       <div class="size-label">${label}</div>
       <div class="controls-grid">`;
     types.forEach(type => {
-      let key = prefix + '_' + label.replace(/\//g, "-") + '_' + type;
+      let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "") + '_' + type;
       html += `<div class="counter-box"><label>${type}</label>
         <div class="btn-wrap">
           <button class="btn" onclick="update('${key}', -1)">−</button>
@@ -155,26 +155,37 @@
         Object.keys(state).forEach(key => {
             if(state[key] > 0 && key.startsWith(sec.id + '_')) {
                 let parts = key.split('_');
-                let rawSize = parts[1]; // e.g. "1-6" or "8'"
+                let rawSize = parts[1];
                 let sizeDisplay = rawSize.replace('-', '/');
                 let type = parts[2];
                 
-                // Numerical sort value
-                let sortVal = parseFloat(rawSize.replace('-', '.').replace("'", ""));
+                // Fixed Sort Logic: 1/10 is wider than 1/8
+                let sortVal = 0;
+                if(rawSize.includes('-')) {
+                    let s = rawSize.split('-');
+                    sortVal = parseInt(s[0]) + (parseInt(s[1]) / 12);
+                } else {
+                    sortVal = parseInt(rawSize);
+                }
 
                 let text = "";
-                if (sec.id === 'HR') text = `${sizeDisplay} ${type} Rail - ${state[key]}`;
-                else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
-                else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}`;
-                else if (sec.id === '80' || sec.id === 'DBL80') text = `${sizeDisplay} 8/0 ${type} - ${state[key]}`;
-                else text = `${sizeDisplay} ${type} - ${state[key]}`;
+                if (sec.id === 'HR') {
+                    text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
+                } else if (sec.id === 'STSH') {
+                    text = `Shoe (${type}) - ${state[key]}`;
+                } else if (sec.id === 'ST') {
+                    text = `${parts[1]} - ${state[key]}`;
+                } else if (sec.id === '80' || sec.id === 'DBL80') {
+                    text = `${sizeDisplay} 8/0 ${type} - ${state[key]}`;
+                } else {
+                    text = `${sizeDisplay} ${type} - ${state[key]}`;
+                }
                 
                 entries.push({ sortVal, text, type });
             }
         });
 
         if(entries.length > 0) {
-            // Sort by size (sortVal), then by hand (LH before RH)
             entries.sort((a, b) => a.sortVal - b.sortVal || a.type.localeCompare(b.type));
             out += sec.head + "\n" + entries.map(e => e.text).join("\n") + "\n\n";
         }
