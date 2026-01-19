@@ -12,9 +12,8 @@
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; }
     
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: center; }
-    /* Styles for the logo in your header */
-    .app-logo { width: 140px; height: auto; margin: 0 auto 10px auto; display: block; }
-    h1 { color: var(--navy); margin: 0 0 12px 0; font-size: 18px; text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
+    
     label { font-weight: 700; font-size: 10px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     
@@ -37,12 +36,15 @@
     .btn:active { background: var(--accent); transform: scale(0.95); }
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
+
+    /* Fire Rated Toggle Styles */
+    .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 5px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; }
+    .toggle-label { font-size: 9px; font-weight: 800; color: #ef4444; }
     
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
-    #summary { background: #fff; height: 550px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
-    
+    #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
     .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
   </style>
 </head>
@@ -50,7 +52,6 @@
 
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
-  <h1>Elevate Trim</h1>
   <label>Customer</label>
   <input id="customer" type="text" placeholder="e.g. Pulte">
   <div class="input-row">
@@ -78,10 +79,10 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.86 - Branded Header & Correct Sorting</div>
+<div class="version-tag">Version 1.0.87 - Restored Attic Stairs</div>
 
 <script>
-  const state = {};
+  const state = { fireRated: false };
 
   function update(key, delta) {
     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(8);
@@ -90,12 +91,17 @@
     if(el) el.innerText = state[key];
   }
 
+  function toggleFire() {
+    state.fireRated = !state.fireRated;
+    document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+  }
+
   function renderRow(label, prefix, types) {
     let html = `<div class="door-row">
       <div class="size-label">${label}</div>
       <div class="controls-grid">`;
     types.forEach(type => {
-      let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "") + '_' + type;
+      let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
       html += `<div class="counter-box"><label>${type}</label>
         <div class="btn-wrap">
           <button class="btn" onclick="update('${key}', -1)">−</button>
@@ -124,6 +130,15 @@
   html += `<div class="section-title double-title">8/0 Double Doors</div>`;
   dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST", "FRENCH"]));
 
+  html += `<div class="section-title stair-title">Attic Stairs</div>`;
+  html += renderRow("22x54", "AS", ["QTY"]);
+  html += renderRow("25x54", "AS", ["QTY"]);
+  html += renderRow("Scuttle", "AS", ["QTY"]);
+  html += `<div class="toggle-container">
+            <span class="toggle-label">FIRE RATED?</span>
+            <button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button>
+           </div>`;
+
   html += `<div class="section-title stair-title">Handrail</div>`;
   railLengths.forEach(s => html += renderRow(s, "HR", ["OPEN", "WALL"]));
 
@@ -148,6 +163,7 @@
         {id: 'DBL68', head: '--- 6/8 DOUBLE ---'},
         {id: '80', head: '--- 8/0 SINGLE ---'},
         {id: 'DBL80', head: '--- 8/0 DOUBLE ---'},
+        {id: 'AS', head: '--- ATTIC STAIRS ---'},
         {id: 'HR', head: '--- HANDRAIL ---'},
         {id: 'ST', head: '--- STAIR HARDWARE ---'},
         {id: 'STSH', head: '--- SHOES ---'}
@@ -162,17 +178,20 @@
                 let sizeDisplay = rawSize.replace('-', '/');
                 let type = parts[2];
                 
-                // MATH FIX: 1/10 (1.83) now sorts correctly after 1/8 (1.66)
                 let sortVal = 0;
                 if(rawSize.includes('-')) {
                     let s = rawSize.split('-');
                     sortVal = parseInt(s[0]) + (parseInt(s[1]) / 12);
                 } else {
-                    sortVal = parseInt(rawSize);
+                    sortVal = parseInt(rawSize) || 0;
                 }
 
                 let text = "";
-                if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
+                if (sec.id === 'AS') {
+                   let fireText = state.fireRated ? " (FIRE RATED)" : "";
+                   text = `Attic Stair ${sizeDisplay}${fireText} - ${state[key]}`;
+                }
+                else if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
                 else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
                 else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}`;
                 else if (sec.id === '80' || sec.id === 'DBL80') text = `${sizeDisplay} 8/0 ${type} - ${state[key]}`;
