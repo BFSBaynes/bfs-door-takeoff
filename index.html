@@ -11,9 +11,11 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; }
     
-    .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: center; }
+    /* Styles for the logo in your header */
+    .app-logo { width: 140px; height: auto; margin: 0 auto 10px auto; display: block; }
     h1 { color: var(--navy); margin: 0 0 12px 0; font-size: 18px; text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-    label { font-weight: 700; font-size: 10px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; }
+    label { font-weight: 700; font-size: 10px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     
     .input-row { display: flex; gap: 8px; }
@@ -47,6 +49,7 @@
 <body>
 
 <div class="header-card">
+  <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
   <h1>Elevate Trim</h1>
   <label>Customer</label>
   <input id="customer" type="text" placeholder="e.g. Pulte">
@@ -75,7 +78,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.84 - Reordered Hardware</div>
+<div class="version-tag">Version 1.0.86 - Branded Header & Correct Sorting</div>
 
 <script>
   const state = {};
@@ -124,7 +127,6 @@
   html += `<div class="section-title stair-title">Handrail</div>`;
   railLengths.forEach(s => html += renderRow(s, "HR", ["OPEN", "WALL"]));
 
-  // Brackets first as requested
   html += `<div class="section-title stair-title">Stair Hardware</div>`;
   html += renderRow("Brackets", "ST", ["QTY"]);
   html += renderRow("Newels", "ST", ["QTY"]);
@@ -160,7 +162,7 @@
                 let sizeDisplay = rawSize.replace('-', '/');
                 let type = parts[2];
                 
-                // Fixed Sort: 1/10 comes after 1/8
+                // MATH FIX: 1/10 (1.83) now sorts correctly after 1/8 (1.66)
                 let sortVal = 0;
                 if(rawSize.includes('-')) {
                     let s = rawSize.split('-');
