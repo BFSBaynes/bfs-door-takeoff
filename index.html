@@ -9,7 +9,7 @@
   <style>
     :root{ --navy:#0A2E4E; --bg:#f4f7f9; --accent: #1e40af; --slate: #334155; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; }
+    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
     
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: center; }
     .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
@@ -21,7 +21,22 @@
     .input-group { flex: 1; }
     .lot-group { width: 85px; }
 
-    .section-title { background: var(--navy); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 12px; margin: 15px -8px 8px -8px; position: sticky; top: 0; z-index: 100; text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.1); }
+    /* STICKY HEADER FIX: Added background-clip and higher z-index */
+    .section-title { 
+      background: var(--navy); 
+      color: #fff; 
+      padding: 10px 12px; 
+      font-weight: 700; 
+      font-size: 12px; 
+      margin: 15px -8px 8px -8px; 
+      position: -webkit-sticky; 
+      position: sticky; 
+      top: 0; 
+      z-index: 999; 
+      text-transform: uppercase; 
+      border-bottom: 2px solid rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
     .double-title { background: var(--slate); }
     .stair-title { background: #475569; }
 
@@ -37,7 +52,6 @@
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
 
-    /* Fire Rated Toggle Styles */
     .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 5px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; }
     .toggle-label { font-size: 9px; font-weight: 800; color: #ef4444; }
     
@@ -79,7 +93,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.87 - Restored Attic Stairs</div>
+<div class="version-tag">Version 1.0.88 - Sticky Headers & Simplified Doubles</div>
 
 <script>
   const state = { fireRated: false };
@@ -122,13 +136,13 @@
   doorSizes.forEach(s => html += renderRow(s, "68", ["LH", "RH", "SLAB"]));
 
   html += `<div class="section-title double-title">6/8 Double Doors</div>`;
-  dblSizes.forEach(s => html += renderRow(s, "DBL68", ["DBL", "T-AST", "FRENCH"]));
+  dblSizes.forEach(s => html += renderRow(s, "DBL68", ["DBL", "T-AST"]));
 
   html += `<div class="section-title">8/0 Doors</div>`;
   doorSizes.forEach(s => html += renderRow(s, "80", ["LH", "RH", "SLAB"]));
 
   html += `<div class="section-title double-title">8/0 Double Doors</div>`;
-  dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST", "FRENCH"]));
+  dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST"]));
 
   html += `<div class="section-title stair-title">Attic Stairs</div>`;
   html += renderRow("22x54", "AS", ["QTY"]);
@@ -182,8 +196,8 @@
                 if(rawSize.includes('-')) {
                     let s = rawSize.split('-');
                     sortVal = parseInt(s[0]) + (parseInt(s[1]) / 12);
-                } else {
-                    sortVal = parseInt(rawSize) || 0;
+                } else if (!isNaN(parseInt(rawSize))) {
+                    sortVal = parseInt(rawSize);
                 }
 
                 let text = "";
