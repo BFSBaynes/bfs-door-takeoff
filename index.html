@@ -19,35 +19,53 @@
     label { font-weight: 700; font-size: 13px; color: #666; display: block; margin-bottom: 4px; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; margin-bottom: 10px; }
 
-    .section-title { background: var(--navy); color: #fff; padding: 10px; border-radius: 8px; font-weight: 700; margin: 20px 0 10px 0; }
+    /* STICKY HEADER CODE */
+    .section-title { 
+      background: var(--navy); 
+      color: #fff; 
+      padding: 12px; 
+      font-weight: 700; 
+      margin: 10px 0;
+      position: -webkit-sticky; /* Support for Safari */
+      position: sticky; 
+      top: 0; 
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
     
-    /* New Mobile Stacked Layout */
     .door-row { 
       background: #fff; 
       border-radius: 10px; 
-      padding: 12px; 
+      padding: 10px; 
       margin-bottom: 8px; 
       display: flex; 
       align-items: center; 
-      justify-content: space-between;
+      gap: 10px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    .size-label { font-weight: 800; font-size: 18px; width: 50px; }
-    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 1; }
+    .size-label { font-weight: 800; font-size: 16px; width: 45px; flex-shrink: 0; }
     
-    .counter-box { display: flex; flex-direction: column; align-items: center; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #eee; }
-    .counter-box label { font-size: 10px; margin-bottom: 4px; text-transform: uppercase; }
+    /* THREE COLUMN GRID: LH, RH, SLAB */
+    .controls-grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr 1fr; 
+      gap: 5px; 
+      flex-grow: 1; 
+    }
     
-    .btn-wrap { display: flex; align-items: center; gap: 10px; }
-    .btn { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; }
-    .qty { font-weight: 800; font-size: 16px; min-width: 15px; text-align: center; }
+    .counter-box { display: flex; flex-direction: column; align-items: center; background: #f8f9fa; padding: 4px; border-radius: 6px; border: 1px solid #eee; }
+    .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: var(--navy); }
+    
+    .btn-wrap { display: flex; align-items: center; gap: 4px; }
+    .btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; touch-action: manipulation; }
+    .qty { font-weight: 800; font-size: 14px; min-width: 12px; text-align: center; }
 
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
     .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
     .primary { background: var(--navy); color: white; }
     .secondary { background: #e2e8f0; color: var(--navy); }
     
-    #summary { background: #fff; height: 180px; margin-top: 10px; font-family: monospace; }
+    #summary { background: #fff; height: 180px; margin-top: 10px; font-family: monospace; font-size: 14px; line-height: 1.4; }
   </style>
 </head>
 <body>
@@ -68,7 +86,7 @@
     <button class="actionBtn secondary" onclick="copySummary()">Copy to Clipboard</button>
   </div>
   <textarea id="summary" readonly placeholder="Your summary will appear here..."></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="location.reload()">Reset All</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all?')) location.reload()">Reset All</button>
 </div>
 
 <script>
@@ -89,11 +107,12 @@
         <div class="controls-grid">`;
       
       if(isSingle) {
-        ['LH', 'RH'].forEach(hand => {
-          let key = `${prefix}-${size}-${hand}`;
+        // Updated to include SLAB ONLY column
+        ['LH', 'RH', 'SLAB'].forEach(type => {
+          let key = `${prefix}-${size}-${type}`;
           html += `
             <div class="counter-box">
-              <label>${hand}</label>
+              <label>${type}</label>
               <div class="btn-wrap">
                 <button class="btn" onclick="update('${key}', -1)">-</button>
                 <span class="qty" id="qty-${key}">0</span>
@@ -104,7 +123,7 @@
       } else {
         let key = `${prefix}-${size}-DBL`;
         html += `
-          <div class="counter-box" style="grid-column: span 2;">
+          <div class="counter-box" style="grid-column: span 3;">
             <label>Double</label>
             <div class="btn-wrap">
               <button class="btn" onclick="update('${key}', -1)">-</button>
@@ -129,11 +148,12 @@
     let output = `TAKEOFF: ${cust} ${lot}\n------------------\n`;
     
     let entries = [];
-    // Sort keys to keep sizes organized
     Object.keys(state).sort().forEach(key => {
       if (state[key] > 0) {
         let [prefix, size, type] = key.split('-');
-        entries.push(`${size} ${type} - ${state[key]}`);
+        // Format height for clarity in takeoff
+        let height = prefix === "68" ? "6/8" : (prefix === "80" ? "8/0" : "");
+        entries.push(`${size} ${height} ${type} - ${state[key]}`);
       }
     });
     
