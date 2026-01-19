@@ -1,6 +1,6 @@
 {
   "name": "BFS Interior Door Takeoff",
-  "short_name": "Door Takeoff",
+  "short_name": "Elevate Trim",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
