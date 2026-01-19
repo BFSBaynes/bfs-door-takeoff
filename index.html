@@ -20,9 +20,8 @@
     .input-group { flex: 1; }
     .lot-group { width: 85px; }
 
-    /* Section Styling */
     .section-title { background: var(--navy); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 12px; margin: 15px -8px 8px -8px; position: sticky; top: 0; z-index: 100; text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.1); }
-    .double-title { background: var(--slate); } /* Visual distinction for Doubles */
+    .double-title { background: var(--slate); }
     .stair-title { background: #475569; }
 
     .door-row { background: #fff; border-radius: 6px; padding: 5px 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
@@ -39,7 +38,10 @@
     
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    #summary { background: #fff; height: 220px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 13px; border: 1px solid #cbd5e1; width:100%; border-radius:4px; padding:8px; line-height: 1.4; }
+    
+    /* Bigger Summary Box */
+    #summary { background: #fff; height: 450px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.5; color: #000; }
+    
     .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
   </style>
 </head>
@@ -47,12 +49,8 @@
 
 <div class="header-card">
   <h1>Elevate Trim</h1>
-  <label>Customer</label>
-  <input id="customer" type="text" placeholder="e.g. Pulte">
-  <div class="input-row">
-    <div class="input-group"><label>Subdivision</label><input id="subdivision" type="text" placeholder="e.g. Huxley"></div>
-    <div class="lot-group"><label>Lot #</label><input id="lot" type="text" placeholder="104"></div>
-  </div>
+  <label>Job Site / Lot Info</label>
+  <input id="jobInfo" type="text" placeholder="e.g. Pulte Huxley 104">
 </div>
 
 <div id="app-content"></div>
@@ -61,14 +59,14 @@
   <label>Notes & Summary</label>
   <textarea id="notes" placeholder="Special instructions..."></textarea>
   <div class="actions">
-    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate</button>
-    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy</button>
+    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate Takeoff</button>
+    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
   <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset App</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.77 - Final Formatting Fix</div>
+<div class="version-tag">Version 1.0.78 - Detailed Takeoff + Large View</div>
 
 <script>
   const state = {};
@@ -102,7 +100,6 @@
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "10'", "12'", "14'", "16'", "18'"];
 
-  // Layout order changed per user request
   let html = `<div class="section-title">6/8 Doors</div>`;
   doorSizes.forEach(s => html += renderRow(s, "68", ["LH", "RH", "SLAB"]));
 
@@ -115,7 +112,7 @@
   html += `<div class="section-title double-title">8/0 Double Doors</div>`;
   dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST", "FRENCH"]));
 
-  html += `<div class="section-title stair-title">Handrail (Open vs Wall)</div>`;
+  html += `<div class="section-title stair-title">Handrail</div>`;
   railLengths.forEach(s => html += renderRow(s, "HR", ["OPEN", "WALL"]));
 
   html += `<div class="section-title stair-title">Stair Hardware</div>`;
@@ -128,11 +125,8 @@
   document.getElementById('app-content').innerHTML = html;
 
   function generateSummary() {
-    const cust = document.getElementById('customer').value || "N/A";
-    const sub = document.getElementById('subdivision').value || "N/A";
-    const lot = document.getElementById('lot').value || "N/A";
-    
-    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n------------------\n`;
+    const info = document.getElementById('jobInfo').value || "N/A";
+    let out = `TAKEOFF: ${info}\n------------------\n`;
     
     const order = ['68', 'DBL68', '80', 'DBL80', 'HR', 'ST', 'ST-SH'];
     let outputSections = {};
@@ -142,11 +136,11 @@
       if(state[key] > 0) {
         let p = key.split('-');
         let section = p[0];
-        // Ensure size always uses the / formatting
         let size = p[1].replace('-', '/');
         let type = p[2];
         let entry = "";
 
+        // DESCRIPTIVE LOGIC
         if(section === '68') {
             entry = `${size} ${type} - ${state[key]}`;
         } else if(section === '80') {
@@ -172,14 +166,15 @@
         let header = sec === '68' ? "--- 6/8 SINGLE ---" : 
                      sec === '80' ? "--- 8/0 SINGLE ---" : 
                      sec === 'DBL68' ? "--- 6/8 DOUBLE ---" :
-                     sec === 'DBL80' ? "--- 8/0 DOUBLE ---" : "--- STAIR/RAIL ---";
+                     sec === 'DBL80' ? "--- 8/0 DOUBLE ---" : "--- HARDWARE ---";
         
-        if (finalEntries.indexOf(header) === -1) finalEntries.push(header);
+        finalEntries.push(header);
         finalEntries = finalEntries.concat(outputSections[sec]);
+        finalEntries.push(""); // Add spacing between groups
       }
     });
 
-    out += finalEntries.length ? finalEntries.join("\n") : "No selections made.";
+    out += finalEntries.length ? finalEntries.join("\n") : "Nothing selected.";
     if(document.getElementById('notes').value) out += "\n------------------\nNOTES: " + document.getElementById('notes').value;
     document.getElementById('summary').value = out;
   }
@@ -188,7 +183,7 @@
     const s = document.getElementById("summary");
     s.select();
     document.execCommand("copy");
-    alert("Copied!");
+    alert("Takeoff copied to clipboard!");
   }
 </script>
 </body>
