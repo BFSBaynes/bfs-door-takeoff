@@ -118,18 +118,42 @@
     createTable("8/0 Doors", "80", sizes, true) +
     createTable("Double Doors", "DBL", dblSizes, false);
 
-  function generateSummary() {
+ function generateSummary() {
     const cust = document.getElementById('customer').value;
     const lot = document.getElementById('lot').value;
-    let output = `TAKEOFF: ${cust} - ${lot}\n------------------\n`;
-
+    
+    // Header
+    let output = `TAKEOFF: ${cust} ${lot}\n`;
+    output += `------------------\n`;
+    
     let entries = [];
     for (let key in state) {
       if (state[key] > 0) {
-        let parts = key.split('-');
-        // Formatting to look like the AppWright screenshot shorthand
-        entries.push(`${state[key]} ${parts[1]} ${parts[2]} (${parts[0]})`);
+        let parts = key.split('-'); // parts: [section, size, type]
+        let section = parts[0];     // e.g., "68"
+        let size = parts[1];        // e.g., "1/8"
+        let typeCode = parts[2];    // e.g., "LHU"
+        
+        let displayType = "";
+        
+        // Convert technical codes to your preferred shorthand
+        if (typeCode === "LHU" || typeCode === "LHS") displayType = "LH";
+        else if (typeCode === "RHU" || typeCode === "RHS") displayType = "RH";
+        else if (typeCode === "U" || typeCode === "F") displayType = "DBL";
+
+        // Create the line: 1/8 LH - 2
+        entries.push(`${size} ${displayType} - ${state[key]}`);
       }
+    }
+    
+    if (entries.length > 0) {
+      output += entries.join("\n");
+    } else {
+      output += "No items selected.";
+    }
+    
+    document.getElementById('summary').value = output;
+  }
     }
 
     output += entries.length > 0 ? entries.join(". ") + "." : "No items selected.";
