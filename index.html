@@ -13,23 +13,23 @@
     .header-card { background:#fff; border-radius: var(--cardRadius); padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { color: var(--navy); margin: 0 0 15px 0; font-size: 24px; text-align: center; font-weight: 800; }
     label { font-weight: 700; font-size: 13px; color: #666; display: block; margin-bottom: 4px; }
-    input, textarea { width:100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 12px; outline: none; }
+    input, textarea, select { width:100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 12px; outline: none; background: #fff; }
     .section-title { background: var(--navy); color: #fff; padding: 12px; font-weight: 700; margin: 10px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .door-row { background: #fff; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .size-label { font-weight: 800; font-size: 14px; width: 65px; flex-shrink: 0; color: var(--navy); }
+    .size-label { font-weight: 800; font-size: 14px; width: 75px; flex-shrink: 0; color: var(--navy); }
     .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 6px; flex-grow: 1; }
     .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px; border: 1px solid #eee; border-radius: 8px; }
     .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: #888; text-align: center; }
     .btn-wrap { display: flex; align-items: center; gap: 4px; }
     .btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; touch-action: manipulation; }
     .qty { font-weight: 800; font-size: 14px; min-width: 12px; text-align: center; }
-    .ft-check { width: 20px; height: 20px; cursor: pointer; margin: 5px 0; }
+    .toggle-group { display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 8px; width: 100%; margin-bottom: 8px; }
+    .toggle-btn { flex: 1; border: 0; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 700; background: transparent; color: #64748b; cursor: pointer; }
+    .toggle-btn.active { background: var(--navy); color: white; }
     .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .clear-link { font-size: 11px; color: #b91c1c; text-decoration: none; font-weight: 700; }
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
     .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
-    .primary { background: var(--navy); color: white; }
-    .secondary { background: #e2e8f0; color: var(--navy); }
     #summary { background: #fff; height: 220px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid #eee; }
     .version-tag { text-align:center; color:#ccc; font-size:10px; margin-top:20px; }
   </style>
@@ -63,18 +63,31 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.61 - Added Stair Rail Parts</div>
+<div class="version-tag">Version 1.0.63 - Added Rail Toggles</div>
 
 <script>
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const atticSizes = ["22x54", "25x54", "Scuttle"];
-  const stairParts = ["Handrail", "Newels", "Balusters", "Shoes", "Rosettes"];
-  const state = {};
+  
+  const state = {
+    railLength: "",
+    railQty: 0,
+    railType: "Open" // Default to Open
+  };
 
   function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
-    document.getElementById(`qty-${key}`).innerText = state[key];
+    if(document.getElementById(`qty-${key}`)) {
+      document.getElementById(`qty-${key}`).innerText = state[key];
+    }
+  }
+
+  function setRailType(type) {
+    state.railType = type;
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.innerText === type);
+    });
   }
 
   function toggleFT(key) {
@@ -91,7 +104,7 @@
         let key = `${prefix}-${size}-${type}`;
         html += `<div class="counter-box"><label>${type}</label>`;
         if (type === "FT") {
-          html += `<input type="checkbox" class="ft-check" onchange="toggleFT('${key}')">`;
+          html += `<input type="checkbox" onchange="toggleFT('${key}')">`;
         } else {
           html += `<div class="btn-wrap">
             <button class="btn" onclick="update('${key}', -1)">-</button>
@@ -106,19 +119,88 @@
     return html;
   }
 
-  document.getElementById('app-content').innerHTML = 
-    renderSection("6/8 Doors", "68", doorSizes, ["LH", "RH", "SLAB"]) +
-    renderSection("8/0 Doors", "80", doorSizes, ["LH", "RH", "SLAB"]) +
-    renderSection("Double Doors", "DBL", dblSizes, ["DBL", "T-AST", "FRENCH"]) +
-    renderSection("Attic Access", "AA", atticSizes, ["QTY", "FT"]) +
-    renderSection("Stair / Rail", "ST", stairParts, ["QTY", "FLAT", "ANGLE"]);
+  let mainHtml = renderSection("6/8 Doors", "68", doorSizes, ["LH", "RH", "SLAB"]) +
+                 renderSection("8/0 Doors", "80", doorSizes, ["LH", "RH", "SLAB"]) +
+                 renderSection("Double Doors", "DBL", dblSizes, ["DBL", "T-AST", "FRENCH"]) +
+                 renderSection("Attic Access", "AA", atticSizes, ["QTY", "FT"]);
+
+  mainHtml += `<div class="section-title">Stair / Rail</div>`;
+  
+  // Toggle for Rail Type
+  mainHtml += `<div class="door-row" style="flex-direction: column; align-items: flex-start;">
+    <label style="font-size: 11px; margin-bottom: 6px;">RAIL INSTALL TYPE</label>
+    <div class="toggle-group">
+      <button class="toggle-btn active" onclick="setRailType('Open')">Open</button>
+      <button class="toggle-btn" onclick="setRailType('Wall')">Wall</button>
+    </div>
+  </div>`;
+
+  // Handrail Length/Qty
+  mainHtml += `<div class="door-row">
+    <div class="size-label">Handrail</div>
+    <div style="display: flex; gap: 10px; flex-grow: 1;">
+      <select id="rail-len" style="margin-bottom:0;" onchange="state.railLength = this.value">
+        <option value="">Select Length</option>
+        <option value="8'">8' Rail</option>
+        <option value="10'">10' Rail</option>
+        <option value="12'">12' Rail</option>
+        <option value="14'">14' Rail</option>
+        <option value="16'">16' Rail</option>
+        <option value="18'">18' Rail</option>
+      </select>
+      <div class="counter-box" style="min-width: 80px;">
+        <label>QTY</label>
+        <div class="btn-wrap">
+          <button class="btn" onclick="update('railQty', -1); document.getElementById('qty-railQty').innerText = state.railQty">-</button>
+          <span class="qty" id="qty-railQty">0</span>
+          <button class="btn" onclick="update('railQty', 1); document.getElementById('qty-railQty').innerText = state.railQty">+</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  ["Newels", "Balusters", "Rosettes"].forEach(item => {
+    mainHtml += `<div class="door-row">
+      <div class="size-label">${item}</div>
+      <div class="controls-grid">
+        <div class="counter-box"><label>QTY</label>
+          <div class="btn-wrap">
+            <button class="btn" onclick="update('ST-${item}', -1)">-</button>
+            <span class="qty" id="qty-ST-${item}">0</span>
+            <button class="btn" onclick="update('ST-${item}', 1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  mainHtml += `<div class="door-row">
+    <div class="size-label">Shoes</div>
+    <div class="controls-grid">
+      <div class="counter-box"><label>FLAT</label>
+        <div class="btn-wrap">
+          <button class="btn" onclick="update('ST-Shoes-Flat', -1)">-</button>
+          <span class="qty" id="qty-ST-Shoes-Flat">0</span>
+          <button class="btn" onclick="update('ST-Shoes-Flat', 1)">+</button>
+        </div>
+      </div>
+      <div class="counter-box"><label>ANGLED</label>
+        <div class="btn-wrap">
+          <button class="btn" onclick="update('ST-Shoes-Angle', -1)">-</button>
+          <span class="qty" id="qty-ST-Shoes-Angle">0</span>
+          <button class="btn" onclick="update('ST-Shoes-Angle', 1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('app-content').innerHTML = mainHtml;
 
   function generateSummary() {
     const cust = document.getElementById('customer').value;
     const sub = document.getElementById('subdivision').value;
     const lot = document.getElementById('lot').value;
     const notes = document.getElementById('notes').value;
-    
     let output = `TAKEOFF: ${cust} ${sub} ${lot}\n------------------\n`;
     let entries = [];
     
@@ -126,8 +208,7 @@
       { prefix: "68", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
       { prefix: "80", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
       { prefix: "DBL", sizes: dblSizes, types: ["DBL", "T-AST", "FRENCH"] },
-      { prefix: "AA", sizes: atticSizes, types: ["QTY", "FT"] },
-      { prefix: "ST", sizes: stairParts, types: ["QTY", "FLAT", "ANGLE"] }
+      { prefix: "AA", sizes: atticSizes, types: ["QTY", "FT"] }
     ];
     
     sections.forEach(sec => {
@@ -135,37 +216,27 @@
         if (sec.prefix === "AA") {
           let qtyKey = `AA-${size}-QTY`;
           let ftKey = `AA-${size}-FT`;
-          if (state[qtyKey] > 0) {
-            let label = state[ftKey] ? `${size} FT` : `${size}`;
-            entries.push(`${label} - ${state[qtyKey]}`);
-          }
-        } else if (sec.prefix === "ST") {
-          sec.types.forEach(type => {
-            let key = `ST-${size}-${type}`;
-            if (state[key] > 0) {
-              let suffix = (type !== "QTY") ? ` (${type})` : "";
-              let unit = (size === "Handrail" && type === "QTY") ? "FT" : "";
-              entries.push(`${size}${suffix} - ${state[key]}${unit}`);
-            }
-          });
+          if (state[qtyKey] > 0) entries.push(`${size}${state[ftKey] ? ' FT' : ''} - ${state[qtyKey]}`);
         } else {
           sec.types.forEach(type => {
             let key = `${sec.prefix}-${size}-${type}`;
-            if (state[key] > 0) {
-              let heightDisplay = (sec.prefix === "80") ? " 8/0" : "";
-              entries.push(`${size}${heightDisplay} ${type} - ${state[key]}`);
-            }
+            if (state[key] > 0) entries.push(`${size}${(sec.prefix === "80") ? " 8/0" : ""} ${type} - ${state[key]}`);
           });
         }
       });
     });
+
+    if (state.railQty > 0 && state.railLength) {
+      entries.push(`${state.railLength} ${state.railType} Rail - ${state.railQty}`);
+    }
+    if (state['ST-Newels'] > 0) entries.push(`Newels - ${state['ST-Newels']}`);
+    if (state['ST-Balusters'] > 0) entries.push(`Balusters - ${state['ST-Balusters']}`);
+    if (state['ST-Shoes-Flat'] > 0) entries.push(`Shoes (Flat) - ${state['ST-Shoes-Flat']}`);
+    if (state['ST-Shoes-Angle'] > 0) entries.push(`Shoes (Angled) - ${state['ST-Shoes-Angle']}`);
+    if (state['ST-Rosettes'] > 0) entries.push(`Rosettes - ${state['ST-Rosettes']}`);
     
     output += entries.length > 0 ? entries.join("\n") : "No items selected.";
-    
-    if (notes.trim() !== "") {
-      output += `\n------------------\nNOTES: ${notes}`;
-    }
-
+    if (notes.trim() !== "") output += `\n------------------\nNOTES: ${notes}`;
     document.getElementById('summary').value = output;
   }
 
