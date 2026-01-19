@@ -48,7 +48,7 @@
     .controls-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; flex-grow: 1; }
     
     .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px; border: 1px solid #eee; border-radius: 8px; }
-    .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: #888; }
+    .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: #888; text-align: center; }
     
     .btn-wrap { display: flex; align-items: center; gap: 4px; }
     .btn { width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; touch-action: manipulation; }
@@ -89,9 +89,9 @@
 </div>
 
 <script>
-  // Sizes in the specific order you want them to populate
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes = ["4/0","4/8","5/0","6/0"];
+  // Added 5/4 to the double door list
+  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const state = {};
 
   function update(key, delta) {
@@ -99,47 +99,36 @@
     document.getElementById(`qty-${key}`).innerText = state[key];
   }
 
-  function renderSection(title, prefix, sizes, isSingle) {
+  function renderSection(title, prefix, sizes, types) {
     let html = `<div class="section-title">${title}</div>`;
     sizes.forEach(size => {
       html += `<div class="door-row">
         <div class="size-label">${size}</div>
         <div class="controls-grid">`;
       
-      if(isSingle) {
-        ['LH', 'RH', 'SLAB'].forEach(type => {
-          let key = `${prefix}-${size}-${type}`;
-          html += `
-            <div class="counter-box">
-              <label>${type}</label>
-              <div class="btn-wrap">
-                <button class="btn" onclick="update('${key}', -1)">-</button>
-                <span class="qty" id="qty-${key}">0</span>
-                <button class="btn" onclick="update('${key}', 1)">+</button>
-              </div>
-            </div>`;
-        });
-      } else {
-        let key = `${prefix}-${size}-DBL`;
+      types.forEach(type => {
+        let key = `${prefix}-${size}-${type}`;
         html += `
-          <div class="counter-box" style="grid-column: span 3;">
-            <label>Double</label>
+          <div class="counter-box">
+            <label>${type}</label>
             <div class="btn-wrap">
               <button class="btn" onclick="update('${key}', -1)">-</button>
               <span class="qty" id="qty-${key}">0</span>
               <button class="btn" onclick="update('${key}', 1)">+</button>
             </div>
           </div>`;
-      }
+      });
+      
       html += `</div></div>`;
     });
     return html;
   }
 
+  // Define headers for the sections
   document.getElementById('app-content').innerHTML = 
-    renderSection("6/8 Doors", "68", doorSizes, true) +
-    renderSection("8/0 Doors", "80", doorSizes, true) +
-    renderSection("Double Doors", "DBL", dblSizes, false);
+    renderSection("6/8 Doors", "68", doorSizes, ["LH", "RH", "SLAB"]) +
+    renderSection("8/0 Doors", "80", doorSizes, ["LH", "RH", "SLAB"]) +
+    renderSection("Double Doors", "DBL", dblSizes, ["DBL", "T-AST", "FRENCH"]);
 
   function generateSummary() {
     const cust = document.getElementById('customer').value;
@@ -147,24 +136,24 @@
     const lot = document.getElementById('lot').value;
     
     let output = `TAKEOFF: ${cust} ${sub} ${lot}\n------------------\n`;
-    
     let entries = [];
     
-    // We process sections in a specific order so the output is consistent
-    const sections = ["68", "80", "DBL"];
+    // Process sections in order
+    const sections = [
+      { prefix: "68", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
+      { prefix: "80", sizes: doorSizes, types: ["LH", "RH", "SLAB"] },
+      { prefix: "DBL", sizes: dblSizes, types: ["DBL", "T-AST", "FRENCH"] }
+    ];
     
-    sections.forEach(secPrefix => {
-      const currentSizes = secPrefix === "DBL" ? dblSizes : doorSizes;
-      
-      currentSizes.forEach(size => {
-        const types = secPrefix === "DBL" ? ["DBL"] : ["LH", "RH", "SLAB"];
-        
-        types.forEach(type => {
-          let key = `${secPrefix}-${size}-${type}`;
+    sections.forEach(sec => {
+      sec.sizes.forEach(size => {
+        sec.types.forEach(type => {
+          let key = `${sec.prefix}-${size}-${type}`;
           if (state[key] > 0) {
-            // Only show height for 8/0 doors
-            let heightDisplay = (secPrefix === "80") ? " 8/0" : "";
-            entries.push(`${size}${heightDisplay} ${type} - ${state[key]}`);
+            let heightDisplay = (sec.prefix === "80") ? " 8/0" : "";
+            // Keep "DBL" notation for double door sizes
+            let typeLabel = type;
+            entries.push(`${size}${heightDisplay} ${typeLabel} - ${state[key]}`);
           }
         });
       });
