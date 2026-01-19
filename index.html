@@ -13,24 +13,24 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; }
     body{ margin:0; background: var(--bg); padding: 10px; padding-bottom: 40px; }
     
-    .header-card { background:#fff; border-radius: var(--cardRadius); padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    h1 { color: var(--navy); margin: 0 0 15px 0; font-size: 24px; text-align: center; }
+    .header-card { background:#fff; border-radius: var(--cardRadius); padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { color: var(--navy); margin: 0 0 15px 0; font-size: 24px; text-align: center; font-weight: 800; }
     
     label { font-weight: 700; font-size: 13px; color: #666; display: block; margin-bottom: 4px; }
-    input, textarea { width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; margin-bottom: 10px; }
+    input, textarea { width:100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 12px; outline: none; }
+    input:focus { border-color: var(--navy); }
 
-    /* STICKY HEADER CODE */
     .section-title { 
       background: var(--navy); 
       color: #fff; 
       padding: 12px; 
       font-weight: 700; 
       margin: 10px 0;
-      position: -webkit-sticky; /* Support for Safari */
+      position: -webkit-sticky;
       position: sticky; 
       top: 0; 
       z-index: 100;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
     .door-row { 
@@ -41,31 +41,26 @@
       display: flex; 
       align-items: center; 
       gap: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .size-label { font-weight: 800; font-size: 16px; width: 45px; flex-shrink: 0; }
+    .size-label { font-weight: 800; font-size: 16px; width: 45px; flex-shrink: 0; color: var(--navy); }
     
-    /* THREE COLUMN GRID: LH, RH, SLAB */
-    .controls-grid { 
-      display: grid; 
-      grid-template-columns: 1fr 1fr 1fr; 
-      gap: 5px; 
-      flex-grow: 1; 
-    }
+    .controls-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; flex-grow: 1; }
     
-    .counter-box { display: flex; flex-direction: column; align-items: center; background: #f8f9fa; padding: 4px; border-radius: 6px; border: 1px solid #eee; }
-    .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: var(--navy); }
+    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px; border: 1px solid #eee; border-radius: 8px; }
+    .counter-box label { font-size: 9px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800; color: #888; }
     
     .btn-wrap { display: flex; align-items: center; gap: 4px; }
-    .btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; touch-action: manipulation; }
-    .qty { font-weight: 800; font-size: 14px; min-width: 12px; text-align: center; }
+    .btn { width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; touch-action: manipulation; }
+    .btn:active { opacity: 0.7; }
+    .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; }
 
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-    .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .actionBtn { padding: 15px; border: 0; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .primary { background: var(--navy); color: white; }
     .secondary { background: #e2e8f0; color: var(--navy); }
     
-    #summary { background: #fff; height: 180px; margin-top: 10px; font-family: monospace; font-size: 14px; line-height: 1.4; }
+    #summary { background: #fff; height: 200px; margin-top: 10px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid #eee; }
   </style>
 </head>
 <body>
@@ -73,9 +68,13 @@
 <div class="header-card">
   <h1>Elevate Trim</h1>
   <label>Customer</label>
-  <input id="customer" type="text" placeholder="Pulte">
-  <label>Lot # / Job Address</label>
-  <input id="lot" type="text" placeholder="1405 Rowboat Rd">
+  <input id="customer" type="text" placeholder="e.g. Pulte">
+  
+  <label>Subdivision</label>
+  <input id="subdivision" type="text" placeholder="e.g. Harris LC2B">
+
+  <label>Lot #</label>
+  <input id="lot" type="text" placeholder="e.g. 1405">
 </div>
 
 <div id="app-content"></div>
@@ -85,11 +84,12 @@
     <button class="actionBtn primary" onclick="generateSummary()">Generate Takeoff</button>
     <button class="actionBtn secondary" onclick="copySummary()">Copy to Clipboard</button>
   </div>
-  <textarea id="summary" readonly placeholder="Your summary will appear here..."></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all?')) location.reload()">Reset All</button>
+  <textarea id="summary" readonly placeholder="Final summary for AppWright..."></textarea>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:10px;" onclick="if(confirm('Clear all entries?')) location.reload()">Reset All</button>
 </div>
 
 <script>
+  // Sizes in the specific order you want them to populate
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","6/0"];
   const state = {};
@@ -107,7 +107,6 @@
         <div class="controls-grid">`;
       
       if(isSingle) {
-        // Updated to include SLAB ONLY column
         ['LH', 'RH', 'SLAB'].forEach(type => {
           let key = `${prefix}-${size}-${type}`;
           html += `
@@ -144,17 +143,31 @@
 
   function generateSummary() {
     const cust = document.getElementById('customer').value;
+    const sub = document.getElementById('subdivision').value;
     const lot = document.getElementById('lot').value;
-    let output = `TAKEOFF: ${cust} ${lot}\n------------------\n`;
+    
+    let output = `TAKEOFF: ${cust} ${sub} ${lot}\n------------------\n`;
     
     let entries = [];
-    Object.keys(state).sort().forEach(key => {
-      if (state[key] > 0) {
-        let [prefix, size, type] = key.split('-');
-        // Format height for clarity in takeoff
-        let height = prefix === "68" ? "6/8" : (prefix === "80" ? "8/0" : "");
-        entries.push(`${size} ${height} ${type} - ${state[key]}`);
-      }
+    
+    // We process sections in a specific order so the output is consistent
+    const sections = ["68", "80", "DBL"];
+    
+    sections.forEach(secPrefix => {
+      const currentSizes = secPrefix === "DBL" ? dblSizes : doorSizes;
+      
+      currentSizes.forEach(size => {
+        const types = secPrefix === "DBL" ? ["DBL"] : ["LH", "RH", "SLAB"];
+        
+        types.forEach(type => {
+          let key = `${secPrefix}-${size}-${type}`;
+          if (state[key] > 0) {
+            // Only show height for 8/0 doors
+            let heightDisplay = (secPrefix === "80") ? " 8/0" : "";
+            entries.push(`${size}${heightDisplay} ${type} - ${state[key]}`);
+          }
+        });
+      });
     });
     
     output += entries.length > 0 ? entries.join("\n") : "No items selected.";
@@ -166,7 +179,7 @@
     ta.select();
     ta.setSelectionRange(0, 99999);
     document.execCommand("copy");
-    alert("Copied for AppWright!");
+    alert("Copied to Clipboard!");
   }
 </script>
 
