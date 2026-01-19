@@ -2,74 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Elevate Trim - BFS</title>
   <style>
     :root{ --navy:#0A2E4E; --bg:#f4f7f9; }
-    *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 40px; }
+    *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; }
     
-    .header-card { background:#fff; border-radius: 10px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-    h1 { color: var(--navy); margin: 0 0 10px 0; font-size: 20px; text-align: center; font-weight: 800; }
-    label { font-weight: 700; font-size: 11px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; }
-    input, textarea { width:100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; margin-bottom: 10px; outline: none; }
+    .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    h1 { color: var(--navy); margin: 0 0 10px 0; font-size: 18px; text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    label { font-weight: 700; font-size: 10px; color: #64748b; display: block; margin-bottom: 3px; text-transform: uppercase; }
+    input, textarea { width:100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     
-    .section-title { background: var(--navy); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 13px; margin: 12px -8px 8px -8px; position: sticky; top: 0; z-index: 100; }
+    .section-title { background: var(--navy); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 12px; margin: 15px -8px 8px -8px; position: sticky; top: 0; z-index: 100; text-transform: uppercase; }
     
-    .door-row { background: #fff; border-radius: 8px; padding: 6px 10px; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
-    .size-label { font-weight: 800; font-size: 12px; width: 60px; flex-shrink: 0; color: var(--navy); }
+    .door-row { background: #fff; border-radius: 6px; padding: 5px 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
+    .size-label { font-weight: 800; font-size: 11px; width: 55px; flex-shrink: 0; color: var(--navy); }
     
-    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(55px, 1fr)); gap: 4px; flex-grow: 1; }
-    .counter-box { display: flex; flex-direction: column; align-items: center; background: #f8fafc; padding: 3px; border: 1px solid #e2e8f0; border-radius: 6px; }
-    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #94a3b8; }
+    .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(52px, 1fr)); gap: 3px; flex-grow: 1; }
+    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 2px; border: 1px solid #f1f5f9; border-radius: 4px; }
+    .counter-box label { font-size: 7px; margin-bottom: 1px; color: #94a3b8; font-weight: 900; }
     
-    .btn-wrap { display: flex; align-items: center; gap: 4px; }
-    /* SMALLER, COMPACT BUTTONS */
+    .btn-wrap { display: flex; align-items: center; gap: 3px; }
+    /* Mobile-optimized button size */
     .btn { 
-      width: 26px; height: 26px; 
-      border-radius: 4px; border: 0; 
+      width: 24px; height: 24px; 
+      border-radius: 3px; border: 0; 
       background: var(--navy); color: white; 
-      font-weight: bold; font-size: 16px; 
+      font-weight: bold; font-size: 14px; 
       display: flex; align-items: center; justify-content: center;
-      touch-action: manipulation;
     }
-    .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
+    .btn:active { opacity: 0.7; background: #000; }
     
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-    .actionBtn { padding: 12px; border: 0; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    #summary { background: #fff; height: 180px; margin-top: 10px; font-family: monospace; font-size: 12px; border: 1px solid #cbd5e1; width:100%; border-radius:6px; padding:8px; }
-    .version-tag { text-align:center; color:#94a3b8; font-size:10px; margin-top:20px; }
+    .qty { font-weight: 800; font-size: 13px; min-width: 12px; text-align: center; color: var(--navy); }
+    
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .actionBtn { padding: 12px; border: 0; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    #summary { background: #fff; height: 160px; margin-top: 8px; font-family: monospace; font-size: 12px; border: 1px solid #cbd5e1; width:100%; border-radius:4px; padding:8px; }
+    .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
   </style>
 </head>
 <body>
 
 <div class="header-card">
   <h1>Elevate Trim</h1>
-  <label>Job Information</label>
+  <label>Job Site / Lot Info</label>
   <input id="job" type="text" placeholder="e.g. Pulte Huxley 104">
 </div>
 
 <div id="app-content"></div>
 
 <div class="header-card" style="margin-top:15px;">
-  <label>Takeoff Summary</label>
+  <label>Notes & Takeoff</label>
   <div class="actions">
     <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate</button>
-    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy</button>
+    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Clipboard</button>
   </div>
-  <textarea id="summary" readonly placeholder="Summary appears here..."></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all?')) location.reload()">Reset App</button>
+  <textarea id="summary" readonly></textarea>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All</button>
 </div>
 
-<div class="version-tag">Version 1.0.71 - Anti-Zoom Fix</div>
+<div class="version-tag">Version 1.0.72 - Tablet & Phone Optimized</div>
 
 <script>
   const state = {};
 
   function update(key, delta) {
-    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(8);
+    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(5);
     state[key] = Math.max(0, (state[key] || 0) + delta);
     const el = document.getElementById('qty-' + key);
     if(el) el.innerText = state[key];
@@ -142,7 +143,7 @@
     const s = document.getElementById("summary");
     s.select();
     document.execCommand("copy");
-    alert("Copied to Clipboard!");
+    alert("Copied!");
   }
 </script>
 </body>
