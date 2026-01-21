@@ -44,6 +44,8 @@
     .note-box { width: 100%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
     .note-box::placeholder { color: #94a3b8; font-size: 7px; }
 
+    .attic-text-area { min-height: 80px; font-size: 14px; border: 1px dashed var(--navy); background: #fff; margin-top: 5px; }
+
     .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 5px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; }
     .toggle-label { font-size: 9px; font-weight: 800; color: #ef4444; }
     
@@ -85,7 +87,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.1.3 - Door Notes & UI Feedback</div>
+<div class="version-tag">Version 1.2.0 - 1/4 Sizes & Custom Attic Box</div>
 
 <script>
   const state = { fireRated: false };
@@ -122,7 +124,7 @@
     return html;
   }
 
-  const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
+  const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "10'", "16'", "18'"];
 
@@ -138,8 +140,8 @@
   html += `<div class="section-title double-title">8/0 Double Doors</div>`;
   dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST"]));
 
-  html += `<div class="section-title stair-title">Attic SC Doors</div>`;
-  doorSizes.forEach(s => html += renderRow(s, "AD", ["LH", "RH"]));
+  html += `<div class="section-title stair-title">Attic SC Doors (Custom)</div>`;
+  html += `<div style="padding:0 8px;"><textarea id="attic_custom" class="attic-text-area" placeholder="Enter sizes, handing, and cuts here..."></textarea></div>`;
 
   html += `<div class="section-title stair-title">Attic Stairs</div>`;
   html += renderRow("22x54", "AS", ["QTY"]);
@@ -173,7 +175,6 @@
         {id: 'DBL68', head: '--- 6/8 DOUBLE ---'},
         {id: '80', head: '--- 8/0 SINGLE ---'},
         {id: 'DBL80', head: '--- 8/0 DOUBLE ---'},
-        {id: 'AD', head: '--- ATTIC DOORS ---'},
         {id: 'AS', head: '--- ATTIC STAIRS ---'},
         {id: 'HR', head: '--- HANDRAIL ---'},
         {id: 'ST', head: '--- STAIR HARDWARE ---'},
@@ -199,17 +200,21 @@
                 else if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
                 else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
                 else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}`;
-                else if (sec.id === '80' || sec.id === 'DBL80') text = `${sizeDisplay} 8/0 ${type}${noteText} - ${state[key]}`;
-                else if (sec.id === 'AD') text = `${sizeDisplay} ${type} Attic Door${noteText} - ${state[key]}`;
                 else text = `${sizeDisplay} ${type}${noteText} - ${state[key]}`;
                 
-                entries.push({ text, type, label: parts[1] });
+                entries.push({ text });
             }
         });
         if(entries.length > 0) {
             out += sec.head + "\n" + entries.map(e => e.text).join("\n") + "\n\n";
         }
     });
+
+    // Handle Custom Attic SC Box
+    const atticVal = document.getElementById('attic_custom').value;
+    if(atticVal) {
+      out += "--- ATTIC SC DOORS ---\n" + atticVal + "\n\n";
+    }
 
     const notes = document.getElementById('notes').value;
     if(notes) out += "----------------------------\nNOTES: " + notes;
@@ -222,15 +227,13 @@
     s.select();
     document.execCommand("copy");
     
-    const originalText = btn.innerText;
-    const originalBg = btn.style.background;
     btn.innerText = "COPIED!";
     btn.style.background = "var(--green)";
     btn.style.color = "white";
     
     setTimeout(() => {
-      btn.innerText = originalText;
-      btn.style.background = originalBg;
+      btn.innerText = "Copy Text";
+      btn.style.background = "#e2e8f0";
       btn.style.color = "var(--navy)";
     }, 1500);
   }
