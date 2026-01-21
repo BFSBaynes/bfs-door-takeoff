@@ -87,7 +87,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.2.0 - 1/4 Sizes & Custom Attic Box</div>
+<div class="version-tag">Version 1.2.1 - Tabbed Note Logic</div>
 
 <script>
   const state = { fireRated: false };
@@ -190,7 +190,9 @@
                 let sizeDisplay = rawSize.replace('-', '/');
                 let type = parts[2];
                 let noteVal = document.getElementById('NOTE_' + key)?.value;
-                let noteText = noteVal ? ` [Note: ${noteVal}]` : "";
+                
+                // Formulate the tabbed note line
+                let noteText = noteVal ? `\n   *Note: ${noteVal}` : "";
 
                 let text = "";
                 if (sec.id === 'AS') {
@@ -200,7 +202,8 @@
                 else if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
                 else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
                 else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}`;
-                else text = `${sizeDisplay} ${type}${noteText} - ${state[key]}`;
+                else if (sec.id === '68' || sec.id === '80') text = `${sizeDisplay} ${type} - ${state[key]}${noteText}`;
+                else text = `${sizeDisplay} ${type} - ${state[key]}${noteText}`;
                 
                 entries.push({ text });
             }
@@ -210,7 +213,6 @@
         }
     });
 
-    // Handle Custom Attic SC Box
     const atticVal = document.getElementById('attic_custom').value;
     if(atticVal) {
       out += "--- ATTIC SC DOORS ---\n" + atticVal + "\n\n";
