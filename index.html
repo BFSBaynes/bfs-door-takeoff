@@ -7,7 +7,7 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Elevate Trim - BFS</title>
   <style>
-    :root{ --navy:#0A2E4E; --bg:#f4f7f9; --accent: #1e40af; --slate: #334155; }
+    :root{ --navy:#0A2E4E; --bg:#f4f7f9; --accent: #1e40af; --slate: #334155; --green: #22c55e; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
     
@@ -22,19 +22,9 @@
     .lot-group { width: 85px; }
 
     .section-title { 
-      background: var(--navy); 
-      color: #fff; 
-      padding: 10px 12px; 
-      font-weight: 700; 
-      font-size: 12px; 
-      margin: 15px -8px 8px -8px; 
-      position: -webkit-sticky; 
-      position: sticky; 
-      top: 0; 
-      z-index: 999; 
-      text-transform: uppercase; 
-      border-bottom: 2px solid rgba(0,0,0,0.1);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background: var(--navy); color: #fff; padding: 10px 12px; font-weight: 700; font-size: 12px; 
+      margin: 15px -8px 8px -8px; position: -webkit-sticky; position: sticky; top: 0; z-index: 999; 
+      text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .double-title { background: var(--slate); }
     .stair-title { background: #475569; }
@@ -51,15 +41,14 @@
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
 
-    /* Attic Note Style */
-    .note-box { width: 100%; height: 38px; background: #f8fafc; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; font-size: 11px; text-align: center; margin-bottom: 0; }
-    .note-box::placeholder { color: #94a3b8; font-size: 9px; }
+    .note-box { width: 100%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
+    .note-box::placeholder { color: #94a3b8; font-size: 7px; }
 
     .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 5px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; }
     .toggle-label { font-size: 9px; font-weight: 800; color: #ef4444; }
     
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; }
     
     #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
     .version-tag { text-align:center; color:#94a3b8; font-size:9px; margin-top:15px; }
@@ -90,13 +79,13 @@
   <textarea id="notes" placeholder="General Notes..."></textarea>
   <div class="actions">
     <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate Takeoff</button>
-    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
+    <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
   <textarea id="summary" readonly></textarea>
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.1.1 - Per-Row Attic Notes</div>
+<div class="version-tag">Version 1.1.3 - Door Notes & UI Feedback</div>
 
 <script>
   const state = { fireRated: false };
@@ -119,38 +108,16 @@
       <div class="controls-grid">`;
     types.forEach(type => {
       let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
+      let noteKey = 'NOTE_' + key;
       html += `<div class="counter-box"><label>${type}</label>
         <div class="btn-wrap">
           <button class="btn" onclick="update('${key}', -1)">−</button>
           <span class="qty" id="qty-${key}">0</span>
           <button class="btn" onclick="update('${key}', 1)">+</button>
         </div>
+        <input type="text" id="${noteKey}" class="note-box" placeholder="Note">
       </div>`;
     });
-    html += `</div></div>`;
-    return html;
-  }
-
-  function renderAtticRow(label, prefix, types) {
-    let html = `<div class="door-row">
-      <div class="size-label">${label}</div>
-      <div class="controls-grid" style="grid-template-columns: repeat(3, 1fr);">`;
-    types.forEach(type => {
-      let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
-      html += `<div class="counter-box"><label>${type}</label>
-        <div class="btn-wrap">
-          <button class="btn" onclick="update('${key}', -1)">−</button>
-          <span class="qty" id="qty-${key}">0</span>
-          <button class="btn" onclick="update('${key}', 1)">+</button>
-        </div>
-      </div>`;
-    });
-    // Add the Detail Note Box
-    let noteKey = 'NOTE_' + prefix + '_' + label.replace(/\//g, "-");
-    html += `<div class="counter-box" style="background:transparent; border:none; grid-column: span 1;">
-               <label>CUTS/DETAILS</label>
-               <input type="text" id="${noteKey}" class="note-box" placeholder="e.g. RH @ 74">
-             </div>`;
     html += `</div></div>`;
     return html;
   }
@@ -172,7 +139,7 @@
   dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST"]));
 
   html += `<div class="section-title stair-title">Attic SC Doors</div>`;
-  doorSizes.forEach(s => html += renderAtticRow(s, "AD", ["LH", "RH"]));
+  doorSizes.forEach(s => html += renderRow(s, "AD", ["LH", "RH"]));
 
   html += `<div class="section-title stair-title">Attic Stairs</div>`;
   html += renderRow("22x54", "AS", ["QTY"]);
@@ -199,7 +166,6 @@
     const cust = document.getElementById('customer').value || "N/A";
     const sub = document.getElementById('subdivision').value || "N/A";
     const lot = document.getElementById('lot').value || "N/A";
-    
     let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n----------------------------\n`;
     
     const sections = [
@@ -222,42 +188,25 @@
                 let rawSize = parts[1];
                 let sizeDisplay = rawSize.replace('-', '/');
                 let type = parts[2];
-                
-                let sortVal = 0;
-                if(rawSize.includes('-')) {
-                    let s = rawSize.split('-');
-                    sortVal = parseInt(s[0]) + (parseInt(s[1]) / 12);
-                } else if (!isNaN(parseInt(rawSize))) {
-                    sortVal = parseInt(rawSize);
-                }
+                let noteVal = document.getElementById('NOTE_' + key)?.value;
+                let noteText = noteVal ? ` [Note: ${noteVal}]` : "";
 
                 let text = "";
                 if (sec.id === 'AS') {
                    let fireText = state.fireRated ? " (FIRE RATED)" : "";
                    text = `Attic Stair ${sizeDisplay}${fireText} - ${state[key]}`;
                 }
-                else if (sec.id === 'AD') {
-                   let noteVal = document.getElementById('NOTE_AD_' + rawSize).value;
-                   let noteText = noteVal ? ` [Note: ${noteVal}]` : "";
-                   text = `${sizeDisplay} ${type} Attic Door${noteText} - ${state[key]}`;
-                }
                 else if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
                 else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
                 else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}`;
-                else if (sec.id === '80' || sec.id === 'DBL80') text = `${sizeDisplay} 8/0 ${type} - ${state[key]}`;
-                else text = `${sizeDisplay} ${type} - ${state[key]}`;
+                else if (sec.id === '80' || sec.id === 'DBL80') text = `${sizeDisplay} 8/0 ${type}${noteText} - ${state[key]}`;
+                else if (sec.id === 'AD') text = `${sizeDisplay} ${type} Attic Door${noteText} - ${state[key]}`;
+                else text = `${sizeDisplay} ${type}${noteText} - ${state[key]}`;
                 
-                entries.push({ sortVal, text, type, label: parts[1] });
+                entries.push({ text, type, label: parts[1] });
             }
         });
-
         if(entries.length > 0) {
-            if(sec.id === 'ST') {
-              const hardwareOrder = ["Brackets", "Newels", "Rosettes", "Balusters"];
-              entries.sort((a, b) => hardwareOrder.indexOf(a.label) - hardwareOrder.indexOf(b.label));
-            } else {
-              entries.sort((a, b) => a.sortVal - b.sortVal || a.type.localeCompare(b.type));
-            }
             out += sec.head + "\n" + entries.map(e => e.text).join("\n") + "\n\n";
         }
     });
@@ -269,9 +218,21 @@
 
   function copySummary() {
     const s = document.getElementById("summary");
+    const btn = document.getElementById("copyBtn");
     s.select();
     document.execCommand("copy");
-    alert("Takeoff copied to clipboard!");
+    
+    const originalText = btn.innerText;
+    const originalBg = btn.style.background;
+    btn.innerText = "COPIED!";
+    btn.style.background = "var(--green)";
+    btn.style.color = "white";
+    
+    setTimeout(() => {
+      btn.innerText = originalText;
+      btn.style.background = originalBg;
+      btn.style.color = "var(--navy)";
+    }, 1500);
   }
 </script>
 </body>
