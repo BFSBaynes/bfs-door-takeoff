@@ -51,6 +51,10 @@
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
 
+    /* Attic Door Cut Box Style */
+    .cut-box { width: 45px; height: 38px; background: #1a1a1a; color: white; border: none; border-radius: 4px; padding: 2px; font-size: 12px; text-align: center; margin-bottom: 0; }
+    .cut-box::placeholder { color: #666; font-size: 9px; }
+
     .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 5px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; }
     .toggle-label { font-size: 9px; font-weight: 800; color: #ef4444; }
     
@@ -92,7 +96,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.0.89 - Updated Handrail Sizes</div>
+<div class="version-tag">Version 1.1.0 - Added Attic Doors w/ Cut Height</div>
 
 <script>
   const state = { fireRated: false };
@@ -127,6 +131,30 @@
     return html;
   }
 
+  function renderAtticRow(label, prefix, types) {
+    let html = `<div class="door-row">
+      <div class="size-label">${label}</div>
+      <div class="controls-grid">`;
+    types.forEach(type => {
+      let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
+      html += `<div class="counter-box"><label>${type}</label>
+        <div class="btn-wrap">
+          <button class="btn" onclick="update('${key}', -1)">−</button>
+          <span class="qty" id="qty-${key}">0</span>
+          <button class="btn" onclick="update('${key}', 1)">+</button>
+        </div>
+      </div>`;
+    });
+    // Add the Black Height Box
+    let heightKey = 'HEIGHT_' + prefix + '_' + label.replace(/\//g, "-");
+    html += `<div class="counter-box" style="background:transparent; border:none;">
+               <label>HEIGHT</label>
+               <input type="text" id="${heightKey}" class="cut-box" placeholder="CUT">
+             </div>`;
+    html += `</div></div>`;
+    return html;
+  }
+
   const doorSizes = ["1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "10'", "16'", "18'"];
@@ -142,6 +170,9 @@
 
   html += `<div class="section-title double-title">8/0 Double Doors</div>`;
   dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST"]));
+
+  html += `<div class="section-title stair-title">Attic SC Doors</div>`;
+  doorSizes.forEach(s => html += renderAtticRow(s, "AD", ["LH", "RH"]));
 
   html += `<div class="section-title stair-title">Attic Stairs</div>`;
   html += renderRow("22x54", "AS", ["QTY"]);
@@ -176,6 +207,7 @@
         {id: 'DBL68', head: '--- 6/8 DOUBLE ---'},
         {id: '80', head: '--- 8/0 SINGLE ---'},
         {id: 'DBL80', head: '--- 8/0 DOUBLE ---'},
+        {id: 'AD', head: '--- ATTIC DOORS ---'},
         {id: 'AS', head: '--- ATTIC STAIRS ---'},
         {id: 'HR', head: '--- HANDRAIL ---'},
         {id: 'ST', head: '--- STAIR HARDWARE ---'},
@@ -203,6 +235,11 @@
                 if (sec.id === 'AS') {
                    let fireText = state.fireRated ? " (FIRE RATED)" : "";
                    text = `Attic Stair ${sizeDisplay}${fireText} - ${state[key]}`;
+                }
+                else if (sec.id === 'AD') {
+                   let heightVal = document.getElementById('HEIGHT_AD_' + rawSize).value;
+                   let cutText = heightVal ? ` (Cut: ${heightVal}")` : "";
+                   text = `${sizeDisplay} ${type} Attic Door${cutText} - ${state[key]}`;
                 }
                 else if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}`;
                 else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}`;
