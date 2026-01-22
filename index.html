@@ -29,25 +29,27 @@
     .double-title { background: var(--slate); }
     .stair-title { background: #475569; }
 
-    /* Fluid Row to prevent overlap on large fonts */
-    .door-row { background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border: 1px solid #e2e8f0; }
-    .size-label { font-weight: 800; font-size: 11px; min-width: 50px; color: var(--navy); }
-    .controls-grid { display: flex; flex-wrap: wrap; gap: 6px; flex-grow: 1; }
+    /* Compact row logic - No Wrapping */
+    .door-row { background: #fff; border-radius: 6px; padding: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
+    .size-label { font-weight: 800; font-size: 11px; width: 45px; flex-shrink: 0; color: var(--navy); }
     
-    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px; border: 1px solid #f1f5f9; border-radius: 4px; flex-grow: 1; min-width: 60px; }
-    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #94a3b8; font-weight: 900; }
+    /* Fixed 3-column or 2-column grid to prevent vertical stacking */
+    .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
     
-    .btn-wrap { display: flex; align-items: center; gap: 5px; }
-    .btn { width: 32px; height: 32px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-    .btn:active { background: var(--accent); transform: scale(0.95); }
+    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px 2px; border: 1px solid #f1f5f9; border-radius: 4px; min-width: 0; }
+    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #94a3b8; font-weight: 900; white-space: nowrap; }
     
-    .qty { font-weight: 800; font-size: 16px; min-width: 18px; text-align: center; color: var(--navy); }
+    .btn-wrap { display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
+    .btn { width: 28px; height: 28px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .btn:active { background: var(--accent); transform: scale(0.9); }
+    
+    .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
 
-    .note-box { width: 100%; height: 24px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 10px; text-align: center; margin-top: 5px; }
+    .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
 
     .attic-text-area { min-height: 80px; font-size: 14px; border: 1px dashed var(--navy); background: #fff; margin-top: 5px; }
 
-    .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 10px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; width: 100%; }
+    .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 8px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; }
     .toggle-label { font-size: 10px; font-weight: 800; color: #ef4444; }
     
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
@@ -88,7 +90,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.2.2 - Universal Notes & Fluid UI</div>
+<div class="version-tag">Version 1.2.3 - Compact Grid Fix</div>
 
 <script>
   const state = { fireRated: false };
