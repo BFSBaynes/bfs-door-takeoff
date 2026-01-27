@@ -29,11 +29,9 @@
     .double-title { background: var(--slate); }
     .stair-title { background: #475569; }
 
-    /* Compact row logic - No Wrapping */
     .door-row { background: #fff; border-radius: 6px; padding: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
     .size-label { font-weight: 800; font-size: 11px; width: 45px; flex-shrink: 0; color: var(--navy); }
     
-    /* Fixed 3-column or 2-column grid to prevent vertical stacking */
     .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
     
     .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px 2px; border: 1px solid #f1f5f9; border-radius: 4px; min-width: 0; }
@@ -90,10 +88,15 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.2.3 - Compact Grid Fix</div>
+<div class="version-tag">Version 1.2.4 - Ordered Summary</div>
 
 <script>
   const state = { fireRated: false };
+  const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
+  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
+  const railLengths = ["8'", "10'", "16'", "18'"];
+  const stairItems = ["Brackets", "Newels", "Rosettes", "Balusters"];
+  const shoeTypes = ["FLAT", "ANGLE"];
 
   function update(key, delta) {
     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(8);
@@ -127,10 +130,6 @@
     return html;
   }
 
-  const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "10'", "16'", "18'"];
-
   let html = `<div class="section-title">6/8 Doors</div>`;
   doorSizes.forEach(s => html += renderRow(s, "68", ["LH", "RH", "SLAB"]));
 
@@ -159,10 +158,7 @@
   railLengths.forEach(s => html += renderRow(s, "HR", ["OPEN", "WALL"]));
 
   html += `<div class="section-title stair-title">Stair Hardware</div>`;
-  html += renderRow("Brackets", "ST", ["QTY"]);
-  html += renderRow("Newels", "ST", ["QTY"]);
-  html += renderRow("Rosettes", "ST", ["QTY"]);
-  html += renderRow("Balusters", "ST", ["QTY"]);
+  stairItems.forEach(s => html += renderRow(s, "ST", ["QTY"]));
   html += renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]);
 
   document.getElementById('app-content').innerHTML = html;
@@ -174,43 +170,37 @@
     let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n----------------------------\n`;
     
     const sections = [
-        {id: '68', head: '--- 6/8 SINGLE ---'},
-        {id: 'DBL68', head: '--- 6/8 DOUBLE ---'},
-        {id: '80', head: '--- 8/0 SINGLE ---'},
-        {id: 'DBL80', head: '--- 8/0 DOUBLE ---'},
-        {id: 'AS', head: '--- ATTIC STAIRS ---'},
-        {id: 'HR', head: '--- HANDRAIL ---'},
-        {id: 'ST', head: '--- STAIR HARDWARE ---'},
-        {id: 'STSH', head: '--- SHOES ---'}
+        {id: '68', head: '--- 6/8 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
+        {id: 'DBL68', head: '--- 6/8 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
+        {id: '80', head: '--- 8/0 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
+        {id: 'DBL80', head: '--- 8/0 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
+        {id: 'AS', head: '--- ATTIC STAIRS ---', sizes: ["22x54", "25x54", "Scuttle"], types: ["QTY"]},
+        {id: 'HR', head: '--- HANDRAIL ---', sizes: railLengths, types: ["OPEN", "WALL"]},
+        {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems, types: ["QTY"]},
+        {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]}
     ];
 
     sections.forEach(sec => {
-        let entries = [];
-        Object.keys(state).forEach(key => {
-            if(state[key] > 0 && key.startsWith(sec.id + '_')) {
-                let parts = key.split('_');
-                let rawSize = parts[1];
-                let sizeDisplay = rawSize.replace('-', '/');
-                let type = parts[2];
-                let noteVal = document.getElementById('NOTE_' + key)?.value;
-                let noteText = noteVal ? `\n   *Note: ${noteVal}` : "";
-
-                let text = "";
-                if (sec.id === 'AS') {
-                   let fireText = state.fireRated ? " (FIRE RATED)" : "";
-                   text = `Attic Stair ${sizeDisplay}${fireText} - ${state[key]}${noteText}`;
+        let sectionText = "";
+        sec.sizes.forEach(sz => {
+            sec.types.forEach(tp => {
+                let key = sec.id + '_' + sz.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + tp;
+                if(state[key] > 0) {
+                    let noteVal = document.getElementById('NOTE_' + key)?.value;
+                    let noteText = noteVal ? `\n   *Note: ${noteVal}` : "";
+                    
+                    if (sec.id === 'AS') {
+                       let fireText = state.fireRated ? " (FIRE RATED)" : "";
+                       sectionText += `Attic Stair ${sz}${fireText} - ${state[key]}${noteText}\n`;
+                    }
+                    else if (sec.id === 'HR') sectionText += `${sz} ${tp} Rail - ${state[key]}${noteText}\n`;
+                    else if (sec.id === 'STSH') sectionText += `Shoe (${tp}) - ${state[key]}${noteText}\n`;
+                    else if (sec.id === 'ST') sectionText += `${sz} - ${state[key]}${noteText}\n`;
+                    else sectionText += `${sz} ${tp} - ${state[key]}${noteText}\n`;
                 }
-                else if (sec.id === 'HR') text = `${sizeDisplay}' ${type} Rail - ${state[key]}${noteText}`;
-                else if (sec.id === 'STSH') text = `Shoe (${type}) - ${state[key]}${noteText}`;
-                else if (sec.id === 'ST') text = `${parts[1]} - ${state[key]}${noteText}`;
-                else text = `${sizeDisplay} ${type} - ${state[key]}${noteText}`;
-                
-                entries.push({ text });
-            }
+            });
         });
-        if(entries.length > 0) {
-            out += sec.head + "\n" + entries.map(e => e.text).join("\n") + "\n\n";
-        }
+        if(sectionText) out += sec.head + "\n" + sectionText + "\n";
     });
 
     const atticVal = document.getElementById('attic_custom').value;
