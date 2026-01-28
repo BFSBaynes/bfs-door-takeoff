@@ -43,8 +43,13 @@
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
     
-    /* Direct number entry style for high-volume items */
-    .qty-input { width: 45px; height: 28px; padding: 2px; text-align: center; border: 1px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; margin: 0; }
+    /* Styled number input for Balusters/Shoes */
+    .qty-input { 
+      width: 50px; height: 28px; padding: 2px; text-align: center; 
+      border: 2px solid var(--navy); border-radius: 4px; 
+      font-weight: 800; font-size: 14px; margin: 0; 
+      color: var(--navy); background: #fff;
+    }
 
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
 
@@ -91,7 +96,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.2.5 - Type-in QTY Support</div>
+<div class="version-tag">Version 1.2.6 - Styled Manual Inputs</div>
 
 <script>
   const state = { fireRated: false };
@@ -120,7 +125,6 @@
       let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
       let noteKey = 'NOTE_' + key;
       
-      // Check if it's Balusters or Shoes to provide direct input instead of buttons
       const isHighVolume = (label === "Balusters" || prefix === "STSH");
 
       html += `<div class="counter-box"><label>${type}</label>
