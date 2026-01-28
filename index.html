@@ -42,6 +42,9 @@
     .btn:active { background: var(--accent); transform: scale(0.9); }
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
+    
+    /* Direct number entry style for high-volume items */
+    .qty-input { width: 45px; height: 28px; padding: 2px; text-align: center; border: 1px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; margin: 0; }
 
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
 
@@ -88,15 +91,14 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.2.4 - Ordered Summary</div>
+<div class="version-tag">Version 1.2.5 - Type-in QTY Support</div>
 
 <script>
   const state = { fireRated: false };
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "10'", "16'", "18'"];
-  const stairItems = ["Brackets", "Newels", "Rosettes", "Balusters"];
-  const shoeTypes = ["FLAT", "ANGLE"];
+  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters"];
 
   function update(key, delta) {
     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(8);
@@ -117,12 +119,22 @@
     types.forEach(type => {
       let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
       let noteKey = 'NOTE_' + key;
+      
+      // Check if it's Balusters or Shoes to provide direct input instead of buttons
+      const isHighVolume = (label === "Balusters" || prefix === "STSH");
+
       html += `<div class="counter-box"><label>${type}</label>
-        <div class="btn-wrap">
-          <button class="btn" onclick="update('${key}', -1)">−</button>
-          <span class="qty" id="qty-${key}">0</span>
-          <button class="btn" onclick="update('${key}', 1)">+</button>
-        </div>
+        <div class="btn-wrap">`;
+      
+      if (isHighVolume) {
+        html += `<input type="number" class="qty-input" id="inp-${key}" oninput="state['${key}']=parseInt(this.value)||0" placeholder="0">`;
+      } else {
+        html += `<button class="btn" onclick="update('${key}', -1)">−</button>
+                 <span class="qty" id="qty-${key}">0</span>
+                 <button class="btn" onclick="update('${key}', 1)">+</button>`;
+      }
+      
+      html += `</div>
         <input type="text" id="${noteKey}" class="note-box" placeholder="Note">
       </div>`;
     });
@@ -185,18 +197,20 @@
         sec.sizes.forEach(sz => {
             sec.types.forEach(tp => {
                 let key = sec.id + '_' + sz.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + tp;
-                if(state[key] > 0) {
+                let val = state[key] || 0;
+                
+                if(val > 0) {
                     let noteVal = document.getElementById('NOTE_' + key)?.value;
                     let noteText = noteVal ? `\n   *Note: ${noteVal}` : "";
                     
                     if (sec.id === 'AS') {
                        let fireText = state.fireRated ? " (FIRE RATED)" : "";
-                       sectionText += `Attic Stair ${sz}${fireText} - ${state[key]}${noteText}\n`;
+                       sectionText += `Attic Stair ${sz}${fireText} - ${val}${noteText}\n`;
                     }
-                    else if (sec.id === 'HR') sectionText += `${sz} ${tp} Rail - ${state[key]}${noteText}\n`;
-                    else if (sec.id === 'STSH') sectionText += `Shoe (${tp}) - ${state[key]}${noteText}\n`;
-                    else if (sec.id === 'ST') sectionText += `${sz} - ${state[key]}${noteText}\n`;
-                    else sectionText += `${sz} ${tp} - ${state[key]}${noteText}\n`;
+                    else if (sec.id === 'HR') sectionText += `${sz} ${tp} Rail - ${val}${noteText}\n`;
+                    else if (sec.id === 'STSH') sectionText += `Shoe (${tp}) - ${val}${noteText}\n`;
+                    else if (sec.id === 'ST') sectionText += `${sz} - ${val}${noteText}\n`;
+                    else sectionText += `${sz} ${tp} - ${val}${noteText}\n`;
                 }
             });
         });
