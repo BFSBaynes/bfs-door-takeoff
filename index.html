@@ -30,7 +30,7 @@
     .stair-title { background: #475569; }
 
     .door-row { background: #fff; border-radius: 6px; padding: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
-    .size-label { font-weight: 800; font-size: 11px; width: 55px; flex-shrink: 0; color: var(--navy); }
+    .size-label { font-weight: 800; font-size: 11px; width: 45px; flex-shrink: 0; color: var(--navy); }
     
     .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
     
@@ -95,7 +95,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.2.7 - 8/0 Label & Attic Update</div>
+<div class="version-tag">Version 1.2.8 - Summary Sequence Fix</div>
 
 <script>
   const state = { fireRated: false };
@@ -118,7 +118,6 @@
 
   function renderRow(label, prefix, types) {
     let displayLabel = label;
-    // Add x8/0 suffix to display only for the 8/0 sections
     if (prefix === "80" || prefix === "DBL80") {
       displayLabel = label + "x8/0";
     }
@@ -195,6 +194,7 @@
         {id: 'DBL68', head: '--- 6/8 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
         {id: '80', head: '--- 8/0 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
         {id: 'DBL80', head: '--- 8/0 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
+        {id: 'ATTIC_SC', head: '--- ATTIC SOLID CORE DOORS (CUSTOM) ---'},
         {id: 'AS', head: '--- ATTIC STAIRS ---', sizes: ["22x54", "25x54", "Scuttle"], types: ["QTY"]},
         {id: 'HR', head: '--- HANDRAIL ---', sizes: railLengths, types: ["OPEN", "WALL"]},
         {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems, types: ["QTY"]},
@@ -202,6 +202,12 @@
     ];
 
     sections.forEach(sec => {
+        if (sec.id === 'ATTIC_SC') {
+            const atticVal = document.getElementById('attic_custom').value;
+            if(atticVal) out += sec.head + "\n" + atticVal + "\n\n";
+            return;
+        }
+
         let sectionText = "";
         sec.sizes.forEach(sz => {
             sec.types.forEach(tp => {
@@ -230,9 +236,6 @@
         });
         if(sectionText) out += sec.head + "\n" + sectionText + "\n";
     });
-
-    const atticVal = document.getElementById('attic_custom').value;
-    if(atticVal) out += "--- ATTIC SOLID CORE DOORS (CUSTOM) ---\n" + atticVal + "\n\n";
 
     const notes = document.getElementById('notes').value;
     if(notes) out += "----------------------------\nNOTES: " + notes;
