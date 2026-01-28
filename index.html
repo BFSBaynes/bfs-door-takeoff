@@ -30,7 +30,7 @@
     .stair-title { background: #475569; }
 
     .door-row { background: #fff; border-radius: 6px; padding: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; }
-    .size-label { font-weight: 800; font-size: 11px; width: 45px; flex-shrink: 0; color: var(--navy); }
+    .size-label { font-weight: 800; font-size: 11px; width: 55px; flex-shrink: 0; color: var(--navy); }
     
     .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
     
@@ -43,7 +43,6 @@
     
     .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
     
-    /* Styled number input for Balusters/Shoes */
     .qty-input { 
       width: 50px; height: 28px; padding: 2px; text-align: center; 
       border: 2px solid var(--navy); border-radius: 4px; 
@@ -96,7 +95,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.2.6 - Styled Manual Inputs</div>
+<div class="version-tag">Version 1.2.7 - 8/0 Label & Attic Update</div>
 
 <script>
   const state = { fireRated: false };
@@ -118,8 +117,14 @@
   }
 
   function renderRow(label, prefix, types) {
+    let displayLabel = label;
+    // Add x8/0 suffix to display only for the 8/0 sections
+    if (prefix === "80" || prefix === "DBL80") {
+      displayLabel = label + "x8/0";
+    }
+
     let html = `<div class="door-row">
-      <div class="size-label">${label}</div>
+      <div class="size-label">${displayLabel}</div>
       <div class="controls-grid">`;
     types.forEach(type => {
       let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
@@ -158,7 +163,7 @@
   html += `<div class="section-title double-title">8/0 Double Doors</div>`;
   dblSizes.forEach(s => html += renderRow(s, "DBL80", ["DBL", "T-AST"]));
 
-  html += `<div class="section-title stair-title">Attic SC Doors (Custom)</div>`;
+  html += `<div class="section-title stair-title">ATTIC SOLID CORE DOORS (CUSTOM)</div>`;
   html += `<div style="padding:0 8px;"><textarea id="attic_custom" class="attic-text-area" placeholder="Enter sizes, handing, and cuts here..."></textarea></div>`;
 
   html += `<div class="section-title stair-title">Attic Stairs</div>`;
@@ -207,14 +212,19 @@
                     let noteVal = document.getElementById('NOTE_' + key)?.value;
                     let noteText = noteVal ? `\n   *Note: ${noteVal}` : "";
                     
+                    let displaySize = sz;
+                    if (sec.id === '80' || sec.id === 'DBL80') {
+                      displaySize = sz + "x8/0";
+                    }
+                    
                     if (sec.id === 'AS') {
                        let fireText = state.fireRated ? " (FIRE RATED)" : "";
-                       sectionText += `Attic Stair ${sz}${fireText} - ${val}${noteText}\n`;
+                       sectionText += `Attic Stair ${displaySize}${fireText} - ${val}${noteText}\n`;
                     }
-                    else if (sec.id === 'HR') sectionText += `${sz} ${tp} Rail - ${val}${noteText}\n`;
+                    else if (sec.id === 'HR') sectionText += `${displaySize} ${tp} Rail - ${val}${noteText}\n`;
                     else if (sec.id === 'STSH') sectionText += `Shoe (${tp}) - ${val}${noteText}\n`;
-                    else if (sec.id === 'ST') sectionText += `${sz} - ${val}${noteText}\n`;
-                    else sectionText += `${sz} ${tp} - ${val}${noteText}\n`;
+                    else if (sec.id === 'ST') sectionText += `${displaySize} - ${val}${noteText}\n`;
+                    else sectionText += `${displaySize} ${tp} - ${val}${noteText}\n`;
                 }
             });
         });
@@ -222,7 +232,7 @@
     });
 
     const atticVal = document.getElementById('attic_custom').value;
-    if(atticVal) out += "--- ATTIC SC DOORS ---\n" + atticVal + "\n\n";
+    if(atticVal) out += "--- ATTIC SOLID CORE DOORS (CUSTOM) ---\n" + atticVal + "\n\n";
 
     const notes = document.getElementById('notes').value;
     if(notes) out += "----------------------------\nNOTES: " + notes;
