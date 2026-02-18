@@ -1,177 +1,492 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elevate Trim – TEST</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Elevate Trim – TEST</title>
+  <style>
+    :root{
+      --navy:#0A2E4E;
+      --red:#E31837;
+      --bg:#e6eef7;
+      --card:#ffffff;
+      --line:#cbd5e1;
+      --muted:#64748b;
+      --lh:#eaf3ff;
+      --rh:#fff2d9;
+      --green:#16a34a;
+    }
+    *{ box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif; -webkit-tap-highlight-color:transparent; }
+    body{ margin:0; background:var(--bg); padding:14px; color:#0f172a; }
+    .wrap{ max-width:720px; margin:0 auto; }
+    .title{
+      font-weight:900; font-size:42px; color:var(--navy);
+      text-align:center; margin:12px 0 18px;
+      letter-spacing:.2px;
+    }
 
-<style>
-:root{
-  --navy:#0A2E4E;
-  --red:#E31837;
-  --bg:#e2e8f0;
-  --green:#16a34a;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      box-shadow:0 10px 22px rgba(15,23,42,.08);
+      padding:14px;
+      margin-bottom:14px;
+    }
 
-*{
-  box-sizing:border-box;
-  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
-}
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    label{ display:block; font-size:12px; font-weight:800; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.4px; }
+    input, textarea{
+      width:100%; padding:12px; border-radius:10px;
+      border:1px solid var(--line); outline:none;
+      font-size:16px; background:#fff;
+    }
+    textarea{ min-height:88px; resize:vertical; }
 
-body{
-  margin:0;
-  background:var(--bg);
-  padding:10px;
-}
+    .section-head{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; margin-bottom:10px;
+    }
+    .section-name{
+      font-weight:900; font-size:22px; color:var(--navy);
+      letter-spacing:.3px; text-transform:uppercase;
+    }
 
-h1{
-  text-align:center;
-  color:var(--navy);
-  margin-bottom:20px;
-}
+    /* Toggle */
+    .seg{
+      display:flex; gap:8px;
+      background:#f1f5f9; padding:6px;
+      border-radius:12px; border:1px solid var(--line);
+      min-width:220px;
+    }
+    .seg button{
+      flex:1; border:0; border-radius:10px;
+      padding:10px 0; font-weight:900; font-size:14px;
+      background:transparent; color:var(--navy);
+    }
+    .seg button.active{ background:var(--navy); color:#fff; }
 
-.section{
-  background:#fff;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:16px;
-  box-shadow:0 4px 8px rgba(0,0,0,0.08);
-}
+    /* Rows */
+    .rows{ display:flex; flex-direction:column; gap:10px; }
+    .row{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      background:#fff;
+    }
+    .size{
+      font-weight:900; font-size:20px; color:var(--navy);
+      min-width:72px;
+    }
 
-.section-title{
-  font-weight:800;
-  font-size:16px;
-  margin-bottom:10px;
-  color:var(--navy);
-  text-transform:uppercase;
-}
+    .cols{
+      display:grid; gap:10px;
+      grid-auto-flow:column;
+      grid-auto-columns:minmax(160px,1fr);
+      width:100%;
+    }
+    .col{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      background:#fff;
+    }
+    .col.lh{ background:var(--lh); }
+    .col.rh{ background:var(--rh); }
 
-.segment{
-  display:flex;
-  gap:6px;
-  margin-bottom:12px;
-}
+    .col-title{
+      font-size:12px; font-weight:900; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.4px;
+      display:flex; justify-content:center; margin-bottom:8px;
+    }
 
-.segment button{
-  flex:1;
-  padding:8px 0;
-  font-weight:700;
-  border-radius:6px;
-  border:1px solid #cbd5e1;
-  background:#f1f5f9;
-}
+    .counter{
+      display:flex; align-items:center; justify-content:center;
+      gap:10px;
+    }
+    .btn{
+      width:52px; height:52px; border:0;
+      border-radius:12px; background:var(--navy);
+      color:#fff; font-size:28px; font-weight:900;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .btn:active{ transform:scale(.96); }
+    .qty{
+      font-weight:900; font-size:22px; min-width:26px; text-align:center;
+    }
+    .qty.has{ color:var(--green); }
 
-.segment button.active{
-  background:var(--navy);
-  color:#fff;
-  border-color:var(--navy);
-}
+    .pair{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    }
 
-.row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
+    /* Hide / show per section */
+    .only-lh .is-rh{ display:none !important; }
+    .only-rh .is-lh{ display:none !important; }
 
-.size{
-  font-weight:800;
-  width:70px;
-  font-size:14px;
-  color:var(--navy);
-}
+    /* Actions */
+    .actions{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+    .action{
+      padding:14px 12px; border-radius:12px; border:0;
+      font-weight:900; font-size:16px;
+    }
+    .primary{ background:var(--navy); color:#fff; }
+    .soft{ background:#e2e8f0; color:var(--navy); }
+    .danger{ background:#fee2e2; color:#b91c1c; }
+    .full{ grid-column:1 / -1; }
 
-.counter{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
+    #summary{
+      margin-top:10px;
+      height:260px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space:pre;
+    }
 
-.btn{
-  width:36px;
-  height:36px;
-  border-radius:6px;
-  border:0;
-  background:var(--navy);
-  color:#fff;
-  font-size:18px;
-  font-weight:700;
-}
-
-.qty{
-  font-weight:800;
-  font-size:16px;
-  min-width:18px;
-  text-align:center;
-}
-
-.hidden{
-  display:none;
-}
-
-@media (max-width:420px){
-  .size{width:60px;font-size:13px;}
-  .btn{width:34px;height:34px;}
-}
-</style>
+    @media (max-width:520px){
+      .title{ font-size:34px; }
+      .grid2{ grid-template-columns:1fr; }
+      .size{ min-width:58px; font-size:18px; }
+      .cols{ grid-auto-columns:minmax(150px,1fr); }
+      .btn{ width:50px; height:50px; font-size:26px; }
+      .seg{ min-width:200px; }
+      .section-name{ font-size:20px; }
+    }
+  </style>
 </head>
 <body>
+<div class="wrap">
+  <div class="title">Elevate Trim – TEST</div>
 
-<h1>Elevate Trim – TEST</h1>
-
-<!-- 8/0 Doors -->
-<div class="section" id="sec-80">
-  <div class="section-title">8/0 Doors</div>
-
-  <div class="segment">
-    <button class="active" onclick="setSide('sec-80','LH',this)">LH</button>
-    <button onclick="setSide('sec-80','RH',this)">RH</button>
-  </div>
-
-  <div class="row">
-    <div class="size">1/6</div>
-    <div class="counter">
-      <button class="btn" onclick="update('80-1-6')">−</button>
-      <div class="qty" id="80-1-6">0</div>
-      <button class="btn" onclick="update('80-1-6',1)">+</button>
+  <div class="card">
+    <div class="grid2">
+      <div>
+        <label>Customer</label>
+        <input id="customer" placeholder="Enter customer name" />
+      </div>
+      <div>
+        <label>Lot #</label>
+        <input id="lot" placeholder="Enter lot number" />
+      </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="size">2/0</div>
-    <div class="counter">
-      <button class="btn" onclick="update('80-2-0')">−</button>
-      <div class="qty" id="80-2-0">0</div>
-      <button class="btn" onclick="update('80-2-0',1)">+</button>
+  <!-- 6/8 DOORS -->
+  <div class="card" id="sec-68">
+    <div class="section-head">
+      <div class="section-name">6/8 Doors</div>
+      <div class="seg">
+        <button class="active" data-side="lh" onclick="setSide('sec-68','lh')">LH</button>
+        <button data-side="rh" onclick="setSide('sec-68','rh')">RH</button>
+      </div>
     </div>
+    <div class="rows" id="rows-68"></div>
   </div>
 
-  <div class="row">
-    <div class="size">2/4</div>
-    <div class="counter">
-      <button class="btn" onclick="update('80-2-4')">−</button>
-      <div class="qty" id="80-2-4">0</div>
-      <button class="btn" onclick="update('80-2-4',1)">+</button>
+  <!-- 8/0 DOORS -->
+  <div class="card" id="sec-80">
+    <div class="section-head">
+      <div class="section-name">8/0 Doors</div>
+      <div class="seg">
+        <button class="active" data-side="lh" onclick="setSide('sec-80','lh')">LH</button>
+        <button data-side="rh" onclick="setSide('sec-80','rh')">RH</button>
+      </div>
     </div>
+    <div class="rows" id="rows-80"></div>
+  </div>
+
+  <!-- DBL DOORS -->
+  <div class="card" id="sec-dbl">
+    <div class="section-head">
+      <div class="section-name">DBL Doors</div>
+      <div style="font-weight:900;color:var(--muted);font-size:12px;text-transform:uppercase;">(No LH/RH)</div>
+    </div>
+    <div class="rows" id="rows-dbl"></div>
+  </div>
+
+  <!-- T-AST DOORS -->
+  <div class="card" id="sec-tast">
+    <div class="section-head">
+      <div class="section-name">T-Ast Doors</div>
+      <div class="seg">
+        <button class="active" data-side="lh" onclick="setSide('sec-tast','lh')">LH</button>
+        <button data-side="rh" onclick="setSide('sec-tast','rh')">RH</button>
+      </div>
+    </div>
+    <div class="rows" id="rows-tast"></div>
+  </div>
+
+  <!-- NOTES + SUMMARY -->
+  <div class="card">
+    <label>Notes</label>
+    <textarea id="notes" placeholder="Enter field notes..."></textarea>
+
+    <div class="actions">
+      <button class="action primary" onclick="generateSummary()">Generate Summary</button>
+      <button id="copyBtn" class="action soft" onclick="copySummary()">Copy Text</button>
+      <button class="action danger full" onclick="resetAll()">Reset All</button>
+    </div>
+
+    <label style="margin-top:12px;">Summary (copy/paste)</label>
+    <textarea id="summary" readonly></textarea>
   </div>
 </div>
 
 <script>
-let state = {};
+  // ---------- DATA ----------
+  const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
+  const dblSizes  = ["4/0","4/8","5/0","5/4","6/0"];
 
-function update(id, add= -1){
-  if(!state[id]) state[id]=0;
-  state[id] = Math.max(0, state[id] + add);
-  document.getElementById(id).innerText = state[id];
-}
+  // ordering inside each size for summary
+  const orderSingle = ["LH Unit","LH Slab","RH Unit","RH Slab"];
+  const orderDbl    = ["Unit","French"];
 
-function setSide(sectionId, side, btn){
-  const section = document.getElementById(sectionId);
-  const buttons = section.querySelectorAll('.segment button');
-  buttons.forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
+  const state = {}; // id -> qty
+
+  // ---------- UI BUILDERS ----------
+  function qtyEl(id){
+    return `<div class="counter">
+      <button class="btn" onclick="bump('${id}',-1)">−</button>
+      <div class="qty" id="q-${id}">0</div>
+      <button class="btn" onclick="bump('${id}',1)">+</button>
+    </div>`;
+  }
+
+  function singleRow(sectionKey, size){
+    // sectionKey: "68" or "80"
+    const base = `${sectionKey}-${size.replace('/','-')}`;
+
+    return `
+      <div class="row">
+        <div class="size">${size}</div>
+        <div class="cols">
+          <div class="col lh is-lh">
+            <div class="col-title">LH • Unit</div>
+            ${qtyEl(`${base}-LH-Unit`)}
+          </div>
+          <div class="col lh is-lh">
+            <div class="col-title">LH • Slab</div>
+            ${qtyEl(`${base}-LH-Slab`)}
+          </div>
+
+          <div class="col rh is-rh">
+            <div class="col-title">RH • Unit</div>
+            ${qtyEl(`${base}-RH-Unit`)}
+          </div>
+          <div class="col rh is-rh">
+            <div class="col-title">RH • Slab</div>
+            ${qtyEl(`${base}-RH-Slab`)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function dblRow(size){
+    const base = `DBL-${size.replace('/','-')}`;
+    return `
+      <div class="row">
+        <div class="size">${size}</div>
+        <div class="cols">
+          <div class="col">
+            <div class="col-title">Unit</div>
+            ${qtyEl(`${base}-Unit`)}
+          </div>
+          <div class="col">
+            <div class="col-title">French</div>
+            ${qtyEl(`${base}-French`)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function tastRow(size){
+    const base = `TAST-${size.replace('/','-')}`;
+    return `
+      <div class="row">
+        <div class="size">${size}</div>
+        <div class="cols">
+          <div class="col lh is-lh">
+            <div class="col-title">LH • Unit</div>
+            ${qtyEl(`${base}-LH-Unit`)}
+          </div>
+          <div class="col lh is-lh">
+            <div class="col-title">LH • French</div>
+            ${qtyEl(`${base}-LH-French`)}
+          </div>
+
+          <div class="col rh is-rh">
+            <div class="col-title">RH • Unit</div>
+            ${qtyEl(`${base}-RH-Unit`)}
+          </div>
+          <div class="col rh is-rh">
+            <div class="col-title">RH • French</div>
+            ${qtyEl(`${base}-RH-French`)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Render sections
+  document.getElementById('rows-68').innerHTML   = doorSizes.map(s => singleRow("68", s)).join('');
+  document.getElementById('rows-80').innerHTML   = doorSizes.map(s => singleRow("80", s)).join('');
+  document.getElementById('rows-dbl').innerHTML  = dblSizes.map(s => dblRow(s)).join('');
+  document.getElementById('rows-tast').innerHTML = dblSizes.map(s => tastRow(s)).join('');
+
+  // Default toggles
+  setSide('sec-68','lh');
+  setSide('sec-80','lh');
+  setSide('sec-tast','lh');
+
+  // ---------- INTERACTION ----------
+  function bump(id, delta){
+    state[id] = Math.max(0, (state[id] || 0) + delta);
+    const el = document.getElementById('q-' + id);
+    if(el){
+      el.textContent = state[id];
+      el.classList.toggle('has', state[id] > 0);
+    }
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+
+  function setSide(sectionId, side){
+    const sec = document.getElementById(sectionId);
+    sec.classList.toggle('only-lh', side === 'lh');
+    sec.classList.toggle('only-rh', side === 'rh');
+
+    sec.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
+    sec.querySelector(`.seg button[data-side="${side}"]`).classList.add('active');
+  }
+
+  // ---------- SUMMARY (ORDERED) ----------
+  function generateSummary(){
+    const cust = (document.getElementById('customer').value || "").trim();
+    const lot  = (document.getElementById('lot').value || "").trim();
+    const notes = (document.getElementById('notes').value || "").trim();
+
+    let out = "";
+    if(cust) out += `Customer: ${cust}\n`;
+    if(lot)  out += `Lot #: ${lot}\n`;
+    out += "\n";
+
+    // helper to add section with underline and ordered lines
+    function addSection(title, lines){
+      if(!lines.length) return;
+      out += `${title}\n`;
+      out += `${"-".repeat(title.length)}\n`;
+      out += lines.join("\n") + "\n\n";
+    }
+
+    // 6/8
+    const lines68 = [];
+    doorSizes.forEach(sz=>{
+      orderSingle.forEach(lbl=>{
+        const [hand, kind] = lbl.split(" ");
+        const id = `68-${sz.replace('/','-')}-${hand}-${kind}`;
+        const v = state[id] || 0;
+        if(v>0) lines68.push(`${sz}: ${hand} ${kind} = ${v}`);
+      });
+    });
+    addSection("6/8 Doors", lines68);
+
+    // 8/0
+    const lines80 = [];
+    doorSizes.forEach(sz=>{
+      orderSingle.forEach(lbl=>{
+        const [hand, kind] = lbl.split(" ");
+        const id = `80-${sz.replace('/','-')}-${hand}-${kind}`;
+        const v = state[id] || 0;
+        if(v>0) lines80.push(`${sz}x8/0: ${hand} ${kind} = ${v}`);
+      });
+    });
+    addSection("8/0 Doors", lines80);
+
+    // DBL
+    const linesDBL = [];
+    dblSizes.forEach(sz=>{
+      orderDbl.forEach(kind=>{
+        const id = `DBL-${sz.replace('/','-')}-${kind}`;
+        const v = state[id] || 0;
+        if(v>0) linesDBL.push(`${sz} DBL: ${kind} = ${v}`);
+      });
+    });
+    addSection("DBL Doors", linesDBL);
+
+    // T-Ast
+    const linesTA = [];
+    dblSizes.forEach(sz=>{
+      ["LH","RH"].forEach(hand=>{
+        ["Unit","French"].forEach(kind=>{
+          const id = `TAST-${sz.replace('/','-')}-${hand}-${kind}`;
+          const v = state[id] || 0;
+          if(v>0) linesTA.push(`${sz} T-Ast: ${hand} ${kind} = ${v}`);
+        });
+      });
+    });
+    addSection("T-Ast Doors", linesTA);
+
+    if(notes){
+      out += "Notes\n-----\n" + notes + "\n";
+    }
+
+    document.getElementById('summary').value = out.trim() + "\n";
+  }
+
+  // ---------- COPY ----------
+  async function copySummary(){
+    const btn = document.getElementById('copyBtn');
+    const txt = document.getElementById('summary').value || "";
+    if(!txt.trim()){
+      btn.textContent = "Generate first";
+      setTimeout(()=>btn.textContent="Copy Text", 1200);
+      return;
+    }
+
+    try{
+      await navigator.clipboard.writeText(txt);
+      btn.textContent = "Copied!";
+      btn.style.background = "var(--green)";
+      btn.style.color = "#fff";
+      setTimeout(()=>{
+        btn.textContent = "Copy Text";
+        btn.style.background = "#e2e8f0";
+        btn.style.color = "var(--navy)";
+      }, 1200);
+    }catch(e){
+      // fallback
+      const s = document.getElementById('summary');
+      s.focus(); s.select();
+      document.execCommand('copy');
+      btn.textContent = "Copied!";
+      setTimeout(()=>btn.textContent="Copy Text", 1200);
+    }
+  }
+
+  // ---------- RESET ----------
+  function resetAll(){
+    if(!confirm("Clear all fields?")) return;
+
+    // clear inputs
+    document.getElementById('customer').value = "";
+    document.getElementById('lot').value = "";
+    document.getElementById('notes').value = "";
+    document.getElementById('summary').value = "";
+
+    // clear quantities
+    Object.keys(state).forEach(k => state[k]=0);
+    document.querySelectorAll('.qty').forEach(el=>{
+      el.textContent = "0";
+      el.classList.remove('has');
+    });
+
+    // reset toggles
+    setSide('sec-68','lh');
+    setSide('sec-80','lh');
+    setSide('sec-tast','lh');
+  }
 </script>
-
 </body>
 </html>
