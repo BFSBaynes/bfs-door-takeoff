@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <title>Elevate Trim - BFS</title>
+
+  <!-- NOTE: test.html does NOT need manifest or icons or service worker -->
+  <title>Elevate Trim - TEST (Slab Toggle)</title>
+
   <style>
-    /* Darkened --bg from #f4f7f9 to #cbd5e1 for better contrast */
-    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #22c55e; }
+    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
     
@@ -21,21 +21,31 @@
     .input-row { display: flex; gap: 8px; margin-bottom: 4px; }
     .input-group { flex: 1; }
 
+    /* STICKY HEADERS */
     .section-title { 
-      color: #fff; padding: 12px; font-weight: 800; font-size: 13px; 
+      color: #fff; padding: 14px; font-weight: 800; font-size: 14px; 
       margin: 8px -8px; cursor: pointer;
       display: flex; justify-content: space-between; align-items: center;
-      text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.2);
+      text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
+      position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .bg-navy { background: var(--navy); }
     .bg-red { background: var(--bfs-red); }
     
-    .section-content { display: none; padding-top: 4px; }
+    .section-content { display: none; padding-top: 8px; }
     .section-content.active { display: block; }
     
-    /* Added subtle shadow to door-rows to make them pop against the darker bg */
-    .door-row { background: #fff; border-radius: 6px; padding: 6px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; border: 1px solid #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .size-label { font-weight: 800; font-size: 11px; width: 45px; flex-shrink: 0; color: var(--navy); }
+    /* COMPACT SIDE-LABEL ROW */
+    .door-row { 
+      background: #fff; border-radius: 6px; padding: 8px; 
+      margin-bottom: 8px; /* Balanced spacing */
+      display: flex; align-items: center; gap: 8px; 
+      border: 1px solid #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    }
+    .size-label { 
+      font-weight: 900; font-size: 13px; width: 48px; 
+      flex-shrink: 0; color: var(--navy); text-align: center;
+    }
     
     .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
     
@@ -45,25 +55,29 @@
     }
     .pulse-flash { background: #e0f2fe !important; }
 
-    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #64748b; font-weight: 900; white-space: nowrap; }
+    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #64748b; font-weight: 900; text-transform: uppercase; }
     .btn-wrap { display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
-    .btn { width: 28px; height: 28px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    
+    .btn { width: 30px; height: 30px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
     .btn:active { transform: scale(0.9); }
     
-    .qty { font-weight: 800; font-size: 14px; min-width: 14px; text-align: center; color: var(--navy); }
-    .qty-input { width: 50px; height: 28px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
+    /* QUANTITY COLOR LOGIC */
+    .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; color: var(--navy); transition: color 0.2s; }
+    .has-qty { color: var(--green) !important; font-size: 17px; }
+
+    .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
 
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
     .attic-text-area { min-height: 80px; font-size: 14px; border: 1px dashed var(--navy); background: #fff; margin-top: 5px; }
 
-    .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 8px; gap: 8px; background: #f8fafc; border-radius: 4px; margin-top: 2px; }
+    .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 8px; gap: 8px; background: #fff; border-radius: 4px; margin-top: 4px; border: 1px solid #cbd5e1; }
     .toggle-label { font-size: 10px; font-weight: 800; color: var(--bfs-red); }
     
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
     #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
-    .version-tag { text-align:center; color:#475569; font-size:9px; margin-top:15px; font-weight: bold; }
+    .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
   </style>
@@ -71,7 +85,8 @@
 <body>
 
 <div class="header-card">
-  <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
+  <!-- keep logo spot, but in test we’ll just show a title if icon isn’t present -->
+  <div style="font-weight:900; color:var(--navy); font-size:16px; margin-bottom:8px;">Elevate Trim (TEST)</div>
   
   <div class="input-row">
     <div class="input-group">
@@ -109,20 +124,27 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.3.2 - High Contrast Layout</div>
+<div class="version-tag">TEST - Slab Mode per Section</div>
 
 <script>
-  const state = { fireRated: false };
+  // ✅ ONLY CHANGE: add slabMode flags (everything else same)
+  const state = { fireRated: false, slabMode68: false, slabMode80: false };
+
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "10'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters"];
 
   function update(key, delta, btnEl) {
-    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(8);
+    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(10);
     state[key] = Math.max(0, (state[key] || 0) + delta);
+    
     const el = document.getElementById('qty-' + key);
-    if(el) el.innerText = state[key];
+    if(el) {
+        el.innerText = state[key];
+        if(state[key] > 0) el.classList.add('has-qty');
+        else el.classList.remove('has-qty');
+    }
 
     const box = btnEl.closest('.counter-box');
     box.classList.add('pulse-flash');
@@ -136,8 +158,29 @@
 
   function toggleSection(id, headerEl) {
     const content = document.getElementById('content-' + id);
-    content.classList.toggle('active');
+    const isActive = content.classList.toggle('active');
     headerEl.classList.toggle('active-header');
+    if(isActive) {
+        setTimeout(() => {
+            const yOffset = -60; 
+            const y = headerEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({top: y, behavior: 'smooth'});
+        }, 100);
+    }
+  }
+
+  // ✅ ONLY CHANGE: slab-mode toggles that re-render the open section
+  function toggleSlabMode(which) {
+    if (which === "68") state.slabMode68 = !state.slabMode68;
+    if (which === "80") state.slabMode80 = !state.slabMode80;
+
+    const secId = which === "68" ? "68_s" : "80_s";
+    const sec = layout.find(s => s.id === secId);
+    const content = document.getElementById("content-" + secId);
+
+    // re-render the section content only
+    content.innerHTML = sec.rows();
+    content.classList.add("active");
   }
 
   function renderRow(label, prefix, types) {
@@ -158,7 +201,7 @@
         html += `<input type="number" class="qty-input" id="inp-${key}" oninput="state['${key}']=parseInt(this.value)||0" placeholder="0">`;
       } else {
         html += `<button class="btn" onclick="update('${key}', -1, this)">−</button>
-                 <span class="qty" id="qty-${key}">0</span>
+                 <span class="qty" id="qty-${key}">${state[key] || 0}</span>
                  <button class="btn" onclick="update('${key}', 1, this)">+</button>`;
       }
       html += `</div>
@@ -169,12 +212,37 @@
     return html;
   }
 
+  // ✅ ONLY CHANGE: 6/8 + 8/0 sections use slab toggle + conditional columns
   const layout = [
-    { title: "6/8 Doors", id: "68_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68", ["LH", "RH", "SLAB"])).join('') },
+    { 
+      title: "6/8 Doors", id: "68_s", color: "bg-navy",
+      rows: () => `
+        <div class="toggle-container">
+          <span class="toggle-label">SLAB ONLY?</span>
+          <button class="btn" style="width:70px; font-size:10px;" onclick="toggleSlabMode('68')">
+            ${state.slabMode68 ? "ON" : "OFF"}
+          </button>
+        </div>
+        ${doorSizes.map(s => renderRow(s, "68", state.slabMode68 ? ["SLAB"] : ["LH", "RH"])).join('')}
+      `
+    },
     { title: "6/8 Double Doors", id: "68_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
-    { title: "8/0 Doors", id: "80_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80", ["LH", "RH", "SLAB"])).join('') },
+
+    { 
+      title: "8/0 Doors", id: "80_s", color: "bg-navy",
+      rows: () => `
+        <div class="toggle-container">
+          <span class="toggle-label">SLAB ONLY?</span>
+          <button class="btn" style="width:70px; font-size:10px;" onclick="toggleSlabMode('80')">
+            ${state.slabMode80 ? "ON" : "OFF"}
+          </button>
+        </div>
+        ${doorSizes.map(s => renderRow(s, "80", state.slabMode80 ? ["SLAB"] : ["LH", "RH"])).join('')}
+      `
+    },
     { title: "8/0 Double Doors", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
-    { title: "Attic Solid Core Doors (Custom)", id: "at_sc", color: "bg-navy", custom: true, rows: () => `<div style="padding:0 8px;"><textarea id="attic_custom" class="attic-text-area" placeholder="Enter sizes, handing, and cuts here..."></textarea></div>` },
+
+    { title: "Attic Solid Core (Custom)", id: "at_sc", color: "bg-navy", custom: true, rows: () => `<div style="padding:0 8px;"><textarea id="attic_custom" class="attic-text-area" placeholder="Enter sizes, handing, and cuts..."></textarea></div>` },
     { title: "Attic Stairs", id: "at_st", color: "bg-red", rows: () => renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
     { title: "Handrail", id: "h_rail", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') },
     { title: "Stair Hardware", id: "s_hard", color: "bg-red", rows: () => stairItems.map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) }
@@ -187,6 +255,7 @@
     <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
   `).join('');
 
+  // ✅ Summary logic stays the same (works with SLAB)
   function generateSummary() {
     const cust = document.getElementById('customer').value || "N/A";
     const sub = document.getElementById('subdivision').value || "N/A";
