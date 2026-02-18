@@ -1,324 +1,177 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elevate Trim – TEST</title>
 
-  <!-- NOTE: test.html does NOT need manifest or icons or service worker -->
-  <title>Elevate Trim - TEST (Slab Toggle)</title>
+<style>
+:root{
+  --navy:#0A2E4E;
+  --red:#E31837;
+  --bg:#e2e8f0;
+  --green:#16a34a;
+}
 
-  <style>
-    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
-    *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
-    
-    .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
-    .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
-    
-    label { font-weight: 700; font-size: 10px; color: #475569; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
-    input, textarea { width:100%; padding: 10px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
-    
-    .input-row { display: flex; gap: 8px; margin-bottom: 4px; }
-    .input-group { flex: 1; }
+*{
+  box-sizing:border-box;
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-    /* STICKY HEADERS */
-    .section-title { 
-      color: #fff; padding: 14px; font-weight: 800; font-size: 14px; 
-      margin: 8px -8px; cursor: pointer;
-      display: flex; justify-content: space-between; align-items: center;
-      text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
-      position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .bg-navy { background: var(--navy); }
-    .bg-red { background: var(--bfs-red); }
-    
-    .section-content { display: none; padding-top: 8px; }
-    .section-content.active { display: block; }
-    
-    /* COMPACT SIDE-LABEL ROW */
-    .door-row { 
-      background: #fff; border-radius: 6px; padding: 8px; 
-      margin-bottom: 8px; /* Balanced spacing */
-      display: flex; align-items: center; gap: 8px; 
-      border: 1px solid #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-    }
-    .size-label { 
-      font-weight: 900; font-size: 13px; width: 48px; 
-      flex-shrink: 0; color: var(--navy); text-align: center;
-    }
-    
-    .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
-    
-    .counter-box { 
-        display: flex; flex-direction: column; align-items: center; background: #fdfdfd; 
-        padding: 4px 2px; border: 1px solid #e2e8f0; border-radius: 4px; transition: background 0.2s; 
-    }
-    .pulse-flash { background: #e0f2fe !important; }
+body{
+  margin:0;
+  background:var(--bg);
+  padding:10px;
+}
 
-    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #64748b; font-weight: 900; text-transform: uppercase; }
-    .btn-wrap { display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
-    
-    .btn { width: 30px; height: 30px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-    .btn:active { transform: scale(0.9); }
-    
-    /* QUANTITY COLOR LOGIC */
-    .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; color: var(--navy); transition: color 0.2s; }
-    .has-qty { color: var(--green) !important; font-size: 17px; }
+h1{
+  text-align:center;
+  color:var(--navy);
+  margin-bottom:20px;
+}
 
-    .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
+.section{
+  background:#fff;
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:16px;
+  box-shadow:0 4px 8px rgba(0,0,0,0.08);
+}
 
-    .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
-    .attic-text-area { min-height: 80px; font-size: 14px; border: 1px dashed var(--navy); background: #fff; margin-top: 5px; }
+.section-title{
+  font-weight:800;
+  font-size:16px;
+  margin-bottom:10px;
+  color:var(--navy);
+  text-transform:uppercase;
+}
 
-    .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 8px; gap: 8px; background: #fff; border-radius: 4px; margin-top: 4px; border: 1px solid #cbd5e1; }
-    .toggle-label { font-size: 10px; font-weight: 800; color: var(--bfs-red); }
-    
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    
-    #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
-    .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
-    .chevron::after { content: '▼'; font-size: 10px; }
-    .active-header .chevron::after { content: '▲'; }
-  </style>
+.segment{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.segment button{
+  flex:1;
+  padding:8px 0;
+  font-weight:700;
+  border-radius:6px;
+  border:1px solid #cbd5e1;
+  background:#f1f5f9;
+}
+
+.segment button.active{
+  background:var(--navy);
+  color:#fff;
+  border-color:var(--navy);
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.size{
+  font-weight:800;
+  width:70px;
+  font-size:14px;
+  color:var(--navy);
+}
+
+.counter{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.btn{
+  width:36px;
+  height:36px;
+  border-radius:6px;
+  border:0;
+  background:var(--navy);
+  color:#fff;
+  font-size:18px;
+  font-weight:700;
+}
+
+.qty{
+  font-weight:800;
+  font-size:16px;
+  min-width:18px;
+  text-align:center;
+}
+
+.hidden{
+  display:none;
+}
+
+@media (max-width:420px){
+  .size{width:60px;font-size:13px;}
+  .btn{width:34px;height:34px;}
+}
+</style>
 </head>
 <body>
 
-<div class="header-card">
-  <!-- keep logo spot, but in test we’ll just show a title if icon isn’t present -->
-  <div style="font-weight:900; color:var(--navy); font-size:16px; margin-bottom:8px;">Elevate Trim (TEST)</div>
-  
-  <div class="input-row">
-    <div class="input-group">
-      <label>Customer</label>
-      <input id="customer" type="text" placeholder="e.g. Pulte">
-    </div>
-    <div class="input-group">
-      <label>Subdivision</label>
-      <input id="subdivision" type="text" placeholder="e.g. Huxley">
+<h1>Elevate Trim – TEST</h1>
+
+<!-- 8/0 Doors -->
+<div class="section" id="sec-80">
+  <div class="section-title">8/0 Doors</div>
+
+  <div class="segment">
+    <button class="active" onclick="setSide('sec-80','LH',this)">LH</button>
+    <button onclick="setSide('sec-80','RH',this)">RH</button>
+  </div>
+
+  <div class="row">
+    <div class="size">1/6</div>
+    <div class="counter">
+      <button class="btn" onclick="update('80-1-6')">−</button>
+      <div class="qty" id="80-1-6">0</div>
+      <button class="btn" onclick="update('80-1-6',1)">+</button>
     </div>
   </div>
 
-  <div class="input-row">
-    <div class="input-group">
-      <label>Lot #</label>
-      <input id="lot" type="text" placeholder="104">
+  <div class="row">
+    <div class="size">2/0</div>
+    <div class="counter">
+      <button class="btn" onclick="update('80-2-0')">−</button>
+      <div class="qty" id="80-2-0">0</div>
+      <button class="btn" onclick="update('80-2-0',1)">+</button>
     </div>
-    <div class="input-group">
-      <label>Plan</label>
-      <input id="plan" type="text" placeholder="2400">
+  </div>
+
+  <div class="row">
+    <div class="size">2/4</div>
+    <div class="counter">
+      <button class="btn" onclick="update('80-2-4')">−</button>
+      <div class="qty" id="80-2-4">0</div>
+      <button class="btn" onclick="update('80-2-4',1)">+</button>
     </div>
   </div>
 </div>
-
-<div id="app-content"></div>
-
-<div class="header-card" style="margin-top:15px;">
-  <label>Notes & Summary</label>
-  <textarea id="notes" placeholder="General Notes..."></textarea>
-  <div class="actions">
-    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate Takeoff</button>
-    <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
-  </div>
-  <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
-</div>
-
-<div class="version-tag">TEST - Slab Mode per Section</div>
 
 <script>
-  // ✅ ONLY CHANGE: add slabMode flags (everything else same)
-  const state = { fireRated: false, slabMode68: false, slabMode80: false };
+let state = {};
 
-  const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "10'", "16'", "18'"];
-  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters"];
+function update(id, add= -1){
+  if(!state[id]) state[id]=0;
+  state[id] = Math.max(0, state[id] + add);
+  document.getElementById(id).innerText = state[id];
+}
 
-  function update(key, delta, btnEl) {
-    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(10);
-    state[key] = Math.max(0, (state[key] || 0) + delta);
-    
-    const el = document.getElementById('qty-' + key);
-    if(el) {
-        el.innerText = state[key];
-        if(state[key] > 0) el.classList.add('has-qty');
-        else el.classList.remove('has-qty');
-    }
-
-    const box = btnEl.closest('.counter-box');
-    box.classList.add('pulse-flash');
-    setTimeout(() => box.classList.remove('pulse-flash'), 200);
-  }
-
-  function toggleFire() {
-    state.fireRated = !state.fireRated;
-    document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
-  }
-
-  function toggleSection(id, headerEl) {
-    const content = document.getElementById('content-' + id);
-    const isActive = content.classList.toggle('active');
-    headerEl.classList.toggle('active-header');
-    if(isActive) {
-        setTimeout(() => {
-            const yOffset = -60; 
-            const y = headerEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({top: y, behavior: 'smooth'});
-        }, 100);
-    }
-  }
-
-  // ✅ ONLY CHANGE: slab-mode toggles that re-render the open section
-  function toggleSlabMode(which) {
-    if (which === "68") state.slabMode68 = !state.slabMode68;
-    if (which === "80") state.slabMode80 = !state.slabMode80;
-
-    const secId = which === "68" ? "68_s" : "80_s";
-    const sec = layout.find(s => s.id === secId);
-    const content = document.getElementById("content-" + secId);
-
-    // re-render the section content only
-    content.innerHTML = sec.rows();
-    content.classList.add("active");
-  }
-
-  function renderRow(label, prefix, types) {
-    let displayLabel = label;
-    if (prefix === "80" || prefix === "DBL80") displayLabel = label + "x8/0";
-
-    let html = `<div class="door-row">
-      <div class="size-label">${displayLabel}</div>
-      <div class="controls-grid">`;
-    types.forEach(type => {
-      let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
-      let noteKey = 'NOTE_' + key;
-      const isHighVolume = (label === "Balusters" || prefix === "STSH");
-
-      html += `<div class="counter-box"><label>${type}</label>
-        <div class="btn-wrap">`;
-      if (isHighVolume) {
-        html += `<input type="number" class="qty-input" id="inp-${key}" oninput="state['${key}']=parseInt(this.value)||0" placeholder="0">`;
-      } else {
-        html += `<button class="btn" onclick="update('${key}', -1, this)">−</button>
-                 <span class="qty" id="qty-${key}">${state[key] || 0}</span>
-                 <button class="btn" onclick="update('${key}', 1, this)">+</button>`;
-      }
-      html += `</div>
-        <input type="text" id="${noteKey}" class="note-box" placeholder="Note">
-      </div>`;
-    });
-    html += `</div></div>`;
-    return html;
-  }
-
-  // ✅ ONLY CHANGE: 6/8 + 8/0 sections use slab toggle + conditional columns
-  const layout = [
-    { 
-      title: "6/8 Doors", id: "68_s", color: "bg-navy",
-      rows: () => `
-        <div class="toggle-container">
-          <span class="toggle-label">SLAB ONLY?</span>
-          <button class="btn" style="width:70px; font-size:10px;" onclick="toggleSlabMode('68')">
-            ${state.slabMode68 ? "ON" : "OFF"}
-          </button>
-        </div>
-        ${doorSizes.map(s => renderRow(s, "68", state.slabMode68 ? ["SLAB"] : ["LH", "RH"])).join('')}
-      `
-    },
-    { title: "6/8 Double Doors", id: "68_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
-
-    { 
-      title: "8/0 Doors", id: "80_s", color: "bg-navy",
-      rows: () => `
-        <div class="toggle-container">
-          <span class="toggle-label">SLAB ONLY?</span>
-          <button class="btn" style="width:70px; font-size:10px;" onclick="toggleSlabMode('80')">
-            ${state.slabMode80 ? "ON" : "OFF"}
-          </button>
-        </div>
-        ${doorSizes.map(s => renderRow(s, "80", state.slabMode80 ? ["SLAB"] : ["LH", "RH"])).join('')}
-      `
-    },
-    { title: "8/0 Double Doors", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
-
-    { title: "Attic Solid Core (Custom)", id: "at_sc", color: "bg-navy", custom: true, rows: () => `<div style="padding:0 8px;"><textarea id="attic_custom" class="attic-text-area" placeholder="Enter sizes, handing, and cuts..."></textarea></div>` },
-    { title: "Attic Stairs", id: "at_st", color: "bg-red", rows: () => renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
-    { title: "Handrail", id: "h_rail", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') },
-    { title: "Stair Hardware", id: "s_hard", color: "bg-red", rows: () => stairItems.map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) }
-  ];
-
-  document.getElementById('app-content').innerHTML = layout.map(sec => `
-    <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
-      <span>${sec.title}</span><span class="chevron"></span>
-    </div>
-    <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
-  `).join('');
-
-  // ✅ Summary logic stays the same (works with SLAB)
-  function generateSummary() {
-    const cust = document.getElementById('customer').value || "N/A";
-    const sub = document.getElementById('subdivision').value || "N/A";
-    const lot = document.getElementById('lot').value || "N/A";
-    const plan = document.getElementById('plan').value || "N/A";
-    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot} | Plan: ${plan}\n----------------------------\n`;
-    
-    const sections = [
-        {id: '68', head: '--- 6/8 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL68', head: '--- 6/8 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
-        {id: '80', head: '--- 8/0 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL80', head: '--- 8/0 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
-        {id: 'ATTIC_SC', head: '--- ATTIC SOLID CORE DOORS (CUSTOM) ---'},
-        {id: 'AS', head: '--- ATTIC STAIRS ---', sizes: ["22x54", "25x54", "Scuttle"], types: ["QTY"]},
-        {id: 'HR', head: '--- HANDRAIL ---', sizes: railLengths, types: ["OPEN", "WALL"]},
-        {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems, types: ["QTY"]},
-        {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]}
-    ];
-
-    sections.forEach(sec => {
-        if (sec.id === 'ATTIC_SC') {
-            const atticVal = document.getElementById('attic_custom').value;
-            if(atticVal) out += sec.head + "\n" + atticVal + "\n\n";
-            return;
-        }
-        let sectionText = "";
-        sec.sizes.forEach(sz => {
-            sec.types.forEach(tp => {
-                let key = sec.id + '_' + sz.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + tp;
-                let val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
-                if(val > 0) {
-                    let noteVal = document.getElementById('NOTE_' + key)?.value;
-                    let noteText = noteVal ? `\n   *Note: ${noteVal}` : "";
-                    let displaySize = (sec.id === '80' || sec.id === 'DBL80') ? sz + "x8/0" : sz;
-                    if (sec.id === 'AS') sectionText += `Attic Stair ${displaySize}${state.fireRated ? " (FIRE RATED)" : ""} - ${val}${noteText}\n`;
-                    else if (sec.id === 'HR') sectionText += `${displaySize} ${tp} Rail - ${val}${noteText}\n`;
-                    else if (sec.id === 'STSH') sectionText += `Shoe (${tp}) - ${val}${noteText}\n`;
-                    else if (sec.id === 'ST') sectionText += `${displaySize} - ${val}${noteText}\n`;
-                    else sectionText += `${displaySize} ${tp} - ${val}${noteText}\n`;
-                }
-            });
-        });
-        if(sectionText) out += sec.head + "\n" + sectionText + "\n";
-    });
-    const notes = document.getElementById('notes').value;
-    if(notes) out += "----------------------------\nNOTES: " + notes;
-    document.getElementById('summary').value = out;
-  }
-
-  function copySummary() {
-    const s = document.getElementById("summary");
-    const btn = document.getElementById("copyBtn");
-    s.select();
-    document.execCommand("copy");
-    btn.innerText = "COPIED!";
-    btn.style.background = "var(--green)";
-    btn.style.color = "white";
-    setTimeout(() => {
-      btn.innerText = "Copy Text";
-      btn.style.background = "#e2e8f0";
-      btn.style.color = "var(--navy)";
-    }, 1500);
-  }
+function setSide(sectionId, side, btn){
+  const section = document.getElementById(sectionId);
+  const buttons = section.querySelectorAll('.segment button');
+  buttons.forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
 </script>
+
 </body>
 </html>
