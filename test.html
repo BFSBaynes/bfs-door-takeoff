@@ -1,1 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Elevate Trim - TEST</title>
 
+<style>
+:root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#ffffff; --green:#16a34a; }
+*{ box-sizing:border-box; font-family:-apple-system,sans-serif; }
+body{ margin:0; background:var(--bg); padding:10px; }
+
+.header-card{ background:#fff; border-radius:8px; padding:12px; margin-bottom:12px; border:1px solid #94a3b8; }
+label{ font-weight:700; font-size:10px; text-transform:uppercase; display:block; margin-bottom:4px; }
+input, textarea{ width:100%; padding:8px; border:1px solid #94a3b8; border-radius:6px; margin-bottom:8px; }
+
+.section-title{
+  background:var(--navy);
+  color:#fff;
+  padding:12px;
+  font-weight:800;
+  margin:12px 0 6px;
+  border-radius:6px;
+}
+
+.door-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:6px;
+  background:#fff;
+  padding:8px;
+  border:1px solid #cbd5e1;
+  border-radius:6px;
+}
+
+.size-label{
+  width:50px;
+  font-weight:900;
+  text-align:center;
+}
+
+.controls{
+  display:flex;
+  gap:6px;
+  flex:1;
+}
+
+.counter{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.btn{
+  width:30px;
+  height:30px;
+  border:0;
+  border-radius:4px;
+  background:var(--navy);
+  color:white;
+  font-weight:bold;
+}
+
+.qty{
+  min-width:20px;
+  text-align:center;
+  font-weight:800;
+}
+
+.toggle{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:6px;
+}
+
+.summary-box{
+  height:300px;
+  font-family:monospace;
+  white-space:pre;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header-card">
+<label>Customer</label>
+<input id="customer">
+<label>Lot</label>
+<input id="lot">
+</div>
+
+<div id="app"></div>
+
+<div class="header-card">
+<button onclick="generateSummary()">Generate</button>
+<button onclick="copySummary()">Copy</button>
+<textarea id="summary" class="summary-box" readonly></textarea>
+</div>
+
+<script>
+const state = {
+  slabMode68:false,
+  slabMode80:false
+};
+
+const doorSizes=["1/6","2/0","2/4","2/6","2/8","3/0"];
+
+function update(key,delta){
+  state[key]=Math.max(0,(state[key]||0)+delta);
+  document.getElementById("qty-"+key).innerText=state[key];
+}
+
+function toggleSlab(section){
+  state["slabMode"+section]=!state["slabMode"+section];
+  render();
+}
+
+function renderSection(title,prefix){
+  const slabMode=state["slabMode"+prefix];
+  let html=`<div class="section-title">${title}</div>`;
+  html+=`<div class="toggle">
+    <button class="btn" onclick="toggleSlab('${prefix}')">
+      SLAB MODE: ${slabMode?"ON":"OFF"}
+    </button>
+  </div>`;
+  doorSizes.forEach(size=>{
+    html+=`<div class="door-row">
+      <div class="size-label">${size}</div>
+      <div class="controls">`;
+    const types=slabMode?["SLAB"]:["LH","RH"];
+    types.forEach(type=>{
+      const key=prefix+"_"+size.replace("/","-")+"_"+type;
+      html+=`
+        <div class="counter">
+          <span>${type}</span>
+          <button class="btn" onclick="update('${key}',-1)">−</button>
+          <span id="qty-${key}" class="qty">${state[key]||0}</span>
+          <button class="btn" onclick="update('${key}',1)">+</button>
+        </div>
+      `;
+    });
+    html+=`</div></div>`;
+  });
+  return html;
+}
+
+function render(){
+  document.getElementById("app").innerHTML=
+    renderSection("6/8 Doors","68")+
+    renderSection("8/0 Doors","80");
+}
+
+function generateSummary(){
+  let out="";
+  const cust=document.getElementById("customer").value;
+  const lot=document.getElementById("lot").value;
+  out+=`TAKEOFF: ${cust} | Lot: ${lot}\n\n`;
+
+  Object.keys(state).forEach(k=>{
+    if(k.includes("_") && state[k]>0){
+      out+=k.replaceAll("_"," ")+" - "+state[k]+"\n";
+    }
+  });
+  document.getElementById("summary").value=out;
+}
+
+function copySummary(){
+  const s=document.getElementById("summary");
+  s.select();
+  document.execCommand("copy");
+}
+
+render();
+</script>
+
+</body>
+</html>
