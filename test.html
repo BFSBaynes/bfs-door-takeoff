@@ -90,11 +90,11 @@
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
   <div class="input-row">
-    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="Pulte" oninput="saveDraft()"></div>
+    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="Pulte" oninput="saveFullState()"></div>
   </div>
   <div class="input-row">
-    <div class="input-group" style="flex: 0.75;"><label>Subdivision</label><input id="subdivision" type="text" placeholder="Huxley" oninput="saveDraft()"></div>
-    <div class="input-group" style="flex: 0.25;"><label>Lot #</label><input id="lot" type="text" placeholder="104" oninput="saveDraft()"></div>
+    <div class="input-group" style="flex: 0.75;"><label>Subdivision</label><input id="subdivision" type="text" placeholder="Huxley" oninput="saveFullState()"></div>
+    <div class="input-group" style="flex: 0.25;"><label>Lot #</label><input id="lot" type="text" placeholder="104" oninput="saveFullState()"></div>
   </div>
 </div>
 
@@ -110,7 +110,7 @@
 
 <div class="header-card" style="margin-top:15px;">
   <label>General Project Notes</label>
-  <textarea id="notes" placeholder="General Notes..."></textarea>
+  <textarea id="notes" placeholder="General Notes..." oninput="saveFullState()"></textarea>
   <div class="actions">
     <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="generateSummary()">Generate Takeoff</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
@@ -124,16 +124,16 @@
     <div id="history-list"></div>
 </div>
 
-<div class="version-tag">Version 1.7.0 - History & Visual Logic</div>
+<div class="version-tag">Version 1.7.5 - Full Persistence Mode</div>
 
 <script>
-  const state = { fireRated: false };
+  let state = {};
   let activeSectionId = "";
   let activeItemLabel = "";
   let activeTypes = [];
 
   const icons = {
-    "LH": "◧", "RH": "◨", "SLAB": "▭", "DBL": "◫", "T-AST": "≗", "OPEN": "stairs", "WALL": "house"
+    "LH": "◧", "RH": "◨", "SLAB": "▭", "DBL": "◫", "T-AST": "≗", "OPEN": "◰", "WALL": "▭"
   };
 
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
@@ -143,9 +143,10 @@
   const directInputItems = ["Brackets", "Balusters", "Shoes"];
 
   function init() {
-      loadDraft();
+      loadFullState();
       renderApp();
       updateHistoryUI();
+      refreshCardColors();
   }
 
   function toggleSection(id, headerEl) {
@@ -187,19 +188,25 @@
   }
 
   function closeModal() {
-    let hasData = false;
     activeTypes.forEach(t => {
       const key = `${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-");
-      const noteKey = `NOTE_${key}`;
       const qtyElement = document.getElementById(`mqty-${key}`);
       state[key] = qtyElement.tagName === "INPUT" ? (parseInt(qtyElement.value) || 0) : (state[key] || 0);
-      state[noteKey] = document.getElementById(`mnote-${key}`).value.trim();
-      if(state[key] > 0) hasData = true;
+      state[`NOTE_${key}`] = document.getElementById(`mnote-${key}`).value.trim();
     });
-    const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
-    const card = document.getElementById(cardId);
-    if(card) hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
+    saveFullState();
+    refreshCardColors();
     document.getElementById('itemModal').style.display = 'none';
+  }
+
+  function refreshCardColors() {
+      // Find every card and see if its state group has data
+      document.querySelectorAll('.item-card').forEach(card => {
+          const [prefix, sectionId, label] = card.id.split('-');
+          // Check state for any key that starts with sectionId_label
+          const hasData = Object.keys(state).some(k => k.startsWith(`${sectionId}_${label}`) && state[k] > 0);
+          hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
+      });
   }
 
   function renderGrid(sectionId, items, types) {
@@ -270,17 +277,27 @@
     saveHistory(report, `${sub} L${lot}`);
   }
 
-  function saveDraft() {
-      const draft = { cust: document.getElementById('customer').value, sub: document.getElementById('subdivision').value, lot: document.getElementById('lot').value };
-      localStorage.setItem('bfs_draft', JSON.stringify(draft));
+  function saveFullState() {
+      const data = {
+          header: { 
+              cust: document.getElementById('customer').value, 
+              sub: document.getElementById('subdivision').value, 
+              lot: document.getElementById('lot').value,
+              notes: document.getElementById('notes').value
+          },
+          state: state
+      };
+      localStorage.setItem('bfs_full_state', JSON.stringify(data));
   }
 
-  function loadDraft() {
-      const draft = JSON.parse(localStorage.getItem('bfs_draft'));
-      if(draft) {
-          document.getElementById('customer').value = draft.cust;
-          document.getElementById('subdivision').value = draft.sub;
-          document.getElementById('lot').value = draft.lot;
+  function loadFullState() {
+      const saved = JSON.parse(localStorage.getItem('bfs_full_state'));
+      if(saved) {
+          document.getElementById('customer').value = saved.header.cust || "";
+          document.getElementById('subdivision').value = saved.header.sub || "";
+          document.getElementById('lot').value = saved.header.lot || "";
+          document.getElementById('notes').value = saved.header.notes || "";
+          state = saved.state || {};
       }
   }
 
@@ -317,7 +334,10 @@
   }
 
   function clearAll() {
-      if(confirm('Clear all data?')) { localStorage.removeItem('bfs_draft'); location.reload(); }
+      if(confirm('This will delete EVERYTHING you have entered. Proceed?')) { 
+          localStorage.removeItem('bfs_full_state'); 
+          location.reload(); 
+      }
   }
 
   init();
