@@ -68,7 +68,6 @@
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
 
-    /* Copy Feedback Toast */
     #toast {
       visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 30px; padding: 12px;
       position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold;
@@ -114,7 +113,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.6.1 - UI Polishing</div>
+<div class="version-tag">Version 1.6.2 - Note Logic Update</div>
 
 <script>
   const state = { fireRated: false };
@@ -152,7 +151,10 @@
       const key = `${sectionId}_${label}_${type}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
-      let note = state[noteKey] || (sectionId === "atws" ? "Cut down to: " : "");
+      const savedNote = state[noteKey] || "";
+      
+      // Determine placeholder vs actual value
+      const placeholderText = (sectionId === "atws") ? "Cut down to: " : "Notes...";
 
       let controlHtml = "";
       const greenClass = qty > 0 ? 'active-qty' : '';
@@ -174,8 +176,8 @@
             <label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>
             ${controlHtml}
           </div>
-          <input type="text" id="mnote-${key}" value="${note}" 
-                 placeholder="Notes..." 
+          <input type="text" id="mnote-${key}" value="${savedNote}" 
+                 placeholder="${placeholderText}" 
                  style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;">
         </div>`;
     });
@@ -199,7 +201,7 @@
         state[key] = parseInt(qtyElement.value) || 0;
       }
       const noteInput = document.getElementById(`mnote-${key}`);
-      if(noteInput) state[noteKey] = noteInput.value;
+      if(noteInput) state[noteKey] = noteInput.value.trim();
       if(state[key] > 0) hasData = true;
     });
     const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
@@ -310,7 +312,8 @@
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " [FIRE RATED]" : "";
             groupContent += ` • ${item}${g.suffix} ${t}: ${state[key]}${fireLabel}`;
-            if(state[noteKey]) groupContent += ` (${state[noteKey]})`;
+            // Only add note if it actually contains text
+            if(state[noteKey] && state[noteKey].length > 0) groupContent += ` (${state[noteKey]})`;
             groupContent += `\n`;
           }
         });
@@ -327,8 +330,6 @@
   function copySummary() {
     const summaryText = document.getElementById("summary").value;
     if(!summaryText) return;
-
-    // Navigator API for clean, non-visual copying
     navigator.clipboard.writeText(summaryText).then(() => {
       const toast = document.getElementById("toast");
       toast.className = "show";
