@@ -101,7 +101,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.7 - Smart Keyboard Fix</div>
+<div class="version-tag">Version 1.6.0 - Attic & Takeoff Facelift</div>
 
 <script>
   const state = { fireRated: false };
@@ -125,21 +125,32 @@
     activeItemLabel = label;
     activeTypes = types;
     
-    document.getElementById('m-title').innerText = label;
+    // Logic for dynamic header (adds x8/0 if in that section)
+    let displayHeader = label;
+    if (sectionId === "80s" || sectionId === "80d") {
+       displayHeader = `${label}x8/0`;
+    }
+    document.getElementById('m-title').innerText = displayHeader;
+
     const container = document.getElementById('m-blocks');
     container.innerHTML = "";
-
     const useDirectInput = directInputItems.includes(label);
 
     types.forEach(type => {
       const key = `${sectionId}_${label}_${type}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
-      const note = state[noteKey] || "";
+      
+      // Default note for Attic section
+      let note = state[noteKey];
+      if (note === undefined && sectionId === "atws") {
+          note = "Cut down to: ";
+      } else if (note === undefined) {
+          note = "";
+      }
 
       let controlHtml = "";
       if (useDirectInput) {
-        // Added inputmode="numeric" to force number pad on mobile
         controlHtml = `<input type="number" inputmode="numeric" class="qty-input" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()">`;
       } else {
         controlHtml = `
@@ -157,11 +168,10 @@
             ${controlHtml}
           </div>
           <input type="text" id="mnote-${key}" value="${note}" 
-                 placeholder="Notes for ${type}..." 
+                 placeholder="Notes..." 
                  style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;">
         </div>`;
     });
-
     document.getElementById('itemModal').style.display = 'flex';
   }
 
@@ -175,17 +185,14 @@
     activeTypes.forEach(t => {
       const key = `${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
-      
       const qtyElement = document.getElementById(`mqty-${key}`);
       if (qtyElement.tagName === "INPUT") {
         state[key] = parseInt(qtyElement.value) || 0;
       }
-
       const noteInput = document.getElementById(`mnote-${key}`);
       if(noteInput) state[noteKey] = noteInput.value;
       if(state[key] > 0) hasData = true;
     });
-
     const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
     const card = document.getElementById(cardId);
     if(card) {
@@ -204,7 +211,6 @@
   function renderGrid(sectionId, items, types) {
     const grid = document.createElement('div');
     grid.className = 'item-grid';
-    
     items.forEach(item => {
       const card = document.createElement('div');
       card.className = 'item-card';
@@ -221,7 +227,7 @@
     { title: "6/8 Double", id: "68d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
     { title: "8/0 Doors", id: "80s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
     { title: "8/0 Double", id: "80d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
-    { title: "Attic Solid Core", id: "atsc", color: "bg-navy", custom: true },
+    { title: "Attic W/S Door", id: "atws", color: "bg-navy", items: doorSizes, types: ["LH", "RH"] },
     { title: "Attic Stairs", id: "atst", color: "bg-red", items: ["22x54", "25x54", "Scuttle"], types: ["QTY"] },
     { 
       title: "Stair Parts", 
@@ -241,14 +247,11 @@
     title.className = `section-title ${sec.color}`;
     title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
     title.onclick = () => toggleSection(sec.id, title);
-
     const content = document.createElement('div');
     content.id = `content-${sec.id}`;
     content.className = 'section-content';
 
-    if(sec.custom) {
-      content.innerHTML = `<div style="padding:8px;"><textarea id="attic_custom" style="height:100px;" placeholder="Describe custom attic sizes/cuts..."></textarea></div>`;
-    } else if (sec.sections) {
+    if (sec.sections) {
       sec.sections.forEach(subset => {
         content.appendChild(renderGrid(sec.id, subset.items, subset.types));
       });
@@ -265,7 +268,6 @@
         content.appendChild(fireBtn);
       }
     }
-
     appContainer.appendChild(title);
     appContainer.appendChild(content);
   });
@@ -277,17 +279,18 @@
     
     let report = `TAKEOFF: ${cust} | ${sub} | LOT: ${lot}\n`;
     report += `DATE: ${new Date().toLocaleDateString()}\n`;
-    report += `------------------------------------------\n\n`;
+    report += `==========================================\n\n`;
 
     const groups = [
-      {id: "68s", head: "6/8 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes},
-      {id: "68d", head: "6/8 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes},
-      {id: "80s", head: "8/0 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes},
-      {id: "80d", head: "8/0 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes},
-      {id: "atst", head: "ATTIC STAIRS", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"]},
-      {id: "sp", head: "HANDRAIL", types: ["OPEN", "WALL"], items: railLengths},
-      {id: "sp", head: "STAIR HARDWARE", types: ["QTY"], items: stairItems},
-      {id: "sp", head: "SHOES", types: ["FLAT", "ANGLE"], items: ["Shoes"]}
+      {id: "68s", head: "6/8 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:""},
+      {id: "68d", head: "6/8 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes, suffix:""},
+      {id: "80s", head: "8/0 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:"x8/0"},
+      {id: "80d", head: "8/0 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes, suffix:"x8/0"},
+      {id: "atws", head: "ATTIC W/S DOORS", types: ["LH", "RH"], items: doorSizes, suffix:""},
+      {id: "atst", head: "ATTIC STAIRS", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"], suffix:""},
+      {id: "sp", head: "HANDRAIL", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
+      {id: "sp", head: "STAIR HARDWARE", types: ["QTY"], items: stairItems, suffix:""},
+      {id: "sp", head: "SHOES", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""}
     ];
 
     groups.forEach(g => {
@@ -298,44 +301,30 @@
           const noteKey = `NOTE_${key}`;
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " [FIRE RATED]" : "";
-            groupContent += `${item} ${t}: ${state[key]}${fireLabel}`;
+            groupContent += ` • ${item}${g.suffix} ${t}: ${state[key]}${fireLabel}`;
             if(state[noteKey]) groupContent += ` (${state[noteKey]})`;
             groupContent += `\n`;
           }
         });
       });
-      if(groupContent) report += `[${g.head}]\n${groupContent}\n`;
+      if(groupContent) report += `${g.head}\n${groupContent}\n`;
     });
-
-    const custom = document.getElementById('attic_custom').value;
-    if(custom) report += `[ATTIC CUSTOM/SOLID CORE]\n${custom}\n\n`;
     
     const genNotes = document.getElementById('notes').value;
-    if(genNotes) report += `[GENERAL NOTES]\n${genNotes}\n`;
+    if(genNotes) report += `GENERAL NOTES\n • ${genNotes.split('\n').join('\n • ')}\n`;
 
     document.getElementById('summary').value = report;
   }
 
   function copySummary() {
     const s = document.getElementById("summary");
-    const textToCopy = s.value;
-    const tempTextArea = document.createElement("textarea");
-    tempTextArea.value = textToCopy;
-    tempTextArea.style.position = "fixed";
-    tempTextArea.style.left = "-9999px";
-    tempTextArea.style.top = "0";
-    document.body.appendChild(tempTextArea);
-    tempTextArea.focus();
-    tempTextArea.select();
-    tempTextArea.setSelectionRange(0, 99999);
+    s.select();
+    s.setSelectionRange(0, 99999);
     try {
       document.execCommand('copy');
       document.getElementById("copyBtn").innerText = "COPIED!";
       setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
-    } catch (err) {
-      console.error('Copy failed', err);
-    }
-    document.body.removeChild(tempTextArea);
+    } catch (err) { console.error('Copy failed', err); }
   }
 </script>
 </body>
