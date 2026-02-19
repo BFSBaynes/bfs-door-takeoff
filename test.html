@@ -113,7 +113,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.6.6 - Updated Aesthetics</div>
+<div class="version-tag">Version 1.6.7 - Structured Output Mode</div>
 
 <script>
   const state = { fireRated: false };
@@ -287,18 +287,19 @@
     const sub = document.getElementById('subdivision').value || "NA";
     const lot = document.getElementById('lot').value || "NA";
     
-    let report = `TAKEOFF  ${cust}  ${sub}  LOT ${lot}\n\n`;
+    // Header using dashes instead of colons/pipes
+    let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
 
     const groups = [
-      {id: "68s", head: "6/8 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:""},
-      {id: "68d", head: "6/8 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes, suffix:""},
-      {id: "80s", head: "8/0 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:"x8/0"},
-      {id: "80d", head: "8/0 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes, suffix:"x8/0"},
-      {id: "atws", head: "ATTIC WS DOORS", types: ["LH", "RH"], items: doorSizes, suffix:""},
-      {id: "atst", head: "ATTIC STAIRS", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"], suffix:""},
-      {id: "sp", head: "HANDRAIL", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
-      {id: "sp", head: "STAIR HARDWARE", types: ["QTY"], items: stairItems, suffix:""},
-      {id: "sp", head: "SHOES", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""}
+      {id: "68s", head: "--- 6/8 SINGLE DOORS ---", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:""},
+      {id: "68d", head: "--- 6/8 DOUBLE DOORS ---", types: ["DBL", "T-AST"], items: dblSizes, suffix:""},
+      {id: "80s", head: "--- 8/0 SINGLE DOORS ---", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:"x8/0"},
+      {id: "80d", head: "--- 8/0 DOUBLE DOORS ---", types: ["DBL", "T-AST"], items: dblSizes, suffix:"x8/0"},
+      {id: "atws", head: "--- ATTIC WS DOORS ---", types: ["LH", "RH"], items: doorSizes, suffix:""},
+      {id: "atst", head: "--- ATTIC STAIRS ---", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"], suffix:""},
+      {id: "sp", head: "--- HANDRAIL ---", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
+      {id: "sp", head: "--- STAIR HARDWARE ---", types: ["QTY"], items: stairItems, suffix:""},
+      {id: "sp", head: "--- SHOES ---", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""}
     ];
 
     groups.forEach(g => {
@@ -308,9 +309,11 @@
           const key = `${g.id}_${item}_${t}`.replace(/[\/ ']/g, "-");
           const noteKey = `NOTE_${key}`;
           if(state[key] > 0) {
-            const fireLabel = (g.id === "atst" && state.fireRated) ? " FIRE RATED" : "";
-            groupContent += `${item}${g.suffix} ${t}  ${state[key]}${fireLabel}`;
-            if(state[noteKey] && state[noteKey].length > 0) groupContent += ` (${state[noteKey]})`;
+            const fireLabel = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
+            
+            // Format line: Size Type - Qty (Note)
+            groupContent += `${item}${g.suffix} ${t} -- ${state[key]}${fireLabel}`;
+            if(state[noteKey] && state[noteKey].length > 0) groupContent += `\n   *Note: ${state[noteKey]}`;
             groupContent += `\n`;
           }
         });
@@ -319,7 +322,7 @@
     });
     
     const genNotes = document.getElementById('notes').value;
-    if(genNotes) report += `GENERAL NOTES\n${genNotes}\n`;
+    if(genNotes) report += `----------------------------\nGENERAL NOTES\n${genNotes}\n`;
 
     document.getElementById('summary').value = report;
   }
