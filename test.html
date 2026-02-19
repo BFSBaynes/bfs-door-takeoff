@@ -100,7 +100,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.3 - Raw Text Fix</div>
+<div class="version-tag">Version 1.5.4 - Portal Paste Fix</div>
 
 <script>
   const state = { fireRated: false };
@@ -288,19 +288,32 @@
 
   function copySummary() {
     const s = document.getElementById("summary");
-    // Standard clipboard API for clean text copy
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(s.value).then(() => {
-        document.getElementById("copyBtn").innerText = "COPIED!";
-        setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
-      });
-    } else {
-      // Fallback for older browsers
-      s.select();
+    const textToCopy = s.value;
+
+    // Use a temporary textarea to ensure clean, unformatted text is copied
+    const tempTextArea = document.createElement("textarea");
+    tempTextArea.value = textToCopy;
+    tempTextArea.style.position = "fixed";
+    tempTextArea.style.left = "-9999px";
+    tempTextArea.style.top = "0";
+    document.body.appendChild(tempTextArea);
+
+    // Force focus and selection
+    tempTextArea.focus();
+    tempTextArea.select();
+    tempTextArea.setSelectionRange(0, 99999);
+
+    try {
+      // Use the older execCommand which is often more reliable for plain-text 
+      // passthroughs on corporate portals
       document.execCommand('copy');
       document.getElementById("copyBtn").innerText = "COPIED!";
       setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
+    } catch (err) {
+      console.error('Copy failed', err);
     }
+
+    document.body.removeChild(tempTextArea);
   }
 </script>
 </body>
