@@ -36,11 +36,9 @@
     .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px; }
     .item-card { 
       background: #fff; border: 2px solid #94a3b8; border-radius: 8px; 
-      padding: 10px 4px; text-align: center; font-weight: 800; color: var(--navy);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 12px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 15px 4px; text-align: center; font-weight: 800; color: var(--navy);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; cursor: pointer;
     }
-    .item-card span.icon { font-size: 18px; }
     .item-card:active { transform: scale(0.95); background: #f1f5f9; }
     .item-card.has-data { border-color: var(--green); background: #f0fdf4; color: var(--green); }
 
@@ -62,14 +60,17 @@
     .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); margin-bottom: 0; }
     .qty-input.active-qty { color: var(--green); border-color: var(--green); }
 
-    .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
-    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
-    .history-item:last-child { border: 0; }
-
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
-    #summary { background: #fff; height: 250px; margin-top: 8px; font-family: sans-serif; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre-wrap; }
+    #summary { background: #fff; height: 350px; margin-top: 8px; font-family: sans-serif; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre-wrap; }
+    
+    /* History List Styles */
+    .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
+    .history-item:last-child { border: 0; }
+    .load-btn { padding: 4px 10px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 700; cursor: pointer; }
+
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
@@ -90,11 +91,11 @@
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
   <div class="input-row">
-    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="Pulte" oninput="saveFullState()"></div>
+    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="Pulte"></div>
   </div>
   <div class="input-row">
-    <div class="input-group" style="flex: 0.75;"><label>Subdivision</label><input id="subdivision" type="text" placeholder="Huxley" oninput="saveFullState()"></div>
-    <div class="input-group" style="flex: 0.25;"><label>Lot #</label><input id="lot" type="text" placeholder="104" oninput="saveFullState()"></div>
+    <div class="input-group" style="flex: 0.75;"><label>Subdivision</label><input id="subdivision" type="text" placeholder="Huxley"></div>
+    <div class="input-group" style="flex: 0.25;"><label>Lot #</label><input id="lot" type="text" placeholder="104"></div>
   </div>
 </div>
 
@@ -110,13 +111,13 @@
 
 <div class="header-card" style="margin-top:15px;">
   <label>General Project Notes</label>
-  <textarea id="notes" placeholder="General Notes..." oninput="saveFullState()"></textarea>
+  <textarea id="notes" placeholder="Example: Key code, delivery instructions..."></textarea>
   <div class="actions">
     <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="generateSummary()">Generate Takeoff</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
   <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="clearAll()">Reset All Fields</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
 <div class="history-section">
@@ -124,17 +125,13 @@
     <div id="history-list"></div>
 </div>
 
-<div class="version-tag">Version 1.7.5 - Full Persistence Mode</div>
+<div class="version-tag">Version 1.6.9 - History Mode</div>
 
 <script>
-  let state = {};
+  const state = { fireRated: false };
   let activeSectionId = "";
   let activeItemLabel = "";
   let activeTypes = [];
-
-  const icons = {
-    "LH": "◧", "RH": "◨", "SLAB": "▭", "DBL": "◫", "T-AST": "≗", "OPEN": "◰", "WALL": "▭"
-  };
 
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
@@ -142,41 +139,40 @@
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Epoxy"];
   const directInputItems = ["Brackets", "Balusters", "Shoes"];
 
-  function init() {
-      loadFullState();
-      renderApp();
-      updateHistoryUI();
-      refreshCardColors();
-  }
-
   function toggleSection(id, headerEl) {
     document.getElementById('content-' + id).classList.toggle('active');
     headerEl.classList.toggle('active-header');
   }
 
   function openModal(sectionId, label, types) {
-    activeSectionId = sectionId; activeItemLabel = label; activeTypes = types;
-    let displayHeader = (sectionId === "80s" || sectionId === "80d") ? `${label}x8/0` : label;
+    activeSectionId = sectionId;
+    activeItemLabel = label;
+    activeTypes = types;
+    let displayHeader = label;
+    if (sectionId === "80s" || sectionId === "80d") {
+       displayHeader = `${label}x8/0`;
+    }
     document.getElementById('m-title').innerText = displayHeader;
     const container = document.getElementById('m-blocks');
     container.innerHTML = "";
+    const useDirectInput = directInputItems.includes(label);
 
     types.forEach(type => {
       const key = `${sectionId}_${label}_${type}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
       const savedNote = state[noteKey] || "";
-      const icon = icons[type] || "";
-      
-      let controlHtml = directInputItems.includes(label) ? 
-        `<input type="number" class="qty-input ${qty>0?'active-qty':''}" id="mqty-${key}" value="${qty}" oninput="this.classList.toggle('active-qty', this.value > 0)">` :
-        `<div style="display:flex; align-items:center; gap:12px;"><button class="btn" onclick="updateModalQty('${key}', -1)">-</button><span class="qty-display ${qty>0?'active-qty':''}" id="mqty-${key}">${qty}</span><button class="btn" onclick="updateModalQty('${key}', 1)">+</button></div>`;
+      const placeholderText = (sectionId === "atws") ? "Cut down to / R.O. is" : "Notes...";
+      let controlHtml = "";
+      const greenClass = qty > 0 ? 'active-qty' : '';
 
-      container.innerHTML += `
-        <div class="modal-type-block">
-          <div class="modal-counter-row"><label style="font-size:16px; font-weight:800; color:var(--navy);">${icon} ${type}</label>${controlHtml}</div>
-          <input type="text" id="mnote-${key}" value="${savedNote}" placeholder="Notes..." style="margin-top:5px; font-size:14px; padding:8px; width:100%; border:1px solid #94a3b8; border-radius:4px;">
-        </div>`;
+      if (useDirectInput) {
+        controlHtml = `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">`;
+      } else {
+        controlHtml = `<div style="display:flex; align-items:center; gap:12px;"><button class="btn" onclick="updateModalQty('${key}', -1)">-</button><span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span><button class="btn" onclick="updateModalQty('${key}', 1)">+</button></div>`;
+      }
+
+      container.innerHTML += `<div class="modal-type-block"><div class="modal-counter-row"><label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>${controlHtml}</div><input type="text" id="mnote-${key}" value="${savedNote}" placeholder="${placeholderText}" style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;"></div>`;
     });
     document.getElementById('itemModal').style.display = 'flex';
   }
@@ -184,29 +180,32 @@
   function updateModalQty(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     const el = document.getElementById(`mqty-${key}`);
-    el.innerText = state[key]; el.classList.toggle('active-qty', state[key] > 0);
+    el.innerText = state[key];
+    el.classList.toggle('active-qty', state[key] > 0);
   }
 
   function closeModal() {
+    let hasData = false;
     activeTypes.forEach(t => {
       const key = `${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-");
+      const noteKey = `NOTE_${key}`;
       const qtyElement = document.getElementById(`mqty-${key}`);
-      state[key] = qtyElement.tagName === "INPUT" ? (parseInt(qtyElement.value) || 0) : (state[key] || 0);
-      state[`NOTE_${key}`] = document.getElementById(`mnote-${key}`).value.trim();
+      if (qtyElement.tagName === "INPUT") { state[key] = parseInt(qtyElement.value) || 0; }
+      const noteInput = document.getElementById(`mnote-${key}`);
+      if(noteInput) state[noteKey] = noteInput.value.trim();
+      if(state[key] > 0) hasData = true;
     });
-    saveFullState();
-    refreshCardColors();
+    const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
+    const card = document.getElementById(cardId);
+    if(card) { hasData ? card.classList.add('has-data') : card.classList.remove('has-data'); }
     document.getElementById('itemModal').style.display = 'none';
   }
 
-  function refreshCardColors() {
-      // Find every card and see if its state group has data
-      document.querySelectorAll('.item-card').forEach(card => {
-          const [prefix, sectionId, label] = card.id.split('-');
-          // Check state for any key that starts with sectionId_label
-          const hasData = Object.keys(state).some(k => k.startsWith(`${sectionId}_${label}`) && state[k] > 0);
-          hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
-      });
+  function toggleFire() {
+    state.fireRated = !state.fireRated;
+    const btn = document.getElementById('fire-status');
+    btn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO";
+    state.fireRated ? btn.classList.add('has-data') : btn.classList.remove('has-data');
   }
 
   function renderGrid(sectionId, items, types) {
@@ -214,35 +213,38 @@
     items.forEach(item => {
       const card = document.createElement('div'); card.className = 'item-card';
       card.id = `card-${sectionId}-${item}`.replace(/[\/ ']/g, "-");
-      let iconMarkup = "";
-      if(types.includes("LH")) iconMarkup = `<span class="icon">◧ ◨</span>`;
-      if(types.includes("DBL")) iconMarkup = `<span class="icon">◫</span>`;
-      card.innerHTML = `${iconMarkup}<span>${item}</span>`;
-      card.onclick = () => openModal(sectionId, item, types);
+      card.innerText = item; card.onclick = () => openModal(sectionId, item, types);
       grid.appendChild(card);
     });
     return grid;
   }
 
-  function renderApp() {
-    const layout = [
-        { title: "6/8 Doors", id: "68s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
-        { title: "6/8 Double", id: "68d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
-        { title: "8/0 Doors", id: "80s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
-        { title: "8/0 Double", id: "80d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
-        { title: "Stair Parts", id: "sp", color: "bg-navy", sections: [{ items: railLengths, types: ["OPEN", "WALL"] }, { items: stairItems, types: ["QTY"] }, { items: ["Shoes"], types: ["FLAT", "ANGLE"] }] }
-    ];
-    const container = document.getElementById('app-content');
-    layout.forEach(sec => {
-        const title = document.createElement('div'); title.className = `section-title ${sec.color}`;
-        title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
-        title.onclick = () => toggleSection(sec.id, title);
-        const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
-        if (sec.sections) sec.sections.forEach(s => content.appendChild(renderGrid(sec.id, s.items, s.types)));
-        else content.appendChild(renderGrid(sec.id, sec.items, sec.types));
-        container.appendChild(title); container.appendChild(content);
-    });
-  }
+  const layout = [
+    { title: "6/8 Doors", id: "68s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
+    { title: "6/8 Double", id: "68d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
+    { title: "8/0 Doors", id: "80s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
+    { title: "8/0 Double", id: "80d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
+    { title: "Attic W/S Door", id: "atws", color: "bg-navy", items: doorSizes, types: ["LH", "RH"] },
+    { title: "Attic Stairs", id: "atst", color: "bg-red", items: ["22x54", "25x54", "Scuttle"], types: ["QTY"] },
+    { title: "Stair Parts", id: "sp", color: "bg-navy", sections: [{ items: railLengths, types: ["OPEN", "WALL"] }, { items: stairItems, types: ["QTY"] }, { items: ["Shoes"], types: ["FLAT", "ANGLE"] }] }
+  ];
+
+  const appContainer = document.getElementById('app-content');
+  layout.forEach(sec => {
+    const title = document.createElement('div'); title.className = `section-title ${sec.color}`;
+    title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
+    title.onclick = () => toggleSection(sec.id, title);
+    const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
+    if (sec.sections) { sec.sections.forEach(subset => { content.appendChild(renderGrid(sec.id, subset.items, subset.types)); });
+    } else { content.appendChild(renderGrid(sec.id, sec.items, sec.types));
+      if(sec.id === "atst") {
+        const fireBtn = document.createElement('button'); fireBtn.id = "fire-status"; fireBtn.className = "item-card";
+        fireBtn.style.width = "calc(100% - 16px)"; fireBtn.style.margin = "8px"; fireBtn.innerText = "FIRE RATED: NO"; fireBtn.onclick = toggleFire;
+        content.appendChild(fireBtn);
+      }
+    }
+    appContainer.appendChild(title); appContainer.appendChild(content);
+  });
 
   function generateSummary() {
     const cust = document.getElementById('customer').value || "NA";
@@ -250,97 +252,74 @@
     const lot = document.getElementById('lot').value || "NA";
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
     const groups = [
-        {id: "68s", head: "--- 6/8 SINGLE DOORS ---", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:""},
-        {id: "68d", head: "--- 6/8 DOUBLE DOORS ---", types: ["DBL", "T-AST"], items: dblSizes, suffix:""},
-        {id: "80s", head: "--- 8/0 SINGLE DOORS ---", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:"x8/0"},
-        {id: "80d", head: "--- 8/0 DOUBLE DOORS ---", types: ["DBL", "T-AST"], items: dblSizes, suffix:"x8/0"},
-        {id: "sp", head: "--- HANDRAIL ---", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
-        {id: "sp", head: "--- STAIR HARDWARE ---", types: ["QTY"], items: stairItems, suffix:""},
-        {id: "sp", head: "--- SHOES ---", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""}
+      {id: "68s", head: "--- 6/8 SINGLE DOORS ---", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:""},
+      {id: "68d", head: "--- 6/8 DOUBLE DOORS ---", types: ["DBL", "T-AST"], items: dblSizes, suffix:""},
+      {id: "80s", head: "--- 8/0 SINGLE DOORS ---", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:"x8/0"},
+      {id: "80d", head: "--- 8/0 DOUBLE DOORS ---", types: ["DBL", "T-AST"], items: dblSizes, suffix:"x8/0"},
+      {id: "atws", head: "--- ATTIC WS DOORS ---", types: ["LH", "RH"], items: doorSizes, suffix:""},
+      {id: "atst", head: "--- ATTIC STAIRS ---", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"], suffix:""},
+      {id: "sp", head: "--- HANDRAIL ---", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
+      {id: "sp", head: "--- STAIR HARDWARE ---", types: ["QTY"], items: stairItems, suffix:""},
+      {id: "sp", head: "--- SHOES ---", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""}
     ];
     groups.forEach(g => {
-        let groupText = "";
-        g.items.forEach(item => {
-            g.types.forEach(t => {
-                const key = `${g.id}_${item}_${t}`.replace(/[\/ ']/g, "-");
-                if(state[key] > 0) {
-                    groupText += `- ${item}${g.suffix} ${t} -- ${state[key]}\n`;
-                    if(state[`NOTE_${key}`]) groupText += `   *Note: ${state[`NOTE_${key}`]}\n`;
-                }
-            });
+      let groupContent = "";
+      g.items.forEach(item => {
+        g.types.forEach(t => {
+          const key = `${g.id}_${item}_${t}`.replace(/[\/ ']/g, "-");
+          if(state[key] > 0) {
+            const fireLabel = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
+            groupContent += `- ${item}${g.suffix} ${t} -- ${state[key]}${fireLabel}`;
+            if(state[`NOTE_${key}`]) { groupContent += `\n   *Note: ${state[`NOTE_${key}`]}`; }
+            groupContent += `\n`;
+          }
         });
-        if(groupText) report += `${g.head}\n${groupText}\n`;
+      });
+      if(groupContent) report += `${g.head}\n${groupContent}\n`;
     });
     const genNotes = document.getElementById('notes').value;
     if(genNotes) report += `----------------------------\nGENERAL NOTES\n${genNotes}\n`;
     document.getElementById('summary').value = report;
-    saveHistory(report, `${sub} L${lot}`);
+    
+    // SAVE TO HISTORY
+    saveToHistory(report, `${sub} L${lot}`);
   }
 
-  function saveFullState() {
-      const data = {
-          header: { 
-              cust: document.getElementById('customer').value, 
-              sub: document.getElementById('subdivision').value, 
-              lot: document.getElementById('lot').value,
-              notes: document.getElementById('notes').value
-          },
-          state: state
-      };
-      localStorage.setItem('bfs_full_state', JSON.stringify(data));
+  function saveToHistory(text, label) {
+    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    history.unshift({ label: label, text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+    if(history.length > 5) history.pop();
+    localStorage.setItem('bfs_history', JSON.stringify(history));
+    renderHistory();
   }
 
-  function loadFullState() {
-      const saved = JSON.parse(localStorage.getItem('bfs_full_state'));
-      if(saved) {
-          document.getElementById('customer').value = saved.header.cust || "";
-          document.getElementById('subdivision').value = saved.header.sub || "";
-          document.getElementById('lot').value = saved.header.lot || "";
-          document.getElementById('notes').value = saved.header.notes || "";
-          state = saved.state || {};
-      }
-  }
-
-  function saveHistory(text, label) {
-      let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-      history.unshift({ label: label, text: text, date: new Date().toLocaleTimeString() });
-      if(history.length > 5) history.pop();
-      localStorage.setItem('bfs_history', JSON.stringify(history));
-      updateHistoryUI();
-  }
-
-  function updateHistoryUI() {
-      const list = document.getElementById('history-list');
-      const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-      list.innerHTML = history.length ? "" : "<p style='font-size:11px; color:#94a3b8;'>No recent history.</p>";
-      history.forEach((h, i) => {
-          list.innerHTML += `<div class="history-item"><span><b>${h.label}</b> (${h.date})</span><button onclick="loadHistoryItem(${i})" style="padding:4px 8px; border-radius:4px; border:0; background:var(--navy); color:white; font-size:10px;">LOAD</button></div>`;
-      });
-  }
-
-  function loadHistoryItem(index) {
-      const history = JSON.parse(localStorage.getItem('bfs_history'));
-      document.getElementById('summary').value = history[index].text;
-      window.scrollTo(0, document.body.scrollHeight);
-  }
-
-  function copySummary() {
-    const s = document.getElementById("summary");
-    if(!s.value) return;
-    navigator.clipboard.writeText(s.value).then(() => {
-      const t = document.getElementById("toast");
-      t.className = "show"; setTimeout(() => t.className = "", 2000);
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    list.innerHTML = history.length ? "" : "<p style='font-size:11px; color:#94a3b8;'>No recent takeoffs.</p>";
+    history.forEach((item, index) => {
+      list.innerHTML += `<div class="history-item"><span><b>${item.label}</b> (${item.time})</span><button class="load-btn" onclick="loadHistory(${index})">LOAD</button></div>`;
     });
   }
 
-  function clearAll() {
-      if(confirm('This will delete EVERYTHING you have entered. Proceed?')) { 
-          localStorage.removeItem('bfs_full_state'); 
-          location.reload(); 
-      }
+  function loadHistory(index) {
+    const history = JSON.parse(localStorage.getItem('bfs_history'));
+    document.getElementById('summary').value = history[index].text;
+    window.scrollTo(0, document.body.scrollHeight);
   }
 
-  init();
+  function copySummary() {
+    const summaryText = document.getElementById("summary").value;
+    if(!summaryText) return;
+    navigator.clipboard.writeText(summaryText).then(() => {
+      const toast = document.getElementById("toast");
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+    });
+  }
+
+  // Initial History Render
+  renderHistory();
 </script>
 </body>
 </html>
