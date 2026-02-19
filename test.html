@@ -47,20 +47,20 @@
       background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; 
     }
     .modal-content { 
-      background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 400px; text-align: center;
+      background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto;
     }
-    .modal-counter-row { 
-      display: flex; align-items: center; justify-content: space-between; 
-      background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;
+    .modal-type-block {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 12px; text-align: left;
     }
+    .modal-counter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 
     .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
-    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); }
+    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; }
 
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
-    #summary { background: #fff; height: 250px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre; }
+    #summary { background: #fff; height: 350px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 13px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre; }
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
@@ -83,16 +83,15 @@
 
 <div id="itemModal" class="modal-overlay">
   <div class="modal-content">
-    <h2 id="m-title" style="margin:0; color:var(--navy); font-size: 1.3rem;">Item Name</h2>
-    <div id="m-counters" style="margin-top: 15px;"></div>
-    <textarea id="m-note" placeholder="Add notes for this item..." style="margin-top:10px; height:80px;"></textarea>
-    <button class="actionBtn" style="width:100%; background:var(--green); color:white; margin-top:10px;" onclick="closeModal()">SAVE ENTRY</button>
+    <h2 id="m-title" style="margin:0 0 15px 0; color:var(--navy); font-size: 1.4rem;">Item Name</h2>
+    <div id="m-blocks"></div>
+    <button class="actionBtn" style="width:100%; background:var(--green); color:white; margin-top:10px; font-size: 1.1rem;" onclick="closeModal()">SAVE ENTRY</button>
   </div>
 </div>
 
 <div class="header-card" style="margin-top:15px;">
-  <label>Notes & Summary</label>
-  <textarea id="notes" placeholder="General Notes..."></textarea>
+  <label>General Project Notes</label>
+  <textarea id="notes" placeholder="Example: Key code, delivery instructions..."></textarea>
   <div class="actions">
     <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate Takeoff</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
@@ -101,7 +100,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.1 - Fix Click Interaction</div>
+<div class="version-tag">Version 1.5.2 - Enhanced Summary & Fixed Handrail</div>
 
 <script>
   const state = { fireRated: false };
@@ -119,33 +118,37 @@
     headerEl.classList.toggle('active-header');
   }
 
-  // FIXED: Improved escaping for labels with single quotes like 8'
-  function openModal(sectionId, label, typesJson) {
-    const types = JSON.parse(decodeURIComponent(typesJson));
+  function openModal(sectionId, label, types) {
     activeSectionId = sectionId;
     activeItemLabel = label;
     activeTypes = types;
     
     document.getElementById('m-title').innerText = label;
-    const container = document.getElementById('m-counters');
+    const container = document.getElementById('m-blocks');
     container.innerHTML = "";
 
     types.forEach(type => {
       const key = `${sectionId}_${label}_${type}`.replace(/[\/ ']/g, "-");
-      const val = state[key] || 0;
+      const noteKey = `NOTE_${key}`;
+      const qty = state[key] || 0;
+      const note = state[noteKey] || "";
+
       container.innerHTML += `
-        <div class="modal-counter-row">
-          <label style="font-size:14px; font-weight:800; color:var(--navy); text-align:left;">${type}</label>
-          <div style="display:flex; align-items:center; gap:15px;">
-            <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
-            <span class="qty-display" id="mqty-${key}">${val}</span>
-            <button class="btn" onclick="updateModalQty('${key}', 1)">+</button>
+        <div class="modal-type-block">
+          <div class="modal-counter-row">
+            <label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
+              <span class="qty-display" id="mqty-${key}">${qty}</span>
+              <button class="btn" onclick="updateModalQty('${key}', 1)">+</button>
+            </div>
           </div>
+          <input type="text" id="mnote-${key}" value="${note}" 
+                 placeholder="Notes for ${type}..." 
+                 style="margin: 5px 0 0 0; font-size: 14px; padding: 8px;">
         </div>`;
     });
 
-    const noteKey = `NOTE_${sectionId}_${label}`.replace(/[\/ ']/g, "-");
-    document.getElementById('m-note').value = state[noteKey] || "";
     document.getElementById('itemModal').style.display = 'flex';
   }
 
@@ -155,12 +158,12 @@
   }
 
   function closeModal() {
-    const noteKey = `NOTE_${activeSectionId}_${activeItemLabel}`.replace(/[\/ ']/g, "-");
-    state[noteKey] = document.getElementById('m-note').value;
-    
     let hasData = false;
     activeTypes.forEach(t => {
-      if(state[`${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-")] > 0) hasData = true;
+      const key = `${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-");
+      const noteKey = `NOTE_${key}`;
+      state[noteKey] = document.getElementById(`mnote-${key}`).value;
+      if(state[key] > 0) hasData = true;
     });
 
     const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
@@ -168,7 +171,6 @@
     if(card) {
       hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
     }
-
     document.getElementById('itemModal').style.display = 'none';
   }
 
@@ -179,18 +181,22 @@
     state.fireRated ? btn.classList.add('has-data') : btn.classList.remove('has-data');
   }
 
+  // FIXED: Programmatic Grid Rendering to prevent single-quote crashes
   function renderGrid(sectionId, items, types) {
-    let html = `<div class="item-grid">`;
-    const typesStr = encodeURIComponent(JSON.stringify(types));
+    const grid = document.createElement('div');
+    grid.className = 'item-grid';
+    
     items.forEach(item => {
-      const id = `card-${sectionId}-${item}`.replace(/[\/ ']/g, "-");
-      // Use double quotes for the attribute to handle single quotes in labels safely
-      html += `<div class="item-card" id="${id}" onclick="openModal('${sectionId}', '${item}', '${typesStr}')">${item}</div>`;
+      const card = document.createElement('div');
+      card.className = 'item-card';
+      card.id = `card-${sectionId}-${item}`.replace(/[\/ ']/g, "-");
+      card.innerText = item;
+      card.onclick = () => openModal(sectionId, item, types);
+      grid.appendChild(card);
     });
-    return html + `</div>`;
+    return grid;
   }
 
-  // Render App Content
   const layout = [
     { title: "6/8 Doors", id: "68s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
     { title: "6/8 Double", id: "68d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
@@ -203,33 +209,51 @@
     { title: "Shoes", id: "shoes", color: "bg-red", items: ["Shoes"], types: ["FLAT", "ANGLE"] }
   ];
 
-  document.getElementById('app-content').innerHTML = layout.map(sec => {
-    let content = "";
+  const appContainer = document.getElementById('app-content');
+  layout.forEach(sec => {
+    const title = document.createElement('div');
+    title.className = `section-title ${sec.color}`;
+    title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
+    title.onclick = () => toggleSection(sec.id, title);
+
+    const content = document.createElement('div');
+    content.id = `content-${sec.id}`;
+    content.className = 'section-content';
+
     if(sec.custom) {
-      content = `<div style="padding:8px;"><textarea id="attic_custom" style="height:100px;" placeholder="Custom sizes & cuts..."></textarea></div>`;
+      content.innerHTML = `<div style="padding:8px;"><textarea id="attic_custom" style="height:100px;" placeholder="Describe custom attic sizes/cuts..."></textarea></div>`;
     } else {
-      content = renderGrid(sec.id, sec.items, sec.types);
+      content.appendChild(renderGrid(sec.id, sec.items, sec.types));
       if(sec.id === "atst") {
-        content += `<div style="padding:8px;"><button id="fire-status" class="item-card" style="width:100%;" onclick="toggleFire()">FIRE RATED: NO</button></div>`;
+        const fireBtn = document.createElement('button');
+        fireBtn.id = "fire-status";
+        fireBtn.className = "item-card";
+        fireBtn.style.width = "calc(100% - 16px)";
+        fireBtn.style.margin = "8px";
+        fireBtn.innerText = "FIRE RATED: NO";
+        fireBtn.onclick = toggleFire;
+        content.appendChild(fireBtn);
       }
     }
-    return `
-      <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
-        <span>${sec.title}</span><span class="chevron"></span>
-      </div>
-      <div id="content-${sec.id}" class="section-content">${content}</div>
-    `;
-  }).join('');
+
+    appContainer.appendChild(title);
+    appContainer.appendChild(content);
+  });
 
   function generateSummary() {
-    const info = `TAKEOFF: ${document.getElementById('customer').value || "N/A"} | ${document.getElementById('subdivision').value || "N/A"} | Lot: ${document.getElementById('lot').value || "N/A"}\n----------------------------\n`;
-    let body = "";
+    const cust = document.getElementById('customer').value || "N/A";
+    const sub = document.getElementById('subdivision').value || "N/A";
+    const lot = document.getElementById('lot').value || "N/A";
+    
+    let report = `TAKEOFF: ${cust} | ${sub} | LOT: ${lot}\n`;
+    report += `DATE: ${new Date().toLocaleDateString()}\n`;
+    report += `------------------------------------------\n\n`;
 
     const groups = [
-      {id: "68s", head: "6/8 SINGLE", types: ["LH", "RH", "SLAB"], items: doorSizes},
-      {id: "68d", head: "6/8 DOUBLE", types: ["DBL", "T-AST"], items: dblSizes},
-      {id: "80s", head: "8/0 SINGLE", types: ["LH", "RH", "SLAB"], items: doorSizes},
-      {id: "80d", head: "8/0 DOUBLE", types: ["DBL", "T-AST"], items: dblSizes},
+      {id: "68s", head: "6/8 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes},
+      {id: "68d", head: "6/8 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes},
+      {id: "80s", head: "8/0 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes},
+      {id: "80d", head: "8/0 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes},
       {id: "atst", head: "ATTIC STAIRS", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"]},
       {id: "hr", head: "HANDRAIL", types: ["OPEN", "WALL"], items: railLengths},
       {id: "st", head: "STAIR HARDWARE", types: ["QTY"], items: stairItems},
@@ -239,31 +263,34 @@
     groups.forEach(g => {
       let groupContent = "";
       g.items.forEach(item => {
-        let line = "";
         g.types.forEach(t => {
           const key = `${g.id}_${item}_${t}`.replace(/[\/ ']/g, "-");
-          if(state[key] > 0) line += `${t}:${state[key]} `;
+          const noteKey = `NOTE_${key}`;
+          if(state[key] > 0) {
+            const fireLabel = (g.id === "atst" && state.fireRated) ? " [FIRE RATED]" : "";
+            groupContent += `${item} ${t}: ${state[key]}${fireLabel}`;
+            if(state[noteKey]) groupContent += ` (${state[noteKey]})`;
+            groupContent += `\n`;
+          }
         });
-        if(line) {
-          const nKey = `NOTE_${g.id}_${item}`.replace(/[\/ ']/g, "-");
-          const fire = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
-          groupContent += `* ${item}${fire} -> ${line}${state[nKey] ? `\n  Note: ${state[nKey]}` : ""}\n`;
-        }
       });
-      if(groupContent) body += `--- ${g.head} ---\n${groupContent}\n`;
+      if(groupContent) report += `[${g.head}]\n${groupContent}\n`;
     });
 
     const custom = document.getElementById('attic_custom').value;
-    if(custom) body += `--- ATTIC CUSTOM ---\n${custom}\n\n`;
+    if(custom) report += `[ATTIC CUSTOM/SOLID CORE]\n${custom}\n\n`;
     
-    const notes = document.getElementById('notes').value;
-    document.getElementById('summary').value = info + body + (notes ? "NOTES: " + notes : "");
+    const genNotes = document.getElementById('notes').value;
+    if(genNotes) report += `[GENERAL NOTES]\n${genNotes}\n`;
+
+    document.getElementById('summary').value = report;
   }
 
   function copySummary() {
     const s = document.getElementById("summary");
     s.select();
-    document.execCommand("copy");
+    s.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(s.value);
     document.getElementById("copyBtn").innerText = "COPIED!";
     setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
   }
