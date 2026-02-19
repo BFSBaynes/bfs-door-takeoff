@@ -101,7 +101,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.6 - High Qty Input Fix</div>
+<div class="version-tag">Version 1.5.7 - Smart Keyboard Fix</div>
 
 <script>
   const state = { fireRated: false };
@@ -139,7 +139,8 @@
 
       let controlHtml = "";
       if (useDirectInput) {
-        controlHtml = `<input type="number" class="qty-input" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()">`;
+        // Added inputmode="numeric" to force number pad on mobile
+        controlHtml = `<input type="number" inputmode="numeric" class="qty-input" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()">`;
       } else {
         controlHtml = `
           <div style="display:flex; align-items:center; gap:12px;">
