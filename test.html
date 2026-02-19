@@ -56,19 +56,19 @@
 
     .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
     .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; }
-    .qty-display.active-qty { color: var(--green); }
-    .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); margin-bottom: 0; }
-    .qty-input.active-qty { color: var(--green); border-color: var(--green); }
+    .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); }
+    .active-qty { color: var(--green) !important; border-color: var(--green) !important; }
 
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
     #summary { background: #fff; height: 350px; margin-top: 8px; font-family: sans-serif; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre-wrap; }
     
-    /* History List Styles */
     .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
-    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
     .history-item:last-child { border: 0; }
+    .history-controls { display: flex; gap: 5px; }
+    .del-btn { background: #fee2e2; color: #b91c1c; border: 0; padding: 4px 10px; border-radius: 4px; font-weight: bold; }
     .load-btn { padding: 4px 10px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 700; cursor: pointer; }
 
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
@@ -117,15 +117,16 @@
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
   <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear current fields?')) location.reload()">Reset Current Fields</button>
 </div>
 
 <div class="history-section">
-    <label>Recent Takeoffs</label>
+    <label>Recent Takeoffs (Last 10)</label>
     <div id="history-list"></div>
+    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:10px; cursor:pointer;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.6.9 - History Mode</div>
+<div class="version-tag">Version 1.8.0 - Individual History Delete</div>
 
 <script>
   const state = { fireRated: false };
@@ -136,7 +137,7 @@
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "12'", "16'", "18'"];
-  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Epoxy"];
+  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
   const directInputItems = ["Brackets", "Balusters", "Shoes"];
 
   function toggleSection(id, headerEl) {
@@ -149,9 +150,7 @@
     activeItemLabel = label;
     activeTypes = types;
     let displayHeader = label;
-    if (sectionId === "80s" || sectionId === "80d") {
-       displayHeader = `${label}x8/0`;
-    }
+    if (sectionId === "80s" || sectionId === "80d") { displayHeader = `${label}x8/0`; }
     document.getElementById('m-title').innerText = displayHeader;
     const container = document.getElementById('m-blocks');
     container.innerHTML = "";
@@ -162,9 +161,8 @@
       const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
       const savedNote = state[noteKey] || "";
-      const placeholderText = (sectionId === "atws") ? "Cut down to / R.O. is" : "Notes...";
-      let controlHtml = "";
       const greenClass = qty > 0 ? 'active-qty' : '';
+      let controlHtml = "";
 
       if (useDirectInput) {
         controlHtml = `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">`;
@@ -172,7 +170,7 @@
         controlHtml = `<div style="display:flex; align-items:center; gap:12px;"><button class="btn" onclick="updateModalQty('${key}', -1)">-</button><span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span><button class="btn" onclick="updateModalQty('${key}', 1)">+</button></div>`;
       }
 
-      container.innerHTML += `<div class="modal-type-block"><div class="modal-counter-row"><label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>${controlHtml}</div><input type="text" id="mnote-${key}" value="${savedNote}" placeholder="${placeholderText}" style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;"></div>`;
+      container.innerHTML += `<div class="modal-type-block"><div class="modal-counter-row"><label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>${controlHtml}</div><input type="text" id="mnote-${key}" value="${savedNote}" placeholder="Notes..." style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;"></div>`;
     });
     document.getElementById('itemModal').style.display = 'flex';
   }
@@ -226,7 +224,7 @@
     { title: "8/0 Double", id: "80d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
     { title: "Attic W/S Door", id: "atws", color: "bg-navy", items: doorSizes, types: ["LH", "RH"] },
     { title: "Attic Stairs", id: "atst", color: "bg-red", items: ["22x54", "25x54", "Scuttle"], types: ["QTY"] },
-    { title: "Stair Parts", id: "sp", color: "bg-navy", sections: [{ items: railLengths, types: ["OPEN", "WALL"] }, { items: stairItems, types: ["QTY"] }, { items: ["Shoes"], types: ["FLAT", "ANGLE"] }] }
+    { title: "Stair Parts", id: "sp", color: "bg-navy", sections: [{ items: railLengths, types: ["OPEN", "WALL"] }, { items: stairItems, types: ["QTY", "FLAT", "ANGLE"] }] }
   ];
 
   const appContainer = document.getElementById('app-content');
@@ -235,7 +233,14 @@
     title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
     title.onclick = () => toggleSection(sec.id, title);
     const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
-    if (sec.sections) { sec.sections.forEach(subset => { content.appendChild(renderGrid(sec.id, subset.items, subset.types)); });
+    if (sec.sections) { 
+      sec.sections.forEach(subset => { 
+        subset.items.forEach(item => {
+            let itemTypes = (item === "Shoes") ? ["FLAT", "ANGLE"] : ["QTY"];
+            if (railLengths.includes(item)) itemTypes = ["OPEN", "WALL"];
+            content.appendChild(renderGrid(sec.id, [item], itemTypes));
+        });
+      });
     } else { content.appendChild(renderGrid(sec.id, sec.items, sec.types));
       if(sec.id === "atst") {
         const fireBtn = document.createElement('button'); fireBtn.id = "fire-status"; fireBtn.className = "item-card";
@@ -259,8 +264,7 @@
       {id: "atws", head: "--- ATTIC WS DOORS ---", types: ["LH", "RH"], items: doorSizes, suffix:""},
       {id: "atst", head: "--- ATTIC STAIRS ---", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"], suffix:""},
       {id: "sp", head: "--- HANDRAIL ---", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
-      {id: "sp", head: "--- STAIR HARDWARE ---", types: ["QTY"], items: stairItems, suffix:""},
-      {id: "sp", head: "--- SHOES ---", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""}
+      {id: "sp", head: "--- STAIR HARDWARE ---", types: ["QTY", "FLAT", "ANGLE"], items: stairItems, suffix:""}
     ];
     groups.forEach(g => {
       let groupContent = "";
@@ -280,15 +284,16 @@
     const genNotes = document.getElementById('notes').value;
     if(genNotes) report += `----------------------------\nGENERAL NOTES\n${genNotes}\n`;
     document.getElementById('summary').value = report;
-    
-    // SAVE TO HISTORY
     saveToHistory(report, `${sub} L${lot}`);
   }
 
   function saveToHistory(text, label) {
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    history.unshift({ label: label, text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-    if(history.length > 5) history.pop();
+    const now = new Date();
+    const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
+    const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    history.unshift({ label: `${dateStr} - ${label}`, text: text, time: timeStr });
+    if(history.length > 10) history.pop();
     localStorage.setItem('bfs_history', JSON.stringify(history));
     renderHistory();
   }
@@ -298,14 +303,35 @@
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     list.innerHTML = history.length ? "" : "<p style='font-size:11px; color:#94a3b8;'>No recent takeoffs.</p>";
     history.forEach((item, index) => {
-      list.innerHTML += `<div class="history-item"><span><b>${item.label}</b> (${item.time})</span><button class="load-btn" onclick="loadHistory(${index})">LOAD</button></div>`;
+      list.innerHTML += `
+        <div class="history-item">
+          <span><b>${item.label}</b> <small style="color:#64748b">(${item.time})</small></span>
+          <div class="history-controls">
+            <button class="load-btn" onclick="loadHistory(${index})">LOAD</button>
+            <button class="del-btn" onclick="deleteHistoryItem(${index})">X</button>
+          </div>
+        </div>`;
     });
+  }
+
+  function deleteHistoryItem(index) {
+      let history = JSON.parse(localStorage.getItem('bfs_history'));
+      history.splice(index, 1);
+      localStorage.setItem('bfs_history', JSON.stringify(history));
+      renderHistory();
   }
 
   function loadHistory(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history'));
     document.getElementById('summary').value = history[index].text;
-    window.scrollTo(0, document.body.scrollHeight);
+    document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function clearHistory() {
+      if(confirm('Delete all stored history?')) {
+          localStorage.removeItem('bfs_history');
+          renderHistory();
+      }
   }
 
   function copySummary() {
@@ -318,7 +344,6 @@
     });
   }
 
-  // Initial History Render
   renderHistory();
 </script>
 </body>
