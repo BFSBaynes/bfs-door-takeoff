@@ -100,7 +100,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.2 - Enhanced Summary & Fixed Handrail</div>
+<div class="version-tag">Version 1.5.3 - Raw Text Fix</div>
 
 <script>
   const state = { fireRated: false };
@@ -145,7 +145,7 @@
           </div>
           <input type="text" id="mnote-${key}" value="${note}" 
                  placeholder="Notes for ${type}..." 
-                 style="margin: 5px 0 0 0; font-size: 14px; padding: 8px;">
+                 style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;">
         </div>`;
     });
 
@@ -162,7 +162,8 @@
     activeTypes.forEach(t => {
       const key = `${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
-      state[noteKey] = document.getElementById(`mnote-${key}`).value;
+      const noteInput = document.getElementById(`mnote-${key}`);
+      if(noteInput) state[noteKey] = noteInput.value;
       if(state[key] > 0) hasData = true;
     });
 
@@ -181,7 +182,6 @@
     state.fireRated ? btn.classList.add('has-data') : btn.classList.remove('has-data');
   }
 
-  // FIXED: Programmatic Grid Rendering to prevent single-quote crashes
   function renderGrid(sectionId, items, types) {
     const grid = document.createElement('div');
     grid.className = 'item-grid';
@@ -288,11 +288,19 @@
 
   function copySummary() {
     const s = document.getElementById("summary");
-    s.select();
-    s.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(s.value);
-    document.getElementById("copyBtn").innerText = "COPIED!";
-    setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
+    // Standard clipboard API for clean text copy
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(s.value).then(() => {
+        document.getElementById("copyBtn").innerText = "COPIED!";
+        setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
+      });
+    } else {
+      // Fallback for older browsers
+      s.select();
+      document.execCommand('copy');
+      document.getElementById("copyBtn").innerText = "COPIED!";
+      setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
+    }
   }
 </script>
 </body>
