@@ -56,7 +56,9 @@
 
     .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
     .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; }
+    .qty-display.active-qty { color: var(--green); }
     .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); margin-bottom: 0; }
+    .qty-input.active-qty { color: var(--green); border-color: var(--green); }
 
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
@@ -65,9 +67,20 @@
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
+
+    /* Copy Feedback Toast */
+    #toast {
+      visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 30px; padding: 12px;
+      position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold;
+    }
+    #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 1.5s; }
+    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+    @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
   </style>
 </head>
 <body>
+
+<div id="toast">TEXT COPIED</div>
 
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
@@ -101,7 +114,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.6.0 - Attic & Takeoff Facelift</div>
+<div class="version-tag">Version 1.6.1 - UI Polishing</div>
 
 <script>
   const state = { fireRated: false };
@@ -125,7 +138,6 @@
     activeItemLabel = label;
     activeTypes = types;
     
-    // Logic for dynamic header (adds x8/0 if in that section)
     let displayHeader = label;
     if (sectionId === "80s" || sectionId === "80d") {
        displayHeader = `${label}x8/0`;
@@ -140,23 +152,18 @@
       const key = `${sectionId}_${label}_${type}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
-      
-      // Default note for Attic section
-      let note = state[noteKey];
-      if (note === undefined && sectionId === "atws") {
-          note = "Cut down to: ";
-      } else if (note === undefined) {
-          note = "";
-      }
+      let note = state[noteKey] || (sectionId === "atws" ? "Cut down to: " : "");
 
       let controlHtml = "";
+      const greenClass = qty > 0 ? 'active-qty' : '';
+      
       if (useDirectInput) {
-        controlHtml = `<input type="number" inputmode="numeric" class="qty-input" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()">`;
+        controlHtml = `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">`;
       } else {
         controlHtml = `
           <div style="display:flex; align-items:center; gap:12px;">
             <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
-            <span class="qty-display" id="mqty-${key}">${qty}</span>
+            <span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span>
             <button class="btn" onclick="updateModalQty('${key}', 1)">+</button>
           </div>`;
       }
@@ -177,7 +184,9 @@
 
   function updateModalQty(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
-    document.getElementById(`mqty-${key}`).innerText = state[key];
+    const el = document.getElementById(`mqty-${key}`);
+    el.innerText = state[key];
+    el.classList.toggle('active-qty', state[key] > 0);
   }
 
   function closeModal() {
@@ -278,7 +287,6 @@
     const lot = document.getElementById('lot').value || "N/A";
     
     let report = `TAKEOFF: ${cust} | ${sub} | LOT: ${lot}\n`;
-    report += `DATE: ${new Date().toLocaleDateString()}\n`;
     report += `==========================================\n\n`;
 
     const groups = [
@@ -317,14 +325,17 @@
   }
 
   function copySummary() {
-    const s = document.getElementById("summary");
-    s.select();
-    s.setSelectionRange(0, 99999);
-    try {
-      document.execCommand('copy');
-      document.getElementById("copyBtn").innerText = "COPIED!";
-      setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
-    } catch (err) { console.error('Copy failed', err); }
+    const summaryText = document.getElementById("summary").value;
+    if(!summaryText) return;
+
+    // Navigator API for clean, non-visual copying
+    navigator.clipboard.writeText(summaryText).then(() => {
+      const toast = document.getElementById("toast");
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+    }).catch(err => {
+      console.error('Copy failed', err);
+    });
   }
 </script>
 </body>
