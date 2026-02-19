@@ -100,7 +100,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.4 - Portal Paste Fix</div>
+<div class="version-tag">Version 1.5.5 - Combined Stair Parts</div>
 
 <script>
   const state = { fireRated: false };
@@ -197,6 +197,7 @@
     return grid;
   }
 
+  // Layout definition for UI rendering
   const layout = [
     { title: "6/8 Doors", id: "68s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
     { title: "6/8 Double", id: "68d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
@@ -204,9 +205,16 @@
     { title: "8/0 Double", id: "80d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
     { title: "Attic Solid Core", id: "atsc", color: "bg-navy", custom: true },
     { title: "Attic Stairs", id: "atst", color: "bg-red", items: ["22x54", "25x54", "Scuttle"], types: ["QTY"] },
-    { title: "Handrail", id: "hr", color: "bg-navy", items: railLengths, types: ["OPEN", "WALL"] },
-    { title: "Stair Hardware", id: "st", color: "bg-red", items: stairItems, types: ["QTY"] },
-    { title: "Shoes", id: "shoes", color: "bg-red", items: ["Shoes"], types: ["FLAT", "ANGLE"] }
+    { 
+      title: "Stair Parts", 
+      id: "sp", 
+      color: "bg-navy", 
+      sections: [
+        { items: railLengths, types: ["OPEN", "WALL"] },
+        { items: stairItems, types: ["QTY"] },
+        { items: ["Shoes"], types: ["FLAT", "ANGLE"] }
+      ]
+    }
   ];
 
   const appContainer = document.getElementById('app-content');
@@ -222,6 +230,11 @@
 
     if(sec.custom) {
       content.innerHTML = `<div style="padding:8px;"><textarea id="attic_custom" style="height:100px;" placeholder="Describe custom attic sizes/cuts..."></textarea></div>`;
+    } else if (sec.sections) {
+      // Logic for combined Stair Parts section
+      sec.sections.forEach(subset => {
+        content.appendChild(renderGrid(sec.id, subset.items, subset.types));
+      });
     } else {
       content.appendChild(renderGrid(sec.id, sec.items, sec.types));
       if(sec.id === "atst") {
@@ -255,9 +268,9 @@
       {id: "80s", head: "8/0 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes},
       {id: "80d", head: "8/0 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes},
       {id: "atst", head: "ATTIC STAIRS", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"]},
-      {id: "hr", head: "HANDRAIL", types: ["OPEN", "WALL"], items: railLengths},
-      {id: "st", head: "STAIR HARDWARE", types: ["QTY"], items: stairItems},
-      {id: "shoes", head: "SHOES", types: ["FLAT", "ANGLE"], items: ["Shoes"]}
+      {id: "sp", head: "HANDRAIL", types: ["OPEN", "WALL"], items: railLengths},
+      {id: "sp", head: "STAIR HARDWARE", types: ["QTY"], items: stairItems},
+      {id: "sp", head: "SHOES", types: ["FLAT", "ANGLE"], items: ["Shoes"]}
     ];
 
     groups.forEach(g => {
@@ -289,30 +302,22 @@
   function copySummary() {
     const s = document.getElementById("summary");
     const textToCopy = s.value;
-
-    // Use a temporary textarea to ensure clean, unformatted text is copied
     const tempTextArea = document.createElement("textarea");
     tempTextArea.value = textToCopy;
     tempTextArea.style.position = "fixed";
     tempTextArea.style.left = "-9999px";
     tempTextArea.style.top = "0";
     document.body.appendChild(tempTextArea);
-
-    // Force focus and selection
     tempTextArea.focus();
     tempTextArea.select();
     tempTextArea.setSelectionRange(0, 99999);
-
     try {
-      // Use the older execCommand which is often more reliable for plain-text 
-      // passthroughs on corporate portals
       document.execCommand('copy');
       document.getElementById("copyBtn").innerText = "COPIED!";
       setTimeout(() => { document.getElementById("copyBtn").innerText = "Copy Text"; }, 1500);
     } catch (err) {
       console.error('Copy failed', err);
     }
-
     document.body.removeChild(tempTextArea);
   }
 </script>
