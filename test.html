@@ -17,16 +17,12 @@
     label { font-weight: 700; font-size: 10px; color: #475569; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     
-    .input-row { display: flex; gap: 8px; margin-bottom: 4px; }
-    .input-group { flex: 1; }
-
-    /* STICKY HEADERS */
     .section-title { 
       color: #fff; padding: 14px; font-weight: 800; font-size: 14px; 
       margin: 8px -8px; cursor: pointer;
       display: flex; justify-content: space-between; align-items: center;
       text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
-      position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: sticky; top: 0; z-index: 100;
     }
     .bg-navy { background: var(--navy); }
     .bg-red { background: var(--bfs-red); }
@@ -34,251 +30,192 @@
     .section-content { display: none; padding-top: 8px; }
     .section-content.active { display: block; }
     
-    /* IMPROVED COMPACT ROW */
+    /* THE CLEAN ROW */
     .door-row { 
-      background: #fff; border-radius: 6px; padding: 10px; 
-      margin-bottom: 8px; 
-      display: flex; flex-wrap: wrap; align-items: center; gap: 8px; 
-      border: 1px solid #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+      background: #fff; border-radius: 6px; padding: 8px; 
+      margin-bottom: 8px; display: flex; align-items: center; gap: 10px; 
+      border: 1px solid #94a3b8; 
     }
 
-    /* Widened for 2/10x8/0 and Stair names */
-    .size-label { 
-      font-weight: 900; font-size: 13px; width: 75px; 
-      flex-shrink: 0; color: var(--navy); text-align: left;
-    }
+    .label-col { width: 75px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .size-label { font-weight: 900; font-size: 13px; color: var(--navy); }
     
-    .controls-grid { display: grid; gap: 4px; flex: 1; grid-auto-flow: column; grid-auto-columns: 1fr; min-width: 210px; }
+    .slab-trigger { 
+      font-size: 9px; font-weight: 800; padding: 4px; border-radius: 4px; 
+      border: 1px solid var(--navy); background: #f1f5f9; color: var(--navy); 
+      text-align: center; cursor: pointer;
+    }
+    .slab-active { background: var(--green); color: white; border-color: var(--green); }
+
+    .controls-grid { display: grid; gap: 6px; flex: 1; grid-template-columns: 1fr 1fr; }
     
     .counter-box { 
         display: flex; flex-direction: column; align-items: center; background: #fdfdfd; 
-        padding: 4px 2px; border: 1px solid #e2e8f0; border-radius: 4px; transition: background 0.2s; 
+        padding: 4px; border: 1px solid #e2e8f0; border-radius: 4px; 
     }
-    .pulse-flash { background: #e0f2fe !important; }
 
-    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #64748b; font-weight: 900; text-transform: uppercase; }
-    .btn-wrap { display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
+    .counter-box label { font-size: 9px; margin-bottom: 2px; color: #64748b; font-weight: 900; }
+    .btn-wrap { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; }
     
-    .btn { width: 32px; height: 32px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-    .btn:active { transform: scale(0.9); }
+    .btn { width: 34px; height: 34px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 20px; }
     
-    .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; color: var(--navy); transition: color 0.2s; }
-    .has-qty { color: var(--green) !important; font-size: 17px; }
+    .qty { font-weight: 800; font-size: 16px; min-width: 20px; text-align: center; color: var(--navy); }
+    .has-qty { color: var(--green) !important; }
 
-    .qty-input { width: 100%; height: 32px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
-
-    .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
+    .note-box { width: 95%; height: 22px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
     
-    /* Specific fix for Stair items which have long names like "Brackets" */
-    #content-s_hard .size-label { width: 85px; }
+    /* MODAL STYLES */
+    .modal-overlay { 
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; 
+    }
+    .modal-content { 
+      background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 350px; 
+      text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .modal-header { font-weight: 900; color: var(--navy); margin-bottom: 15px; font-size: 18px; }
 
-    .attic-text-area { min-height: 80px; font-size: 14px; border: 1px dashed var(--navy); background: #fff; margin-top: 5px; }
-
-    .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 8px; gap: 8px; background: #fff; border-radius: 4px; margin-top: 4px; border: 1px solid #cbd5e1; }
-    .toggle-label { font-size: 10px; font-weight: 800; color: var(--bfs-red); }
-    
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    
-    #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
-    .chevron::after { content: '▼'; font-size: 10px; }
-    .active-header .chevron::after { content: '▲'; }
   </style>
 </head>
 <body>
 
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
-  
-  <div class="input-row">
-    <div class="input-group">
-      <label>Customer</label>
-      <input id="customer" type="text" placeholder="e.g. Pulte">
-    </div>
-    <div class="input-group">
-      <label>Subdivision</label>
-      <input id="subdivision" type="text" placeholder="e.g. Huxley">
-    </div>
+  <div class="input-row" style="display:flex; gap:8px;">
+    <div style="flex:1"><label>Customer</label><input id="customer" type="text"></div>
+    <div style="flex:1"><label>Subdivision</label><input id="subdivision" type="text"></div>
   </div>
-
-  <div class="input-row">
-    <div class="input-group">
-      <label>Lot #</label>
-      <input id="lot" type="text" placeholder="104">
-    </div>
-    <div class="input-group">
-      <label>Plan</label>
-      <input id="plan" type="text" placeholder="2400">
-    </div>
+  <div class="input-row" style="display:flex; gap:8px;">
+    <div style="flex:1"><label>Lot #</label><input id="lot" type="text"></div>
+    <div style="flex:1"><label>Plan</label><input id="plan" type="text"></div>
   </div>
 </div>
 
 <div id="app-content"></div>
 
-<div class="header-card" style="margin-top:15px;">
-  <label>Notes & Summary</label>
-  <textarea id="notes" placeholder="General Notes..."></textarea>
-  <div class="actions">
-    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate Takeoff</button>
-    <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
+<div id="slabModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header" id="modalTitle">Add Slab</div>
+    <div class="counter-box" style="padding: 15px; border: 2px solid var(--navy);">
+      <label>Slab Quantity</label>
+      <div class="btn-wrap">
+        <button class="btn" onclick="updateSlab(-1)">−</button>
+        <span class="qty" id="modalQty">0</span>
+        <button class="btn" onclick="updateSlab(1)">+</button>
+      </div>
+      <input type="text" id="modalNote" class="note-box" style="height:40px; font-size:14px; margin-top:15px;" placeholder="Slab Notes...">
+    </div>
+    <button class="actionBtn" style="width:100%; background:var(--navy); color:white; margin-top:15px; padding:12px; border-radius:8px; font-weight:bold;" onclick="closeSlabModal()">Save & Close</button>
   </div>
-  <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.3.5 - Label Fix Edition</div>
+<div class="header-card" style="margin-top:15px;">
+  <button class="actionBtn" style="width:100%; background:var(--navy); color:white; padding:15px; border-radius:8px; font-weight:800;" onclick="generateSummary()">Generate Takeoff</button>
+  <textarea id="summary" readonly style="margin-top:10px; height:200px; font-family:monospace;"></textarea>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px; border:0; padding:10px;" onclick="location.reload()">Reset All</button>
+</div>
+
+<div class="version-tag">Version 1.3.6 - Slab Modal Edition</div>
 
 <script>
-  const state = { fireRated: false };
+  const state = {};
+  let currentSlabKey = "";
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "10'", "16'", "18'"];
-  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters"];
 
-  function update(key, delta, btnEl) {
-    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(10);
+  function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
-    
     const el = document.getElementById('qty-' + key);
     if(el) {
-        el.innerText = state[key];
-        if(state[key] > 0) el.classList.add('has-qty');
-        else el.classList.remove('has-qty');
+      el.innerText = state[key];
+      state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
     }
-
-    const box = btnEl.closest('.counter-box');
-    box.classList.add('pulse-flash');
-    setTimeout(() => box.classList.remove('pulse-flash'), 200);
   }
 
-  function toggleFire() {
-    state.fireRated = !state.fireRated;
-    document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+  function openSlabModal(key, label) {
+    currentSlabKey = key;
+    document.getElementById('modalTitle').innerText = label + " Slab";
+    document.getElementById('modalQty').innerText = state[key] || 0;
+    document.getElementById('modalNote').value = document.getElementById('NOTE_' + key)?.value || "";
+    document.getElementById('slabModal').style.display = 'flex';
+  }
+
+  function updateSlab(delta) {
+    let val = Math.max(0, (parseInt(document.getElementById('modalQty').innerText) || 0) + delta);
+    document.getElementById('modalQty').innerText = val;
+  }
+
+  function closeSlabModal() {
+    const val = parseInt(document.getElementById('modalQty').innerText) || 0;
+    state[currentSlabKey] = val;
+    
+    // Hidden note storage
+    let noteInput = document.getElementById('NOTE_' + currentSlabKey);
+    if (!noteInput) {
+        noteInput = document.createElement('input');
+        noteInput.type = 'hidden';
+        noteInput.id = 'NOTE_' + currentSlabKey;
+        document.body.appendChild(noteInput);
+    }
+    noteInput.value = document.getElementById('modalNote').value;
+
+    const trigger = document.getElementById('trigger-' + currentSlabKey);
+    val > 0 ? trigger.classList.add('slab-active') : trigger.classList.remove('slab-active');
+    
+    document.getElementById('slabModal').style.display = 'none';
   }
 
   function toggleSection(id, headerEl) {
-    const content = document.getElementById('content-' + id);
-    const isActive = content.classList.toggle('active');
-    headerEl.classList.toggle('active-header');
-    if(isActive) {
-        setTimeout(() => {
-            const yOffset = -60; 
-            const y = headerEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({top: y, behavior: 'smooth'});
-        }, 100);
-    }
+    document.getElementById('content-' + id).classList.toggle('active');
   }
 
   function renderRow(label, prefix, types) {
-    let displayLabel = label;
-    if (prefix === "80" || prefix === "DBL80") displayLabel = label + "x8/0";
+    let displayLabel = prefix.includes("80") ? label + "x8/0" : label;
+    let slabKey = prefix + '_' + label.replace(/\//g, "-") + '_SLAB';
 
     let html = `<div class="door-row">
-      <div class="size-label">${displayLabel}</div>
+      <div class="label-col">
+        <div class="size-label">${displayLabel}</div>
+        <div class="slab-trigger" id="trigger-${slabKey}" onclick="openSlabModal('${slabKey}', '${displayLabel}')">Add Slab</div>
+      </div>
       <div class="controls-grid">`;
-    types.forEach(type => {
-      let key = prefix + '_' + label.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + type;
-      let noteKey = 'NOTE_' + key;
-      const isHighVolume = (label === "Balusters" || prefix === "STSH");
-
+    
+    ["LH", "RH"].forEach(type => {
+      let key = prefix + '_' + label.replace(/\//g, "-") + '_' + type;
       html += `<div class="counter-box"><label>${type}</label>
-        <div class="btn-wrap">`;
-      if (isHighVolume) {
-        html += `<input type="number" class="qty-input" id="inp-${key}" oninput="state['${key}']=parseInt(this.value)||0" placeholder="0">`;
-      } else {
-        html += `<button class="btn" onclick="update('${key}', -1, this)">−</button>
-                 <span class="qty" id="qty-${key}">0</span>
-                 <button class="btn" onclick="update('${key}', 1, this)">+</button>`;
-      }
-      html += `</div>
-        <input type="text" id="${noteKey}" class="note-box" placeholder="Note">
+        <div class="btn-wrap">
+          <button class="btn" onclick="update('${key}', -1)">−</button>
+          <span class="qty" id="qty-${key}">0</span>
+          <button class="btn" onclick="update('${key}', 1)">+</button>
+        </div>
+        <input type="text" id="NOTE_${key}" class="note-box" placeholder="Note">
       </div>`;
     });
-    html += `</div></div>`;
-    return html;
+    return html + `</div></div>`;
   }
 
   const layout = [
-    { title: "6/8 Doors", id: "68_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68", ["LH", "RH", "SLAB"])).join('') },
-    { title: "6/8 Double Doors", id: "68_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
-    { title: "8/0 Doors", id: "80_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80", ["LH", "RH", "SLAB"])).join('') },
-    { title: "8/0 Double Doors", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
-    { title: "Attic Solid Core (Custom)", id: "at_sc", color: "bg-navy", custom: true, rows: () => `<div style="padding:0 8px;"><textarea id="attic_custom" class="attic-text-area" placeholder="Enter sizes, handing, and cuts..."></textarea></div>` },
-    { title: "Attic Stairs", id: "at_st", color: "bg-red", rows: () => renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
-    { title: "Handrail", id: "h_rail", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') },
-    { title: "Stair Hardware", id: "s_hard", color: "bg-red", rows: () => stairItems.map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) }
+    { title: "6/8 Doors", id: "68_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68", ["LH", "RH"])).join('') },
+    { title: "8/0 Doors", id: "80_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80", ["LH", "RH"])).join('') }
   ];
 
   document.getElementById('app-content').innerHTML = layout.map(sec => `
     <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
-      <span>${sec.title}</span><span class="chevron"></span>
+      <span>${sec.title}</span><span>▼</span>
     </div>
     <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
   `).join('');
 
   function generateSummary() {
-    const cust = document.getElementById('customer').value || "N/A";
-    const sub = document.getElementById('subdivision').value || "N/A";
-    const lot = document.getElementById('lot').value || "N/A";
-    const plan = document.getElementById('plan').value || "N/A";
-    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot} | Plan: ${plan}\n----------------------------\n`;
-    
-    const sections = [
-        {id: '68', head: '--- 6/8 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL68', head: '--- 6/8 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
-        {id: '80', head: '--- 8/0 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL80', head: '--- 8/0 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
-        {id: 'ATTIC_SC', head: '--- ATTIC SOLID CORE DOORS (CUSTOM) ---'},
-        {id: 'AS', head: '--- ATTIC STAIRS ---', sizes: ["22x54", "25x54", "Scuttle"], types: ["QTY"]},
-        {id: 'HR', head: '--- HANDRAIL ---', sizes: railLengths, types: ["OPEN", "WALL"]},
-        {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems, types: ["QTY"]},
-        {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]}
-    ];
-
-    sections.forEach(sec => {
-        if (sec.id === 'ATTIC_SC') {
-            const atticVal = document.getElementById('attic_custom').value;
-            if(atticVal) out += sec.head + "\n" + atticVal + "\n\n";
-            return;
-        }
-        let sectionText = "";
-        sec.sizes.forEach(sz => {
-            sec.types.forEach(tp => {
-                let key = sec.id + '_' + sz.replace(/\//g, "-").replace(/'/g, "").replace(/ /g, "") + '_' + tp;
-                let val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
-                if(val > 0) {
-                    let noteVal = document.getElementById('NOTE_' + key)?.value;
-                    let noteText = noteVal ? `\n   *Note: ${noteVal}` : "";
-                    let displaySize = (sec.id === '80' || sec.id === 'DBL80') ? sz + "x8/0" : sz;
-                    if (sec.id === 'AS') sectionText += `Attic Stair ${displaySize}${state.fireRated ? " (FIRE RATED)" : ""} - ${val}${noteText}\n`;
-                    else if (sec.id === 'HR') sectionText += `${displaySize} ${tp} Rail - ${val}${noteText}\n`;
-                    else if (sec.id === 'STSH') sectionText += `Shoe (${tp}) - ${val}${noteText}\n`;
-                    else if (sec.id === 'ST') sectionText += `${displaySize} - ${val}${noteText}\n`;
-                    else sectionText += `${displaySize} ${tp} - ${val}${noteText}\n`;
-                }
-            });
-        });
-        if(sectionText) out += sec.head + "\n" + sectionText + "\n";
-    });
-    const notes = document.getElementById('notes').value;
-    if(notes) out += "----------------------------\nNOTES: " + notes;
+    let out = `TAKEOFF SUMMARY\n----------------\n`;
+    for (let key in state) {
+      if (state[key] > 0) {
+        let note = document.getElementById('NOTE_' + key)?.value;
+        out += `${key.replace(/_/g, ' ')}: ${state[key]} ${note ? '(' + note + ')' : ''}\n`;
+      }
+    }
     document.getElementById('summary').value = out;
-  }
-
-  function copySummary() {
-    const s = document.getElementById("summary");
-    const btn = document.getElementById("copyBtn");
-    s.select();
-    document.execCommand("copy");
-    btn.innerText = "COPIED!";
-    btn.style.background = "var(--green)";
-    btn.style.color = "white";
-    setTimeout(() => {
-      btn.innerText = "Copy Text";
-      btn.style.background = "#e2e8f0";
-      btn.style.color = "var(--navy)";
-    }, 1500);
   }
 </script>
 </body>
