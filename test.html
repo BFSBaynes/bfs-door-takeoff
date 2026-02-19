@@ -113,7 +113,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.6.7 - Structured Output Mode</div>
+<div class="version-tag">Version 1.6.8 - List Bullet Mode</div>
 
 <script>
   const state = { fireRated: false };
@@ -287,7 +287,6 @@
     const sub = document.getElementById('subdivision').value || "NA";
     const lot = document.getElementById('lot').value || "NA";
     
-    // Header using dashes instead of colons/pipes
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
 
     const groups = [
@@ -311,9 +310,11 @@
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
             
-            // Format line: Size Type - Qty (Note)
-            groupContent += `${item}${g.suffix} ${t} -- ${state[key]}${fireLabel}`;
-            if(state[noteKey] && state[noteKey].length > 0) groupContent += `\n   *Note: ${state[noteKey]}`;
+            // Format line with a leading bullet dash for row separation
+            groupContent += `- ${item}${g.suffix} ${t} -- ${state[key]}${fireLabel}`;
+            if(state[noteKey] && state[noteKey].length > 0) {
+                groupContent += `\n   *Note: ${state[noteKey]}`;
+            }
             groupContent += `\n`;
           }
         });
