@@ -113,7 +113,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.6.2 - Note Logic Update</div>
+<div class="version-tag">Version 1.6.3 - Text Compatibility Fix</div>
 
 <script>
   const state = { fireRated: false };
@@ -153,7 +153,6 @@
       const qty = state[key] || 0;
       const savedNote = state[noteKey] || "";
       
-      // Determine placeholder vs actual value
       const placeholderText = (sectionId === "atws") ? "Cut down to: " : "Notes...";
 
       let controlHtml = "";
@@ -287,9 +286,10 @@
     const cust = document.getElementById('customer').value || "N/A";
     const sub = document.getElementById('subdivision').value || "N/A";
     const lot = document.getElementById('lot').value || "N/A";
+    const date = new Date().toLocaleDateString();
     
     let report = `TAKEOFF: ${cust} | ${sub} | LOT: ${lot}\n`;
-    report += `==========================================\n\n`;
+    report += `DATE: ${date}\n------------------------------------------\n\n`;
 
     const groups = [
       {id: "68s", head: "6/8 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:""},
@@ -311,18 +311,18 @@
           const noteKey = `NOTE_${key}`;
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " [FIRE RATED]" : "";
-            groupContent += ` • ${item}${g.suffix} ${t}: ${state[key]}${fireLabel}`;
-            // Only add note if it actually contains text
+            // Swapped bullet point for simple dash for better compatibility
+            groupContent += ` - ${item}${g.suffix} ${t}: ${state[key]}${fireLabel}`;
             if(state[noteKey] && state[noteKey].length > 0) groupContent += ` (${state[noteKey]})`;
             groupContent += `\n`;
           }
         });
       });
-      if(groupContent) report += `${g.head}\n${groupContent}\n`;
+      if(groupContent) report += `[${g.head}]\n${groupContent}\n`;
     });
     
     const genNotes = document.getElementById('notes').value;
-    if(genNotes) report += `GENERAL NOTES\n • ${genNotes.split('\n').join('\n • ')}\n`;
+    if(genNotes) report += `GENERAL NOTES\n - ${genNotes.split('\n').join('\n - ')}\n`;
 
     document.getElementById('summary').value = report;
   }
