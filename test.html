@@ -56,6 +56,7 @@
 
     .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
     .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; }
+    .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); margin-bottom: 0; }
 
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
@@ -100,7 +101,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.5 - Combined Stair Parts</div>
+<div class="version-tag">Version 1.5.6 - High Qty Input Fix</div>
 
 <script>
   const state = { fireRated: false };
@@ -110,8 +111,9 @@
 
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "10'", "16'", "18'"];
+  const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Epoxy"];
+  const directInputItems = ["Brackets", "Balusters", "Shoes"];
 
   function toggleSection(id, headerEl) {
     document.getElementById('content-' + id).classList.toggle('active');
@@ -127,21 +129,31 @@
     const container = document.getElementById('m-blocks');
     container.innerHTML = "";
 
+    const useDirectInput = directInputItems.includes(label);
+
     types.forEach(type => {
       const key = `${sectionId}_${label}_${type}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
       const note = state[noteKey] || "";
 
+      let controlHtml = "";
+      if (useDirectInput) {
+        controlHtml = `<input type="number" class="qty-input" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()">`;
+      } else {
+        controlHtml = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
+            <span class="qty-display" id="mqty-${key}">${qty}</span>
+            <button class="btn" onclick="updateModalQty('${key}', 1)">+</button>
+          </div>`;
+      }
+
       container.innerHTML += `
         <div class="modal-type-block">
           <div class="modal-counter-row">
             <label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
-              <span class="qty-display" id="mqty-${key}">${qty}</span>
-              <button class="btn" onclick="updateModalQty('${key}', 1)">+</button>
-            </div>
+            ${controlHtml}
           </div>
           <input type="text" id="mnote-${key}" value="${note}" 
                  placeholder="Notes for ${type}..." 
@@ -162,6 +174,12 @@
     activeTypes.forEach(t => {
       const key = `${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-");
       const noteKey = `NOTE_${key}`;
+      
+      const qtyElement = document.getElementById(`mqty-${key}`);
+      if (qtyElement.tagName === "INPUT") {
+        state[key] = parseInt(qtyElement.value) || 0;
+      }
+
       const noteInput = document.getElementById(`mnote-${key}`);
       if(noteInput) state[noteKey] = noteInput.value;
       if(state[key] > 0) hasData = true;
@@ -197,7 +215,6 @@
     return grid;
   }
 
-  // Layout definition for UI rendering
   const layout = [
     { title: "6/8 Doors", id: "68s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
     { title: "6/8 Double", id: "68d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
@@ -231,7 +248,6 @@
     if(sec.custom) {
       content.innerHTML = `<div style="padding:8px;"><textarea id="attic_custom" style="height:100px;" placeholder="Describe custom attic sizes/cuts..."></textarea></div>`;
     } else if (sec.sections) {
-      // Logic for combined Stair Parts section
       sec.sections.forEach(subset => {
         content.appendChild(renderGrid(sec.id, subset.items, subset.types));
       });
