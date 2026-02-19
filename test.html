@@ -106,14 +106,14 @@
   <label>General Project Notes</label>
   <textarea id="notes" placeholder="Example: Key code, delivery instructions..."></textarea>
   <div class="actions">
-    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate Takeoff</button>
+    <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="generateSummary()">Generate Takeoff</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
   <textarea id="summary" readonly></textarea>
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.6.5 - High Compatibility Mode</div>
+<div class="version-tag">Version 1.6.6 - Updated Aesthetics</div>
 
 <script>
   const state = { fireRated: false };
@@ -153,7 +153,6 @@
       const qty = state[key] || 0;
       const savedNote = state[noteKey] || "";
       
-      // FIX: Updated ghost text for Attic W/S Door
       const placeholderText = (sectionId === "atws") ? "Cut down to / R.O. is" : "Notes...";
 
       let controlHtml = "";
@@ -283,7 +282,6 @@
     appContainer.appendChild(content);
   });
 
-  // FIX: Stripped special characters that cause URL encoding in email
   function generateSummary() {
     const cust = document.getElementById('customer').value || "NA";
     const sub = document.getElementById('subdivision').value || "NA";
@@ -311,7 +309,6 @@
           const noteKey = `NOTE_${key}`;
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " FIRE RATED" : "";
-            // Removed colon and pipe for email safety
             groupContent += `${item}${g.suffix} ${t}  ${state[key]}${fireLabel}`;
             if(state[noteKey] && state[noteKey].length > 0) groupContent += ` (${state[noteKey]})`;
             groupContent += `\n`;
