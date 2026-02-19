@@ -63,7 +63,7 @@
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
-    #summary { background: #fff; height: 350px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 13px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre; }
+    #summary { background: #fff; height: 350px; margin-top: 8px; font-family: sans-serif; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre-wrap; }
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
@@ -113,7 +113,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.6.4 - Email Compatibility Fix</div>
+<div class="version-tag">Version 1.6.5 - High Compatibility Mode</div>
 
 <script>
   const state = { fireRated: false };
@@ -153,7 +153,8 @@
       const qty = state[key] || 0;
       const savedNote = state[noteKey] || "";
       
-      const placeholderText = (sectionId === "atws") ? "Cut down to: " : "Notes...";
+      // FIX: Updated ghost text for Attic W/S Door
+      const placeholderText = (sectionId === "atws") ? "Cut down to / R.O. is" : "Notes...";
 
       let controlHtml = "";
       const greenClass = qty > 0 ? 'active-qty' : '';
@@ -282,19 +283,20 @@
     appContainer.appendChild(content);
   });
 
+  // FIX: Stripped special characters that cause URL encoding in email
   function generateSummary() {
-    const cust = document.getElementById('customer').value || "N/A";
-    const sub = document.getElementById('subdivision').value || "N/A";
-    const lot = document.getElementById('lot').value || "N/A";
+    const cust = document.getElementById('customer').value || "NA";
+    const sub = document.getElementById('subdivision').value || "NA";
+    const lot = document.getElementById('lot').value || "NA";
     
-    let report = `TAKEOFF: ${cust} | ${sub} | LOT: ${lot}\n\n`;
+    let report = `TAKEOFF  ${cust}  ${sub}  LOT ${lot}\n\n`;
 
     const groups = [
       {id: "68s", head: "6/8 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:""},
       {id: "68d", head: "6/8 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes, suffix:""},
       {id: "80s", head: "8/0 SINGLE DOORS", types: ["LH", "RH", "SLAB"], items: doorSizes, suffix:"x8/0"},
       {id: "80d", head: "8/0 DOUBLE DOORS", types: ["DBL", "T-AST"], items: dblSizes, suffix:"x8/0"},
-      {id: "atws", head: "ATTIC W/S DOORS", types: ["LH", "RH"], items: doorSizes, suffix:""},
+      {id: "atws", head: "ATTIC WS DOORS", types: ["LH", "RH"], items: doorSizes, suffix:""},
       {id: "atst", head: "ATTIC STAIRS", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"], suffix:""},
       {id: "sp", head: "HANDRAIL", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
       {id: "sp", head: "STAIR HARDWARE", types: ["QTY"], items: stairItems, suffix:""},
@@ -309,7 +311,8 @@
           const noteKey = `NOTE_${key}`;
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " FIRE RATED" : "";
-            groupContent += `${item}${g.suffix} ${t}: ${state[key]}${fireLabel}`;
+            // Removed colon and pipe for email safety
+            groupContent += `${item}${g.suffix} ${t}  ${state[key]}${fireLabel}`;
             if(state[noteKey] && state[noteKey].length > 0) groupContent += ` (${state[noteKey]})`;
             groupContent += `\n`;
           }
