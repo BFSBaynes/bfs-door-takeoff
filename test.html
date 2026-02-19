@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -45,7 +44,6 @@
     .label-col { width: 75px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
     .size-label { font-weight: 900; font-size: 13px; color: var(--navy); text-align: left; }
     
-    /* Slab Button Styling */
     .slab-trigger { 
       font-size: 9px; font-weight: 800; padding: 4px; border-radius: 4px; 
       border: 1px solid var(--navy); background: #f1f5f9; color: var(--navy); 
@@ -74,7 +72,6 @@
 
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
     
-    /* Modal Styles */
     .modal-overlay { 
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; 
@@ -93,6 +90,7 @@
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
     #summary { background: #fff; height: 300px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
+    .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
   </style>
@@ -101,10 +99,23 @@
 
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
+  
   <div class="input-row">
-    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="e.g. Pulte"></div>
-    <div class="input-group"><label>Subdivision</label><input id="subdivision" type="text" placeholder="e.g. Huxley"></div>
-    <div class="input-group" style="flex:0.5;"><label>Lot #</label><input id="lot" type="text" placeholder="104"></div>
+    <div class="input-group">
+      <label>Customer</label>
+      <input id="customer" type="text" placeholder="e.g. Pulte">
+    </div>
+  </div>
+
+  <div class="input-row">
+    <div class="input-group" style="flex: 0.75;">
+      <label>Subdivision</label>
+      <input id="subdivision" type="text" placeholder="e.g. Huxley">
+    </div>
+    <div class="input-group" style="flex: 0.25;">
+      <label>Lot #</label>
+      <input id="lot" type="text" placeholder="104">
+    </div>
   </div>
 </div>
 
@@ -137,6 +148,8 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
+<div class="version-tag">Version 1.3.7 - Slab Modal Edition</div>
+
 <script>
   const state = { fireRated: false };
   let currentSlabKey = "";
@@ -159,7 +172,6 @@
     }
   }
 
-  // Slab Modal Logic
   function openSlabModal(key, label) {
     currentSlabKey = key;
     document.getElementById('modalTitle').innerText = label + " Slab";
