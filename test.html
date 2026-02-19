@@ -33,17 +33,15 @@
     .section-content { display: none; padding: 8px 0; }
     .section-content.active { display: block; }
 
-    /* GRID LAYOUT */
     .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px; }
     .item-card { 
       background: #fff; border: 2px solid #94a3b8; border-radius: 8px; 
-      padding: 12px 4px; text-align: center; font-weight: 800; color: var(--navy);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px;
+      padding: 15px 4px; text-align: center; font-weight: 800; color: var(--navy);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; cursor: pointer;
     }
-    .item-card:active { transform: scale(0.95); }
+    .item-card:active { transform: scale(0.95); background: #f1f5f9; }
     .item-card.has-data { border-color: var(--green); background: #f0fdf4; color: var(--green); }
 
-    /* MODAL */
     .modal-overlay { 
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; 
@@ -55,10 +53,9 @@
       display: flex; align-items: center; justify-content: space-between; 
       background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;
     }
-    .modal-counter-row label { margin: 0; font-size: 14px; flex: 1; }
 
     .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
-    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; }
+    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); }
 
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
@@ -86,9 +83,9 @@
 
 <div id="itemModal" class="modal-overlay">
   <div class="modal-content">
-    <h2 id="m-title" style="margin:0; color:var(--navy); font-size: 1.2rem;">Item Name</h2>
+    <h2 id="m-title" style="margin:0; color:var(--navy); font-size: 1.3rem;">Item Name</h2>
     <div id="m-counters" style="margin-top: 15px;"></div>
-    <textarea id="m-note" placeholder="Add notes for this item..." style="margin-top:10px; height:60px;"></textarea>
+    <textarea id="m-note" placeholder="Add notes for this item..." style="margin-top:10px; height:80px;"></textarea>
     <button class="actionBtn" style="width:100%; background:var(--green); color:white; margin-top:10px;" onclick="closeModal()">SAVE ENTRY</button>
   </div>
 </div>
@@ -104,7 +101,7 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.5.0 - Full Grid Integration</div>
+<div class="version-tag">Version 1.5.1 - Fix Click Interaction</div>
 
 <script>
   const state = { fireRated: false };
@@ -122,7 +119,9 @@
     headerEl.classList.toggle('active-header');
   }
 
-  function openModal(sectionId, label, types) {
+  // FIXED: Improved escaping for labels with single quotes like 8'
+  function openModal(sectionId, label, typesJson) {
+    const types = JSON.parse(decodeURIComponent(typesJson));
     activeSectionId = sectionId;
     activeItemLabel = label;
     activeTypes = types;
@@ -136,7 +135,7 @@
       const val = state[key] || 0;
       container.innerHTML += `
         <div class="modal-counter-row">
-          <label>${type}</label>
+          <label style="font-size:14px; font-weight:800; color:var(--navy); text-align:left;">${type}</label>
           <div style="display:flex; align-items:center; gap:15px;">
             <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
             <span class="qty-display" id="mqty-${key}">${val}</span>
@@ -166,7 +165,9 @@
 
     const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
     const card = document.getElementById(cardId);
-    if(card) hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
+    if(card) {
+      hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
+    }
 
     document.getElementById('itemModal').style.display = 'none';
   }
@@ -174,36 +175,51 @@
   function toggleFire() {
     state.fireRated = !state.fireRated;
     const btn = document.getElementById('fire-status');
-    btn.innerText = state.fireRated ? "YES (FIRE)" : "NO";
+    btn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO";
     state.fireRated ? btn.classList.add('has-data') : btn.classList.remove('has-data');
   }
 
   function renderGrid(sectionId, items, types) {
     let html = `<div class="item-grid">`;
+    const typesStr = encodeURIComponent(JSON.stringify(types));
     items.forEach(item => {
       const id = `card-${sectionId}-${item}`.replace(/[\/ ']/g, "-");
-      html += `<div class="item-card" id="${id}" onclick="openModal('${sectionId}', '${item}', ${JSON.stringify(types)})">${item}</div>`;
+      // Use double quotes for the attribute to handle single quotes in labels safely
+      html += `<div class="item-card" id="${id}" onclick="openModal('${sectionId}', '${item}', '${typesStr}')">${item}</div>`;
     });
     return html + `</div>`;
   }
 
+  // Render App Content
   const layout = [
-    { title: "6/8 Doors", id: "68s", color: "bg-navy", html: renderGrid("68s", doorSizes, ["LH", "RH", "SLAB"]) },
-    { title: "6/8 Double", id: "68d", color: "bg-red", html: renderGrid("68d", dblSizes, ["DBL", "T-AST"]) },
-    { title: "8/0 Doors", id: "80s", color: "bg-navy", html: renderGrid("80s", doorSizes, ["LH", "RH", "SLAB"]) },
-    { title: "8/0 Double", id: "80d", color: "bg-red", html: renderGrid("80d", dblSizes, ["DBL", "T-AST"]) },
-    { title: "Attic Solid Core", id: "atsc", color: "bg-navy", html: `<div style="padding:8px;"><textarea id="attic_custom" style="height:100px;" placeholder="Custom sizes & cuts..."></textarea></div>` },
-    { title: "Attic Stairs", id: "atst", color: "bg-red", html: renderGrid("atst", ["22x54", "25x54", "Scuttle"], ["QTY"]) + `<div style="padding:8px;"><button id="fire-status" class="item-card" style="width:100%;" onclick="toggleFire()">FIRE RATED? NO</button></div>` },
-    { title: "Handrail", id: "hr", color: "bg-navy", html: renderGrid("hr", railLengths, ["OPEN", "WALL"]) },
-    { title: "Stair Hardware", id: "st", color: "bg-red", html: renderGrid("st", stairItems, ["QTY"]) + renderGrid("shoes", ["Shoes"], ["FLAT", "ANGLE"]) }
+    { title: "6/8 Doors", id: "68s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
+    { title: "6/8 Double", id: "68d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
+    { title: "8/0 Doors", id: "80s", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
+    { title: "8/0 Double", id: "80d", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
+    { title: "Attic Solid Core", id: "atsc", color: "bg-navy", custom: true },
+    { title: "Attic Stairs", id: "atst", color: "bg-red", items: ["22x54", "25x54", "Scuttle"], types: ["QTY"] },
+    { title: "Handrail", id: "hr", color: "bg-navy", items: railLengths, types: ["OPEN", "WALL"] },
+    { title: "Stair Hardware", id: "st", color: "bg-red", items: stairItems, types: ["QTY"] },
+    { title: "Shoes", id: "shoes", color: "bg-red", items: ["Shoes"], types: ["FLAT", "ANGLE"] }
   ];
 
-  document.getElementById('app-content').innerHTML = layout.map(sec => `
-    <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
-      <span>${sec.title}</span><span class="chevron"></span>
-    </div>
-    <div id="content-${sec.id}" class="section-content">${sec.html}</div>
-  `).join('');
+  document.getElementById('app-content').innerHTML = layout.map(sec => {
+    let content = "";
+    if(sec.custom) {
+      content = `<div style="padding:8px;"><textarea id="attic_custom" style="height:100px;" placeholder="Custom sizes & cuts..."></textarea></div>`;
+    } else {
+      content = renderGrid(sec.id, sec.items, sec.types);
+      if(sec.id === "atst") {
+        content += `<div style="padding:8px;"><button id="fire-status" class="item-card" style="width:100%;" onclick="toggleFire()">FIRE RATED: NO</button></div>`;
+      }
+    }
+    return `
+      <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
+        <span>${sec.title}</span><span class="chevron"></span>
+      </div>
+      <div id="content-${sec.id}" class="section-content">${content}</div>
+    `;
+  }).join('');
 
   function generateSummary() {
     const info = `TAKEOFF: ${document.getElementById('customer').value || "N/A"} | ${document.getElementById('subdivision').value || "N/A"} | Lot: ${document.getElementById('lot').value || "N/A"}\n----------------------------\n`;
@@ -226,7 +242,7 @@
         let line = "";
         g.types.forEach(t => {
           const key = `${g.id}_${item}_${t}`.replace(/[\/ ']/g, "-");
-          if(state[key] > 0) line += `${t}: ${state[key]} `;
+          if(state[key] > 0) line += `${t}:${state[key]} `;
         });
         if(line) {
           const nKey = `NOTE_${g.id}_${item}`.replace(/[\/ ']/g, "-");
