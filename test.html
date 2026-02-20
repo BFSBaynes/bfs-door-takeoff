@@ -136,7 +136,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.1 - Grid & Badge Fix</div>
+<div class="version-tag">Version 1.9.2 - Stair Hardware Logic Fixed</div>
 
 <script>
   const state = { fireRated: false };
@@ -222,18 +222,15 @@
       const key = `${sectionId}_${label}_${t}`.replace(/[\/ ']/g, "-");
       const qty = state[key] || 0;
       if (qty > 0) {
-        // Logic for 2-option items (Double doors, Rail, Shoes)
         if (types.length === 2) {
           if (index === 0) { leftB.innerText = `${t}:${qty}`; leftB.classList.add('active'); }
           else { rightB.innerText = `${t}:${qty}`; rightB.classList.add('active'); }
         } 
-        // Logic for 3-option items (Single doors)
         else if (types.length === 3) {
           if (t === "LH") { leftB.innerText = `L:${qty}`; leftB.classList.add('active'); }
           else if (t === "RH") { rightB.innerText = `R:${qty}`; rightB.classList.add('active'); }
           else { centerB.innerText = `S:${qty}`; centerB.classList.add('active'); }
         }
-        // Logic for 1-option items (Attic, most hardware)
         else {
           centerB.innerText = qty; centerB.classList.add('active');
         }
@@ -282,13 +279,11 @@
     const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
     
     if (sec.id === "sp") {
-      // Specialized Stair Parts Grid to keep it in 3-columns
       const grid = document.createElement('div'); grid.className = 'item-grid';
       sec.items.forEach(item => {
           let itemTypes = ["QTY"];
           if (railLengths.includes(item)) itemTypes = ["OPEN", "WALL"];
           if (item === "Shoes") itemTypes = ["FLAT", "ANGLE"];
-          if (["Rosettes", "Balusters"].includes(item)) itemTypes = ["QTY", "FLAT", "ANGLE"];
           
           const card = document.createElement('div'); card.className = 'item-card';
           card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
@@ -332,7 +327,8 @@
           const key = `${g.id}_${item}_${t}`.replace(/[\/ ']/g, "-");
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
-            groupContent += `- ${item}${g.suffix} ${t} -- ${state[key]}${fireLabel}`;
+            const cleanType = (t === "QTY") ? "" : ` ${t}`;
+            groupContent += `- ${item}${g.suffix}${cleanType} -- ${state[key]}${fireLabel}`;
             if(state[`NOTE_${key}`]) { groupContent += `\n   *Note: ${state[`NOTE_${key}`]}`; }
             groupContent += `\n`;
           }
