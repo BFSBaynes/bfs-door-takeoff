@@ -34,11 +34,24 @@
     .section-content.active { display: block; }
 
     .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px; }
+    
+    /* Card Badge Styling */
     .item-card { 
       background: #fff; border: 2px solid #94a3b8; border-radius: 8px; 
-      padding: 15px 4px; text-align: center; font-weight: 800; color: var(--navy);
+      padding: 15px 4px 22px 4px; text-align: center; font-weight: 800; color: var(--navy);
       box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; cursor: pointer;
+      position: relative; overflow: hidden;
     }
+    .badge {
+      position: absolute; bottom: 2px; font-size: 10px; font-weight: 900;
+      background: rgba(226, 232, 240, 0.8); padding: 1px 4px; border-radius: 3px;
+      color: var(--navy); display: none;
+    }
+    .badge.active { display: block; color: var(--green); }
+    .badge-left { left: 4px; }
+    .badge-right { right: 4px; }
+    .badge-center { left: 50%; transform: translateX(-50%); }
+
     .item-card:active { transform: scale(0.95); background: #f1f5f9; }
     .item-card.has-data { border-color: var(--green); background: #f0fdf4; color: var(--green); }
 
@@ -69,7 +82,7 @@
     .history-item:last-child { border: 0; }
     .history-controls { display: flex; gap: 12px; align-items: center; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; }
-    .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 6px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
+    .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
 
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
@@ -126,7 +139,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.8.1 - Improved History Safety</div>
+<div class="version-tag">Version 1.9.0 - Dynamic Badges</div>
 
 <script>
   const state = { fireRated: false };
@@ -193,10 +206,37 @@
       if(noteInput) state[noteKey] = noteInput.value.trim();
       if(state[key] > 0) hasData = true;
     });
+    
     const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
     const card = document.getElementById(cardId);
-    if(card) { hasData ? card.classList.add('has-data') : card.classList.remove('has-data'); }
+    if(card) { 
+      hasData ? card.classList.add('has-data') : card.classList.remove('has-data'); 
+      updateCardBadges(card, activeSectionId, activeItemLabel, activeTypes);
+    }
     document.getElementById('itemModal').style.display = 'none';
+  }
+
+  function updateCardBadges(card, sectionId, label, types) {
+    const leftBadge = card.querySelector('.badge-left');
+    const rightBadge = card.querySelector('.badge-right');
+    const centerBadge = card.querySelector('.badge-center');
+    
+    // Clear current display
+    [leftBadge, rightBadge, centerBadge].forEach(b => { if(b){ b.innerText = ""; b.classList.remove('active'); }});
+
+    types.forEach(t => {
+      const key = `${sectionId}_${label}_${t}`.replace(/[\/ ']/g, "-");
+      const qty = state[key] || 0;
+      if (qty > 0) {
+        if (t === "LH") { leftBadge.innerText = `L:${qty}`; leftBadge.classList.add('active'); }
+        else if (t === "RH") { rightBadge.innerText = `R:${qty}`; rightBadge.classList.add('active'); }
+        else { 
+            // Handle Slabs, Double types, or single QTY items
+            centerBadge.innerText = (types.length === 1) ? qty : `${t.charAt(0)}:${qty}`; 
+            centerBadge.classList.add('active'); 
+        }
+      }
+    });
   }
 
   function toggleFire() {
@@ -210,8 +250,13 @@
     const grid = document.createElement('div'); grid.className = 'item-grid';
     items.forEach(item => {
       const card = document.createElement('div'); card.className = 'item-card';
-      card.id = `card-${sectionId}-${item}`.replace(/[\/ ']/g, "-");
-      card.innerText = item; card.onclick = () => openModal(sectionId, item, types);
+      const cleanItem = item.replace(/[\/ ']/g, "-");
+      card.id = `card-${sectionId}-${cleanItem}`;
+      card.innerHTML = `<span>${item}</span>
+                        <div class="badge badge-left"></div>
+                        <div class="badge badge-center"></div>
+                        <div class="badge badge-right"></div>`;
+      card.onclick = () => openModal(sectionId, item, types);
       grid.appendChild(card);
     });
     return grid;
