@@ -1,4 +1,4 @@
-const CACHE_NAME = "door-takeoff-v1.9.2";
+const CACHE_NAME = "door-takeoff-v1.9.2"; // Bumped to 56
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,7 +8,6 @@ const ASSETS = [
   "./icon-512.png"
 ];
 
-// Install: Cache all files
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
@@ -16,7 +15,6 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate: Cleanup old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -30,7 +28,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: Network first, fallback to cache
+// AGGRESSIVE UPDATE: Try network first, then cache
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request).catch(() => {
