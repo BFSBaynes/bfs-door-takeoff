@@ -136,10 +136,10 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.2 - Stair Hardware Logic Fixed</div>
+<div class="version-tag">Version 1.9.3 - History Loading Improved</div>
 
 <script>
-  const state = { fireRated: false };
+  let state = { fireRated: false };
   let activeSectionId = "";
   let activeItemLabel = "";
   let activeTypes = [];
@@ -203,13 +203,34 @@
       if(state[key] > 0) hasData = true;
     });
     
-    const cardId = `card-${activeSectionId}-${activeItemLabel}`.replace(/[\/ ']/g, "-");
-    const card = document.getElementById(cardId);
-    if(card) { 
-      hasData ? card.classList.add('has-data') : card.classList.remove('has-data'); 
-      updateCardBadges(card, activeSectionId, activeItemLabel, activeTypes);
-    }
+    refreshAllCards();
     document.getElementById('itemModal').style.display = 'none';
+  }
+
+  function refreshAllCards() {
+    layout.forEach(sec => {
+      sec.items.forEach(item => {
+        let types = sec.types || [];
+        if (sec.id === "sp") {
+            types = ["QTY"];
+            if (railLengths.includes(item)) types = ["OPEN", "WALL"];
+            if (item === "Shoes") types = ["FLAT", "ANGLE"];
+        }
+        const cardId = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
+        const card = document.getElementById(cardId);
+        if(card) {
+          let hasData = types.some(t => state[`${sec.id}_${item}_${t}`.replace(/[\/ ']/g, "-")] > 0);
+          hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
+          updateCardBadges(card, sec.id, item, types);
+        }
+      });
+    });
+    // Special fire rated button check
+    const fireBtn = document.getElementById('fire-status');
+    if(fireBtn) {
+       fireBtn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO";
+       state.fireRated ? fireBtn.classList.add('has-data') : fireBtn.classList.remove('has-data');
+    }
   }
 
   function updateCardBadges(card, sectionId, label, types) {
@@ -308,6 +329,7 @@
     const cust = document.getElementById('customer').value || "NA";
     const sub = document.getElementById('subdivision').value || "NA";
     const lot = document.getElementById('lot').value || "NA";
+    const gNotes = document.getElementById('notes').value || "";
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
     
     const groups = [
@@ -336,18 +358,31 @@
       });
       if(groupContent) report += `${g.head}\n${groupContent}\n`;
     });
-    const genNotes = document.getElementById('notes').value;
-    if(genNotes) report += `----------------------------\nGENERAL NOTES\n${genNotes}\n`;
+    
+    if(gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
     document.getElementById('summary').value = report;
-    saveToHistory(report, `${sub} L${lot}`);
+    
+    // SAVE DATA SNAPSHOT TO HISTORY
+    saveToHistory(report, `${sub} L${lot}`, {
+        customer: cust,
+        subdivision: sub,
+        lot: lot,
+        notes: gNotes,
+        state: JSON.parse(JSON.stringify(state))
+    });
   }
 
-  function saveToHistory(text, label) {
+  function saveToHistory(text, label, fullData) {
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     const now = new Date();
     const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
     const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    history.unshift({ label: `${dateStr} - ${label}`, text: text, time: timeStr });
+    history.unshift({ 
+        label: `${dateStr} - ${label}`, 
+        text: text, 
+        time: timeStr,
+        fullData: fullData 
+    });
     if(history.length > 10) history.pop();
     localStorage.setItem('bfs_history', JSON.stringify(history));
     renderHistory();
@@ -380,8 +415,26 @@
 
   function loadHistory(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history'));
-    document.getElementById('summary').value = history[index].text;
+    const item = history[index];
+    
+    // Load text report
+    document.getElementById('summary').value = item.text;
+
+    // IF full data exists, reload the state and UI
+    if (item.fullData) {
+        document.getElementById('customer').value = item.fullData.customer || "";
+        document.getElementById('subdivision').value = item.fullData.subdivision || "";
+        document.getElementById('lot').value = item.fullData.lot || "";
+        document.getElementById('notes').value = item.fullData.notes || "";
+        state = JSON.parse(JSON.stringify(item.fullData.state));
+        refreshAllCards();
+    }
+    
     document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
+    const toast = document.getElementById("toast");
+    toast.innerText = "TAKEOFF LOADED";
+    toast.classList.add("show");
+    setTimeout(() => { toast.classList.remove("show"); toast.innerText = "TEXT COPIED"; }, 2000);
   }
 
   function clearHistory() {
@@ -399,6 +452,15 @@
   }
 
   renderHistory();
+
+  // SERVICE WORKER REGISTRATION
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log('SW Registered'))
+        .catch(err => console.log('SW Error', err));
+    });
+  }
 </script>
 </body>
 </html>
