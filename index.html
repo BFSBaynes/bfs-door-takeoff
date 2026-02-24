@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  
+  <meta name="theme-color" content="#0A2E4E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
+  
   <title>Elevate Trim - BFS Pro</title>
   <style>
     :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
@@ -155,7 +161,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.4 - Switchback Added</div>
+<div class="version-tag">Version 1.9.4 - Synced Switchback</div>
 
 <script>
   let state = { fireRated: false };
@@ -244,7 +250,6 @@
         }
       });
     });
-    // Special fire rated button check
     const fireBtn = document.getElementById('fire-status');
     if(fireBtn) {
        fireBtn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO";
@@ -370,7 +375,7 @@
             const fireLabel = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
             const cleanType = (t === "QTY") ? "" : ` ${t}`;
             groupContent += `- ${item}${g.suffix}${cleanType} -- ${state[key]}${fireLabel}`;
-            if(state[`NOTE_${key}`]) { groupContent += `\n   *Note: ${state[`NOTE_${key}`]}`; }
+            if(state[`NOTE_${key}`]) { groupContent += `\n    *Note: ${state[`NOTE_${key}`]}`; }
             groupContent += `\n`;
           }
         });
@@ -381,13 +386,8 @@
     if(gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
     document.getElementById('summary').value = report;
     
-    // SAVE DATA SNAPSHOT TO HISTORY
     saveToHistory(report, `${sub} L${lot}`, {
-        customer: cust,
-        subdivision: sub,
-        lot: lot,
-        notes: gNotes,
-        state: JSON.parse(JSON.stringify(state))
+        customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state))
     });
   }
 
@@ -396,12 +396,7 @@
     const now = new Date();
     const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
     const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    history.unshift({ 
-        label: `${dateStr} - ${label}`, 
-        text: text, 
-        time: timeStr,
-        fullData: fullData 
-    });
+    history.unshift({ label: `${dateStr} - ${label}`, text: text, time: timeStr, fullData: fullData });
     if(history.length > 10) history.pop();
     localStorage.setItem('bfs_history', JSON.stringify(history));
     renderHistory();
@@ -435,11 +430,7 @@
   function loadHistory(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history'));
     const item = history[index];
-    
-    // Load text report
     document.getElementById('summary').value = item.text;
-
-    // IF full data exists, reload the state and UI
     if (item.fullData) {
         document.getElementById('customer').value = item.fullData.customer || "";
         document.getElementById('subdivision').value = item.fullData.subdivision || "";
@@ -448,7 +439,6 @@
         state = JSON.parse(JSON.stringify(item.fullData.state));
         refreshAllCards();
     }
-    
     document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
     const toast = document.getElementById("toast");
     toast.innerText = "TAKEOFF LOADED";
@@ -472,11 +462,11 @@
 
   renderHistory();
 
-  // SERVICE WORKER REGISTRATION
+  // UNIFIED SERVICE WORKER REGISTRATION
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('SW Registered'))
+        .then(reg => console.log('Modern Synced with Unified SW'))
         .catch(err => console.log('SW Error', err));
     });
   }
