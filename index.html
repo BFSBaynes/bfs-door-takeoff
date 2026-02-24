@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script>
+    // IMMEDIATE REDIRECT: Check preference before the page even renders
+    if (localStorage.getItem('preferred_mode') === 'classic') {
+      window.location.href = 'classic.html';
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   
@@ -119,7 +125,7 @@
 </head>
 <body>
 
-<a href="classic.html" class="mode-switch">SWITCH TO CLASSIC</a>
+<a href="classic.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'classic')">SWITCH TO CLASSIC</a>
 
 <div id="toast">TEXT COPIED</div>
 
