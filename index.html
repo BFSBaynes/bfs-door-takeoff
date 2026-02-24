@@ -23,21 +23,11 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
     
-    /* MODE SWITCH BUTTON */
     .mode-switch {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 999;
-      background: var(--navy);
-      color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 800;
-      text-decoration: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      border: 2px solid white;
+      position: fixed; top: 10px; right: 10px; z-index: 999;
+      background: var(--navy); color: white; padding: 6px 12px;
+      border-radius: 20px; font-size: 10px; font-weight: 800;
+      text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white;
     }
 
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
@@ -51,8 +41,7 @@
 
     .section-title { 
       color: #fff; padding: 14px; font-weight: 800; font-size: 14px; 
-      margin: 8px -8px; cursor: pointer;
-      display: flex; justify-content: space-between; align-items: center;
+      margin: 8px -8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
       text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
       position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
@@ -90,9 +79,7 @@
     .modal-content { 
       background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto;
     }
-    .modal-type-block {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 12px; text-align: left;
-    }
+    .modal-type-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 12px; text-align: left; }
     .modal-counter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 
     .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
@@ -107,7 +94,6 @@
     
     .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
-    .history-item:last-child { border: 0; }
     .history-controls { display: flex; gap: 12px; align-items: center; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; }
     .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
@@ -167,7 +153,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.5 - Synced Switchback Corrected</div>
+<div class="version-tag">Version 1.9.6 - Sync Logic Unified</div>
 
 <script>
   let state = { fireRated: false };
@@ -180,6 +166,12 @@
   const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
   const directInputItems = ["Brackets", "Balusters", "Shoes"];
+
+  // SYNC HELPER: Matches the Classic naming convention (Prefix_Label-With-Dashes_Type)
+  function getSyncKey(sectionId, label, type) {
+    let cleanLabel = label.replace(/[\/ ']/g, "-");
+    return `${sectionId}_${cleanLabel}_${type}`;
+  }
 
   function toggleSection(id, headerEl) {
     document.getElementById('content-' + id).classList.toggle('active');
@@ -198,7 +190,7 @@
     const useDirectInput = directInputItems.includes(label);
 
     types.forEach(type => {
-      const key = `${sectionId}_${label}_${type}`.replace(/[\/ ']/g, "-");
+      const key = getSyncKey(sectionId, label, type);
       const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
       const savedNote = state[noteKey] || "";
@@ -224,16 +216,13 @@
   }
 
   function closeModal() {
-    let hasData = false;
     activeTypes.forEach(t => {
-      const key = `${activeSectionId}_${activeItemLabel}_${t}`.replace(/[\/ ']/g, "-");
+      const key = getSyncKey(activeSectionId, activeItemLabel, t);
       const qtyElement = document.getElementById(`mqty-${key}`);
       if (qtyElement.tagName === "INPUT") { state[key] = parseInt(qtyElement.value) || 0; }
       const noteInput = document.getElementById(`mnote-${key}`);
       if(noteInput) state[`NOTE_${key}`] = noteInput.value.trim();
-      if(state[key] > 0) hasData = true;
     });
-    
     refreshAllCards();
     document.getElementById('itemModal').style.display = 'none';
   }
@@ -250,7 +239,7 @@
         const cardId = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
         const card = document.getElementById(cardId);
         if(card) {
-          let hasData = types.some(t => state[`${sec.id}_${item}_${t}`.replace(/[\/ ']/g, "-")] > 0);
+          let hasData = types.some(t => state[getSyncKey(sec.id, item, t)] > 0);
           hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
           updateCardBadges(card, sec.id, item, types);
         }
@@ -270,7 +259,7 @@
     [leftB, rightB, centerB].forEach(b => { b.innerText = ""; b.classList.remove('active'); });
 
     types.forEach((t, index) => {
-      const key = `${sectionId}_${label}_${t}`.replace(/[\/ ']/g, "-");
+      const key = getSyncKey(sectionId, label, t);
       const qty = state[key] || 0;
       if (qty > 0) {
         if (types.length === 2) {
@@ -282,18 +271,14 @@
           else if (t === "RH") { rightB.innerText = `R:${qty}`; rightB.classList.add('active'); }
           else { centerB.innerText = `S:${qty}`; centerB.classList.add('active'); }
         }
-        else {
-          centerB.innerText = qty; centerB.classList.add('active');
-        }
+        else { centerB.innerText = qty; centerB.classList.add('active'); }
       }
     });
   }
 
   function toggleFire() {
     state.fireRated = !state.fireRated;
-    const btn = document.getElementById('fire-status');
-    btn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO";
-    state.fireRated ? btn.classList.add('has-data') : btn.classList.remove('has-data');
+    refreshAllCards();
   }
 
   function renderGrid(sectionId, items, types) {
@@ -302,10 +287,7 @@
       const card = document.createElement('div'); card.className = 'item-card';
       const cleanItem = item.replace(/[\/ ']/g, "-");
       card.id = `card-${sectionId}-${cleanItem}`;
-      card.innerHTML = `<span>${item}</span>
-                        <div class="badge badge-left"></div>
-                        <div class="badge badge-center"></div>
-                        <div class="badge badge-right"></div>`;
+      card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
       card.onclick = () => openModal(sectionId, item, types);
       grid.appendChild(card);
     });
@@ -335,7 +317,6 @@
           let itemTypes = ["QTY"];
           if (railLengths.includes(item)) itemTypes = ["OPEN", "WALL"];
           if (item === "Shoes") itemTypes = ["FLAT", "ANGLE"];
-          
           const card = document.createElement('div'); card.className = 'item-card';
           card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
           card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
@@ -343,7 +324,7 @@
           grid.appendChild(card);
       });
       content.appendChild(grid);
-    } else if (sec.items) {
+    } else {
       content.appendChild(renderGrid(sec.id, sec.items, sec.types));
     }
 
@@ -376,7 +357,7 @@
       let groupContent = "";
       g.items.forEach(item => {
         g.types.forEach(t => {
-          const key = `${g.id}_${item}_${t}`.replace(/[\/ ']/g, "-");
+          const key = getSyncKey(g.id, item, t);
           if(state[key] > 0) {
             const fireLabel = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
             const cleanType = (t === "QTY") ? "" : ` ${t}`;
@@ -443,7 +424,7 @@
         document.getElementById('lot').value = item.fullData.lot || "";
         document.getElementById('notes').value = item.fullData.notes || "";
         state = JSON.parse(JSON.stringify(item.fullData.state));
-        refreshAllCards();
+        refreshAllCards(); // This lights up the green cards
     }
     document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
     const toast = document.getElementById("toast");
@@ -468,7 +449,6 @@
 
   renderHistory();
 
-  // UNIFIED SERVICE WORKER REGISTRATION
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
