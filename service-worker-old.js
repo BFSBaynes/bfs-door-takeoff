@@ -1,4 +1,5 @@
-const CACHE_NAME = "door-takeoff-OLD-v1.4.0"; 
+// Update the version number here to force a refresh
+const CACHE_NAME = "door-takeoff-OLD-v1.4.1"; 
 const ASSETS = [
   "./",
   "./classic.html",
@@ -22,6 +23,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((k) => {
+          // This deletes any OLD cache that isn't the current version
           if (k.includes("door-takeoff-OLD") && k !== CACHE_NAME) {
              return caches.delete(k);
           }
