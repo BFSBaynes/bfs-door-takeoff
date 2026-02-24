@@ -13,6 +13,23 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
     
+    /* MODE SWITCH BUTTON */
+    .mode-switch {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 999;
+      background: var(--bfs-red);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
     .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
     
@@ -83,7 +100,7 @@
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
     .history-item:last-child { border: 0; }
     .history-controls { display: flex; gap: 12px; align-items: center; }
-    .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; }
+    .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
     .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
 
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
@@ -92,6 +109,8 @@
   </style>
 </head>
 <body>
+
+<a href="index.html" class="mode-switch">SWITCH TO MODERN</a>
 
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
@@ -125,7 +144,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.4.0 - CLASSIC EDITION</div>
+<div class="version-tag">Version 1.4.1 - CLASSIC EDITION</div>
 
 <script>
   let state = { fireRated: false };
@@ -198,7 +217,6 @@
     const gNotes = document.getElementById('notes').value || "";
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
     
-    // Summary Logic (Shortened for brevity but functional)
     const sections = [
         {id: '68', head: '--- 6/8 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
         {id: 'DBL68', head: '--- 6/8 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
@@ -228,13 +246,11 @@
     if(gNotes) report += `NOTES: ${gNotes}`;
     document.getElementById('summary').value = report;
     
-    // Save to history using INDEX.HTML format
     saveToHistory(report, `${sub} L${lot}`, {
         customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state))
     });
   }
 
-  // --- COPIED HISTORY FUNCTIONS FROM INDEX.HTML ---
   function saveToHistory(text, label, fullData) {
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     const now = new Date();
@@ -281,14 +297,19 @@
         document.getElementById('lot').value = item.fullData.lot || "";
         document.getElementById('notes').value = item.fullData.notes || "";
         state = JSON.parse(JSON.stringify(item.fullData.state));
-        // Refresh UI
+        
         Object.keys(state).forEach(key => {
             const el = document.getElementById('qty-' + key);
             if(el) {
                 el.innerText = state[key];
                 state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
             }
+            const inp = document.getElementById('inp-' + key);
+            if(inp) inp.value = state[key] || "";
         });
+        if(document.getElementById('fire-status')) {
+            document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+        }
     }
     document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
   }
