@@ -11,6 +11,23 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
     
+    /* MODE SWITCH BUTTON */
+    .mode-switch {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 999;
+      background: var(--navy);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
     .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
     
@@ -95,6 +112,8 @@
   </style>
 </head>
 <body>
+
+<a href="classic.html" class="mode-switch">SWITCH TO CLASSIC</a>
 
 <div id="toast">TEXT COPIED</div>
 
