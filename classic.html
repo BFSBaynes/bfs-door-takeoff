@@ -73,7 +73,6 @@
 
     .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
-    .attic-text-area { min-height: 80px; font-size: 14px; border: 1px dashed var(--navy); background: #fff; margin-top: 5px; }
 
     .toggle-container { display: flex; align-items: center; justify-content: flex-end; padding: 8px; gap: 8px; background: #fff; border-radius: 4px; margin-top: 4px; border: 1px solid #cbd5e1; }
     .toggle-label { font-size: 10px; font-weight: 800; color: var(--bfs-red); }
@@ -127,15 +126,14 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.6 - Universal Sync Enabled</div>
+<div class="version-tag">Version 1.9.7 - Universal Sync Fixed</div>
 
 <script>
   let state = { fireRated: false };
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  // FIXED: Changed 10' to 12'
   const railLengths = ["8'", "12'", "16'", "18'"];
-  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters"];
+  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
 
   function update(key, delta, btnEl) {
     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(10);
@@ -166,7 +164,7 @@
     let html = `<div class="door-row"><div class="size-label">${displayLabel}</div><div class="controls-grid">`;
     types.forEach(type => {
       let key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type;
-      let isHighVolume = (label === "Balusters" || prefix === "STSH");
+      let isHighVolume = (label === "Balusters" || label === "Shoes" || label === "Brackets");
       html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">`;
       if (isHighVolume) {
         html += `<input type="number" class="qty-input" id="inp-${key}" oninput="state['${key}']=parseInt(this.value)||0" placeholder="0">`;
@@ -180,13 +178,12 @@
 
   const layout = [
     { title: "6/8 Doors", id: "68_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68", ["LH", "RH", "SLAB"])).join('') },
-    { title: "6/8 Double Doors", id: "68_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
+    { title: "6/8 Double", id: "68_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
     { title: "8/0 Doors", id: "80_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80", ["LH", "RH", "SLAB"])).join('') },
-    { title: "8/0 Double Doors", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
-    { title: "Attic Solid Core (Custom)", id: "at_sc", color: "bg-navy", rows: () => `<div style="padding:0 8px;"><textarea id="attic_custom" class="attic-text-area" placeholder="Enter sizes, handing, and cuts..."></textarea></div>` },
+    { title: "8/0 Double", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
+    { title: "Attic W/S Door", id: "at_ws", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "atws", ["LH", "RH"])).join('') },
     { title: "Attic Stairs", id: "at_st", color: "bg-red", rows: () => renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
-    { title: "Handrail", id: "h_rail", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') },
-    { title: "Stair Hardware", id: "s_hard", color: "bg-red", rows: () => stairItems.map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) }
+    { title: "Stair Parts", id: "s_parts", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') + stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) }
   ];
 
   document.getElementById('app-content').innerHTML = layout.map(sec => `
@@ -206,17 +203,17 @@
     const sub = document.getElementById('subdivision').value || "NA";
     const lot = document.getElementById('lot').value || "NA";
     const gNotes = document.getElementById('notes').value || "";
-    const aNotes = document.getElementById('attic_custom').value || "";
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
     
     const sections = [
-        {id: '68', head: '--- 6/8 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL68', head: '--- 6/8 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
-        {id: '80', head: '--- 8/0 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL80', head: '--- 8/0 DOUBLE ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
+        {id: '68', head: '--- 6/8 SINGLE DOORS ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
+        {id: 'DBL68', head: '--- 6/8 DOUBLE DOORS ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
+        {id: '80', head: '--- 8/0 SINGLE DOORS ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
+        {id: 'DBL80', head: '--- 8/0 DOUBLE DOORS ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
+        {id: 'atws', head: '--- ATTIC WS DOORS ---', sizes: doorSizes, types: ["LH", "RH"]},
         {id: 'AS', head: '--- ATTIC STAIRS ---', sizes: ["22x54", "25x54", "Scuttle"], types: ["QTY"]},
         {id: 'HR', head: '--- HANDRAIL ---', sizes: railLengths, types: ["OPEN", "WALL"]},
-        {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems, types: ["QTY"]},
+        {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems.filter(i=>i!=="Shoes"), types: ["QTY"]},
         {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]}
     ];
 
@@ -228,19 +225,19 @@
                 let val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
                 if(val > 0) {
                     let note = document.getElementById('NOTE_' + key)?.value;
-                    sectionText += `- ${sz} ${tp}: ${val}${state.fireRated && sec.id==='AS' ? ' (FIRE)' : ''}${note ? ' *'+note : ''}\n`;
+                    let fireTag = (state.fireRated && sec.id==='AS') ? ' (FIRE RATED)' : '';
+                    sectionText += `- ${sz} ${tp}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
                 }
             });
         });
         if(sectionText) report += sec.head + "\n" + sectionText + "\n";
     });
 
-    if(aNotes) report += `--- ATTIC CUSTOM ---\n${aNotes}\n\n`;
-    if(gNotes) report += `NOTES: ${gNotes}`;
+    if(gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}`;
     document.getElementById('summary').value = report;
     
     saveToHistory(report, `${sub} L${lot}`, {
-        customer: cust, subdivision: sub, lot: lot, notes: gNotes, attic: aNotes, state: JSON.parse(JSON.stringify(state))
+        customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state))
     });
   }
 
@@ -283,21 +280,14 @@
   function loadHistory(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history'));
     const item = history[index];
-    
-    // CRITICAL: Reset UI before loading new data
     resetAllUI();
-
     document.getElementById('summary').value = item.text;
     if (item.fullData) {
         document.getElementById('customer').value = item.fullData.customer || "";
         document.getElementById('subdivision').value = item.fullData.subdivision || "";
         document.getElementById('lot').value = item.fullData.lot || "";
         document.getElementById('notes').value = item.fullData.notes || "";
-        if(item.fullData.attic) document.getElementById('attic_custom').value = item.fullData.attic;
-        
         state = JSON.parse(JSON.stringify(item.fullData.state));
-        
-        // Loop through the state and light up buttons
         Object.keys(state).forEach(key => {
             const el = document.getElementById('qty-' + key);
             if(el) {
@@ -306,8 +296,9 @@
             }
             const inp = document.getElementById('inp-' + key);
             if(inp) inp.value = state[key] || "";
+            const noteEl = document.getElementById('NOTE_' + key);
+            if(noteEl && state['NOTE_'+key]) noteEl.value = state['NOTE_'+key];
         });
-
         if(document.getElementById('fire-status')) {
             document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
         }
