@@ -96,7 +96,6 @@
     
     #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
     
-    /* SYNCED HISTORY STYLES */
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
     .history-item:last-child { border: 0; }
     .history-controls { display: flex; gap: 12px; align-items: center; }
@@ -136,15 +135,13 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="section-title bg-slate" onclick="toggleSection('history', this)">
-  <span>Takeoff History (Last 10)</span><span class="chevron"></span>
-</div>
-<div id="content-history" class="section-content">
-  <div id="history-list" style="padding: 0 8px; background: #fff; border-radius: 8px;"></div>
-  <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
+<div class="header-card" style="margin-top:20px; text-align: left;">
+    <label>Takeoff History (Last 10)</label>
+    <div id="history-list" style="background: #fff; border-radius: 8px;"></div>
+    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.4.2 - Updated Switchback</div>
+<div class="version-tag">Version 1.4.2 - Synced Switchback</div>
 
 <script>
   let state = { fireRated: false };
@@ -327,9 +324,12 @@
 
   window.onload = renderHistory;
 
+  // CRITICAL: Updated to use the single main service worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker-old.js');
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log('Classic Synced with Main SW'))
+        .catch(err => console.log('SW Error', err));
     });
   }
 </script>
