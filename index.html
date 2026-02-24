@@ -144,7 +144,7 @@
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
   <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear current fields?')) location.reload()">Reset Current Fields</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="resetCurrentFields()">Reset All Fields</button>
 </div>
 
 <div class="history-section">
@@ -153,7 +153,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.7 - Sync Logic Unified</div>
+<div class="version-tag">Version 1.9.8 - Master Reset Enabled</div>
 
 <script>
   let state = { fireRated: false };
@@ -167,7 +167,6 @@
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
   const directInputItems = ["Brackets", "Balusters", "Shoes"];
 
-  // SYNC HELPER: Matches the Classic naming convention (Prefix_Label-With-Dashes_Type)
   function getSyncKey(sectionId, label, type) {
     let cleanLabel = label.replace(/[\/ ']/g, "-");
     return `${sectionId}_${cleanLabel}_${type}`;
@@ -191,17 +190,12 @@
 
     types.forEach(type => {
       const key = getSyncKey(sectionId, label, type);
-      const noteKey = `NOTE_${key}`;
       const qty = state[key] || 0;
-      const savedNote = state[noteKey] || "";
+      const savedNote = state[`NOTE_${key}`] || "";
       const greenClass = qty > 0 ? 'active-qty' : '';
-      let controlHtml = "";
-
-      if (useDirectInput) {
-        controlHtml = `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">`;
-      } else {
-        controlHtml = `<div style="display:flex; align-items:center; gap:12px;"><button class="btn" onclick="updateModalQty('${key}', -1)">-</button><span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span><button class="btn" onclick="updateModalQty('${key}', 1)">+</button></div>`;
-      }
+      let controlHtml = useDirectInput ? 
+        `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">` :
+        `<div style="display:flex; align-items:center; gap:12px;"><button class="btn" onclick="updateModalQty('${key}', -1)">-</button><span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span><button class="btn" onclick="updateModalQty('${key}', 1)">+</button></div>`;
 
       container.innerHTML += `<div class="modal-type-block"><div class="modal-counter-row"><label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>${controlHtml}</div><input type="text" id="mnote-${key}" value="${savedNote}" placeholder="Notes..." style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;"></div>`;
     });
@@ -265,13 +259,11 @@
         if (types.length === 2) {
           if (index === 0) { leftB.innerText = `${t}:${qty}`; leftB.classList.add('active'); }
           else { rightB.innerText = `${t}:${qty}`; rightB.classList.add('active'); }
-        } 
-        else if (types.length === 3) {
+        } else if (types.length === 3) {
           if (t === "LH") { leftB.innerText = `L:${qty}`; leftB.classList.add('active'); }
           else if (t === "RH") { rightB.innerText = `R:${qty}`; rightB.classList.add('active'); }
           else { centerB.innerText = `S:${qty}`; centerB.classList.add('active'); }
-        }
-        else { centerB.innerText = qty; centerB.classList.add('active'); }
+        } else { centerB.innerText = qty; centerB.classList.add('active'); }
       }
     });
   }
@@ -285,8 +277,7 @@
     const grid = document.createElement('div'); grid.className = 'item-grid';
     items.forEach(item => {
       const card = document.createElement('div'); card.className = 'item-card';
-      const cleanItem = item.replace(/[\/ ']/g, "-");
-      card.id = `card-${sectionId}-${cleanItem}`;
+      card.id = `card-${sectionId}-${item.replace(/[\/ ']/g, "-")}`;
       card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
       card.onclick = () => openModal(sectionId, item, types);
       grid.appendChild(card);
@@ -310,13 +301,10 @@
     title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
     title.onclick = () => toggleSection(sec.id, title);
     const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
-    
     if (sec.id === "sp") {
       const grid = document.createElement('div'); grid.className = 'item-grid';
       sec.items.forEach(item => {
-          let itemTypes = ["QTY"];
-          if (railLengths.includes(item)) itemTypes = ["OPEN", "WALL"];
-          if (item === "Shoes") itemTypes = ["FLAT", "ANGLE"];
+          let itemTypes = (railLengths.includes(item)) ? ["OPEN", "WALL"] : (item === "Shoes" ? ["FLAT", "ANGLE"] : ["QTY"]);
           const card = document.createElement('div'); card.className = 'item-card';
           card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
           card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
@@ -324,10 +312,7 @@
           grid.appendChild(card);
       });
       content.appendChild(grid);
-    } else {
-      content.appendChild(renderGrid(sec.id, sec.items, sec.types));
-    }
-
+    } else { content.appendChild(renderGrid(sec.id, sec.items, sec.types)); }
     if(sec.id === "atst") {
       const fireBtn = document.createElement('button'); fireBtn.id = "fire-status"; fireBtn.className = "item-card";
       fireBtn.style.width = "calc(100% - 16px)"; fireBtn.style.margin = "8px"; fireBtn.innerText = "FIRE RATED: NO"; fireBtn.onclick = toggleFire;
@@ -335,6 +320,17 @@
     }
     appContainer.appendChild(title); appContainer.appendChild(content);
   });
+
+  function resetCurrentFields() {
+    if(confirm('Clear all data for this lot?')) {
+        state = { fireRated: false };
+        localStorage.removeItem('bfs_draft_modern');
+        document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
+        refreshAllCards();
+        window.scrollTo(0,0);
+        alert('All fields reset.');
+    }
+  }
 
   function generateSummary() {
     const cust = document.getElementById('customer').value || "NA";
@@ -362,7 +358,7 @@
             const fireLabel = (g.id === "atst" && state.fireRated) ? " (FIRE RATED)" : "";
             const cleanType = (t === "QTY") ? "" : ` ${t}`;
             groupContent += `- ${item}${g.suffix}${cleanType} -- ${state[key]}${fireLabel}`;
-            if(state[`NOTE_${key}`]) { groupContent += `\n    *Note: ${state[`NOTE_${key}`]}`; }
+            if(state[`NOTE_${key}`]) groupContent += `\n    *Note: ${state[`NOTE_${key}`]}`;
             groupContent += `\n`;
           }
         });
@@ -372,10 +368,7 @@
     
     if(gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
     document.getElementById('summary').value = report;
-    
-    saveToHistory(report, `${sub} L${lot}`, {
-        customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state))
-    });
+    saveToHistory(report, `${sub} L${lot}`, { customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state)) });
   }
 
   function saveToHistory(text, label, fullData) {
@@ -394,14 +387,7 @@
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     list.innerHTML = history.length ? "" : "<p style='font-size:11px; color:#94a3b8;'>No recent takeoffs.</p>";
     history.forEach((item, index) => {
-      list.innerHTML += `
-        <div class="history-item">
-          <span><b>${item.label}</b> <br><small style="color:#64748b">${item.time}</small></span>
-          <div class="history-controls">
-            <button class="load-btn" onclick="loadHistory(${index})">LOAD</button>
-            <button class="del-btn" onclick="deleteHistoryItem(${index})">X</button>
-          </div>
-        </div>`;
+      list.innerHTML += `<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time}</small></span><div class="history-controls"><button class="load-btn" onclick="loadHistory(${index})">LOAD</button><button class="del-btn" onclick="deleteHistoryItem(${index})">X</button></div></div>`;
     });
   }
 
@@ -424,18 +410,15 @@
         document.getElementById('lot').value = item.fullData.lot || "";
         document.getElementById('notes').value = item.fullData.notes || "";
         state = JSON.parse(JSON.stringify(item.fullData.state));
-        refreshAllCards(); // This lights up the green cards
+        refreshAllCards();
     }
     document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
     const toast = document.getElementById("toast");
-    toast.innerText = "TAKEOFF LOADED";
-    toast.classList.add("show");
+    toast.innerText = "TAKEOFF LOADED"; toast.classList.add("show");
     setTimeout(() => { toast.classList.remove("show"); toast.innerText = "TEXT COPIED"; }, 2000);
   }
 
-  function clearHistory() {
-      if(confirm('Delete all history?')) { localStorage.removeItem('bfs_history'); renderHistory(); }
-  }
+  function clearHistory() { if(confirm('Delete all history?')) { localStorage.removeItem('bfs_history'); renderHistory(); } }
 
   function copySummary() {
     const summaryText = document.getElementById("summary").value;
@@ -448,14 +431,6 @@
   }
 
   renderHistory();
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('Modern Synced with Unified SW'))
-        .catch(err => console.log('SW Error', err));
-    });
-  }
 </script>
 </body>
 </html>
