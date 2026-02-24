@@ -21,6 +21,9 @@
     
     .input-row { display: flex; gap: 8px; margin-bottom: 4px; }
     .input-group { flex: 1; }
+    /* Specific Widths for 2nd Row */
+    .w-75 { flex: 0 0 75%; }
+    .w-25 { flex: 0 0 22%; } /* Adjusted slightly for gap spacing */
 
     .section-title { 
       color: #fff; padding: 14px; font-weight: 800; font-size: 14px; 
@@ -31,6 +34,7 @@
     }
     .bg-navy { background: var(--navy); }
     .bg-red { background: var(--bfs-red); }
+    .bg-slate { background: var(--slate); }
     
     .section-content { display: none; padding-top: 8px; }
     .section-content.active { display: block; }
@@ -75,6 +79,17 @@
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     
     #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
+    
+    /* History Styles */
+    .history-item { 
+      background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; margin-bottom: 6px; 
+      border-radius: 6px; display: flex; justify-content: space-between; align-items: center;
+      text-align: left;
+    }
+    .history-info { flex-grow: 1; font-size: 12px; font-weight: bold; color: var(--navy); }
+    .history-date { font-size: 10px; color: #64748b; display: block; font-weight: normal; }
+    .history-btn { padding: 6px 10px; font-size: 11px; font-weight: bold; background: var(--navy); color: white; border: 0; border-radius: 4px; }
+
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
@@ -90,20 +105,16 @@
      <label>Customer</label>
       <input id="customer" type="text" placeholder="e.g. Pulte">
     </div>
-    <div class="input-group">
-     <label>Subdivision</label>
-      <input id="subdivision" type="text" placeholder="e.g. Huxley">
-    </div>
   </div>
 
   <div class="input-row">
-    <div class="input-group">
+    <div class="input-group w-75">
+     <label>Subdivision</label>
+      <input id="subdivision" type="text" placeholder="e.g. Huxley">
+    </div>
+    <div class="input-group w-25">
       <label>Lot #</label>
       <input id="lot" type="text" placeholder="104">
-    </div>
-    <div class="input-group">
-     <label>Plan</label>
-      <input id="plan" type="text" placeholder="2400">
     </div>
   </div>
 </div>
@@ -121,7 +132,14 @@
   <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
 </div>
 
-<div class="version-tag">Version 1.3.4 - CLASSIC EDITION</div>
+<div class="section-title bg-slate" onclick="toggleSection('history', this)">
+  <span>Takeoff History (Last 10)</span><span class="chevron"></span>
+</div>
+<div id="content-history" class="section-content">
+  <div id="history-list" style="padding: 0 8px;"></div>
+</div>
+
+<div class="version-tag">Version 1.4.0 - CLASSIC EDITION</div>
 
 <script>
   const state = { fireRated: false };
@@ -215,8 +233,7 @@
     const cust = document.getElementById('customer').value || "N/A";
     const sub = document.getElementById('subdivision').value || "N/A";
     const lot = document.getElementById('lot').value || "N/A";
-    const plan = document.getElementById('plan').value || "N/A";
-    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot} | Plan: ${plan}\n----------------------------\n`;
+    let out = `TAKEOFF: ${cust} | ${sub} | Lot: ${lot}\n----------------------------\n`;
     
     const sections = [
         {id: '68', head: '--- 6/8 SINGLE ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
@@ -258,6 +275,51 @@
     const notes = document.getElementById('notes').value;
     if(notes) out += "----------------------------\nNOTES: " + notes;
     document.getElementById('summary').value = out;
+
+    saveToHistory(cust, sub, lot, out);
+  }
+
+  function saveToHistory(cust, sub, lot, text) {
+    let history = JSON.parse(localStorage.getItem('takeoffHistoryClassic') || '[]');
+    const newEntry = {
+      id: Date.now(),
+      title: `${cust} - ${sub} (Lot ${lot})`,
+      date: new Date().toLocaleString(),
+      summary: text
+    };
+    history.unshift(newEntry);
+    if(history.length > 10) history.pop();
+    localStorage.setItem('takeoffHistoryClassic', JSON.stringify(history));
+    loadHistory();
+  }
+
+  function loadHistory() {
+    const history = JSON.parse(localStorage.getItem('takeoffHistoryClassic') || '[]');
+    const container = document.getElementById('history-list');
+    container.innerHTML = history.length ? '' : '<p style="font-size:12px; color:#64748b; text-align:center;">No history yet.</p>';
+    
+    history.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML = `
+        <div class="history-info">
+          ${item.title}
+          <span class="history-date">${item.date}</span>
+        </div>
+        <button class="history-btn" onclick="restoreHistory('${item.id}')">LOAD</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function restoreHistory(id) {
+    const history = JSON.parse(localStorage.getItem('takeoffHistoryClassic') || '[]');
+    const entry = history.find(e => e.id == id);
+    if(entry) {
+      document.getElementById('summary').value = entry.summary;
+      document.getElementById('summary').scrollIntoView({behavior: 'smooth'});
+      alert("Takeoff text restored to the summary box!");
+    }
   }
 
   function copySummary() {
@@ -275,7 +337,8 @@
     }, 1500);
   }
 
-  // --- SERVICE WORKER REGISTRATION FOR CLASSIC VERSION ---
+  window.onload = loadHistory;
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker-old.js')
