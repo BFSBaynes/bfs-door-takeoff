@@ -50,6 +50,7 @@
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     #summary { background: #fff; height: 350px; margin-top: 8px; font-family: sans-serif; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space: pre-wrap; }
+    #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227, 24, 55, 0.1); }
     .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
     .history-controls { display: flex; gap: 12px; align-items: center; }
@@ -88,7 +89,7 @@
   </div>
 </div>
 
-<div class="header-card" style="margin-top:15px;">
+<div class="header-card" style="margin-top:15px;" id="summary-section">
   <label>General Project Notes</label>
   <textarea id="notes" placeholder="Notes..." oninput="saveState()"></textarea>
   <div class="actions">
@@ -105,7 +106,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.0.0 - Full Sync Active</div>
+<div class="version-tag">Version 2.1.0 - Summary Sync Active</div>
 
 <script>
   let state = { fireRated: false };
@@ -135,9 +136,11 @@
       subdivision: document.getElementById('subdivision').value,
       lot: document.getElementById('lot').value,
       notes: document.getElementById('notes').value,
+      summaryText: document.getElementById('summary').value,
       state: state
     };
     localStorage.setItem('bfs_active_work', JSON.stringify(fullData));
+    updateSummaryStyle();
   }
 
   function loadActiveState() {
@@ -148,8 +151,10 @@
       document.getElementById('subdivision').value = data.subdivision || "";
       document.getElementById('lot').value = data.lot || "";
       document.getElementById('notes').value = data.notes || "";
+      document.getElementById('summary').value = data.summaryText || "";
       state = data.state || { fireRated: false };
       refreshAllCards();
+      updateSummaryStyle();
     }
   }
 
@@ -217,9 +222,7 @@
       sec.items.forEach(item => {
         let types = sec.types || [];
         if (sec.id === "sp") {
-            types = ["QTY"];
-            if (railLengths.includes(item)) types = ["OPEN", "WALL"];
-            if (item === "Shoes") types = ["FLAT", "ANGLE"];
+            types = (railLengths.includes(item)) ? ["OPEN", "WALL"] : (item === "Shoes" ? ["FLAT", "ANGLE"] : ["QTY"]);
         }
         const cardId = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
         const card = document.getElementById(cardId);
@@ -265,33 +268,6 @@
     saveState();
   }
 
-  const appContainer = document.getElementById('app-content');
-  layout.forEach(sec => {
-    const title = document.createElement('div'); title.className = `section-title ${sec.color}`;
-    title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
-    title.onclick = () => toggleSection(sec.id, title);
-    const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
-    const grid = document.createElement('div'); grid.className = 'item-grid';
-    sec.items.forEach(item => {
-        let itemTypes = sec.types || [];
-        if (sec.id === "sp") {
-            itemTypes = (railLengths.includes(item)) ? ["OPEN", "WALL"] : (item === "Shoes" ? ["FLAT", "ANGLE"] : ["QTY"]);
-        }
-        const card = document.createElement('div'); card.className = 'item-card';
-        card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
-        card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
-        card.onclick = () => openModal(sec.id, item, itemTypes);
-        grid.appendChild(card);
-    });
-    content.appendChild(grid);
-    if(sec.id === "AS") {
-      const fireBtn = document.createElement('button'); fireBtn.id = "fire-status"; fireBtn.className = "item-card";
-      fireBtn.style.width = "calc(100% - 16px)"; fireBtn.style.margin = "8px"; fireBtn.innerText = "FIRE RATED: NO"; fireBtn.onclick = toggleFire;
-      content.appendChild(fireBtn);
-    }
-    appContainer.appendChild(title); appContainer.appendChild(content);
-  });
-
   function generateSummary() {
     const cust = document.getElementById('customer').value || "NA";
     const sub = document.getElementById('subdivision').value || "NA";
@@ -330,7 +306,14 @@
     
     if(gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
     document.getElementById('summary').value = report;
+    saveState();
+    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
     saveToHistory(report, `${sub} L${lot}`, { customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state)) });
+  }
+
+  function updateSummaryStyle() {
+    const s = document.getElementById('summary');
+    s.value.length > 0 ? s.classList.add('has-text') : s.classList.remove('has-text');
   }
 
   function saveToHistory(text, label, fullData) {
@@ -353,15 +336,6 @@
     });
   }
 
-  function deleteHistoryItem(index) {
-      if(confirm('Delete this?')) {
-          let h = JSON.parse(localStorage.getItem('bfs_history'));
-          h.splice(index, 1);
-          localStorage.setItem('bfs_history', JSON.stringify(h));
-          renderHistory();
-      }
-  }
-
   function loadHistory(index) {
     const h = JSON.parse(localStorage.getItem('bfs_history'))[index];
     document.getElementById('summary').value = h.text;
@@ -374,20 +348,20 @@
         refreshAllCards();
         saveState();
     }
-    document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
   }
 
   function resetCurrentFields() {
     if(confirm('Reset current lot?')) {
         state = { fireRated: false };
+        document.getElementById('summary').value = "";
         localStorage.removeItem('bfs_active_work');
         document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
         refreshAllCards();
+        updateSummaryStyle();
         window.scrollTo(0,0);
     }
   }
-
-  function clearHistory() { if(confirm('Clear history?')) { localStorage.removeItem('bfs_history'); renderHistory(); } }
 
   function copySummary() {
     const s = document.getElementById("summary");
@@ -397,6 +371,34 @@
       setTimeout(() => t.classList.remove("show"), 2000);
     });
   }
+
+  // --- Initial Layout Building ---
+  const appContainer = document.getElementById('app-content');
+  layout.forEach(sec => {
+    const title = document.createElement('div'); title.className = `section-title ${sec.color}`;
+    title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
+    title.onclick = () => toggleSection(sec.id, title);
+    const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
+    const grid = document.createElement('div'); grid.className = 'item-grid';
+    sec.items.forEach(item => {
+        let itemTypes = sec.types || [];
+        if (sec.id === "sp") {
+            itemTypes = (railLengths.includes(item)) ? ["OPEN", "WALL"] : (item === "Shoes" ? ["FLAT", "ANGLE"] : ["QTY"]);
+        }
+        const card = document.createElement('div'); card.className = 'item-card';
+        card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
+        card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
+        card.onclick = () => openModal(sec.id, item, itemTypes);
+        grid.appendChild(card);
+    });
+    content.appendChild(grid);
+    if(sec.id === "AS") {
+      const fireBtn = document.createElement('button'); fireBtn.id = "fire-status"; fireBtn.className = "item-card";
+      fireBtn.style.width = "calc(100% - 16px)"; fireBtn.style.margin = "8px"; fireBtn.innerText = "FIRE RATED: NO"; fireBtn.onclick = toggleFire;
+      content.appendChild(fireBtn);
+    }
+    appContainer.appendChild(title); appContainer.appendChild(content);
+  });
 
   renderHistory();
   loadActiveState();
