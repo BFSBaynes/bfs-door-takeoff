@@ -2,7 +2,9 @@ const CACHE_NAME = "door-takeoff-v1.9.4";
 const ASSETS = [
   "./",
   "./index.html",
+  "./classic.html",        // Added: This allows classic to work offline
   "./manifest.json",
+  "./manifest-old.json",   // Added: Just in case classic needs its manifest
   "./service-worker.js",
   "./icon-192.png",
   "./icon-512.png"
