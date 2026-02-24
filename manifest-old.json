@@ -1,7 +1,7 @@
 {
   "name": "Elevate Trim - CLASSIC",
   "short_name": "BFS Classic",
-  "start_url": "./test.html",
+  "start_url": "./classic.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
