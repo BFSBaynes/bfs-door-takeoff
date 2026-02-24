@@ -97,11 +97,11 @@
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
   <div class="input-row">
-    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="e.g. Pulte"></div>
+    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="e.g. Pulte" oninput="saveActiveState()"></div>
   </div>
   <div class="input-row">
-    <div class="input-group w-75"><label>Subdivision</label><input id="subdivision" type="text" placeholder="e.g. Huxley"></div>
-    <div class="input-group w-25"><label>Lot #</label><input id="lot" type="text" placeholder="104"></div>
+    <div class="input-group w-75"><label>Subdivision</label><input id="subdivision" type="text" placeholder="e.g. Huxley" oninput="saveActiveState()"></div>
+    <div class="input-group w-25"><label>Lot #</label><input id="lot" type="text" placeholder="104" oninput="saveActiveState()"></div>
   </div>
 </div>
 
@@ -109,7 +109,7 @@
 
 <div class="header-card" style="margin-top:15px;">
   <label>Notes & Summary</label>
-  <textarea id="notes" placeholder="General Notes..."></textarea>
+  <textarea id="notes" placeholder="General Notes..." oninput="saveActiveState()"></textarea>
   <div class="actions">
     <button class="actionBtn" style="background:var(--navy); color:white;" onclick="generateSummary()">Generate Takeoff</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
@@ -124,7 +124,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.8 - Category & Sync Lock</div>
+<div class="version-tag">Version 1.9.9 - Live Sync Enabled</div>
 
 <script>
   let state = { fireRated: false };
@@ -132,6 +132,59 @@
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
+
+  // --- SYNC LOGIC ---
+  function saveActiveState() {
+    // Capture values from any direct-input number fields before saving
+    document.querySelectorAll('.qty-input').forEach(inp => {
+        const key = inp.id.replace('inp-', '');
+        state[key] = parseInt(inp.value) || 0;
+    });
+    // Capture all notes
+    document.querySelectorAll('.note-box').forEach(note => {
+        state[note.id] = note.value;
+    });
+
+    const fullData = {
+      customer: document.getElementById('customer').value,
+      subdivision: document.getElementById('subdivision').value,
+      lot: document.getElementById('lot').value,
+      notes: document.getElementById('notes').value,
+      state: state
+    };
+    localStorage.setItem('bfs_active_work', JSON.stringify(fullData));
+  }
+
+  function loadActiveState() {
+    const saved = localStorage.getItem('bfs_active_work');
+    if (saved) {
+      const data = JSON.parse(saved);
+      document.getElementById('customer').value = data.customer || "";
+      document.getElementById('subdivision').value = data.subdivision || "";
+      document.getElementById('lot').value = data.lot || "";
+      document.getElementById('notes').value = data.notes || "";
+      state = data.state || { fireRated: false };
+      refreshUI();
+    }
+  }
+
+  function refreshUI() {
+    Object.keys(state).forEach(key => {
+        const el = document.getElementById('qty-' + key);
+        if(el) {
+            el.innerText = state[key];
+            state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
+        }
+        const inp = document.getElementById('inp-' + key);
+        if(inp) inp.value = state[key] || "";
+        
+        const noteBox = document.getElementById('NOTE_' + key);
+        if(noteBox && state['NOTE_'+key] !== undefined) noteBox.value = state['NOTE_'+key];
+    });
+    if(document.getElementById('fire-status')) {
+        document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    }
+  }
 
   function update(key, delta, btnEl) {
     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(10);
@@ -144,11 +197,13 @@
     const box = btnEl.closest('.counter-box');
     box.classList.add('pulse-flash');
     setTimeout(() => box.classList.remove('pulse-flash'), 200);
+    saveActiveState();
   }
 
   function toggleFire() {
     state.fireRated = !state.fireRated;
     document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    saveActiveState();
   }
 
   function toggleSection(id, headerEl) {
@@ -165,11 +220,11 @@
       let isHighVolume = (label === "Balusters" || label === "Shoes" || label === "Brackets");
       html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">`;
       if (isHighVolume) {
-        html += `<input type="number" class="qty-input" id="inp-${key}" oninput="state['${key}']=parseInt(this.value)||0" placeholder="0">`;
+        html += `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState()" placeholder="0">`;
       } else {
         html += `<button class="btn" onclick="update('${key}', -1, this)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1, this)">+</button>`;
       }
-      html += `</div><input type="text" id="NOTE_${key}" class="note-box" placeholder="Note"></div>`;
+      html += `</div><input type="text" id="NOTE_${key}" class="note-box" placeholder="Note" oninput="saveActiveState()"></div>`;
     });
     return html + `</div></div>`;
   }
@@ -191,7 +246,7 @@
 
   function resetAllUI() {
     state = { fireRated: false };
-    localStorage.removeItem('bfs_draft_classic'); // Clears draft memory
+    localStorage.removeItem('bfs_active_work'); 
     document.querySelectorAll('.qty').forEach(el => { el.innerText = "0"; el.classList.remove('has-qty'); });
     document.querySelectorAll('.qty-input, .note-box, input[type="text"], textarea').forEach(el => el.value = "");
     document.getElementById('fire-status').innerText = "NO";
@@ -280,7 +335,7 @@
   function loadHistory(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history'));
     const item = history[index];
-    state = { fireRated: false }; // Hard reset state
+    state = { fireRated: false }; 
     document.querySelectorAll('.qty').forEach(el => { el.innerText = "0"; el.classList.remove('has-qty'); });
     document.querySelectorAll('.qty-input, .note-box, input[type="text"], textarea').forEach(el => el.value = "");
 
@@ -291,18 +346,8 @@
         document.getElementById('lot').value = item.fullData.lot || "";
         document.getElementById('notes').value = item.fullData.notes || "";
         state = JSON.parse(JSON.stringify(item.fullData.state));
-        Object.keys(state).forEach(key => {
-            const el = document.getElementById('qty-' + key);
-            if(el) {
-                el.innerText = state[key];
-                state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
-            }
-            const inp = document.getElementById('inp-' + key);
-            if(inp) inp.value = state[key] || "";
-        });
-        if(document.getElementById('fire-status')) {
-            document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
-        }
+        refreshUI();
+        saveActiveState(); // Ensure this loaded history syncs to Modern version
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -318,7 +363,10 @@
     alert("Copied!");
   }
 
-  window.onload = renderHistory;
+  window.onload = () => {
+    renderHistory();
+    loadActiveState();
+  };
 
 </script>
 </body>
