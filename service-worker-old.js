@@ -1,7 +1,7 @@
 const CACHE_NAME = "door-takeoff-OLD-v1"; // Distinct name
 const ASSETS = [
   "./",
-  "./test.html",           // Points to the version they like
+  "./classic.html",           // Points to the version they like
   "./manifest-old.json",   // We will create this next
   "./service-worker-old.js",
   "./icon-192.png",
