@@ -118,11 +118,11 @@
 <div class="header-card">
   <img src="icon-512.png" alt="Elevate Trim Logo" class="app-logo">
   <div class="input-row">
-    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="Pulte"></div>
+    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="Pulte" oninput="saveState()"></div>
   </div>
   <div class="input-row">
-    <div class="input-group" style="flex: 0.75;"><label>Subdivision</label><input id="subdivision" type="text" placeholder="Huxley"></div>
-    <div class="input-group" style="flex: 0.25;"><label>Lot #</label><input id="lot" type="text" placeholder="104"></div>
+    <div class="input-group" style="flex: 0.75;"><label>Subdivision</label><input id="subdivision" type="text" placeholder="Huxley" oninput="saveState()"></div>
+    <div class="input-group" style="flex: 0.25;"><label>Lot #</label><input id="lot" type="text" placeholder="104" oninput="saveState()"></div>
   </div>
 </div>
 
@@ -138,7 +138,7 @@
 
 <div class="header-card" style="margin-top:15px;">
   <label>General Project Notes</label>
-  <textarea id="notes" placeholder="Example: Key code, delivery instructions..."></textarea>
+  <textarea id="notes" placeholder="Example: Key code, delivery instructions..." oninput="saveState()"></textarea>
   <div class="actions">
     <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="generateSummary()">Generate Takeoff</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
@@ -153,7 +153,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.8 - Master Reset Enabled</div>
+<div class="version-tag">Version 1.9.9 - Live Sync Enabled</div>
 
 <script>
   let state = { fireRated: false };
@@ -166,6 +166,31 @@
   const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
   const directInputItems = ["Brackets", "Balusters", "Shoes"];
+
+  // --- SYNC LOGIC ---
+  function saveState() {
+    const fullData = {
+      customer: document.getElementById('customer').value,
+      subdivision: document.getElementById('subdivision').value,
+      lot: document.getElementById('lot').value,
+      notes: document.getElementById('notes').value,
+      state: state
+    };
+    localStorage.setItem('bfs_active_work', JSON.stringify(fullData));
+  }
+
+  function loadActiveState() {
+    const saved = localStorage.getItem('bfs_active_work');
+    if (saved) {
+      const data = JSON.parse(saved);
+      document.getElementById('customer').value = data.customer || "";
+      document.getElementById('subdivision').value = data.subdivision || "";
+      document.getElementById('lot').value = data.lot || "";
+      document.getElementById('notes').value = data.notes || "";
+      state = data.state || { fireRated: false };
+      refreshAllCards();
+    }
+  }
 
   function getSyncKey(sectionId, label, type) {
     let cleanLabel = label.replace(/[\/ ']/g, "-");
@@ -218,6 +243,7 @@
       if(noteInput) state[`NOTE_${key}`] = noteInput.value.trim();
     });
     refreshAllCards();
+    saveState();
     document.getElementById('itemModal').style.display = 'none';
   }
 
@@ -271,6 +297,7 @@
   function toggleFire() {
     state.fireRated = !state.fireRated;
     refreshAllCards();
+    saveState();
   }
 
   function renderGrid(sectionId, items, types) {
@@ -324,7 +351,7 @@
   function resetCurrentFields() {
     if(confirm('Clear all data for this lot?')) {
         state = { fireRated: false };
-        localStorage.removeItem('bfs_draft_modern');
+        localStorage.removeItem('bfs_active_work');
         document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
         refreshAllCards();
         window.scrollTo(0,0);
@@ -411,6 +438,7 @@
         document.getElementById('notes').value = item.fullData.notes || "";
         state = JSON.parse(JSON.stringify(item.fullData.state));
         refreshAllCards();
+        saveState(); // Update the shared "active" file
     }
     document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
     const toast = document.getElementById("toast");
@@ -431,6 +459,7 @@
   }
 
   renderHistory();
+  loadActiveState(); // Load work whenever page opens
 </script>
 </body>
 </html>
