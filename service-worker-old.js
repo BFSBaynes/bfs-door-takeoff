@@ -1,5 +1,5 @@
 // Update the version number here to force a refresh
-const CACHE_NAME = "door-takeoff-OLD-v1.4.1"; 
+const CACHE_NAME = "door-takeoff-OLD-v1.4.2"; 
 const ASSETS = [
   "./",
   "./classic.html",
