@@ -1,8 +1,8 @@
-const CACHE_NAME = "door-takeoff-OLD-v1"; // Distinct name
+const CACHE_NAME = "door-takeoff-OLD-v1.4.0"; // Updated version to force update
 const ASSETS = [
   "./",
-  "./classic.html",           // Points to the version they like
-  "./manifest-old.json",   // We will create this next
+  "./classic.html",
+  "./manifest-old.json",
   "./service-worker-old.js",
   "./icon-192.png",
   "./icon-512.png"
@@ -22,7 +22,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((k) => {
-          // Only delete caches that belong to THIS version
+          // This deletes any old "OLD" caches that aren't the current v1.4.0
           if (k.includes("door-takeoff-OLD") && k !== CACHE_NAME) {
              return caches.delete(k);
           }
