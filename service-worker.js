@@ -1,4 +1,4 @@
-const CACHE_NAME = "door-takeoff-v2.0.0"; // Increment this to force an update
+const CACHE_NAME = "door-takeoff-v2.1.0"; // Increment this to force an update
 const ASSETS = [
   "./",
   "./index.html",
