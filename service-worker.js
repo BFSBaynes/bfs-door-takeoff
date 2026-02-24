@@ -2,23 +2,23 @@ const CACHE_NAME = "door-takeoff-v1.9.4";
 const ASSETS = [
   "./",
   "./index.html",
-  "./classic.html",        // Added: This allows classic to work offline
+  "./classic.html",
   "./manifest.json",
-  "./manifest-old.json",   // Added: Just in case classic needs its manifest
-  "./service-worker.js",
   "./icon-192.png",
   "./icon-512.png"
 ];
 
-// Install: Cache all files
+// Install: Cache all essential files
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS);
+    })
   );
   self.skipWaiting();
 });
 
-// Activate: Cleanup old caches
+// Activate: Cleanup old caches to free up space
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -32,7 +32,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: Network first, fallback to cache
+// Fetch: Try the network first, fall back to cache if offline
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request).catch(() => {
