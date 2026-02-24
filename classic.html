@@ -23,21 +23,11 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
     
-    /* MODE SWITCH BUTTON */
     .mode-switch {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 999;
-      background: var(--bfs-red);
-      color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 800;
-      text-decoration: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      border: 2px solid white;
+      position: fixed; top: 10px; right: 10px; z-index: 999;
+      background: var(--bfs-red); color: white; padding: 6px 12px;
+      border-radius: 20px; font-size: 10px; font-weight: 800;
+      text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white;
     }
 
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
@@ -53,37 +43,25 @@
 
     .section-title { 
       color: #fff; padding: 14px; font-weight: 800; font-size: 14px; 
-      margin: 8px -8px; cursor: pointer;
-      display: flex; justify-content: space-between; align-items: center;
+      margin: 8px -8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
       text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
       position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .bg-navy { background: var(--navy); }
     .bg-red { background: var(--bfs-red); }
-    .bg-slate { background: var(--slate); }
     
     .section-content { display: none; padding-top: 8px; }
     .section-content.active { display: block; }
     
     .door-row { 
-      background: #fff; border-radius: 6px; padding: 8px; 
-      margin-bottom: 8px; 
-      display: flex; align-items: center; gap: 8px; 
-      border: 1px solid #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+      background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 8px; 
+      display: flex; align-items: center; gap: 8px; border: 1px solid #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
     }
-    .size-label { 
-      font-weight: 900; font-size: 13px; width: 48px; 
-      flex-shrink: 0; color: var(--navy); text-align: center;
-    }
-    
+    .size-label { font-weight: 900; font-size: 13px; width: 48px; flex-shrink: 0; color: var(--navy); text-align: center; }
     .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
     
-    .counter-box { 
-        display: flex; flex-direction: column; align-items: center; background: #fdfdfd; 
-        padding: 4px 2px; border: 1px solid #e2e8f0; border-radius: 4px; transition: background 0.2s; 
-    }
+    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px 2px; border: 1px solid #e2e8f0; border-radius: 4px; transition: background 0.2s; }
     .pulse-flash { background: #e0f2fe !important; }
-
     .counter-box label { font-size: 8px; margin-bottom: 2px; color: #64748b; font-weight: 900; text-transform: uppercase; }
     .btn-wrap { display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
     
@@ -94,7 +72,6 @@
     .has-qty { color: var(--green) !important; font-size: 17px; }
 
     .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
-
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
     .attic-text-area { min-height: 80px; font-size: 14px; border: 1px dashed var(--navy); background: #fff; margin-top: 5px; }
 
@@ -107,7 +84,6 @@
     #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
     
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
-    .history-item:last-child { border: 0; }
     .history-controls { display: flex; gap: 12px; align-items: center; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
     .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
@@ -142,7 +118,7 @@
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
   <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) location.reload()">Reset All Fields</button>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="if(confirm('Clear all data?')) resetAllUI()">Reset All Fields</button>
 </div>
 
 <div class="header-card" style="margin-top:20px; text-align: left;">
@@ -151,13 +127,14 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.5 - Synced Switchback Corrected</div>
+<div class="version-tag">Version 1.9.6 - Universal Sync Enabled</div>
 
 <script>
   let state = { fireRated: false };
   const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "10'", "16'", "18'"];
+  // FIXED: Changed 10' to 12'
+  const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters"];
 
   function update(key, delta, btnEl) {
@@ -217,11 +194,19 @@
     <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
   `).join('');
 
+  function resetAllUI() {
+    state = { fireRated: false };
+    document.querySelectorAll('.qty').forEach(el => { el.innerText = "0"; el.classList.remove('has-qty'); });
+    document.querySelectorAll('.qty-input, .note-box, input[type="text"], textarea').forEach(el => el.value = "");
+    document.getElementById('fire-status').innerText = "NO";
+  }
+
   function generateSummary() {
     const cust = document.getElementById('customer').value || "NA";
     const sub = document.getElementById('subdivision').value || "NA";
     const lot = document.getElementById('lot').value || "NA";
     const gNotes = document.getElementById('notes').value || "";
+    const aNotes = document.getElementById('attic_custom').value || "";
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
     
     const sections = [
@@ -250,11 +235,12 @@
         if(sectionText) report += sec.head + "\n" + sectionText + "\n";
     });
 
+    if(aNotes) report += `--- ATTIC CUSTOM ---\n${aNotes}\n\n`;
     if(gNotes) report += `NOTES: ${gNotes}`;
     document.getElementById('summary').value = report;
     
     saveToHistory(report, `${sub} L${lot}`, {
-        customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state))
+        customer: cust, subdivision: sub, lot: lot, notes: gNotes, attic: aNotes, state: JSON.parse(JSON.stringify(state))
     });
   }
 
@@ -297,14 +283,21 @@
   function loadHistory(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history'));
     const item = history[index];
+    
+    // CRITICAL: Reset UI before loading new data
+    resetAllUI();
+
     document.getElementById('summary').value = item.text;
     if (item.fullData) {
         document.getElementById('customer').value = item.fullData.customer || "";
         document.getElementById('subdivision').value = item.fullData.subdivision || "";
         document.getElementById('lot').value = item.fullData.lot || "";
         document.getElementById('notes').value = item.fullData.notes || "";
+        if(item.fullData.attic) document.getElementById('attic_custom').value = item.fullData.attic;
+        
         state = JSON.parse(JSON.stringify(item.fullData.state));
         
+        // Loop through the state and light up buttons
         Object.keys(state).forEach(key => {
             const el = document.getElementById('qty-' + key);
             if(el) {
@@ -314,11 +307,12 @@
             const inp = document.getElementById('inp-' + key);
             if(inp) inp.value = state[key] || "";
         });
+
         if(document.getElementById('fire-status')) {
             document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
         }
     }
-    document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function clearHistory() {
@@ -334,7 +328,6 @@
 
   window.onload = renderHistory;
 
-  // CRITICAL: Pointing to the main service worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
