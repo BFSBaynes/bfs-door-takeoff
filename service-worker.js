@@ -1,4 +1,4 @@
-const CACHE_NAME = "door-takeoff-v1.9.8";
+const CACHE_NAME = "door-takeoff-v1.9.9"; // Increment this to force an update
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,19 +12,23 @@ const ASSETS = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      console.log("Caching assets...");
       return cache.addAll(ASSETS);
     })
   );
   self.skipWaiting();
 });
 
-// Activate: Cleanup old caches to free up space
+// Activate: Cleanup old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((k) => {
-          if (k !== CACHE_NAME) return caches.delete(k);
+          if (k !== CACHE_NAME) {
+            console.log("Removing old cache:", k);
+            return caches.delete(k);
+          }
         })
       );
     })
@@ -32,11 +36,13 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: Try the network first, fall back to cache if offline
+// Fetch: CACHE-FIRST (Faster for Job Sites)
+// This checks the cache first. If found, it loads instantly.
+// If not found, it goes to the network.
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
     })
   );
 });
