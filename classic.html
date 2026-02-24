@@ -124,7 +124,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.9 - Live Sync Enabled</div>
+<div class="version-tag">Version 2.0.0 - Full Sync Active</div>
 
 <script>
   let state = { fireRated: false };
@@ -133,14 +133,11 @@
   const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
 
-  // --- SYNC LOGIC ---
   function saveActiveState() {
-    // Capture values from any direct-input number fields before saving
     document.querySelectorAll('.qty-input').forEach(inp => {
         const key = inp.id.replace('inp-', '');
         state[key] = parseInt(inp.value) || 0;
     });
-    // Capture all notes
     document.querySelectorAll('.note-box').forEach(note => {
         state[note.id] = note.value;
     });
@@ -179,7 +176,9 @@
         if(inp) inp.value = state[key] || "";
         
         const noteBox = document.getElementById('NOTE_' + key);
-        if(noteBox && state['NOTE_'+key] !== undefined) noteBox.value = state['NOTE_'+key];
+        if(noteBox) {
+            noteBox.value = state['NOTE_'+key] || "";
+        }
     });
     if(document.getElementById('fire-status')) {
         document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
@@ -347,7 +346,7 @@
         document.getElementById('notes').value = item.fullData.notes || "";
         state = JSON.parse(JSON.stringify(item.fullData.state));
         refreshUI();
-        saveActiveState(); // Ensure this loaded history syncs to Modern version
+        saveActiveState();
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -367,7 +366,6 @@
     renderHistory();
     loadActiveState();
   };
-
 </script>
 </body>
 </html>
