@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
   <script>
-    // IMMEDIATE REDIRECT: Check if they actually prefer Modern
     if (localStorage.getItem('preferred_mode') === 'modern') {
       window.location.href = 'index.html';
     }
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  
   <meta name="theme-color" content="#0A2E4E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -126,7 +124,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 1.9.7 - Universal Sync Fixed</div>
+<div class="version-tag">Version 1.9.8 - Category & Sync Lock</div>
 
 <script>
   let state = { fireRated: false };
@@ -193,9 +191,11 @@
 
   function resetAllUI() {
     state = { fireRated: false };
+    localStorage.removeItem('bfs_draft_classic'); // Clears draft memory
     document.querySelectorAll('.qty').forEach(el => { el.innerText = "0"; el.classList.remove('has-qty'); });
     document.querySelectorAll('.qty-input, .note-box, input[type="text"], textarea').forEach(el => el.value = "");
     document.getElementById('fire-status').innerText = "NO";
+    alert('All fields cleared.');
   }
 
   function generateSummary() {
@@ -280,7 +280,10 @@
   function loadHistory(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history'));
     const item = history[index];
-    resetAllUI();
+    state = { fireRated: false }; // Hard reset state
+    document.querySelectorAll('.qty').forEach(el => { el.innerText = "0"; el.classList.remove('has-qty'); });
+    document.querySelectorAll('.qty-input, .note-box, input[type="text"], textarea').forEach(el => el.value = "");
+
     document.getElementById('summary').value = item.text;
     if (item.fullData) {
         document.getElementById('customer').value = item.fullData.customer || "";
@@ -296,8 +299,6 @@
             }
             const inp = document.getElementById('inp-' + key);
             if(inp) inp.value = state[key] || "";
-            const noteEl = document.getElementById('NOTE_' + key);
-            if(noteEl && state['NOTE_'+key]) noteEl.value = state['NOTE_'+key];
         });
         if(document.getElementById('fire-status')) {
             document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
@@ -319,13 +320,6 @@
 
   window.onload = renderHistory;
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('Classic Synced with Main SW'))
-        .catch(err => console.log('SW Error', err));
-    });
-  }
 </script>
 </body>
 </html>
