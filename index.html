@@ -53,9 +53,9 @@
     #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227, 24, 55, 0.1); }
     .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
-    .history-controls { display: flex; gap: 12px; align-items: center; }
-    .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; }
-    .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
+    .history-controls { display: flex; gap: 8px; align-items: center; }
+    .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
+    .load-btn { padding: 10px 15px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 70px; }
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
@@ -106,7 +106,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.1.0 - Summary Sync Active</div>
+<div class="version-tag">Version 2.1.1 - History Fix</div>
 
 <script>
   let state = { fireRated: false };
@@ -129,6 +129,39 @@
     { title: "Attic Stairs", id: "AS", color: "bg-red", items: ["22x54", "25x54", "Scuttle"], types: ["QTY"] },
     { title: "Stair Parts", id: "sp", color: "bg-navy", items: [...railLengths, ...stairItems] }
   ];
+
+  // Global Functions for History
+  window.loadHistory = function(index) {
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const h = history[index];
+    if (!h) return;
+
+    document.getElementById('summary').value = h.text;
+    if (h.fullData) {
+        document.getElementById('customer').value = h.fullData.customer || "";
+        document.getElementById('subdivision').value = h.fullData.subdivision || "";
+        document.getElementById('lot').value = h.fullData.lot || "";
+        document.getElementById('notes').value = h.fullData.notes || "";
+        state = JSON.parse(JSON.stringify(h.fullData.state));
+        refreshAllCards();
+        saveState();
+    }
+    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  window.deleteHistoryItem = function(index) {
+    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    history.splice(index, 1);
+    localStorage.setItem('bfs_history', JSON.stringify(history));
+    renderHistory();
+  };
+
+  window.clearHistory = function() {
+    if(confirm('Clear all takeoff history?')) {
+        localStorage.removeItem('bfs_history');
+        renderHistory();
+    }
+  };
 
   function saveState() {
     const fullData = {
@@ -244,6 +277,7 @@
     const leftB = card.querySelector('.badge-left');
     const rightB = card.querySelector('.badge-right');
     const centerB = card.querySelector('.badge-center');
+    if(!leftB) return;
     [leftB, rightB, centerB].forEach(b => { b.innerText = ""; b.classList.remove('active'); });
 
     types.forEach((t, index) => {
@@ -334,21 +368,6 @@
     history.forEach((item, index) => {
       list.innerHTML += `<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time}</small></span><div class="history-controls"><button class="load-btn" onclick="loadHistory(${index})">LOAD</button><button class="del-btn" onclick="deleteHistoryItem(${index})">X</button></div></div>`;
     });
-  }
-
-  function loadHistory(index) {
-    const h = JSON.parse(localStorage.getItem('bfs_history'))[index];
-    document.getElementById('summary').value = h.text;
-    if (h.fullData) {
-        document.getElementById('customer').value = h.fullData.customer || "";
-        document.getElementById('subdivision').value = h.fullData.subdivision || "";
-        document.getElementById('lot').value = h.fullData.lot || "";
-        document.getElementById('notes').value = h.fullData.notes || "";
-        state = JSON.parse(JSON.stringify(h.fullData.state));
-        refreshAllCards();
-        saveState();
-    }
-    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
   }
 
   function resetCurrentFields() {
