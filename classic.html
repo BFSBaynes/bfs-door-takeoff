@@ -86,7 +86,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.1.1 - Summary Sync Active</div>
+<div class="version-tag">Version 2.1.5 - Hardware Integrated</div>
 
 <script>
   let state = { fireRated: false };
@@ -94,6 +94,11 @@
   const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
+  
+  // Hardware Configuration
+  const knobTypes = ["Privacy", "Passage", "Dummy"];
+  const lockTypes = ["Keyed Entry", "Deadbolt"];
+  const stopTypes = ["Base", "Hinge"];
 
   function saveActiveState() {
     document.querySelectorAll('.qty-input').forEach(inp => {
@@ -165,7 +170,7 @@
     let displayLabel = (prefix === "80" || prefix === "DBL80") ? label + "x8/0" : label;
     let html = `<div class="door-row"><div class="size-label">${displayLabel}</div><div class="controls-grid">`;
     types.forEach(type => {
-      let key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type;
+      let key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type.replace(/ /g, "-");
       let isHigh = (label === "Balusters" || label === "Shoes" || label === "Brackets");
       html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">`;
       html += isHigh ? `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState()">` : `<button class="btn" onclick="update('${key}', -1, this)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1, this)">+</button>`;
@@ -181,7 +186,8 @@
     { title: "8/0 Double", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
     { title: "Attic W/S", id: "at_ws", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "atws", ["LH", "RH"])).join('') },
     { title: "Attic Stairs", id: "at_st", color: "bg-red", rows: () => renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
-    { title: "Stair Parts", id: "s_parts", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') + stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) }
+    { title: "Stair Parts", id: "s_parts", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') + stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) },
+    { title: "Hardware", id: "hw_sec", color: "bg-red", rows: () => renderRow("Knobs", "HW", knobTypes) + renderRow("Locks", "HW", lockTypes) + renderRow("Stops", "HW", stopTypes) }
   ];
 
   document.getElementById('app-content').innerHTML = layout.map(sec => `
@@ -204,18 +210,21 @@
         {id: 'AS', head: '--- ATTIC STAIRS ---', sizes: ["22x54", "25x54", "Scuttle"], types: ["QTY"]},
         {id: 'HR', head: '--- HANDRAIL ---', sizes: railLengths, types: ["OPEN", "WALL"]},
         {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems.filter(i=>i!=="Shoes"), types: ["QTY"]},
-        {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]}
+        {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]},
+        {id: 'HW', head: '--- HARDWARE ---', sizes: ["Knobs", "Locks", "Stops"], types: ["Privacy", "Passage", "Dummy", "Keyed Entry", "Deadbolt", "Base", "Hinge"]}
     ];
     sections.forEach(sec => {
         let sectionText = "";
         sec.sizes.forEach(sz => {
             sec.types.forEach(tp => {
-                let key = sec.id + '_' + sz.replace(/[\/ ']/g, "-") + '_' + tp;
+                let key = sec.id + '_' + sz.replace(/[\/ ']/g, "-") + '_' + tp.replace(/ /g, "-");
                 let val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
                 if(val > 0) {
                     let note = document.getElementById('NOTE_' + key)?.value;
                     let fireTag = (state.fireRated && sec.id==='AS') ? ' (FIRE RATED)' : '';
-                    sectionText += `- ${sz} ${tp}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
+                    // Clean summary labels for Hardware
+                    let itemLabel = (sz === "Knobs" || sz === "Stops" || sz === "Locks") ? tp : `${sz} ${tp}`;
+                    sectionText += `- ${itemLabel}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
                 }
             });
         });
@@ -248,7 +257,9 @@
   }
 
   function loadHistory(index) {
-    const h = JSON.parse(localStorage.getItem('bfs_history'))[index];
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const h = history[index];
+    if (!h) return;
     document.getElementById('summary').value = h.text;
     if (h.fullData) {
         document.getElementById('customer').value = h.fullData.customer || "";
