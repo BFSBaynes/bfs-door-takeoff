@@ -275,15 +275,21 @@
 
 <!-- HISTORY -->
 <div class="header-card" style="margin-top:20px; text-align:left;">
-  <label>Recent Takeoffs (Last 20)</label>
-  <input type="text" id="history-search" placeholder="🔍  Search customer, subdivision or lot..."
-    style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
-    oninput="renderHistory()">
-  <div id="history-list"></div>
-  <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
+  <div id="history-toggle" onclick="toggleHistorySection()"
+    style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
+    <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">RECENT TAKEOFFS (LAST 20)</label>
+    <span id="history-chevron" style="font-size:11px; color:#475569; font-weight:800;">▼ SHOW</span>
+  </div>
+  <div id="history-body" style="display:none;">
+    <input type="text" id="history-search" placeholder="🔍  Search customer, subdivision or lot..."
+      style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
+      oninput="renderHistory()">
+    <div id="history-list"></div>
+    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
+  </div>
 </div>
 
-<div class="version-tag">Version 3.1.1 - New Lot Counter Fix</div>
+<div class="version-tag">Version 3.1.2 - Collapsible History</div>
 
 <script>
   let state = { fireRated: false };
@@ -606,6 +612,15 @@
   document.getElementById('resetModal').addEventListener('click', function(e) {
     if (e.target === this) closeResetModal();
   });
+
+  // ── HISTORY TOGGLE ───────────────────────────────────────────────
+  function toggleHistorySection() {
+    const body    = document.getElementById('history-body');
+    const chevron = document.getElementById('history-chevron');
+    const isOpen  = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    chevron.innerText  = isOpen ? '▼ SHOW' : '▲ HIDE';
+  }
 
   // ── HISTORY ──────────────────────────────────────────────────────
   function saveToHistory(text, label, fullData) {
