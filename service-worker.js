@@ -1,4 +1,4 @@
-const CACHE_NAME = "door-takeoff-v2.9.1"; // Increment this every time you push a fix
+const CACHE_NAME = "door-takeoff-v2.9.2"; // Increment this every time you push a fix
 const ASSETS = [
   "./",
   "./index.html",
