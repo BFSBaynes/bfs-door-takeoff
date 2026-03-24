@@ -141,6 +141,24 @@
       padding:12px; white-space: pre-wrap;
     }
     #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227, 24, 55, 0.1); }
+    #summary.flash {
+      animation: summaryFlash 0.6s ease-out;
+    }
+    @keyframes summaryFlash {
+      0%   { border-color: var(--green); box-shadow: 0 0 0 4px rgba(22,163,74,0.3); }
+      60%  { border-color: var(--green); box-shadow: 0 0 0 8px rgba(22,163,74,0.1); }
+      100% { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
+    }
+
+    /* ── EMPTY STATE ── */
+    #summary-empty-state {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      pointer-events: none; margin-top: 8px;
+    }
+    #summary-empty-state span { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
+    #summary-empty-state p { font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.6; margin: 0; }
+    #summary-empty-state.hidden { display: none; }
 
     /* ── HISTORY ── */
     .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
@@ -214,7 +232,7 @@
     </div>
     <div class="input-group" style="flex: 0.25;">
       <label>Lot #</label>
-      <input id="lot" type="text" placeholder="104" oninput="saveState(); updateJobBanner()">
+      <input id="lot" type="text" inputmode="numeric" placeholder="104" oninput="saveState(); updateJobBanner()">
     </div>
   </div>
 </div>
@@ -238,8 +256,27 @@
     <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="generateSummary()">Generate Takeoff</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
   </div>
-  <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="resetCurrentFields()">Reset All Fields</button>
+  <div style="position:relative;">
+    <textarea id="summary" readonly></textarea>
+    <div id="summary-empty-state">
+      <span>📋</span>
+      <p>Tap <strong>Generate Takeoff</strong><br>to build your report</p>
+    </div>
+  </div>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="showResetModal()">Reset All Fields</button>
+</div>
+
+<!-- RESET CONFIRMATION MODAL -->
+<div id="resetModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Reset All Fields?</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts, notes, and the current lot. This cannot be undone.</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeResetModal()">Cancel</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="confirmReset()">Yes, Reset</button>
+    </div>
+  </div>
 </div>
 
 <!-- HISTORY -->
@@ -249,7 +286,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.5.0 - Section Checkmarks</div>
+<div class="version-tag">Version 2.6.0 - UX Polish</div>
 
 <script>
   let state = { fireRated: false };
@@ -414,8 +451,10 @@
 
   // TAP OUTSIDE MODAL TO CLOSE
   document.getElementById('itemModal').addEventListener('click', function(e) {
-    // only close if the click was directly on the overlay (not the card inside)
     if (e.target === this) closeModal();
+  });
+  document.getElementById('resetModal').addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
   });
 
   function updateModalQty(key, delta) {
@@ -546,6 +585,11 @@
     if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
     document.getElementById('summary').value = report;
     saveState();
+    // Flash the summary box green to draw the eye
+    const summaryEl = document.getElementById('summary');
+    summaryEl.classList.remove('flash');
+    void summaryEl.offsetWidth; // force reflow to restart animation
+    summaryEl.classList.add('flash');
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
     saveToHistory(report, `${sub} L${lot}`, {
       customer: cust, subdivision: sub, lot: lot, notes: gNotes,
@@ -555,7 +599,10 @@
 
   function updateSummaryStyle() {
     const s = document.getElementById('summary');
-    s.value.length > 0 ? s.classList.add('has-text') : s.classList.remove('has-text');
+    const empty = document.getElementById('summary-empty-state');
+    const hasText = s.value.length > 0;
+    hasText ? s.classList.add('has-text') : s.classList.remove('has-text');
+    hasText ? empty.classList.add('hidden') : empty.classList.remove('hidden');
   }
 
   // ── HISTORY SAVE / RENDER ─────────────────────────────────────────
@@ -589,18 +636,23 @@
     });
   }
 
-  // ── RESET ─────────────────────────────────────────────────────────
-  function resetCurrentFields() {
-    if (confirm('Reset current lot?')) {
-      state = { fireRated: false };
-      document.getElementById('summary').value = "";
-      localStorage.removeItem('bfs_active_work');
-      document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
-      refreshAllCards();
-      updateSummaryStyle();
-      updateJobBanner();
-      window.scrollTo(0, 0);
-    }
+  // ── RESET MODAL ───────────────────────────────────────────────────
+  function showResetModal() {
+    document.getElementById('resetModal').style.display = 'flex';
+  }
+  function closeResetModal() {
+    document.getElementById('resetModal').style.display = 'none';
+  }
+  function confirmReset() {
+    closeResetModal();
+    state = { fireRated: false };
+    document.getElementById('summary').value = "";
+    localStorage.removeItem('bfs_active_work');
+    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
+    refreshAllCards();
+    updateSummaryStyle();
+    updateJobBanner();
+    window.scrollTo(0, 0);
   }
 
   // ── COPY — uses modern Clipboard API ─────────────────────────────
