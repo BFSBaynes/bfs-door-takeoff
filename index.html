@@ -243,7 +243,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.4.1 - Haptic Feedback</div>
+<div class="version-tag">Version 2.4.2 - Clean Build</div>
 
 <script>
   let state = { fireRated: false };
@@ -636,7 +636,7 @@
       card.className = 'item-card';
       card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
       card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
-      card.onclick = () => { navigator.vibrate?.(10); openModal(sec.id, item, itemTypes); };
+      card.onclick = () => openModal(sec.id, item, itemTypes);
       grid.appendChild(card);
     });
 
@@ -649,7 +649,7 @@
       fireBtn.style.width = "calc(100% - 16px)";
       fireBtn.style.margin = "8px";
       fireBtn.innerText = "FIRE RATED: NO";
-      fireBtn.onclick = () => { navigator.vibrate?.(10); toggleFire(); };
+      fireBtn.onclick = toggleFire;
       content.appendChild(fireBtn);
     }
 
