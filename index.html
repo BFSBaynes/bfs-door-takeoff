@@ -24,33 +24,34 @@
       --green: #16a34a;
     }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
+    body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 70px; overflow-x: hidden; }
 
-    /* ── MODE SWITCH ── */
+    /* ── MODE SWITCH — moved to bottom center ── */
     .mode-switch {
-      position: fixed; top: 10px; right: 10px; z-index: 999;
-      background: var(--navy); color: white; padding: 6px 12px;
+      position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+      z-index: 999; background: var(--navy); color: white; padding: 8px 20px;
       border-radius: 20px; font-size: 10px; font-weight: 800;
       text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      border: 2px solid white;
+      border: 2px solid white; white-space: nowrap;
     }
 
-    /* ── STICKY JOB BANNER ── */
+    /* ── STICKY JOB BANNER — fixed to top ── */
     #job-banner {
       display: none;
-      position: sticky;
+      position: fixed;
       top: 0;
-      z-index: 500;
+      left: 0;
+      right: 0;
+      z-index: 600;
       background: var(--bfs-red);
       color: white;
       font-size: 11px;
       font-weight: 800;
       text-align: center;
-      padding: 7px 12px;
+      padding: 8px 12px;
       letter-spacing: 0.5px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       text-transform: uppercase;
-      margin: 0 -8px 8px -8px;
       border-bottom: 2px solid rgba(255,255,255,0.2);
     }
     #job-banner.visible { display: block; }
@@ -73,7 +74,7 @@
       margin: 8px -8px; cursor: pointer; display: flex;
       justify-content: space-between; align-items: center;
       text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
-      position: sticky; top: 0; z-index: 100;
+      position: sticky; top: 33px; z-index: 100;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .bg-navy { background: var(--navy); }
@@ -218,7 +219,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.3.0 - Job Banner + Modal Fixes</div>
+<div class="version-tag">Version 2.3.1 - Banner & Layout Fixes</div>
 
 <script>
   let state = { fireRated: false };
