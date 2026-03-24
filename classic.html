@@ -145,6 +145,15 @@
     .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
 
+    /* ── SCROLL TO TOP ── */
+    #scroll-top {
+      display: none; position: fixed; bottom: 20px; right: 16px; z-index: 998;
+      background: var(--navy); color: white; border: none; border-radius: 50%;
+      width: 44px; height: 44px; font-size: 20px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); align-items: center; justify-content: center;
+    }
+    #scroll-top.visible { display: flex; }
+
     /* ── TOAST ── */
     #toast {
       visibility: hidden; min-width: 200px; background-color: #1e293b; color: #fff;
@@ -162,6 +171,7 @@
 <body>
 
 <a href="index.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'modern')">SWITCH TO MODERN</a>
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
 <div id="job-banner"></div>
 
@@ -216,7 +226,12 @@
       <p>Tap <strong>Generate Takeoff</strong><br>to build your report</p>
     </div>
   </div>
-  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="showResetModal()">Reset All Fields</button>
+
+  <!-- Row 3: New Lot + Reset -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Lot, Same Job</button>
+    <button class="actionBtn" style="background:#fee2e2; color:#b91c1c;" onclick="showResetModal()">🗑 Reset All Fields</button>
+  </div>
 </div>
 
 <!-- RESET MODAL -->
@@ -232,6 +247,32 @@
   </div>
 </div>
 
+<!-- NEW LOT SAME JOB MODAL -->
+<div id="newLotModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:8px;">🏠</div>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">New Lot, Same Job?</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts and notes but keep <strong>Customer</strong> and <strong>Subdivision</strong> filled in.</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeNewLotModal()">Cancel</button>
+      <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmNewLot()">Yes, New Lot</button>
+    </div>
+  </div>
+</div>
+
+<!-- REQUIRED FIELDS WARNING MODAL -->
+<div id="warningModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Missing Info</h2>
+    <p id="warning-text" style="color:#64748b; font-size:13px; margin:0 0 20px 0;"></p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeWarningModal()">Go Back</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeWarningModal(); generateSummary(true)">Generate Anyway</button>
+    </div>
+  </div>
+</div>
+
 <!-- HISTORY -->
 <div class="header-card" style="margin-top:20px; text-align:left;">
   <label>Takeoff History</label>
@@ -239,7 +280,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.9.2 - Banner Layout Fix</div>
+<div class="version-tag">Version 3.0.0 - New Lot, Warning, Scroll Top</div>
 
 <script>
   let state = { fireRated: false };
@@ -428,12 +469,25 @@
   `).join('');
 
   // ── GENERATE SUMMARY ─────────────────────────────────────────────
-  function generateSummary() {
-    const cust   = document.getElementById('customer').value    || "NA";
-    const sub    = document.getElementById('subdivision').value || "NA";
-    const lot    = document.getElementById('lot').value         || "NA";
-    const gNotes = document.getElementById('notes').value       || "";
-    let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
+  function generateSummary(force) {
+    const cust   = document.getElementById('customer').value.trim();
+    const sub    = document.getElementById('subdivision').value.trim();
+    const lot    = document.getElementById('lot').value.trim();
+    if (!force) {
+      const missing = [];
+      if (!cust) missing.push('<strong>Customer</strong>');
+      if (!sub)  missing.push('<strong>Subdivision</strong>');
+      if (!lot)  missing.push('<strong>Lot #</strong>');
+      if (missing.length) {
+        showWarningModal(`Missing: ${missing.join(', ')}. Please fill these in before generating, or tap <em>Generate Anyway</em> to continue.`);
+        return;
+      }
+    }
+    const custVal = cust || "NA";
+    const subVal  = sub  || "NA";
+    const lotVal  = lot  || "NA";
+    const gNotes  = document.getElementById('notes').value || "";
+    let report = `TAKEOFF -- ${custVal} -- ${subVal} -- LOT ${lotVal}\n----------------------------\n\n`;
 
     const sections = [
       { id:'68',    head:'--- 6/8 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"" },
@@ -467,17 +521,14 @@
 
     if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}`;
     document.getElementById('summary').value = report;
-
-    // Flash the summary box
     const summaryEl = document.getElementById('summary');
     summaryEl.classList.remove('flash');
     void summaryEl.offsetWidth;
     summaryEl.classList.add('flash');
-
     saveActiveState();
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
-    saveToHistory(report, `${sub} L${lot}`, {
-      customer: cust, subdivision: sub, lot: lot, notes: gNotes,
+    saveToHistory(report, `${subVal} L${lotVal}`, {
+      customer: custVal, subdivision: subVal, lot: lotVal, notes: gNotes,
       state: JSON.parse(JSON.stringify(state))
     });
   }
@@ -697,6 +748,48 @@
       closeDropdown('ac-subdivision');
     }
   });
+
+  // ── NEW LOT SAME JOB ─────────────────────────────────────────────
+  function showNewLotModal() { document.getElementById('newLotModal').style.display = 'flex'; }
+  function closeNewLotModal() { document.getElementById('newLotModal').style.display = 'none'; }
+  function confirmNewLot() {
+    closeNewLotModal();
+    const cust = document.getElementById('customer').value;
+    const sub  = document.getElementById('subdivision').value;
+    state = { fireRated: false };
+    document.getElementById('summary').value = "";
+    document.getElementById('lot').value = "";
+    document.getElementById('notes').value = "";
+    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
+    refreshUI();
+    updateSummaryStyle();
+    document.getElementById('customer').value = cust;
+    document.getElementById('subdivision').value = sub;
+    saveActiveState();
+    updateJobBanner();
+    document.getElementById('lot').focus();
+    window.scrollTo(0, 0);
+  }
+
+  // ── REQUIRED FIELDS WARNING ──────────────────────────────────────
+  function showWarningModal(msg) {
+    document.getElementById('warning-text').innerHTML = msg;
+    document.getElementById('warningModal').style.display = 'flex';
+  }
+  function closeWarningModal() { document.getElementById('warningModal').style.display = 'none'; }
+
+  // ── SCROLL TO TOP ────────────────────────────────────────────────
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scroll-top');
+    if (window.scrollY > 300) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+
+  // ── MODAL CLOSE ON TAP OUTSIDE ───────────────────────────────────
+  document.getElementById('resetModal').addEventListener('click', function(e) { if (e.target===this) closeResetModal(); });
+  document.getElementById('newLotModal').addEventListener('click', function(e) { if (e.target===this) closeNewLotModal(); });
+  document.getElementById('warningModal').addEventListener('click', function(e) { if (e.target===this) closeWarningModal(); });
 
   // ── INIT ─────────────────────────────────────────────────────────
   renderHistory();
