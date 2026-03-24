@@ -229,7 +229,7 @@
 
   <!-- Row 3: New Lot + Reset -->
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Lot, Same Job</button>
+    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Lot, Same Cust/Sub</button>
     <button class="actionBtn" style="background:#fee2e2; color:#b91c1c;" onclick="showResetModal()">🗑 Reset All Fields</button>
   </div>
 </div>
@@ -251,7 +251,7 @@
 <div id="newLotModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
     <div style="font-size:2rem; margin-bottom:8px;">🏠</div>
-    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">New Lot, Same Job?</h2>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">New Lot, Same Cust/Sub?</h2>
     <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts and notes but keep <strong>Customer</strong> and <strong>Subdivision</strong> filled in.</p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeNewLotModal()">Cancel</button>
@@ -275,12 +275,15 @@
 
 <!-- HISTORY -->
 <div class="header-card" style="margin-top:20px; text-align:left;">
-  <label>Takeoff History</label>
+  <label>Recent Takeoffs (Last 20)</label>
+  <input type="text" id="history-search" placeholder="🔍  Search customer, subdivision or lot..."
+    style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
+    oninput="renderHistory()">
   <div id="history-list"></div>
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 3.0.0 - New Lot, Warning, Scroll Top</div>
+<div class="version-tag">Version 3.1.0 - History Improvements</div>
 
 <script>
   let state = { fireRated: false };
@@ -608,10 +611,12 @@
   function saveToHistory(text, label, fullData) {
     learnFromJob(fullData.customer, fullData.subdivision);
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    const now     = new Date();
-    const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
-    history.unshift({ label: `${dateStr} - ${label}`, text, time: now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), fullData });
-    if (history.length > 10) history.pop();
+    const now      = new Date();
+    const dateStr  = (now.getMonth() + 1) + '/' + now.getDate();
+    const timeStr  = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const richLabel = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
+    history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
+    if (history.length > 20) history.pop();
     localStorage.setItem('bfs_history', JSON.stringify(history));
     renderHistory();
   }
@@ -619,14 +624,26 @@
   function renderHistory() {
     const list    = document.getElementById('history-list');
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    list.innerHTML = history.length ? "" : "<p style='font-size:11px; padding:10px; color:#94a3b8;'>No history.</p>";
-    history.forEach((item, index) => {
+    const query   = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
+    const filtered = query
+      ? history.filter(item =>
+          item.label.toLowerCase().includes(query) ||
+          (item.fullData?.customer || '').toLowerCase().includes(query) ||
+          (item.fullData?.subdivision || '').toLowerCase().includes(query) ||
+          (item.fullData?.lot || '').toLowerCase().includes(query)
+        )
+      : history;
+    list.innerHTML = filtered.length
+      ? ""
+      : `<p style='font-size:11px; padding:10px; color:#94a3b8;'>${query ? 'No matches found.' : 'No history.'}</p>`;
+    filtered.forEach((item) => {
+      const realIndex = history.indexOf(item);
       list.innerHTML += `
         <div class="history-item">
           <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ""}</small></span>
           <div class="history-controls">
-            <button class="load-btn" onclick="loadHistory(${index})">LOAD</button>
-            <button class="del-btn"  onclick="deleteHistoryItem(${index})">✕</button>
+            <button class="load-btn" onclick="loadHistory(${realIndex})">LOAD</button>
+            <button class="del-btn"  onclick="deleteHistoryItem(${realIndex})">✕</button>
           </div>
         </div>`;
     });
