@@ -1,4 +1,4 @@
-const CACHE_NAME = "door-takeoff-v2.1.8"; // Increment this to force an update
+const CACHE_NAME = "door-takeoff-v2.1.9"; // Increment this every time you push a fix
 const ASSETS = [
   "./",
   "./index.html",
@@ -16,7 +16,7 @@ self.addEventListener("install", (event) => {
       return cache.addAll(ASSETS);
     })
   );
-  self.skipWaiting();
+  self.skipWaiting(); // Force the waiting service worker to become the active one
 });
 
 // Activate: Cleanup old caches
@@ -33,16 +33,32 @@ self.addEventListener("activate", (event) => {
       );
     })
   );
-  self.clients.claim();
+  self.clients.claim(); // Take control of all open tabs/windows immediately
 });
 
-// Fetch: CACHE-FIRST (Faster for Job Sites)
-// This checks the cache first. If found, it loads instantly.
-// If not found, it goes to the network.
+// Fetch: NETWORK-FIRST for HTML, Cache-First for Assets
 self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
+  const url = new URL(event.request.url);
+
+  // If it's a webpage (HTML), try the network first so we get updates immediately
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Update the cache with the fresh version we just grabbed
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, response.clone());
+            return response;
+          });
+        })
+        .catch(() => caches.match(event.request)) // If offline (dead zone), use the cache
+    );
+  } else {
+    // For images, icons, and manifest, use the Cache-First strategy
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request);
+      })
+    );
+  }
 });
