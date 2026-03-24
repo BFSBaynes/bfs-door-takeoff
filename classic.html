@@ -43,7 +43,9 @@
     .has-qty { color: var(--green) !important; font-size: 17px; }
     .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
-    #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
+    .toggle-container { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #94a3b8; margin-top: 5px; }
+    .toggle-label { font-weight: 800; font-size: 12px; color: var(--navy); }
+    #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre-wrap; }
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
     .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
@@ -86,7 +88,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.1.5 - Hardware Integrated</div>
+<div class="version-tag">Version 2.1.6 - App Fix</div>
 
 <script>
   let state = { fireRated: false };
@@ -95,19 +97,22 @@
   const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
   
-  // Hardware Configuration
   const knobTypes = ["Privacy", "Passage", "Dummy"];
   const lockTypes = ["Keyed Entry", "Deadbolt"];
   const stopTypes = ["Base", "Hinge"];
 
   function saveActiveState() {
+    // Save counts from qty-input fields (hardware/stair numbers)
     document.querySelectorAll('.qty-input').forEach(inp => {
         const key = inp.id.replace('inp-', '');
         state[key] = parseInt(inp.value) || 0;
     });
+    // Save notes
     document.querySelectorAll('.note-box').forEach(note => {
-        state[note.id] = note.value;
+        const key = note.id.replace('NOTE_', '');
+        state['NOTE_' + key] = note.value;
     });
+    
     const fullData = {
       customer: document.getElementById('customer').value,
       subdivision: document.getElementById('subdivision').value,
@@ -142,13 +147,17 @@
         }
         const inp = document.getElementById('inp-' + key);
         if(inp) inp.value = state[key] || "";
+        
         const noteBox = document.getElementById('NOTE_' + key);
         if(noteBox) noteBox.value = state['NOTE_'+key] || "";
     });
-    if(document.getElementById('fire-status')) document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    if(document.getElementById('fire-status')) {
+      document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+      state.fireRated ? document.getElementById('fire-status').style.background = "var(--green)" : document.getElementById('fire-status').style.background = "var(--navy)";
+    }
   }
 
-  function update(key, delta, btnEl) {
+  function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     refreshUI();
     saveActiveState();
@@ -156,7 +165,7 @@
 
   function toggleFire() {
     state.fireRated = !state.fireRated;
-    document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    refreshUI();
     saveActiveState();
   }
 
@@ -169,31 +178,42 @@
   function renderRow(label, prefix, types) {
     let displayLabel = (prefix === "80" || prefix === "DBL80") ? label + "x8/0" : label;
     let html = `<div class="door-row"><div class="size-label">${displayLabel}</div><div class="controls-grid">`;
+    
     types.forEach(type => {
       let key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type.replace(/ /g, "-");
-      let isHigh = (label === "Balusters" || label === "Shoes" || label === "Brackets");
+      let isManual = (label === "Balusters" || label === "Shoes" || label === "Brackets");
+      
       html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">`;
-      html += isHigh ? `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState()">` : `<button class="btn" onclick="update('${key}', -1, this)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1, this)">+</button>`;
+      if(isManual) {
+        html += `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState()" placeholder="0">`;
+      } else {
+        html += `<button class="btn" onclick="update('${key}', -1)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1)">+</button>`;
+      }
       html += `</div><input type="text" id="NOTE_${key}" class="note-box" placeholder="Note" oninput="saveActiveState()"></div>`;
     });
     return html + `</div></div>`;
   }
 
-  const layout = [
-    { title: "6/8 Doors", id: "68_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68", ["LH", "RH", "SLAB"])).join('') },
-    { title: "6/8 Double", id: "68_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
-    { title: "8/0 Doors", id: "80_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80", ["LH", "RH", "SLAB"])).join('') },
-    { title: "8/0 Double", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
-    { title: "Attic W/S", id: "at_ws", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "atws", ["LH", "RH"])).join('') },
-    { title: "Attic Stairs", id: "at_st", color: "bg-red", rows: () => renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
-    { title: "Stair Parts", id: "s_parts", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') + stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) },
-    { title: "Hardware", id: "hw_sec", color: "bg-red", rows: () => renderRow("Knobs", "HW", knobTypes) + renderRow("Locks", "HW", lockTypes) + renderRow("Stops", "HW", stopTypes) }
-  ];
+  function initApp() {
+    const layout = [
+      { title: "6/8 Doors", id: "68_s", color: "bg-navy", html: doorSizes.map(s => renderRow(s, "68", ["LH", "RH", "SLAB"])).join('') },
+      { title: "6/8 Double", id: "68_d", color: "bg-red", html: dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
+      { title: "8/0 Doors", id: "80_s", color: "bg-navy", html: doorSizes.map(s => renderRow(s, "80", ["LH", "RH", "SLAB"])).join('') },
+      { title: "8/0 Double", id: "80_d", color: "bg-red", html: dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
+      { title: "Attic W/S", id: "at_ws", color: "bg-navy", html: doorSizes.map(s => renderRow(s, "atws", ["LH", "RH"])).join('') },
+      { title: "Attic Stairs", id: "at_st", color: "bg-red", html: renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
+      { title: "Stair Parts", id: "s_parts", color: "bg-navy", html: railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') + stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) },
+      { title: "Hardware", id: "hw_sec", color: "bg-red", html: renderRow("Knobs", "HW", knobTypes) + renderRow("Locks", "HW", lockTypes) + renderRow("Stops", "HW", stopTypes) }
+    ];
 
-  document.getElementById('app-content').innerHTML = layout.map(sec => `
-    <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)"><span>${sec.title}</span><span class="chevron"></span></div>
-    <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
-  `).join('');
+    document.getElementById('app-content').innerHTML = layout.map(sec => `
+      <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)"><span>${sec.title}</span><span class="chevron"></span></div>
+      <div id="content-${sec.id}" class="section-content">${sec.html}</div>
+    `).join('');
+
+    loadActiveState();
+    renderHistory();
+  }
 
   function generateSummary() {
     const cust = document.getElementById('customer').value || "NA";
@@ -201,6 +221,7 @@
     const lot = document.getElementById('lot').value || "NA";
     const gNotes = document.getElementById('notes').value || "";
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
+    
     const sections = [
         {id: '68', head: '--- 6/8 SINGLE DOORS ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
         {id: 'DBL68', head: '--- 6/8 DOUBLE DOORS ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
@@ -213,16 +234,16 @@
         {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]},
         {id: 'HW', head: '--- HARDWARE ---', sizes: ["Knobs", "Locks", "Stops"], types: ["Privacy", "Passage", "Dummy", "Keyed Entry", "Deadbolt", "Base", "Hinge"]}
     ];
+
     sections.forEach(sec => {
         let sectionText = "";
         sec.sizes.forEach(sz => {
             sec.types.forEach(tp => {
                 let key = sec.id + '_' + sz.replace(/[\/ ']/g, "-") + '_' + tp.replace(/ /g, "-");
-                let val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
+                let val = state[key] || 0;
                 if(val > 0) {
-                    let note = document.getElementById('NOTE_' + key)?.value;
+                    let note = state['NOTE_' + key];
                     let fireTag = (state.fireRated && sec.id==='AS') ? ' (FIRE RATED)' : '';
-                    // Clean summary labels for Hardware
                     let itemLabel = (sz === "Knobs" || sz === "Stops" || sz === "Locks") ? tp : `${sz} ${tp}`;
                     sectionText += `- ${itemLabel}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
                 }
@@ -230,6 +251,7 @@
         });
         if(sectionText) report += sec.head + "\n" + sectionText + "\n";
     });
+
     if(gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}`;
     document.getElementById('summary').value = report;
     saveActiveState();
@@ -281,11 +303,22 @@
   }
 
   function clearHistory() { localStorage.removeItem('bfs_history'); renderHistory(); }
-  function copySummary() { const s = document.getElementById("summary"); s.select(); document.execCommand("copy"); alert("Copied!"); }
-  function resetAllUI() { state = { fireRated: false }; document.getElementById('summary').value = ""; localStorage.removeItem('bfs_active_work'); refreshUI(); location.reload(); }
+  
+  function copySummary() { 
+    const s = document.getElementById("summary");
+    navigator.clipboard.writeText(s.value).then(() => {
+      alert("Copied!");
+    });
+  }
 
-  window.onload = loadActiveState;
-  renderHistory();
+  function resetAllUI() { 
+    state = { fireRated: false }; 
+    localStorage.removeItem('bfs_active_work'); 
+    location.reload(); 
+  }
+
+  // Final Call
+  initApp();
 </script>
 </body>
 </html>
