@@ -143,6 +143,22 @@
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
     .load-btn { padding: 10px 15px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 70px; }
 
+    /* ── AUTOCOMPLETE ── */
+    .ac-wrap { position: relative; }
+    .ac-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: #fff; border: 2px solid var(--navy); border-top: none;
+      border-radius: 0 0 8px 8px; z-index: 800; max-height: 180px;
+      overflow-y: auto; box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+    .ac-dropdown.open { display: block; }
+    .ac-item {
+      padding: 11px 14px; font-size: 15px; font-weight: 600; color: var(--navy);
+      border-bottom: 1px solid #e2e8f0; cursor: pointer;
+    }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:active, .ac-item.highlighted { background: #f0f9ff; color: var(--accent); }
+
     /* ── MISC ── */
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
@@ -172,15 +188,23 @@
 <div class="header-card">
   <img src="icon-512.png" alt="Logo" class="app-logo">
   <div class="input-row">
-    <div class="input-group">
+    <div class="input-group ac-wrap">
       <label>Customer</label>
-      <input id="customer" type="text" placeholder="Pulte" oninput="saveState(); updateJobBanner()">
+      <input id="customer" type="text" placeholder="Pulte" autocomplete="off"
+        oninput="saveState(); updateJobBanner(); showCustomerSuggestions()"
+        onfocus="showCustomerSuggestions()"
+        onblur="setTimeout(()=>closeDropdown('ac-customer'),200)">
+      <div id="ac-customer" class="ac-dropdown"></div>
     </div>
   </div>
   <div class="input-row">
-    <div class="input-group" style="flex: 0.75;">
+    <div class="input-group ac-wrap" style="flex: 0.75;">
       <label>Subdivision</label>
-      <input id="subdivision" type="text" placeholder="Huxley" oninput="saveState(); updateJobBanner()">
+      <input id="subdivision" type="text" placeholder="Huxley" autocomplete="off"
+        oninput="saveState(); updateJobBanner(); showSubdivisionSuggestions()"
+        onfocus="showSubdivisionSuggestions()"
+        onblur="setTimeout(()=>closeDropdown('ac-subdivision'),200)">
+      <div id="ac-subdivision" class="ac-dropdown"></div>
     </div>
     <div class="input-group" style="flex: 0.25;">
       <label>Lot #</label>
@@ -219,7 +243,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.3.1 - Banner & Layout Fixes</div>
+<div class="version-tag">Version 2.4.1 - Haptic Feedback</div>
 
 <script>
   let state = { fireRated: false };
@@ -268,11 +292,12 @@
     if (!h) return;
     document.getElementById('summary').value = h.text;
     if (h.fullData) {
-      document.getElementById('customer').value   = h.fullData.customer || "";
+      document.getElementById('customer').value    = h.fullData.customer || "";
       document.getElementById('subdivision').value = h.fullData.subdivision || "";
-      document.getElementById('lot').value         = h.fullData.lot || "";
-      document.getElementById('notes').value       = h.fullData.notes || "";
+      document.getElementById('lot').value          = h.fullData.lot || "";
+      document.getElementById('notes').value        = h.fullData.notes || "";
       state = JSON.parse(JSON.stringify(h.fullData.state));
+      learnFromJob(h.fullData.customer, h.fullData.subdivision);
       refreshAllCards();
       saveState();
       updateJobBanner();
@@ -522,6 +547,7 @@
 
   // ── HISTORY SAVE / RENDER ─────────────────────────────────────────
   function saveToHistory(text, label, fullData) {
+    learnFromJob(fullData.customer, fullData.subdivision);
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     const now     = new Date();
     const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
@@ -610,7 +636,7 @@
       card.className = 'item-card';
       card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
       card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
-      card.onclick = () => openModal(sec.id, item, itemTypes);
+      card.onclick = () => { navigator.vibrate?.(10); openModal(sec.id, item, itemTypes); };
       grid.appendChild(card);
     });
 
@@ -623,12 +649,94 @@
       fireBtn.style.width = "calc(100% - 16px)";
       fireBtn.style.margin = "8px";
       fireBtn.innerText = "FIRE RATED: NO";
-      fireBtn.onclick = toggleFire;
+      fireBtn.onclick = () => { navigator.vibrate?.(10); toggleFire(); };
       content.appendChild(fireBtn);
     }
 
     appContainer.appendChild(title);
     appContainer.appendChild(content);
+  });
+
+  // ── AUTOCOMPLETE KNOWLEDGE BASE ──────────────────────────────────
+  // Structure: { "CustomerName": Set(["Sub1","Sub2",...]) }
+  function getKnowledge() {
+    try { return JSON.parse(localStorage.getItem('bfs_knowledge')) || {}; }
+    catch(e) { return {}; }
+  }
+
+  function saveKnowledge(kb) {
+    // Convert Sets to arrays for JSON storage
+    const plain = {};
+    Object.keys(kb).forEach(k => { plain[k] = Array.isArray(kb[k]) ? kb[k] : Array.from(kb[k]); });
+    localStorage.setItem('bfs_knowledge', JSON.stringify(plain));
+  }
+
+  function learnFromJob(customer, subdivision) {
+    if (!customer) return;
+    const kb = getKnowledge();
+    if (!kb[customer]) kb[customer] = [];
+    if (subdivision && !kb[customer].includes(subdivision)) {
+      kb[customer].push(subdivision);
+    }
+    saveKnowledge(kb);
+  }
+
+  function getCustomers() {
+    return Object.keys(getKnowledge()).sort();
+  }
+
+  function getSubdivisionsFor(customer) {
+    const kb = getKnowledge();
+    if (customer && kb[customer]) return kb[customer].sort();
+    // If no customer typed yet, return all known subdivisions
+    const all = new Set();
+    Object.values(kb).forEach(subs => subs.forEach(s => all.add(s)));
+    return Array.from(all).sort();
+  }
+
+  function showDropdown(dropdownId, items, onSelect) {
+    const dd = document.getElementById(dropdownId);
+    if (!items.length) { dd.classList.remove('open'); return; }
+    dd.innerHTML = items.map(item =>
+      `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${item.replace(/'/g,"\\'")}'); closeDropdown('${dropdownId}')">${item}</div>`
+    ).join('');
+    dd.classList.add('open');
+  }
+
+  function closeDropdown(id) {
+    const dd = document.getElementById(id);
+    if (dd) dd.classList.remove('open');
+  }
+
+  function showCustomerSuggestions() {
+    const val = document.getElementById('customer').value.trim().toLowerCase();
+    const all = getCustomers();
+    const filtered = val ? all.filter(c => c.toLowerCase().includes(val)) : all;
+    showDropdown('ac-customer', filtered, (selected) => {
+      document.getElementById('customer').value = selected;
+      saveState(); updateJobBanner();
+      // Immediately show that customer's subdivisions
+      showSubdivisionSuggestions();
+    });
+  }
+
+  function showSubdivisionSuggestions() {
+    const customer = document.getElementById('customer').value.trim();
+    const val = document.getElementById('subdivision').value.trim().toLowerCase();
+    const all = getSubdivisionsFor(customer);
+    const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
+    showDropdown('ac-subdivision', filtered, (selected) => {
+      document.getElementById('subdivision').value = selected;
+      saveState(); updateJobBanner();
+    });
+  }
+
+  // Close dropdowns when tapping anywhere else
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.ac-wrap')) {
+      closeDropdown('ac-customer');
+      closeDropdown('ac-subdivision');
+    }
   });
 
   // ── INIT ──────────────────────────────────────────────────────────
