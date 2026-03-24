@@ -179,9 +179,17 @@
     .ac-item {
       padding: 11px 14px; font-size: 15px; font-weight: 600; color: var(--navy);
       border-bottom: 1px solid #e2e8f0; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
     .ac-item:last-child { border-bottom: none; }
     .ac-item:active, .ac-item.highlighted { background: #f0f9ff; color: var(--accent); }
+    .ac-item-label { flex: 1; }
+    .ac-delete {
+      flex-shrink: 0; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
+      border-radius: 5px; font-size: 11px; font-weight: 900; padding: 3px 8px;
+      cursor: pointer; line-height: 1;
+    }
+    .ac-delete:active { background: #fecaca; }
 
     /* ── MISC ── */
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
@@ -286,7 +294,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.6.1 - Lot & Reset Fixes</div>
+<div class="version-tag">Version 2.7.0 - Deletable Suggestions</div>
 
 <script>
   let state = { fireRated: false };
@@ -762,12 +770,40 @@
     return Array.from(all).sort();
   }
 
-  function showDropdown(dropdownId, items, onSelect) {
+  function deleteCustomer(customer) {
+    const kb = getKnowledge();
+    delete kb[customer];
+    saveKnowledge(kb);
+    document.getElementById('customer').value = "";
+    document.getElementById('subdivision').value = "";
+    saveState(); updateJobBanner();
+    showCustomerSuggestions();
+  }
+
+  function deleteSubdivision(customer, subdivision) {
+    const kb = getKnowledge();
+    if (kb[customer]) {
+      kb[customer] = kb[customer].filter(s => s !== subdivision);
+      // If customer has no more subdivisions, keep the customer entry (they may add one later)
+    }
+    saveKnowledge(kb);
+    showSubdivisionSuggestions();
+  }
+
+  function showDropdown(dropdownId, items, onSelect, onDelete) {
     const dd = document.getElementById(dropdownId);
     if (!items.length) { dd.classList.remove('open'); return; }
-    dd.innerHTML = items.map(item =>
-      `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${item.replace(/'/g,"\\'")}'); closeDropdown('${dropdownId}')">${item}</div>`
-    ).join('');
+    dd.innerHTML = items.map(item => {
+      const safeItem = item.replace(/'/g, "\\'");
+      const deleteCall = onDelete ? `onDelete('${safeItem}')` : '';
+      const deleteBtnHtml = onDelete
+        ? `<button class="ac-delete" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); (${onDelete.toString()})('${safeItem}'); ">✕</button>`
+        : '';
+      return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${safeItem}'); closeDropdown('${dropdownId}')">
+        <span class="ac-item-label">${item}</span>
+        ${deleteBtnHtml}
+      </div>`;
+    }).join('');
     dd.classList.add('open');
   }
 
@@ -780,12 +816,16 @@
     const val = document.getElementById('customer').value.trim().toLowerCase();
     const all = getCustomers();
     const filtered = val ? all.filter(c => c.toLowerCase().includes(val)) : all;
-    showDropdown('ac-customer', filtered, (selected) => {
-      document.getElementById('customer').value = selected;
-      saveState(); updateJobBanner();
-      // Immediately show that customer's subdivisions
-      showSubdivisionSuggestions();
-    });
+    showDropdown('ac-customer', filtered,
+      (selected) => {
+        document.getElementById('customer').value = selected;
+        saveState(); updateJobBanner();
+        showSubdivisionSuggestions();
+      },
+      (toDelete) => {
+        deleteCustomer(toDelete);
+      }
+    );
   }
 
   function showSubdivisionSuggestions() {
@@ -793,10 +833,15 @@
     const val = document.getElementById('subdivision').value.trim().toLowerCase();
     const all = getSubdivisionsFor(customer);
     const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
-    showDropdown('ac-subdivision', filtered, (selected) => {
-      document.getElementById('subdivision').value = selected;
-      saveState(); updateJobBanner();
-    });
+    showDropdown('ac-subdivision', filtered,
+      (selected) => {
+        document.getElementById('subdivision').value = selected;
+        saveState(); updateJobBanner();
+      },
+      (toDelete) => {
+        deleteSubdivision(customer, toDelete);
+      }
+    );
   }
 
   // Close dropdowns when tapping anywhere else
