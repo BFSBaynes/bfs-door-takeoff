@@ -17,8 +17,29 @@
   <style>
     :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-    body{ margin:0; background: var(--bg); padding: 8px; padding-bottom: 50px; overflow-x: hidden; }
-    .mode-switch { position: fixed; top: 10px; right: 10px; z-index: 999; background: var(--bfs-red); color: white; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white; }
+    body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 70px; overflow-x: hidden; }
+
+    /* ── MODE SWITCH — bottom center ── */
+    .mode-switch {
+      position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+      z-index: 999; background: var(--bfs-red); color: white; padding: 8px 20px;
+      border-radius: 20px; font-size: 10px; font-weight: 800;
+      text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white; white-space: nowrap;
+    }
+
+    /* ── STICKY JOB BANNER ── */
+    #job-banner {
+      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 600;
+      background: var(--bfs-red); color: white; font-size: 11px; font-weight: 800;
+      text-align: center; padding: 8px 12px; letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3); text-transform: uppercase;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+    }
+    #job-banner.visible { display: block; }
+    #job-banner span { opacity: 0.75; font-weight: 600; margin: 0 4px; }
+
+    /* ── HEADER ── */
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
     .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
     label { font-weight: 700; font-size: 10px; color: #475569; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
@@ -27,12 +48,56 @@
     .input-group { flex: 1; }
     .w-75 { flex: 0 0 75%; }
     .w-25 { flex: 0 0 22%; }
-    .section-title { color: #fff; padding: 14px; font-weight: 800; font-size: 14px; margin: 8px -8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+    /* ── AUTOCOMPLETE ── */
+    .ac-wrap { position: relative; }
+    .ac-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: #fff; border: 2px solid var(--navy); border-top: none;
+      border-radius: 0 0 8px 8px; z-index: 800; max-height: 180px;
+      overflow-y: auto; box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+    .ac-dropdown.open { display: block; }
+    .ac-item {
+      padding: 11px 14px; font-size: 15px; font-weight: 600; color: var(--navy);
+      border-bottom: 1px solid #e2e8f0; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:active { background: #f0f9ff; color: var(--accent); }
+    .ac-item-label { flex: 1; }
+    .ac-delete {
+      flex-shrink: 0; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
+      border-radius: 5px; font-size: 11px; font-weight: 900; padding: 3px 8px; cursor: pointer;
+    }
+
+    /* ── SECTIONS ── */
+    .section-title {
+      color: #fff; padding: 14px; font-weight: 800; font-size: 14px;
+      margin: 8px -8px; cursor: pointer; display: flex;
+      justify-content: space-between; align-items: center;
+      text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
+      position: sticky; top: 33px; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .section-check {
+      display: none; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
+      border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 900;
+      color: #fff; margin-right: 8px;
+    }
+    .section-check.active { display: inline-block; background: var(--green); border-color: var(--green); }
     .bg-navy { background: var(--navy); }
     .bg-red { background: var(--bfs-red); }
     .section-content { display: none; padding-top: 8px; }
     .section-content.active { display: block; }
-    .door-row { background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; border: 1px solid #94a3b8; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .chevron::after { content: '▼'; font-size: 10px; }
+    .active-header .chevron::after { content: '▲'; }
+
+    /* ── CLASSIC ROWS ── */
+    .door-row {
+      background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px; border: 1px solid #94a3b8;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
     .size-label { font-weight: 900; font-size: 13px; width: 48px; flex-shrink: 0; color: var(--navy); text-align: center; }
     .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
     .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px 2px; border: 1px solid #e2e8f0; border-radius: 4px; }
@@ -43,107 +108,257 @@
     .has-qty { color: var(--green) !important; font-size: 17px; }
     .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
     .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
-    #summary { background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px; padding:12px; line-height: 1.4; color: #000; white-space: pre; }
+
+    /* ── SUMMARY ── */
+    #summary {
+      background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace;
+      font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px;
+      padding:12px; line-height: 1.4; color: #000; white-space: pre;
+    }
+    #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
+    #summary.flash { animation: summaryFlash 0.6s ease-out; }
+    @keyframes summaryFlash {
+      0%   { border-color: var(--green); box-shadow: 0 0 0 4px rgba(22,163,74,0.3); }
+      60%  { border-color: var(--green); box-shadow: 0 0 0 8px rgba(22,163,74,0.1); }
+      100% { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
+    }
+
+    /* ── EMPTY STATE ── */
+    #summary-empty-state {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      pointer-events: none; margin-top: 8px;
+    }
+    #summary-empty-state span { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
+    #summary-empty-state p { font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.6; margin: 0; }
+    #summary-empty-state.hidden { display: none; }
+
+    /* ── HISTORY ── */
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
+    .history-controls { display: flex; gap: 8px; align-items: center; }
     .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
-    .chevron::after { content: '▼'; font-size: 10px; }
-    .active-header .chevron::after { content: '▲'; }
+
+    /* ── MODAL OVERLAY (reset) ── */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto; }
+    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
+
+    /* ── TOAST ── */
+    #toast {
+      visibility: hidden; min-width: 200px; background-color: #1e293b; color: #fff;
+      text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed;
+      z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%);
+      font-weight: bold; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.4s 1.4s forwards; }
+    @keyframes fadein { from { opacity:0; bottom:20px; } to { opacity:1; bottom:30px; } }
+    @keyframes fadeout { from { opacity:1; } to { opacity:0; } }
+
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <a href="index.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'modern')">SWITCH TO MODERN</a>
+<div id="toast"></div>
+<div id="job-banner"></div>
 
 <div class="header-card">
   <img src="icon-512.png" alt="Logo" class="app-logo">
   <div class="input-row">
-    <div class="input-group"><label>Customer</label><input id="customer" type="text" placeholder="Pulte" oninput="saveActiveState()"></div>
+    <div class="input-group ac-wrap">
+      <label>Customer</label>
+      <input id="customer" type="text" placeholder="Pulte" autocomplete="off"
+        oninput="saveActiveState(); updateJobBanner(); showCustomerSuggestions()"
+        onfocus="showCustomerSuggestions()"
+        onblur="setTimeout(()=>closeDropdown('ac-customer'),200)">
+      <div id="ac-customer" class="ac-dropdown"></div>
+    </div>
   </div>
   <div class="input-row">
-    <div class="input-group w-75"><label>Subdivision</label><input id="subdivision" type="text" placeholder="Huxley" oninput="saveActiveState()"></div>
-    <div class="input-group w-25"><label>Lot #</label><input id="lot" type="text" placeholder="104" oninput="saveActiveState()"></div>
+    <div class="input-group ac-wrap w-75">
+      <label>Subdivision</label>
+      <input id="subdivision" type="text" placeholder="Huxley" autocomplete="off"
+        oninput="saveActiveState(); updateJobBanner(); showSubdivisionSuggestions()"
+        onfocus="showSubdivisionSuggestions()"
+        onblur="setTimeout(()=>closeDropdown('ac-subdivision'),200)">
+      <div id="ac-subdivision" class="ac-dropdown"></div>
+    </div>
+    <div class="input-group w-25">
+      <label>Lot #</label>
+      <input id="lot" type="text" placeholder="104A" oninput="saveActiveState(); updateJobBanner()">
+    </div>
   </div>
 </div>
 
 <div id="app-content"></div>
 
+<!-- SUMMARY -->
 <div class="header-card" style="margin-top:15px;" id="summary-section">
   <label>Notes & Summary</label>
   <textarea id="notes" placeholder="General Notes..." oninput="saveActiveState()"></textarea>
-  <div class="actions" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-    <button class="actionBtn" style="padding:14px; border:0; border-radius:6px; background:var(--navy); color:white; font-weight:700;" onclick="generateSummary()">Generate Takeoff</button>
-    <button class="actionBtn" style="padding:14px; border:0; border-radius:6px; background:#e2e8f0; color:var(--navy); font-weight:700;" onclick="copySummary()">Copy Text</button>
+
+  <!-- Row 1: Generate full width -->
+  <button class="actionBtn" style="width:100%; background:var(--bfs-red); color:white; margin-top:4px; font-size:15px;" onclick="generateSummary()">⚡ Generate Takeoff</button>
+
+  <!-- Row 2: Copy + AppWright -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
+    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="sendToAppWright()">🔗 AppWright</button>
   </div>
-  <textarea id="summary" readonly></textarea>
-  <button class="actionBtn" style="width:100%; border:0; padding:14px; border-radius:6px; background:#fee2e2; color:#b91c1c; margin-top:8px; font-weight:700;" onclick="if(confirm('Clear all data?')) resetAllUI()">Reset All Fields</button>
+
+  <div style="position:relative;">
+    <textarea id="summary" readonly></textarea>
+    <div id="summary-empty-state">
+      <span>📋</span>
+      <p>Tap <strong>Generate Takeoff</strong><br>to build your report</p>
+    </div>
+  </div>
+  <button class="actionBtn" style="width:100%; background:#fee2e2; color:#b91c1c; margin-top:8px;" onclick="showResetModal()">Reset All Fields</button>
 </div>
 
-<div class="header-card" style="margin-top:20px; text-align: left;">
-    <label>Takeoff History</label>
-    <div id="history-list"></div>
-    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
+<!-- RESET MODAL -->
+<div id="resetModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Reset All Fields?</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts, notes, and the current lot. This cannot be undone.</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeResetModal()">Cancel</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="confirmReset()">Yes, Reset</button>
+    </div>
+  </div>
 </div>
 
-<div class="version-tag">Version 2.2.0 - Summary Sync Active</div>
+<!-- HISTORY -->
+<div class="header-card" style="margin-top:20px; text-align:left;">
+  <label>Takeoff History</label>
+  <div id="history-list"></div>
+  <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
+</div>
+
+<div class="version-tag">Version 2.9.0 - Classic Sync</div>
 
 <script>
   let state = { fireRated: false };
-  const doorSizes = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes = ["4/0","4/8","5/0","5/4","6/0"];
-  const railLengths = ["8'", "12'", "16'", "18'"];
-  const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
 
+  const doorSizes    = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
+  const dblSizes     = ["4/0","4/8","5/0","5/4","6/0"];
+  const railLengths  = ["8'", "12'", "16'", "18'"];
+  const stairItems   = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
+  const lockoutItems = ["Passage", "Privacy", "Dummy", "Keyed Entry", "Deadbolt", "Hinge Bumps", "Base Bumps"];
+
+  // ── JOB BANNER ───────────────────────────────────────────────────
+  function updateJobBanner() {
+    const cust = document.getElementById('customer').value.trim();
+    const sub  = document.getElementById('subdivision').value.trim();
+    const lot  = document.getElementById('lot').value.trim();
+    const banner = document.getElementById('job-banner');
+    if (cust || sub || lot) {
+      const parts = [];
+      if (cust) parts.push(cust);
+      if (sub)  parts.push(sub);
+      if (lot)  parts.push(`LOT ${lot}`);
+      banner.innerHTML = `📋 <span>ACTIVE JOB:</span> ${parts.join(' — ')}`;
+      banner.classList.add('visible');
+    } else {
+      banner.classList.remove('visible');
+    }
+  }
+
+  // ── STATE ────────────────────────────────────────────────────────
   function saveActiveState() {
     document.querySelectorAll('.qty-input').forEach(inp => {
-        const key = inp.id.replace('inp-', '');
-        state[key] = parseInt(inp.value) || 0;
+      const key = inp.id.replace('inp-', '');
+      state[key] = parseInt(inp.value) || 0;
     });
     document.querySelectorAll('.note-box').forEach(note => {
-        state[note.id] = note.value;
+      state[note.id] = note.value;
     });
     const fullData = {
-      customer: document.getElementById('customer').value,
+      customer:    document.getElementById('customer').value,
       subdivision: document.getElementById('subdivision').value,
-      lot: document.getElementById('lot').value,
-      notes: document.getElementById('notes').value,
+      lot:         document.getElementById('lot').value,
+      notes:       document.getElementById('notes').value,
       summaryText: document.getElementById('summary').value,
       state: state
     };
     localStorage.setItem('bfs_active_work', JSON.stringify(fullData));
+    updateSummaryStyle();
   }
 
   function loadActiveState() {
     const saved = localStorage.getItem('bfs_active_work');
     if (saved) {
       const data = JSON.parse(saved);
-      document.getElementById('customer').value = data.customer || "";
+      document.getElementById('customer').value    = data.customer || "";
       document.getElementById('subdivision').value = data.subdivision || "";
-      document.getElementById('lot').value = data.lot || "";
-      document.getElementById('notes').value = data.notes || "";
-      document.getElementById('summary').value = data.summaryText || "";
+      document.getElementById('lot').value          = data.lot || "";
+      document.getElementById('notes').value        = data.notes || "";
+      document.getElementById('summary').value      = data.summaryText || "";
       state = data.state || { fireRated: false };
       refreshUI();
+      updateSummaryStyle();
+      updateJobBanner();
     }
   }
 
   function refreshUI() {
     Object.keys(state).forEach(key => {
-        const el = document.getElementById('qty-' + key);
-        if(el) {
-            el.innerText = state[key];
-            state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
-        }
-        const inp = document.getElementById('inp-' + key);
-        if(inp) inp.value = state[key] || "";
-        const noteBox = document.getElementById('NOTE_' + key);
-        if(noteBox) noteBox.value = state['NOTE_'+key] || "";
+      const el = document.getElementById('qty-' + key);
+      if (el) {
+        el.innerText = state[key];
+        state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
+      }
+      const inp = document.getElementById('inp-' + key);
+      if (inp) inp.value = state[key] || "";
+      const noteBox = document.getElementById('NOTE_' + key);
+      if (noteBox) noteBox.value = state['NOTE_' + key] || "";
     });
-    if(document.getElementById('fire-status')) document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    if (document.getElementById('fire-status'))
+      document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    updateSectionCheckmarks();
   }
 
-  function update(key, delta, btnEl) {
+  // ── SECTION CHECKMARKS ───────────────────────────────────────────
+  function updateSectionCheckmarks() {
+    const sectionMap = {
+      "68_s":   { prefix: "68",    sizes: doorSizes,   types: ["LH","RH","SLAB"] },
+      "68_d":   { prefix: "DBL68", sizes: dblSizes,    types: ["DBL","T-AST"] },
+      "80_s":   { prefix: "80",    sizes: doorSizes,   types: ["LH","RH","SLAB"] },
+      "80_d":   { prefix: "DBL80", sizes: dblSizes,    types: ["DBL","T-AST"] },
+      "at_ws":  { prefix: "atws",  sizes: doorSizes,   types: ["LH","RH"] },
+      "at_st":  { prefix: "AS",    sizes: ["22x54","25x54","Scuttle"], types: ["QTY"] },
+      "s_parts":{ prefix: null,    sizes: [...railLengths, ...stairItems], mixed: true },
+      "lockout":{ prefix: "LO",    sizes: lockoutItems, types: ["QTY"] }
+    };
+    Object.keys(sectionMap).forEach(secId => {
+      const s = sectionMap[secId];
+      let hasData = false;
+      s.sizes.forEach(sz => {
+        let types = s.types;
+        if (s.mixed) {
+          types = railLengths.includes(sz) ? ["OPEN","WALL"] : sz === "Shoes" ? ["FLAT","ANGLE"] : ["QTY"];
+          const prefix = railLengths.includes(sz) ? "HR" : sz === "Shoes" ? "STSH" : "ST";
+          types.forEach(t => {
+            const key = `${prefix}_${sz.replace(/[\/ ']/g,"-")}_${t}`;
+            if (state[key] > 0) hasData = true;
+          });
+          return;
+        }
+        types.forEach(t => {
+          const key = `${s.prefix}_${sz.replace(/[\/ ']/g,"-")}_${t}`;
+          if (state[key] > 0) hasData = true;
+        });
+      });
+      if (secId === "at_st" && state.fireRated) hasData = true;
+      const checkEl = document.getElementById(`check-${secId}`);
+      if (checkEl) hasData ? checkEl.classList.add('active') : checkEl.classList.remove('active');
+    });
+  }
+
+  function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     refreshUI();
     saveActiveState();
@@ -152,98 +367,216 @@
   function toggleFire() {
     state.fireRated = !state.fireRated;
     document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    updateSectionCheckmarks();
     saveActiveState();
   }
 
   function toggleSection(id, headerEl) {
-    const content = document.getElementById('content-' + id);
-    content.classList.toggle('active');
+    document.getElementById('content-' + id).classList.toggle('active');
     headerEl.classList.toggle('active-header');
   }
 
+  // ── ROW BUILDER ──────────────────────────────────────────────────
   function renderRow(label, prefix, types) {
     let displayLabel = (prefix === "80" || prefix === "DBL80") ? label + "x8/0" : label;
     let html = `<div class="door-row"><div class="size-label">${displayLabel}</div><div class="controls-grid">`;
     types.forEach(type => {
-      let key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type;
-      let isHigh = (label === "Balusters" || label === "Shoes" || label === "Brackets");
+      const key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type;
+      const isHigh = (label === "Balusters" || label === "Shoes" || label === "Brackets");
       html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">`;
-      html += isHigh ? `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState()">` : `<button class="btn" onclick="update('${key}', -1, this)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1, this)">+</button>`;
+      html += isHigh
+        ? `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState(); updateSectionCheckmarks()">`
+        : `<button class="btn" onclick="update('${key}', -1)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1)">+</button>`;
       html += `</div><input type="text" id="NOTE_${key}" class="note-box" placeholder="Note" oninput="saveActiveState()"></div>`;
     });
     return html + `</div></div>`;
   }
 
+  // ── LAYOUT ───────────────────────────────────────────────────────
   const layout = [
-    { title: "6/8 Doors", id: "68_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68", ["LH", "RH", "SLAB"])).join('') },
-    { title: "6/8 Double", id: "68_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL68", ["DBL", "T-AST"])).join('') },
-    { title: "8/0 Doors", id: "80_s", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80", ["LH", "RH", "SLAB"])).join('') },
-    { title: "8/0 Double", id: "80_d", color: "bg-red", rows: () => dblSizes.map(s => renderRow(s, "DBL80", ["DBL", "T-AST"])).join('') },
-    { title: "Attic W/S", id: "at_ws", color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "atws", ["LH", "RH"])).join('') },
-    { title: "Attic Stairs", id: "at_st", color: "bg-red", rows: () => renderRow("22x54", "AS", ["QTY"]) + renderRow("25x54", "AS", ["QTY"]) + renderRow("Scuttle", "AS", ["QTY"]) + `<div class="toggle-container"><span class="toggle-label">FIRE RATED?</span><button class="btn" style="width:60px; font-size:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>` },
-    { title: "Stair Parts", id: "s_parts", color: "bg-navy", rows: () => railLengths.map(s => renderRow(s, "HR", ["OPEN", "WALL"])).join('') + stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') + renderRow("Shoes", "STSH", ["FLAT", "ANGLE"]) }
+    { title: "6/8 Doors",    id: "68_s",   color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68",    ["LH","RH","SLAB"])).join('') },
+    { title: "6/8 Double",   id: "68_d",   color: "bg-red",  rows: () => dblSizes.map(s  => renderRow(s, "DBL68", ["DBL","T-AST"])).join('') },
+    { title: "8/0 Doors",    id: "80_s",   color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80",    ["LH","RH","SLAB"])).join('') },
+    { title: "8/0 Double",   id: "80_d",   color: "bg-red",  rows: () => dblSizes.map(s  => renderRow(s, "DBL80", ["DBL","T-AST"])).join('') },
+    { title: "Attic W/S",    id: "at_ws",  color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "atws",  ["LH","RH"])).join('') },
+    { title: "Attic Stairs", id: "at_st",  color: "bg-red",  rows: () =>
+        renderRow("22x54",  "AS", ["QTY"]) +
+        renderRow("25x54",  "AS", ["QTY"]) +
+        renderRow("Scuttle","AS", ["QTY"]) +
+        `<div style="padding:8px;"><span style="font-weight:800; font-size:13px; color:var(--navy);">FIRE RATED?</span>
+         <button class="btn" style="width:60px; font-size:10px; margin-left:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>`
+    },
+    { title: "Stair Parts",  id: "s_parts",color: "bg-navy", rows: () =>
+        railLengths.map(s => renderRow(s, "HR", ["OPEN","WALL"])).join('') +
+        stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') +
+        renderRow("Shoes", "STSH", ["FLAT","ANGLE"])
+    },
+    { title: "Lockout",      id: "lockout",color: "bg-red",  rows: () => lockoutItems.map(s => renderRow(s, "LO", ["QTY"])).join('') }
   ];
 
+  // ── BUILD DOM ────────────────────────────────────────────────────
   document.getElementById('app-content').innerHTML = layout.map(sec => `
-    <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)"><span>${sec.title}</span><span class="chevron"></span></div>
+    <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
+      <span>${sec.title}</span>
+      <span style="display:flex;align-items:center;gap:6px;">
+        <span class="section-check" id="check-${sec.id}">✓</span>
+        <span class="chevron"></span>
+      </span>
+    </div>
     <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
   `).join('');
 
+  // ── GENERATE SUMMARY ─────────────────────────────────────────────
   function generateSummary() {
-    const cust = document.getElementById('customer').value || "NA";
-    const sub = document.getElementById('subdivision').value || "NA";
-    const lot = document.getElementById('lot').value || "NA";
-    const gNotes = document.getElementById('notes').value || "";
+    const cust   = document.getElementById('customer').value    || "NA";
+    const sub    = document.getElementById('subdivision').value || "NA";
+    const lot    = document.getElementById('lot').value         || "NA";
+    const gNotes = document.getElementById('notes').value       || "";
     let report = `TAKEOFF -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n`;
+
     const sections = [
-        {id: '68', head: '--- 6/8 SINGLE DOORS ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL68', head: '--- 6/8 DOUBLE DOORS ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
-        {id: '80', head: '--- 8/0 SINGLE DOORS ---', sizes: doorSizes, types: ["LH", "RH", "SLAB"]},
-        {id: 'DBL80', head: '--- 8/0 DOUBLE DOORS ---', sizes: dblSizes, types: ["DBL", "T-AST"]},
-        {id: 'atws', head: '--- ATTIC WS DOORS ---', sizes: doorSizes, types: ["LH", "RH"]},
-        {id: 'AS', head: '--- ATTIC STAIRS ---', sizes: ["22x54", "25x54", "Scuttle"], types: ["QTY"]},
-        {id: 'HR', head: '--- HANDRAIL ---', sizes: railLengths, types: ["OPEN", "WALL"]},
-        {id: 'ST', head: '--- STAIR HARDWARE ---', sizes: stairItems.filter(i=>i!=="Shoes"), types: ["QTY"]},
-        {id: 'STSH', head: '--- SHOES ---', sizes: ["Shoes"], types: ["FLAT", "ANGLE"]}
+      { id:'68',    head:'--- 6/8 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"" },
+      { id:'DBL68', head:'--- 6/8 DOUBLE DOORS ---',  sizes:dblSizes,     types:["DBL","T-AST"],     suffix:"" },
+      { id:'80',    head:'--- 8/0 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"x8/0" },
+      { id:'DBL80', head:'--- 8/0 DOUBLE DOORS ---',  sizes:dblSizes,     types:["DBL","T-AST"],     suffix:"x8/0" },
+      { id:'atws',  head:'--- ATTIC WS DOORS ---',    sizes:doorSizes,    types:["LH","RH"],         suffix:"" },
+      { id:'AS',    head:'--- ATTIC STAIRS ---',      sizes:["22x54","25x54","Scuttle"], types:["QTY"], suffix:"" },
+      { id:'HR',    head:'--- HANDRAIL ---',          sizes:railLengths,  types:["OPEN","WALL"],     suffix:"" },
+      { id:'ST',    head:'--- STAIR HARDWARE ---',    sizes:stairItems.filter(i=>i!=="Shoes"), types:["QTY"], suffix:"" },
+      { id:'STSH',  head:'--- SHOES ---',             sizes:["Shoes"],    types:["FLAT","ANGLE"],    suffix:"" },
+      { id:'LO',    head:'--- LOCKOUT ---',           sizes:lockoutItems, types:["QTY"],             suffix:"" }
     ];
+
     sections.forEach(sec => {
-        let sectionText = "";
-        sec.sizes.forEach(sz => {
-            sec.types.forEach(tp => {
-                let key = sec.id + '_' + sz.replace(/[\/ ']/g, "-") + '_' + tp;
-                let val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
-                if(val > 0) {
-                    let note = document.getElementById('NOTE_' + key)?.value;
-                    let fireTag = (state.fireRated && sec.id==='AS') ? ' (FIRE RATED)' : '';
-                    sectionText += `- ${sz} ${tp}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
-                }
-            });
+      let sectionText = "";
+      sec.sizes.forEach(sz => {
+        sec.types.forEach(tp => {
+          const key = sec.id + '_' + sz.replace(/[\/ ']/g, "-") + '_' + tp;
+          const val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
+          if (val > 0) {
+            const note    = state['NOTE_' + key] || "";
+            const fireTag = (state.fireRated && sec.id==='AS') ? ' (FIRE RATED)' : '';
+            const typeStr = tp === "QTY" ? "" : ` ${tp}`;
+            sectionText  += `- ${sz}${sec.suffix}${typeStr}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
+          }
         });
-        if(sectionText) report += sec.head + "\n" + sectionText + "\n";
+      });
+      if (sectionText) report += sec.head + "\n" + sectionText + "\n";
     });
-    if(gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}`;
+
+    if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}`;
     document.getElementById('summary').value = report;
+
+    // Flash the summary box
+    const summaryEl = document.getElementById('summary');
+    summaryEl.classList.remove('flash');
+    void summaryEl.offsetWidth;
+    summaryEl.classList.add('flash');
+
     saveActiveState();
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
-    saveToHistory(report, `${sub} L${lot}`, { customer: cust, subdivision: sub, lot: lot, notes: gNotes, state: JSON.parse(JSON.stringify(state)) });
+    saveToHistory(report, `${sub} L${lot}`, {
+      customer: cust, subdivision: sub, lot: lot, notes: gNotes,
+      state: JSON.parse(JSON.stringify(state))
+    });
   }
 
+  function updateSummaryStyle() {
+    const s     = document.getElementById('summary');
+    const empty = document.getElementById('summary-empty-state');
+    const hasText = s.value.length > 0;
+    hasText ? s.classList.add('has-text')    : s.classList.remove('has-text');
+    hasText ? empty.classList.add('hidden')  : empty.classList.remove('hidden');
+  }
+
+  // ── TOAST ────────────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.classList.remove("show");
+    void t.offsetWidth;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2000);
+  }
+
+  // ── COPY ─────────────────────────────────────────────────────────
+  function copySummary() {
+    const text = document.getElementById("summary").value;
+    if (!text.trim()) return;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("✓ COPIED TO CLIPBOARD");
+    }).catch(() => {
+      document.getElementById("summary").select();
+      document.execCommand("copy");
+      showToast("✓ COPIED TO CLIPBOARD");
+    });
+  }
+
+  // ── APPWRIGHT ────────────────────────────────────────────────────
+  function sendToAppWright() {
+    const text = document.getElementById("summary").value;
+    if (!text.trim()) {
+      showToast("⚠️ GENERATE TAKEOFF FIRST");
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("✓ COPIED — OPENING APPWRIGHT");
+      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
+    }).catch(() => {
+      showToast("OPENING APPWRIGHT...");
+      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
+    });
+  }
+
+  // ── RESET MODAL ──────────────────────────────────────────────────
+  function showResetModal() {
+    document.getElementById('resetModal').style.display = 'flex';
+  }
+  function closeResetModal() {
+    document.getElementById('resetModal').style.display = 'none';
+  }
+  function confirmReset() {
+    closeResetModal();
+    state = { fireRated: false };
+    document.getElementById('summary').value = "";
+    localStorage.removeItem('bfs_active_work');
+    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
+    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
+    refreshUI();
+    updateSummaryStyle();
+    updateJobBanner();
+    window.scrollTo(0, 0);
+  }
+  document.getElementById('resetModal').addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
+  });
+
+  // ── HISTORY ──────────────────────────────────────────────────────
   function saveToHistory(text, label, fullData) {
+    learnFromJob(fullData.customer, fullData.subdivision);
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    const now = new Date();
+    const now     = new Date();
     const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
-    history.unshift({ label: `${dateStr} - ${label}`, text: text, time: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), fullData: fullData });
-    if(history.length > 10) history.pop();
+    history.unshift({ label: `${dateStr} - ${label}`, text, time: now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), fullData });
+    if (history.length > 10) history.pop();
     localStorage.setItem('bfs_history', JSON.stringify(history));
     renderHistory();
   }
 
   function renderHistory() {
-    const list = document.getElementById('history-list');
+    const list    = document.getElementById('history-list');
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    list.innerHTML = history.length ? "" : "<p style='font-size:11px; padding:10px;'>No history.</p>";
+    list.innerHTML = history.length ? "" : "<p style='font-size:11px; padding:10px; color:#94a3b8;'>No history.</p>";
     history.forEach((item, index) => {
-      list.innerHTML += `<div class="history-item"><span><b>${item.label}</b></span><div class="history-controls"><button class="load-btn" onclick="loadHistory(${index})">LOAD</button><button class="del-btn" onclick="deleteHistoryItem(${index})">X</button></div></div>`;
+      list.innerHTML += `
+        <div class="history-item">
+          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ""}</small></span>
+          <div class="history-controls">
+            <button class="load-btn" onclick="loadHistory(${index})">LOAD</button>
+            <button class="del-btn"  onclick="deleteHistoryItem(${index})">✕</button>
+          </div>
+        </div>`;
     });
   }
 
@@ -251,30 +584,122 @@
     const h = JSON.parse(localStorage.getItem('bfs_history'))[index];
     document.getElementById('summary').value = h.text;
     if (h.fullData) {
-        document.getElementById('customer').value = h.fullData.customer || "";
-        document.getElementById('subdivision').value = h.fullData.subdivision || "";
-        document.getElementById('lot').value = h.fullData.lot || "";
-        document.getElementById('notes').value = h.fullData.notes || "";
-        state = JSON.parse(JSON.stringify(h.fullData.state));
-        refreshUI();
-        saveActiveState();
+      document.getElementById('customer').value    = h.fullData.customer || "";
+      document.getElementById('subdivision').value = h.fullData.subdivision || "";
+      document.getElementById('lot').value          = h.fullData.lot || "";
+      document.getElementById('notes').value        = h.fullData.notes || "";
+      state = JSON.parse(JSON.stringify(h.fullData.state));
+      learnFromJob(h.fullData.customer, h.fullData.subdivision);
+      refreshUI();
+      saveActiveState();
+      updateJobBanner();
+      updateSummaryStyle();
     }
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
   }
 
   function deleteHistoryItem(index) {
-      let h = JSON.parse(localStorage.getItem('bfs_history'));
-      h.splice(index, 1);
-      localStorage.setItem('bfs_history', JSON.stringify(h));
-      renderHistory();
+    let h = JSON.parse(localStorage.getItem('bfs_history'));
+    h.splice(index, 1);
+    localStorage.setItem('bfs_history', JSON.stringify(h));
+    renderHistory();
   }
 
-  function clearHistory() { localStorage.removeItem('bfs_history'); renderHistory(); }
-  function copySummary() { const s = document.getElementById("summary"); s.select(); document.execCommand("copy"); alert("Copied!"); }
-  function resetAllUI() { state = { fireRated: false }; document.getElementById('summary').value = ""; localStorage.removeItem('bfs_active_work'); refreshUI(); location.reload(); }
+  function clearHistory() {
+    if (confirm('Clear all takeoff history?')) {
+      localStorage.removeItem('bfs_history');
+      renderHistory();
+    }
+  }
 
-  window.onload = loadActiveState;
+  // ── AUTOCOMPLETE KNOWLEDGE BASE ──────────────────────────────────
+  function getKnowledge() {
+    try { return JSON.parse(localStorage.getItem('bfs_knowledge')) || {}; }
+    catch(e) { return {}; }
+  }
+  function saveKnowledge(kb) {
+    const plain = {};
+    Object.keys(kb).forEach(k => { plain[k] = Array.isArray(kb[k]) ? kb[k] : Array.from(kb[k]); });
+    localStorage.setItem('bfs_knowledge', JSON.stringify(plain));
+  }
+  function learnFromJob(customer, subdivision) {
+    if (!customer) return;
+    const kb = getKnowledge();
+    if (!kb[customer]) kb[customer] = [];
+    if (subdivision && !kb[customer].includes(subdivision)) kb[customer].push(subdivision);
+    saveKnowledge(kb);
+  }
+  function getCustomers() {
+    return Object.keys(getKnowledge()).sort();
+  }
+  function getSubdivisionsFor(customer) {
+    const kb = getKnowledge();
+    if (customer && kb[customer]) return kb[customer].sort();
+    const all = new Set();
+    Object.values(kb).forEach(subs => subs.forEach(s => all.add(s)));
+    return Array.from(all).sort();
+  }
+  function deleteCustomer(customer) {
+    const kb = getKnowledge();
+    delete kb[customer];
+    saveKnowledge(kb);
+    document.getElementById('customer').value = "";
+    document.getElementById('subdivision').value = "";
+    saveActiveState(); updateJobBanner();
+    showCustomerSuggestions();
+  }
+  function deleteSubdivision(customer, subdivision) {
+    const kb = getKnowledge();
+    if (kb[customer]) kb[customer] = kb[customer].filter(s => s !== subdivision);
+    saveKnowledge(kb);
+    showSubdivisionSuggestions();
+  }
+  function showDropdown(dropdownId, items, onSelect, onDelete) {
+    const dd = document.getElementById(dropdownId);
+    if (!items.length) { dd.classList.remove('open'); return; }
+    dd.innerHTML = items.map(item => {
+      const safe = item.replace(/'/g, "\\'");
+      const deleteBtn = onDelete
+        ? `<button class="ac-delete" onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();(${onDelete.toString()})('${safe}')">✕</button>`
+        : '';
+      return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${safe}');closeDropdown('${dropdownId}')">
+        <span class="ac-item-label">${item}</span>${deleteBtn}
+      </div>`;
+    }).join('');
+    dd.classList.add('open');
+  }
+  function closeDropdown(id) {
+    const dd = document.getElementById(id);
+    if (dd) dd.classList.remove('open');
+  }
+  function showCustomerSuggestions() {
+    const val      = document.getElementById('customer').value.trim().toLowerCase();
+    const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
+    showDropdown('ac-customer', filtered,
+      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); showSubdivisionSuggestions(); },
+      (s) => deleteCustomer(s)
+    );
+  }
+  function showSubdivisionSuggestions() {
+    const customer = document.getElementById('customer').value.trim();
+    const val      = document.getElementById('subdivision').value.trim().toLowerCase();
+    const all      = getSubdivisionsFor(customer);
+    const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
+    showDropdown('ac-subdivision', filtered,
+      (s) => { document.getElementById('subdivision').value = s; saveActiveState(); updateJobBanner(); },
+      (s) => deleteSubdivision(customer, s)
+    );
+  }
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.ac-wrap')) {
+      closeDropdown('ac-customer');
+      closeDropdown('ac-subdivision');
+    }
+  });
+
+  // ── INIT ─────────────────────────────────────────────────────────
   renderHistory();
+  loadActiveState();
 </script>
 </body>
 </html>
