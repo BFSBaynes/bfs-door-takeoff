@@ -106,7 +106,7 @@
     <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.1.7 - Hardware Integrated</div>
+<div class="version-tag">Version 2.1.1 - History Fix</div>
 
 <script>
   let state = { fireRated: false };
@@ -119,12 +119,6 @@
   const railLengths = ["8'", "12'", "16'", "18'"];
   const stairItems = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
   const directInputItems = ["Brackets", "Balusters", "Shoes"];
-  
-  // Hardware Definition
-  const hardwareItems = ["Knobs", "Locks", "Stops"];
-  const knobTypes = ["Privacy", "Passage", "Dummy"];
-  const lockTypes = ["Keyed Entry", "Deadbolt"];
-  const stopTypes = ["Base", "Hinge"];
 
   const layout = [
     { title: "6/8 Doors", id: "68", color: "bg-navy", items: doorSizes, types: ["LH", "RH", "SLAB"] },
@@ -133,14 +127,15 @@
     { title: "8/0 Double", id: "DBL80", color: "bg-red", items: dblSizes, types: ["DBL", "T-AST"] },
     { title: "Attic W/S Door", id: "atws", color: "bg-navy", items: doorSizes, types: ["LH", "RH"] },
     { title: "Attic Stairs", id: "AS", color: "bg-red", items: ["22x54", "25x54", "Scuttle"], types: ["QTY"] },
-    { title: "Stair Parts", id: "sp", color: "bg-navy", items: [...railLengths, ...stairItems] },
-    { title: "Hardware", id: "hw", color: "bg-red", items: hardwareItems }
+    { title: "Stair Parts", id: "sp", color: "bg-navy", items: [...railLengths, ...stairItems] }
   ];
 
+  // Global Functions for History
   window.loadHistory = function(index) {
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     const h = history[index];
     if (!h) return;
+
     document.getElementById('summary').value = h.text;
     if (h.fullData) {
         document.getElementById('customer').value = h.fullData.customer || "";
@@ -203,8 +198,7 @@
         else if (label === "Shoes") sId = "STSH";
         else sId = "ST";
     }
-    if (sectionId === "hw") sId = "HW";
-    return `${sId}_${label.replace(/[\/ ']/g, "-")}_${type.replace(/ /g, "-")}`;
+    return `${sId}_${label.replace(/[\/ ']/g, "-")}_${type}`;
   }
 
   function toggleSection(id, headerEl) {
@@ -263,9 +257,6 @@
         if (sec.id === "sp") {
             types = (railLengths.includes(item)) ? ["OPEN", "WALL"] : (item === "Shoes" ? ["FLAT", "ANGLE"] : ["QTY"]);
         }
-        if (sec.id === "hw") {
-            types = (item === "Knobs") ? knobTypes : (item === "Locks" ? lockTypes : stopTypes);
-        }
         const cardId = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
         const card = document.getElementById(cardId);
         if(card) {
@@ -297,9 +288,9 @@
           if (index === 0) { leftB.innerText = `${t}:${qty}`; leftB.classList.add('active'); }
           else { rightB.innerText = `${t}:${qty}`; rightB.classList.add('active'); }
         } else if (types.length === 3) {
-          if (t === "LH" || t === "Privacy") { leftB.innerText = `${t[0]}:${qty}`; leftB.classList.add('active'); }
-          else if (t === "RH" || t === "Dummy") { rightB.innerText = `${t[0]}:${qty}`; rightB.classList.add('active'); }
-          else { centerB.innerText = `${t[0]}:${qty}`; centerB.classList.add('active'); }
+          if (t === "LH") { leftB.innerText = `L:${qty}`; leftB.classList.add('active'); }
+          else if (t === "RH") { rightB.innerText = `R:${qty}`; rightB.classList.add('active'); }
+          else { centerB.innerText = `S:${qty}`; centerB.classList.add('active'); }
         } else { centerB.innerText = qty; centerB.classList.add('active'); }
       }
     });
@@ -327,20 +318,18 @@
       {id: "AS", head: "--- ATTIC STAIRS ---", types: ["QTY"], items: ["22x54", "25x54", "Scuttle"], suffix:""},
       {id: "HR", head: "--- HANDRAIL ---", types: ["OPEN", "WALL"], items: railLengths, suffix:""},
       {id: "ST", head: "--- STAIR HARDWARE ---", types: ["QTY"], items: stairItems.filter(i=>i!=="Shoes"), suffix:""},
-      {id: "STSH", head: "--- SHOES ---", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""},
-      {id: "HW", head: "--- HARDWARE ---", types: ["Privacy", "Passage", "Dummy", "Keyed Entry", "Deadbolt", "Base", "Hinge"], items: hardwareItems, suffix:""}
+      {id: "STSH", head: "--- SHOES ---", types: ["FLAT", "ANGLE"], items: ["Shoes"], suffix:""}
     ];
 
     groups.forEach(g => {
       let groupContent = "";
       g.items.forEach(item => {
         g.types.forEach(t => {
-          const key = (g.id === "HR" || g.id === "ST" || g.id === "STSH" || g.id === "HW") ? `${g.id}_${item.replace(/[\/ ']/g, "-")}_${t.replace(/ /g, "-")}` : getSyncKey(g.id, item, t);
+          const key = (g.id === "HR" || g.id === "ST" || g.id === "STSH") ? `${g.id}_${item.replace(/[\/ ']/g, "-")}_${t}` : getSyncKey(g.id, item, t);
           if(state[key] > 0) {
             const fireLabel = (g.id === "AS" && state.fireRated) ? " (FIRE RATED)" : "";
             const cleanType = (t === "QTY") ? "" : ` ${t}`;
-            let itemLabel = (g.id === "HW") ? t : `${item}${g.suffix}${cleanType}`;
-            groupContent += `- ${itemLabel}: ${state[key]}${fireLabel}`;
+            groupContent += `- ${item}${g.suffix}${cleanType}: ${state[key]}${fireLabel}`;
             if(state[`NOTE_${key}`]) groupContent += ` *${state[`NOTE_${key}`]}`;
             groupContent += `\n`;
           }
@@ -357,3 +346,81 @@
   }
 
   function updateSummaryStyle() {
+    const s = document.getElementById('summary');
+    s.value.length > 0 ? s.classList.add('has-text') : s.classList.remove('has-text');
+  }
+
+  function saveToHistory(text, label, fullData) {
+    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const now = new Date();
+    const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
+    const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    history.unshift({ label: `${dateStr} - ${label}`, text: text, time: timeStr, fullData: fullData });
+    if(history.length > 10) history.pop();
+    localStorage.setItem('bfs_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    list.innerHTML = history.length ? "" : "<p style='font-size:11px; color:#94a3b8;'>No recent takeoffs.</p>";
+    history.forEach((item, index) => {
+      list.innerHTML += `<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time}</small></span><div class="history-controls"><button class="load-btn" onclick="loadHistory(${index})">LOAD</button><button class="del-btn" onclick="deleteHistoryItem(${index})">X</button></div></div>`;
+    });
+  }
+
+  function resetCurrentFields() {
+    if(confirm('Reset current lot?')) {
+        state = { fireRated: false };
+        document.getElementById('summary').value = "";
+        localStorage.removeItem('bfs_active_work');
+        document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
+        refreshAllCards();
+        updateSummaryStyle();
+        window.scrollTo(0,0);
+    }
+  }
+
+  function copySummary() {
+    const s = document.getElementById("summary");
+    navigator.clipboard.writeText(s.value).then(() => {
+      const t = document.getElementById("toast");
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2000);
+    });
+  }
+
+  // --- Initial Layout Building ---
+  const appContainer = document.getElementById('app-content');
+  layout.forEach(sec => {
+    const title = document.createElement('div'); title.className = `section-title ${sec.color}`;
+    title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
+    title.onclick = () => toggleSection(sec.id, title);
+    const content = document.createElement('div'); content.id = `content-${sec.id}`; content.className = 'section-content';
+    const grid = document.createElement('div'); grid.className = 'item-grid';
+    sec.items.forEach(item => {
+        let itemTypes = sec.types || [];
+        if (sec.id === "sp") {
+            itemTypes = (railLengths.includes(item)) ? ["OPEN", "WALL"] : (item === "Shoes" ? ["FLAT", "ANGLE"] : ["QTY"]);
+        }
+        const card = document.createElement('div'); card.className = 'item-card';
+        card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
+        card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
+        card.onclick = () => openModal(sec.id, item, itemTypes);
+        grid.appendChild(card);
+    });
+    content.appendChild(grid);
+    if(sec.id === "AS") {
+      const fireBtn = document.createElement('button'); fireBtn.id = "fire-status"; fireBtn.className = "item-card";
+      fireBtn.style.width = "calc(100% - 16px)"; fireBtn.style.margin = "8px"; fireBtn.innerText = "FIRE RATED: NO"; fireBtn.onclick = toggleFire;
+      content.appendChild(fireBtn);
+    }
+    appContainer.appendChild(title); appContainer.appendChild(content);
+  });
+
+  renderHistory();
+  loadActiveState();
+</script>
+</body>
+</html>
