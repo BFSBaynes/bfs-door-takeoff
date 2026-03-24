@@ -283,7 +283,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 3.1.0 - History Improvements</div>
+<div class="version-tag">Version 3.1.1 - New Lot Counter Fix</div>
 
 <script>
   let state = { fireRated: false };
@@ -773,14 +773,26 @@
     closeNewLotModal();
     const cust = document.getElementById('customer').value;
     const sub  = document.getElementById('subdivision').value;
+    // Reset state first
     state = { fireRated: false };
     document.getElementById('summary').value = "";
     document.getElementById('lot').value = "";
     document.getElementById('notes').value = "";
+    // Explicitly zero all visible counters and inputs
+    document.querySelectorAll('.qty').forEach(el => {
+      el.innerText = '0';
+      el.classList.remove('has-qty');
+    });
+    document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
+    document.querySelectorAll('.note-box').forEach(el => { el.value = ""; });
+    if (document.getElementById('fire-status'))
+      document.getElementById('fire-status').innerText = "NO";
+    // Collapse all sections
     document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
-    refreshUI();
     updateSummaryStyle();
+    updateSectionCheckmarks();
+    // Restore customer and subdivision
     document.getElementById('customer').value = cust;
     document.getElementById('subdivision').value = sub;
     saveActiveState();
