@@ -212,7 +212,7 @@
 <body>
 
 <a href="classic.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'classic')">SWITCH TO CLASSIC</a>
-<div id="toast">✓ COPIED TO CLIPBOARD</div>
+<div id="toast"></div>
 
 <!-- STICKY JOB BANNER — shown after user scrolls past header -->
 <div id="job-banner"></div>
@@ -260,10 +260,16 @@
 <div class="header-card" style="margin-top:15px;" id="summary-section">
   <label>General Project Notes</label>
   <textarea id="notes" placeholder="Notes..." oninput="saveState()"></textarea>
-  <div class="actions">
-    <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="generateSummary()">Generate Takeoff</button>
-    <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">Copy Text</button>
+
+  <!-- Row 1: Generate (full width) -->
+  <button class="actionBtn" style="width:100%; background:var(--bfs-red); color:white; margin-top:8px; font-size:15px;" onclick="generateSummary()">⚡ Generate Takeoff</button>
+
+  <!-- Row 2: Copy + AppWright side by side -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+    <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
+    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="sendToAppWright()">🔗 AppWright</button>
   </div>
+
   <div style="position:relative;">
     <textarea id="summary" readonly></textarea>
     <div id="summary-empty-state">
@@ -294,7 +300,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.7.0 - Deletable Suggestions</div>
+<div class="version-tag">Version 2.8.1 - AppWright URL Fix</div>
 
 <script>
   let state = { fireRated: false };
@@ -671,19 +677,39 @@
     const text = document.getElementById("summary").value;
     if (!text.trim()) return;
     navigator.clipboard.writeText(text).then(() => {
-      const t = document.getElementById("toast");
-      t.classList.remove("show");
-      // force reflow so animation restarts if tapped twice quickly
-      void t.offsetWidth;
-      t.classList.add("show");
-      setTimeout(() => t.classList.remove("show"), 2000);
+      showToast("✓ COPIED TO CLIPBOARD");
     }).catch(() => {
-      // fallback for any edge-case browser issues
       const ta = document.getElementById("summary");
       ta.select();
       document.execCommand("copy");
-      alert("Copied!");
+      showToast("✓ COPIED TO CLIPBOARD");
     });
+  }
+
+  // ── SEND TO APPWRIGHT — copy + open URL ───────────────────────────
+  function sendToAppWright() {
+    const text = document.getElementById("summary").value;
+    if (!text.trim()) {
+      showToast("⚠️ GENERATE TAKEOFF FIRST");
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("✓ COPIED — OPENING APPWRIGHT");
+      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
+    }).catch(() => {
+      // Fallback if clipboard fails — still open the URL
+      showToast("OPENING APPWRIGHT...");
+      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
+    });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.classList.remove("show");
+    void t.offsetWidth;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2000);
   }
 
   // ── BUILD LAYOUT ──────────────────────────────────────────────────
