@@ -77,6 +77,12 @@
       position: sticky; top: 33px; z-index: 100;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
+    .section-check {
+      display: none; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
+      border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 900;
+      color: #fff; margin-right: 8px; letter-spacing: 0;
+    }
+    .section-check.active { display: inline-block; background: var(--green); border-color: var(--green); }
     .bg-navy { background: var(--navy); }
     .bg-red { background: var(--bfs-red); }
     .section-content { display: none; padding: 8px 0; }
@@ -243,7 +249,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.4.2 - Clean Build</div>
+<div class="version-tag">Version 2.5.0 - Section Checkmarks</div>
 
 <script>
   let state = { fireRated: false };
@@ -437,6 +443,7 @@
   // ── CARD REFRESH ─────────────────────────────────────────────────
   function refreshAllCards() {
     layout.forEach(sec => {
+      let sectionHasData = false;
       sec.items.forEach(item => {
         let types = sec.types || [];
         if (sec.id === "sp") {
@@ -448,10 +455,16 @@
         const card = document.getElementById(cardId);
         if (card) {
           const hasData = types.some(t => state[getSyncKey(sec.id, item, t)] > 0);
+          if (hasData) sectionHasData = true;
           hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
           updateCardBadges(card, sec.id, item, types);
         }
       });
+      // Special case: Attic Stairs section also checks fire rated
+      if (sec.id === "AS" && state.fireRated) sectionHasData = true;
+      // Update section header checkmark
+      const checkEl = document.getElementById(`check-${sec.id}`);
+      if (checkEl) sectionHasData ? checkEl.classList.add('active') : checkEl.classList.remove('active');
     });
     const fireBtn = document.getElementById('fire-status');
     if (fireBtn) {
@@ -615,7 +628,7 @@
   layout.forEach(sec => {
     const title = document.createElement('div');
     title.className = `section-title ${sec.color}`;
-    title.innerHTML = `<span>${sec.title}</span><span class="chevron"></span>`;
+    title.innerHTML = `<span>${sec.title}</span><span style="display:flex;align-items:center;gap:6px;"><span class="section-check" id="check-${sec.id}">✓</span><span class="chevron"></span></span>`;
     title.onclick = () => toggleSection(sec.id, title);
 
     const content = document.createElement('div');
