@@ -17,12 +17,12 @@
   <style>
     :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-    body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 70px; overflow-x: hidden; }
+    body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 30px; overflow-x: hidden; }
 
-    /* ── MODE SWITCH — bottom center ── */
+    /* ── MODE SWITCH — top left ── */
     .mode-switch {
-      position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
-      z-index: 999; background: var(--bfs-red); color: white; padding: 8px 20px;
+      position: fixed; top: 10px; left: 10px;
+      z-index: 999; background: var(--bfs-red); color: white; padding: 6px 12px;
       border-radius: 20px; font-size: 10px; font-weight: 800;
       text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       border: 2px solid white; white-space: nowrap;
@@ -238,7 +238,7 @@
   <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
 </div>
 
-<div class="version-tag">Version 2.9.0 - Classic Sync</div>
+<div class="version-tag">Version 2.9.1 - Switch Button Fix</div>
 
 <script>
   let state = { fireRated: false };
