@@ -108,7 +108,11 @@
     .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; color: var(--navy); }
     .has-qty { color: var(--green) !important; font-size: 17px; }
     .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
-    .note-box { width: 95%; height: 22px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 2px; font-size: 9px; text-align: center; margin-top: 4px; }
+    .note-box { width: 95%; height: 24px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 3px; font-size: 11px; text-align: center; margin-top: 4px; }
+
+    /* ── ALTERNATING ROW COLORS ── */
+    .door-row:nth-child(even) { background: #f8fafc; }
+    .door-row:nth-child(odd)  { background: #ffffff; }
 
     /* ── SUMMARY ── */
     #summary {
@@ -286,7 +290,7 @@
   </div>
 </div>
 
-<div class="version-tag">Version 3.1.5 - Button Layout</div>
+<div class="version-tag">Version 3.2.0 - Note Icons & Classic Polish</div>
 
 <script>
   let state = { fireRated: false };
