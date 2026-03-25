@@ -210,13 +210,10 @@
   <label>Notes & Summary</label>
   <textarea id="notes" placeholder="General Notes..." oninput="saveActiveState()"></textarea>
 
-  <!-- Row 1: Generate full width -->
-  <button class="actionBtn" style="width:100%; background:var(--bfs-red); color:white; margin-top:4px; font-size:15px;" onclick="generateSummary()">⚡ Generate Takeoff</button>
-
-  <!-- Row 2: Copy + AppWright -->
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+  <!-- Row 1: Generate + Copy side by side -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+    <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
     <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
-    <button class="actionBtn" style="background:var(--navy); color:white;" onclick="sendToAppWright()">🔗 AppWright</button>
   </div>
 
   <div style="position:relative;">
@@ -289,7 +286,7 @@
   </div>
 </div>
 
-<div class="version-tag">Version 3.1.3 - Reset Counter Fix</div>
+<div class="version-tag">Version 3.1.5 - Button Layout</div>
 
 <script>
   let state = { fireRated: false };
