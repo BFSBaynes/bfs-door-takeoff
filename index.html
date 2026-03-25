@@ -105,6 +105,11 @@
     .badge-center { left: 50%; transform: translateX(-50%); }
     .item-card:active { transform: scale(0.95); background: #f1f5f9; }
     .item-card.has-data { border-color: var(--green); background: #f0fdf4; color: var(--green); }
+    .note-badge {
+      position: absolute; top: 3px; right: 3px; font-size: 9px;
+      display: none; line-height: 1;
+    }
+    .note-badge.active { display: block; }
 
     /* ── MODAL ── */
     .modal-overlay {
@@ -342,7 +347,7 @@
   </div>
 </div>
 
-<div class="version-tag">Version 3.1.5 - Button Layout</div>
+<div class="version-tag">Version 3.2.0 - Note Icons & Classic Polish</div>
 
 <script>
   let state = { fireRated: false };
@@ -580,25 +585,29 @@
     const leftB   = card.querySelector('.badge-left');
     const rightB  = card.querySelector('.badge-right');
     const centerB = card.querySelector('.badge-center');
+    const noteB   = card.querySelector('.note-badge');
     if (!leftB) return;
     [leftB, rightB, centerB].forEach(b => { b.innerText = ""; b.classList.remove('active'); });
 
+    let hasNote = false;
     types.forEach((t, index) => {
       const key = getSyncKey(sectionId, label, t);
       const qty = state[key] || 0;
+      if (state[`NOTE_${key}`]) hasNote = true;
       if (qty > 0) {
         if (types.length === 2) {
           if (index === 0) { leftB.innerText = `${t}:${qty}`;  leftB.classList.add('active'); }
           else             { rightB.innerText = `${t}:${qty}`; rightB.classList.add('active'); }
         } else if (types.length === 3) {
-          if (t === "LH")   { leftB.innerText   = `L:${qty}`;  leftB.classList.add('active'); }
-          else if (t === "RH") { rightB.innerText = `R:${qty}`; rightB.classList.add('active'); }
-          else              { centerB.innerText  = `S:${qty}`; centerB.classList.add('active'); }
+          if (t === "LH")      { leftB.innerText   = `L:${qty}`;  leftB.classList.add('active'); }
+          else if (t === "RH") { rightB.innerText  = `R:${qty}`;  rightB.classList.add('active'); }
+          else                 { centerB.innerText = `S:${qty}`;  centerB.classList.add('active'); }
         } else {
           centerB.innerText = qty; centerB.classList.add('active');
         }
       }
     });
+    if (noteB) hasNote ? noteB.classList.add('active') : noteB.classList.remove('active');
   }
 
   function toggleFire() {
@@ -869,7 +878,7 @@
       const card = document.createElement('div');
       card.className = 'item-card';
       card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
-      card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div>`;
+      card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div><div class="note-badge">📝</div>`;
       card.onclick = () => openModal(sec.id, item, itemTypes);
       grid.appendChild(card);
     });
