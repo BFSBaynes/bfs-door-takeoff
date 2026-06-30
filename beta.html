@@ -265,16 +265,29 @@
     <button class="actionBtn" style="background:#dcfce7; color:#15803d; font-size:13px;" onclick="savePlanTemplate()">💾 Save As Plan Template</button>
   </div>
 
-  <!-- PLAN PHOTO -->
+  <!-- PLAN PHOTOS / PDFs — multiple labeled pages (1st Floor, 2nd Floor, Options, etc.) -->
   <div style="margin-top:8px;">
-    <input type="file" id="planPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePlanPhotoUpload(event)">
+    <input type="file" id="planPhotoCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePlanFileUpload(event)">
+    <input type="file" id="planPhotoFileInput" accept="image/*,application/pdf,.pdf" style="display:none;" onchange="handlePlanFileUpload(event)">
     <div id="planPhotoControls" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-      <button class="actionBtn" style="background:#fef3c7; color:#92400e; font-size:13px;" onclick="document.getElementById('planPhotoInput').click()">📷 Upload Plan Photo</button>
-      <button class="actionBtn" id="viewPlanPhotoBtn" style="background:#e2e8f0; color:var(--navy); font-size:13px; display:none;" onclick="togglePlanPhoto()">🖼️ View Plan Photo</button>
+      <button class="actionBtn" style="background:#fef3c7; color:#92400e; font-size:13px;" onclick="document.getElementById('planPhotoCameraInput').click()">📷 Take Photo</button>
+      <button class="actionBtn" style="background:#fef3c7; color:#92400e; font-size:13px;" onclick="document.getElementById('planPhotoFileInput').click()">📎 Upload File / PDF</button>
     </div>
+    <div id="planPasteZone" tabindex="0"
+      style="margin-top:8px; border:2px dashed #94a3b8; border-radius:8px; padding:14px; text-align:center; font-size:12px; color:#64748b; cursor:text; background:#f8fafc;"
+      onclick="this.focus()">
+      📋 Tap here, then paste (Cmd/Ctrl+V) a copied plan image or PDF
+    </div>
+    <p style="font-size:10px; color:#94a3b8; margin:6px 0 0 0; text-align:center;">Add as many pages as you need — e.g. First Floor, Second Floor, Options</p>
+
+    <!-- Thumbnail strip of saved pages -->
+    <div id="planPagesStrip" style="display:flex; gap:8px; overflow-x:auto; margin-top:10px; padding-bottom:4px;"></div>
+
+    <!-- Full-size viewer for whichever page is selected -->
     <div id="planPhotoWrap" style="display:none; margin-top:8px; position:relative;">
-      <img id="planPhotoImg" style="width:100%; border-radius:8px; border:2px solid var(--navy);" />
-      <button onclick="removePlanPhoto()" style="position:absolute; top:6px; right:6px; background:var(--bfs-red); color:white; border:none; border-radius:50%; width:30px; height:30px; font-weight:900; font-size:14px;">✕</button>
+      <div id="planPhotoLabel" style="font-weight:800; font-size:12px; color:var(--navy); margin-bottom:4px;"></div>
+      <div id="planPhotoMedia"></div>
+      <button onclick="removeCurrentPlanPage()" style="position:absolute; top:24px; right:6px; background:var(--bfs-red); color:white; border:none; border-radius:50%; width:30px; height:30px; font-weight:900; font-size:14px;">✕</button>
     </div>
   </div>
 </div>
@@ -339,6 +352,20 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeNewLotModal()">Cancel</button>
       <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmNewLot()">Yes, New Lot</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN PAGE LABEL MODAL -->
+<div id="planLabelModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:8px;">🏷️</div>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Label This Page</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 12px 0;">e.g. First Floor, Second Floor, Options, Elevation</p>
+    <input type="text" id="planLabelInput" placeholder="First Floor" style="margin-bottom:14px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="cancelPlanLabel()">Cancel</button>
+      <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmPlanLabel()">Save Page</button>
     </div>
   </div>
 </div>
@@ -846,7 +873,7 @@
     localStorage.removeItem('bfs_beta_active_work');
     document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
     document.getElementById('planHanding').value = "";
-    removePlanPhoto();
+    removeAllPlanPages();
     // Collapse all open sections and reset chevrons
     document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
@@ -1065,15 +1092,58 @@
     });
   });
 
-  // ── PLAN PHOTO (reference image, no AI — just local display) ──────
-  function handlePlanPhotoUpload(event) {
+  // ── PLAN PAGES (reference images/PDFs, no AI — just local display) ──
+  // Stored as an array: [{id, label, type:'image'|'pdf', dataUrl, name}, ...]
+  let planPages = [];
+  let activePlanPageId = null;
+  let pendingPlanFile = null; // file waiting on a label before being saved
+
+  function handlePlanFileUpload(event) {
     const file = event.target.files[0];
+    event.target.value = ""; // allow re-selecting the same file later
     if (!file) return;
+    promptForPlanLabel(file);
+  }
+
+  function promptForPlanLabel(file) {
+    pendingPlanFile = file;
+    const suggestions = ["First Floor", "Second Floor", "Options", "Elevation"];
+    const used = planPages.map(p => p.label);
+    const suggestion = suggestions.find(s => !used.includes(s)) || `Page ${planPages.length + 1}`;
+    document.getElementById('planLabelInput').value = suggestion;
+    document.getElementById('planLabelModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('planLabelInput').select(), 50);
+  }
+
+  function cancelPlanLabel() {
+    pendingPlanFile = null;
+    document.getElementById('planLabelModal').style.display = 'none';
+  }
+
+  function confirmPlanLabel() {
+    const label = document.getElementById('planLabelInput').value.trim() || `Page ${planPages.length + 1}`;
+    const file = pendingPlanFile;
+    document.getElementById('planLabelModal').style.display = 'none';
+    pendingPlanFile = null;
+    if (!file) return;
+    processPlanFile(file, label);
+  }
+
+  function processPlanFile(file, label) {
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
+    if (isPdf) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        addPlanPage({ id: 'p' + Date.now(), label, type: 'pdf', dataUrl: e.target.result, name: file.name || 'plan.pdf' });
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+    // Image — downscale so localStorage doesn't fill up (5MB/origin limit in most browsers)
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = new Image();
       img.onload = function() {
-        // Downscale large photos so localStorage doesn't fill up (5MB limit per-origin in most browsers)
         const MAX_DIM = 1600;
         let w = img.width, h = img.height;
         if (w > MAX_DIM || h > MAX_DIM) {
@@ -1085,43 +1155,113 @@
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        try {
-          localStorage.setItem('bfs_beta_plan_photo', dataUrl);
-          showPlanPhoto(dataUrl);
-          showToast("✓ PLAN PHOTO SAVED");
-        } catch (err) {
-          showToast("⚠️ PHOTO TOO LARGE TO SAVE");
-        }
+        addPlanPage({ id: 'p' + Date.now(), label, type: 'image', dataUrl });
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
-    event.target.value = ""; // allow re-selecting the same file later
   }
 
-  function showPlanPhoto(dataUrl) {
-    document.getElementById('planPhotoImg').src = dataUrl;
+  function addPlanPage(page) {
+    planPages.push(page);
+    try {
+      savePlanPagesToStorage();
+      renderPlanPagesStrip();
+      showPlanPage(page.id);
+      showToast(`✓ "${page.label}" SAVED`);
+    } catch (err) {
+      planPages.pop(); // roll back if storage failed (e.g. quota exceeded)
+      showToast("⚠️ FILE TOO LARGE TO SAVE");
+    }
+  }
+
+  function savePlanPagesToStorage() {
+    localStorage.setItem('bfs_beta_plan_pages', JSON.stringify(planPages));
+  }
+
+  function loadPlanPagesFromStorage() {
+    const saved = localStorage.getItem('bfs_beta_plan_pages');
+    if (saved) {
+      try { planPages = JSON.parse(saved) || []; } catch (e) { planPages = []; }
+    } else {
+      planPages = [];
+    }
+    renderPlanPagesStrip();
+    if (planPages.length) showPlanPage(planPages[0].id);
+  }
+
+  function renderPlanPagesStrip() {
+    const strip = document.getElementById('planPagesStrip');
+    if (!planPages.length) { strip.innerHTML = ''; return; }
+    strip.innerHTML = planPages.map(p => {
+      const thumb = p.type === 'image'
+        ? `<img src="${p.dataUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;" />`
+        : `<div style="font-size:22px;">📄</div>`;
+      const activeStyle = p.id === activePlanPageId ? 'border-color:var(--green); box-shadow:0 0 0 2px rgba(22,163,74,0.3);' : 'border-color:#94a3b8;';
+      return `
+        <div onclick="showPlanPage('${p.id}')" style="flex-shrink:0; width:70px; cursor:pointer; text-align:center;">
+          <div style="width:70px; height:70px; border:2px solid; ${activeStyle} border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff;">${thumb}</div>
+          <div style="font-size:9px; font-weight:800; color:var(--navy); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.label}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function showPlanPage(id) {
+    const page = planPages.find(p => p.id === id);
+    if (!page) return;
+    activePlanPageId = id;
+    document.getElementById('planPhotoLabel').innerText = page.label;
+    const container = document.getElementById('planPhotoMedia');
+    if (page.type === 'pdf') {
+      container.innerHTML = `
+        <embed src="${page.dataUrl}" type="application/pdf" style="width:100%; height:480px; border-radius:8px; border:2px solid var(--navy);" />
+        <p style="font-size:11px; color:#64748b; margin:6px 0 0 0;">If the PDF doesn't preview above (some browsers block inline PDFs), <a href="${page.dataUrl}" download="${page.name || 'plan.pdf'}" style="color:var(--accent); font-weight:700;">tap here to open it</a>.</p>`;
+    } else {
+      container.innerHTML = `<img src="${page.dataUrl}" style="width:100%; border-radius:8px; border:2px solid var(--navy);" />`;
+    }
     document.getElementById('planPhotoWrap').style.display = 'block';
-    document.getElementById('viewPlanPhotoBtn').style.display = 'block';
+    renderPlanPagesStrip(); // refresh highlight on the active thumbnail
   }
 
-  function togglePlanPhoto() {
-    const wrap = document.getElementById('planPhotoWrap');
-    wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
-  }
-
-  function removePlanPhoto() {
-    localStorage.removeItem('bfs_beta_plan_photo');
+  function removeCurrentPlanPage() {
+    if (!activePlanPageId) return;
+    planPages = planPages.filter(p => p.id !== activePlanPageId);
+    savePlanPagesToStorage();
     document.getElementById('planPhotoWrap').style.display = 'none';
-    document.getElementById('viewPlanPhotoBtn').style.display = 'none';
-    document.getElementById('planPhotoImg').src = '';
-    showToast("🗑 PLAN PHOTO REMOVED");
+    activePlanPageId = null;
+    renderPlanPagesStrip();
+    if (planPages.length) showPlanPage(planPages[0].id);
+    showToast("🗑 PAGE REMOVED");
   }
 
-  function loadPlanPhotoFromStorage() {
-    const saved = localStorage.getItem('bfs_beta_plan_photo');
-    if (saved) showPlanPhoto(saved);
+  function removeAllPlanPages() {
+    planPages = [];
+    activePlanPageId = null;
+    localStorage.removeItem('bfs_beta_plan_pages');
+    document.getElementById('planPhotoWrap').style.display = 'none';
+    renderPlanPagesStrip();
   }
+
+  // Paste support — tap the paste zone, then Cmd/Ctrl+V a copied image or PDF
+  document.getElementById('planPasteZone').addEventListener('paste', function(e) {
+    const items = (e.clipboardData && e.clipboardData.items) || [];
+    let handled = false;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].kind === 'file') {
+        const file = items[i].getAsFile();
+        if (file) {
+          promptForPlanLabel(file);
+          handled = true;
+          break;
+        }
+      }
+    }
+    if (!handled) showToast("⚠️ NO IMAGE/PDF FOUND IN CLIPBOARD");
+    e.preventDefault();
+  });
+  document.getElementById('planLabelModal').addEventListener('click', function(e) {
+    if (e.target === this) cancelPlanLabel();
+  });
 
   // ── PLAN TEMPLATES ────────────────────────────────────────────────
   // Templates keyed by "PlanName||HANDING" so Left/Right/N-A variants of the same plan stay separate
@@ -1229,7 +1369,7 @@
   // ── INIT ──────────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
-  loadPlanPhotoFromStorage();
+  loadPlanPagesFromStorage();
 </script>
 </body>
 </html>
