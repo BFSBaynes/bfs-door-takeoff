@@ -240,6 +240,30 @@
       <input id="lot" type="text" placeholder="104A" oninput="saveState(); updateJobBanner()">
     </div>
   </div>
+
+  <!-- PLAN TEMPLATE ROW -->
+  <div class="input-row">
+    <div class="input-group ac-wrap" style="flex: 0.6;">
+      <label>Plan Name</label>
+      <input id="planName" type="text" placeholder="2540" autocomplete="off"
+        oninput="showPlanSuggestions()"
+        onfocus="showPlanSuggestions()"
+        onblur="setTimeout(()=>closeDropdown('ac-plan'),200)">
+      <div id="ac-plan" class="ac-dropdown"></div>
+    </div>
+    <div class="input-group" style="flex: 0.4;">
+      <label>Garage/Porch</label>
+      <select id="planHanding" style="width:100%; padding:10px; border:1px solid #94a3b8; border-radius:6px; font-size:16px; margin-bottom:8px; background:#fff;">
+        <option value="">N/A</option>
+        <option value="LEFT">Garage Left</option>
+        <option value="RIGHT">Garage Right</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px;">
+    <button class="actionBtn" style="background:#1e40af; color:white; font-size:13px;" onclick="loadPlanTemplate()">📂 Load Plan Template</button>
+    <button class="actionBtn" style="background:#dcfce7; color:#15803d; font-size:13px;" onclick="savePlanTemplate()">💾 Save As Plan Template</button>
+  </div>
 </div>
 
 <div id="app-content"></div>
@@ -302,6 +326,19 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeNewLotModal()">Cancel</button>
       <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmNewLot()">Yes, New Lot</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLAN TEMPLATE LOAD CONFIRMATION MODAL -->
+<div id="planLoadModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:8px;">📂</div>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Load Plan Template?</h2>
+    <p id="plan-load-text" style="color:#64748b; font-size:13px; margin:0 0 20px 0;"></p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closePlanLoadModal()">Cancel</button>
+      <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmPlanLoad()">Yes, Load It</button>
     </div>
   </div>
 </div>
@@ -512,6 +549,9 @@
   });
   document.getElementById('warningModal').addEventListener('click', function(e) {
     if (e.target === this) closeWarningModal();
+  });
+  document.getElementById('planLoadModal').addEventListener('click', function(e) {
+    if (e.target === this) closePlanLoadModal();
   });
 
   function updateModalQty(key, delta) {
@@ -1006,6 +1046,109 @@
       closeDropdown('ac-subdivision');
     }
   });
+
+  // ── PLAN TEMPLATES ────────────────────────────────────────────────
+  // Templates keyed by "PlanName||HANDING" so Left/Right/N-A variants of the same plan stay separate
+  function getPlanTemplates() {
+    try { return JSON.parse(localStorage.getItem('bfs_beta_plan_templates')) || {}; }
+    catch(e) { return {}; }
+  }
+
+  function savePlanTemplates(templates) {
+    localStorage.setItem('bfs_beta_plan_templates', JSON.stringify(templates));
+  }
+
+  function getPlanKey(name, handing) {
+    return `${name.trim()}||${handing || 'NA'}`;
+  }
+
+  function savePlanTemplate() {
+    const name = document.getElementById('planName').value.trim();
+    const handing = document.getElementById('planHanding').value;
+    if (!name) {
+      showToast("⚠️ ENTER A PLAN NAME FIRST");
+      document.getElementById('planName').focus();
+      return;
+    }
+    const templates = getPlanTemplates();
+    const key = getPlanKey(name, handing);
+    const existed = !!templates[key];
+    templates[key] = {
+      planName: name,
+      handing: handing,
+      state: JSON.parse(JSON.stringify(state)),
+      savedAt: new Date().toISOString()
+    };
+    savePlanTemplates(templates);
+    showToast(existed ? "✓ PLAN TEMPLATE UPDATED" : "✓ PLAN TEMPLATE SAVED");
+  }
+
+  function loadPlanTemplate() {
+    const name = document.getElementById('planName').value.trim();
+    const handing = document.getElementById('planHanding').value;
+    if (!name) {
+      showToast("⚠️ ENTER OR PICK A PLAN NAME");
+      document.getElementById('planName').focus();
+      return;
+    }
+    const templates = getPlanTemplates();
+    const key = getPlanKey(name, handing);
+    const tpl = templates[key];
+    if (!tpl) {
+      showToast("⚠️ NO TEMPLATE FOUND FOR THAT PLAN/HANDING");
+      return;
+    }
+    pendingPlanTemplate = tpl;
+    showPlanLoadModal(tpl);
+  }
+
+  function showPlanLoadModal(tpl) {
+    const handingLabel = tpl.handing === 'LEFT' ? 'Garage Left' : tpl.handing === 'RIGHT' ? 'Garage Right' : 'N/A';
+    document.getElementById('plan-load-text').innerHTML =
+      `This will replace your current door counts with the saved template for <strong>${tpl.planName}</strong> (${handingLabel}). Customer, Subdivision, Lot #, and Notes will NOT be changed. You can still edit any count after loading.`;
+    document.getElementById('planLoadModal').style.display = 'flex';
+  }
+  function closePlanLoadModal() {
+    document.getElementById('planLoadModal').style.display = 'none';
+    pendingPlanTemplate = null;
+  }
+  function confirmPlanLoad() {
+    if (!pendingPlanTemplate) return;
+    // Keep fireRated flag and door state from template, but preserve job info already typed in
+    state = JSON.parse(JSON.stringify(pendingPlanTemplate.state));
+    refreshAllCards();
+    saveState();
+    closePlanLoadModal();
+    showToast("✓ PLAN TEMPLATE LOADED");
+  }
+
+  function showPlanSuggestions() {
+    const val = document.getElementById('planName').value.trim().toLowerCase();
+    const templates = getPlanTemplates();
+    // De-duplicate plan names for the dropdown (handing is chosen separately)
+    const names = Array.from(new Set(Object.values(templates).map(t => t.planName))).sort();
+    const filtered = val ? names.filter(n => n.toLowerCase().includes(val)) : names;
+    showDropdown('ac-plan', filtered,
+      (selected) => {
+        document.getElementById('planName').value = selected;
+      },
+      (toDelete) => {
+        deletePlanByName(toDelete);
+      }
+    );
+  }
+
+  function deletePlanByName(name) {
+    const templates = getPlanTemplates();
+    Object.keys(templates).forEach(k => {
+      if (templates[k].planName === name) delete templates[k];
+    });
+    savePlanTemplates(templates);
+    showPlanSuggestions();
+    showToast("🗑 PLAN TEMPLATE(S) DELETED");
+  }
+
+  let pendingPlanTemplate = null;
 
   // ── INIT ──────────────────────────────────────────────────────────
   renderHistory();
