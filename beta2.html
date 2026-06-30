@@ -543,13 +543,33 @@
     if (e.target === this) closeRecapModal();
   });
 
-  // ── TAP FEEDBACK (vibration + visual pulse) ───────────────────────
+  // ── TAP FEEDBACK (audio tick + visual pulse) ──────────────────────
   // Makes a successful tap unmistakable — fixes the "tap didn't register
   // and I didn't notice" failure mode that causes undercounts on a walk.
+  // NOTE: navigator.vibrate() does NOT work on iPhone — Safari/WebKit has
+  // never implemented the Vibration API on iOS, on any website. That's a
+  // platform limitation, not a bug here, so we use a short audio tick
+  // instead, which iOS does support.
+  let tapAudioCtx = null;
+  function playTapTick() {
+    try {
+      if (!tapAudioCtx) tapAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (tapAudioCtx.state === 'suspended') tapAudioCtx.resume();
+      const osc = tapAudioCtx.createOscillator();
+      const gain = tapAudioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(880, tapAudioCtx.currentTime);
+      gain.gain.setValueAtTime(0.15, tapAudioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, tapAudioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(tapAudioCtx.destination);
+      osc.start();
+      osc.stop(tapAudioCtx.currentTime + 0.08);
+    } catch (e) { /* audio not available — visual pulse still covers it */ }
+  }
+
   function tapFeedback(targetEl, btnEl) {
-    if (navigator.vibrate) {
-      try { navigator.vibrate(15); } catch (e) {}
-    }
+    playTapTick();
     if (targetEl) {
       targetEl.classList.remove('tap-pulse');
       void targetEl.offsetWidth; // restart animation if tapped rapidly
