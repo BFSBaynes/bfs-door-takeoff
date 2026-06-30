@@ -273,12 +273,10 @@
       <button class="actionBtn" style="background:#fef3c7; color:#92400e; font-size:13px;" onclick="document.getElementById('planPhotoCameraInput').click()">📷 Take Photo</button>
       <button class="actionBtn" style="background:#fef3c7; color:#92400e; font-size:13px;" onclick="document.getElementById('planPhotoFileInput').click()">📎 Upload File / PDF</button>
     </div>
-    <div id="planPasteZone" tabindex="0"
-      style="margin-top:8px; border:2px dashed #94a3b8; border-radius:8px; padding:14px; text-align:center; font-size:12px; color:#64748b; cursor:text; background:#f8fafc;"
-      onclick="this.focus()">
-      📋 Tap here, then paste (Cmd/Ctrl+V) a copied plan image or PDF
-    </div>
-    <p style="font-size:10px; color:#94a3b8; margin:6px 0 0 0; text-align:center;">Add as many pages as you need — e.g. First Floor, Second Floor, Options</p>
+    <textarea id="planPasteZone" rows="2" placeholder="📋 Tap here, then long-press and choose Paste to add a copied plan image or PDF"
+      style="margin-top:8px; border:2px dashed #94a3b8; border-radius:8px; padding:14px; text-align:center; font-size:14px; color:#64748b; background:#f8fafc; width:100%; resize:none; font-family:inherit;"></textarea>
+    <p style="font-size:10px; color:#94a3b8; margin:6px 0 0 0; text-align:center;">On iPhone: copy the plan first, then tap the box above and long-press to choose <strong>Paste</strong></p>
+    <p style="font-size:10px; color:#94a3b8; margin:2px 0 0 0; text-align:center;">Add as many pages as you need — e.g. First Floor, Second Floor, Options</p>
 
     <!-- Thumbnail strip of saved pages -->
     <div id="planPagesStrip" style="display:flex; gap:8px; overflow-x:auto; margin-top:10px; padding-bottom:4px;"></div>
@@ -1093,10 +1091,60 @@
   });
 
   // ── PLAN PAGES (reference images/PDFs, no AI — just local display) ──
-  // Stored as an array: [{id, label, type:'image'|'pdf', dataUrl, name}, ...]
-  let planPages = [];
+  // Stored in IndexedDB as Blobs (not localStorage) — localStorage caps out
+  // around 5MB per site and base64-encoding text adds ~37% overhead on top,
+  // which is why PDFs were hitting "too large to save." IndexedDB has a much
+  // higher ceiling (commonly hundreds of MB+) and stores the raw file bytes.
+  const PLAN_DB_NAME = 'bfs_beta_plan_db';
+  const PLAN_STORE = 'pages';
+  let planPages = [];           // [{id, label, type:'image'|'pdf', blob, name}]
   let activePlanPageId = null;
-  let pendingPlanFile = null; // file waiting on a label before being saved
+  let pendingPlanFile = null;   // file waiting on a label before being saved
+  let currentObjectUrl = null;  // tracked so we can revoke it and avoid memory leaks
+
+  function openPlanDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(PLAN_DB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(PLAN_STORE, { keyPath: 'id' });
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function dbPutPage(page) {
+    const db = await openPlanDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAN_STORE, 'readwrite');
+      tx.objectStore(PLAN_STORE).put(page);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function dbGetAllPages() {
+    const db = await openPlanDB();
+    return new Promise((resolve, reject) => {
+      const req = db.transaction(PLAN_STORE, 'readonly').objectStore(PLAN_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function dbDeletePage(id) {
+    const db = await openPlanDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAN_STORE, 'readwrite');
+      tx.objectStore(PLAN_STORE).delete(id);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function dbClearAllPages() {
+    const db = await openPlanDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAN_STORE, 'readwrite');
+      tx.objectStore(PLAN_STORE).clear();
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  }
 
   function handlePlanFileUpload(event) {
     const file = event.target.files[0];
@@ -1132,19 +1180,16 @@
   function processPlanFile(file, label) {
     const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
     if (isPdf) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        addPlanPage({ id: 'p' + Date.now(), label, type: 'pdf', dataUrl: e.target.result, name: file.name || 'plan.pdf' });
-      };
-      reader.readAsDataURL(file);
+      // PDFs are stored as-is (already a Blob) — no conversion needed
+      addPlanPage({ id: 'p' + Date.now(), label, type: 'pdf', blob: file, name: file.name || 'plan.pdf' });
       return;
     }
-    // Image — downscale so localStorage doesn't fill up (5MB/origin limit in most browsers)
+    // Image — downscale large photos, then store as a JPEG Blob directly (skips base64 entirely)
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = new Image();
       img.onload = function() {
-        const MAX_DIM = 1600;
+        const MAX_DIM = 1800;
         let w = img.width, h = img.height;
         if (w > MAX_DIM || h > MAX_DIM) {
           const scale = MAX_DIM / Math.max(w, h);
@@ -1154,36 +1199,32 @@
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        addPlanPage({ id: 'p' + Date.now(), label, type: 'image', dataUrl });
+        canvas.toBlob((blob) => {
+          addPlanPage({ id: 'p' + Date.now(), label, type: 'image', blob });
+        }, 'image/jpeg', 0.85);
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  function addPlanPage(page) {
-    planPages.push(page);
+  async function addPlanPage(page) {
     try {
-      savePlanPagesToStorage();
+      await dbPutPage(page);
+      planPages.push(page);
       renderPlanPagesStrip();
       showPlanPage(page.id);
       showToast(`✓ "${page.label}" SAVED`);
     } catch (err) {
-      planPages.pop(); // roll back if storage failed (e.g. quota exceeded)
-      showToast("⚠️ FILE TOO LARGE TO SAVE");
+      console.error(err);
+      showToast("⚠️ COULDN'T SAVE — FILE MAY BE TOO LARGE OR DEVICE STORAGE IS FULL");
     }
   }
 
-  function savePlanPagesToStorage() {
-    localStorage.setItem('bfs_beta_plan_pages', JSON.stringify(planPages));
-  }
-
-  function loadPlanPagesFromStorage() {
-    const saved = localStorage.getItem('bfs_beta_plan_pages');
-    if (saved) {
-      try { planPages = JSON.parse(saved) || []; } catch (e) { planPages = []; }
-    } else {
+  async function loadPlanPagesFromStorage() {
+    try {
+      planPages = await dbGetAllPages();
+    } catch (e) {
       planPages = [];
     }
     renderPlanPagesStrip();
@@ -1194,8 +1235,9 @@
     const strip = document.getElementById('planPagesStrip');
     if (!planPages.length) { strip.innerHTML = ''; return; }
     strip.innerHTML = planPages.map(p => {
-      const thumb = p.type === 'image'
-        ? `<img src="${p.dataUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;" />`
+      const thumbUrl = p.type === 'image' ? URL.createObjectURL(p.blob) : null;
+      const thumb = thumbUrl
+        ? `<img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;" />`
         : `<div style="font-size:22px;">📄</div>`;
       const activeStyle = p.id === activePlanPageId ? 'border-color:var(--green); box-shadow:0 0 0 2px rgba(22,163,74,0.3);' : 'border-color:#94a3b8;';
       return `
@@ -1211,22 +1253,26 @@
     if (!page) return;
     activePlanPageId = id;
     document.getElementById('planPhotoLabel').innerText = page.label;
+    if (currentObjectUrl) { URL.revokeObjectURL(currentObjectUrl); currentObjectUrl = null; }
+    const url = URL.createObjectURL(page.blob);
+    currentObjectUrl = url;
     const container = document.getElementById('planPhotoMedia');
     if (page.type === 'pdf') {
       container.innerHTML = `
-        <embed src="${page.dataUrl}" type="application/pdf" style="width:100%; height:480px; border-radius:8px; border:2px solid var(--navy);" />
-        <p style="font-size:11px; color:#64748b; margin:6px 0 0 0;">If the PDF doesn't preview above (some browsers block inline PDFs), <a href="${page.dataUrl}" download="${page.name || 'plan.pdf'}" style="color:var(--accent); font-weight:700;">tap here to open it</a>.</p>`;
+        <embed src="${url}" type="application/pdf" style="width:100%; height:480px; border-radius:8px; border:2px solid var(--navy);" />
+        <p style="font-size:11px; color:#64748b; margin:6px 0 0 0;">If the PDF doesn't preview above (some browsers block inline PDFs), <a href="${url}" download="${page.name || 'plan.pdf'}" style="color:var(--accent); font-weight:700;">tap here to open it</a>.</p>`;
     } else {
-      container.innerHTML = `<img src="${page.dataUrl}" style="width:100%; border-radius:8px; border:2px solid var(--navy);" />`;
+      container.innerHTML = `<img src="${url}" style="width:100%; border-radius:8px; border:2px solid var(--navy);" />`;
     }
     document.getElementById('planPhotoWrap').style.display = 'block';
     renderPlanPagesStrip(); // refresh highlight on the active thumbnail
   }
 
-  function removeCurrentPlanPage() {
+  async function removeCurrentPlanPage() {
     if (!activePlanPageId) return;
-    planPages = planPages.filter(p => p.id !== activePlanPageId);
-    savePlanPagesToStorage();
+    const idToRemove = activePlanPageId;
+    await dbDeletePage(idToRemove);
+    planPages = planPages.filter(p => p.id !== idToRemove);
     document.getElementById('planPhotoWrap').style.display = 'none';
     activePlanPageId = null;
     renderPlanPagesStrip();
@@ -1234,10 +1280,10 @@
     showToast("🗑 PAGE REMOVED");
   }
 
-  function removeAllPlanPages() {
+  async function removeAllPlanPages() {
+    await dbClearAllPages();
     planPages = [];
     activePlanPageId = null;
-    localStorage.removeItem('bfs_beta_plan_pages');
     document.getElementById('planPhotoWrap').style.display = 'none';
     renderPlanPagesStrip();
   }
@@ -1258,6 +1304,7 @@
     }
     if (!handled) showToast("⚠️ NO IMAGE/PDF FOUND IN CLIPBOARD");
     e.preventDefault();
+    setTimeout(() => { e.target.value = ""; }, 0);
   });
   document.getElementById('planLabelModal').addEventListener('click', function(e) {
     if (e.target === this) cancelPlanLabel();
