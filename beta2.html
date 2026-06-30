@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>Elevate Trim - BETA</title>
+  <title>Elevate Trim - BETA 2</title>
   <style>
     :root{
       --navy:#0A2E4E;
@@ -21,6 +21,14 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 30px; overflow-x: hidden; }
 
+    .beta-tag {
+      position: fixed; top: 6px; left: 8px; z-index: 700;
+      background: var(--bfs-red); color: white; padding: 5px 10px;
+      border-radius: 20px; font-size: 9px; font-weight: 800;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      white-space: nowrap; letter-spacing: 0.3px;
+    }
+
     /* ── STICKY JOB BANNER — fixed to top ── */
     #job-banner {
       display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 600;
@@ -32,15 +40,6 @@
     }
     #job-banner.visible { display: flex; }
     #job-banner span { opacity: 0.75; font-weight: 600; margin: 0 4px; }
-
-    /* ── BETA TAG ── */
-    .beta-tag {
-      position: fixed; top: 6px; left: 8px; z-index: 700;
-      background: var(--bfs-red); color: white; padding: 5px 10px;
-      border-radius: 20px; font-size: 9px; font-weight: 800;
-      border: 1.5px solid rgba(255,255,255,0.6);
-      white-space: nowrap; letter-spacing: 0.3px;
-    }
 
     /* ── HEADER ── */
     .header-card {
@@ -116,8 +115,10 @@
       padding: 10px; margin-bottom: 12px; text-align: left;
     }
     .modal-counter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
-    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; }
+    .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; transition: transform 0.08s, background 0.15s; }
+    .btn.tap-pulse { background: var(--green); transform: scale(1.12); }
+    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; transition: transform 0.15s, color 0.15s; }
+    .qty-display.tap-pulse { color: var(--green); transform: scale(1.3); }
     .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); }
     .active-qty { color: var(--green) !important; border-color: var(--green) !important; }
 
@@ -203,11 +204,22 @@
     #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.4s 1.4s forwards; }
     @keyframes fadein { from { opacity:0; bottom: 20px; } to { opacity:1; bottom: 30px; } }
     @keyframes fadeout { from { opacity:1; } to { opacity:0; } }
+
+    /* ── RECAP SCREEN ── */
+    .recap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0; max-height: 50vh; overflow-y: auto; padding-right: 2px; }
+    .recap-tile {
+      background: #f0fdf4; border: 2px solid var(--green); border-radius: 10px;
+      padding: 10px 8px; text-align: center;
+    }
+    .recap-tile .recap-label { font-size: 11px; font-weight: 800; color: var(--navy); text-transform: uppercase; }
+    .recap-tile .recap-qty { font-size: 26px; font-weight: 900; color: var(--green); margin-top: 2px; }
+    .recap-tile .recap-note { font-size: 10px; color: #64748b; margin-top: 2px; font-style: italic; }
+    .recap-empty { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
   </style>
 </head>
 <body>
 
-<div class="beta-tag">BETA TEST</div>
+<div class="beta-tag">BETA 2 — TAP FEEDBACK + RECAP</div>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
 
@@ -240,54 +252,6 @@
       <input id="lot" type="text" placeholder="104A" oninput="saveState(); updateJobBanner()">
     </div>
   </div>
-
-  <!-- PLAN TEMPLATE ROW -->
-  <div class="input-row">
-    <div class="input-group ac-wrap" style="flex: 0.6;">
-      <label>Plan Name</label>
-      <input id="planName" type="text" placeholder="2540" autocomplete="off"
-        oninput="showPlanSuggestions()"
-        onfocus="showPlanSuggestions()"
-        onblur="setTimeout(()=>closeDropdown('ac-plan'),200)">
-      <div id="ac-plan" class="ac-dropdown"></div>
-    </div>
-    <div class="input-group" style="flex: 0.4;">
-      <label>Garage/Porch</label>
-      <select id="planHanding" style="width:100%; padding:10px; border:1px solid #94a3b8; border-radius:6px; font-size:16px; margin-bottom:8px; background:#fff;">
-        <option value="">N/A</option>
-        <option value="LEFT">Garage Left</option>
-        <option value="RIGHT">Garage Right</option>
-      </select>
-    </div>
-  </div>
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px;">
-    <button class="actionBtn" style="background:#1e40af; color:white; font-size:13px;" onclick="loadPlanTemplate()">📂 Load Plan Template</button>
-    <button class="actionBtn" style="background:#dcfce7; color:#15803d; font-size:13px;" onclick="savePlanTemplate()">💾 Save As Plan Template</button>
-  </div>
-
-  <!-- PLAN PHOTOS / PDFs — multiple labeled pages (1st Floor, 2nd Floor, Options, etc.) -->
-  <div style="margin-top:8px;">
-    <input type="file" id="planPhotoCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePlanFileUpload(event)">
-    <input type="file" id="planPhotoFileInput" accept="image/*,application/pdf,.pdf" style="display:none;" onchange="handlePlanFileUpload(event)">
-    <div id="planPhotoControls" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-      <button class="actionBtn" style="background:#fef3c7; color:#92400e; font-size:13px;" onclick="document.getElementById('planPhotoCameraInput').click()">📷 Take Photo</button>
-      <button class="actionBtn" style="background:#fef3c7; color:#92400e; font-size:13px;" onclick="document.getElementById('planPhotoFileInput').click()">📎 Upload File / PDF</button>
-    </div>
-    <textarea id="planPasteZone" rows="2" placeholder="📋 Tap here, then long-press and choose Paste to add a copied plan image or PDF"
-      style="margin-top:8px; border:2px dashed #94a3b8; border-radius:8px; padding:14px; text-align:center; font-size:14px; color:#64748b; background:#f8fafc; width:100%; resize:none; font-family:inherit;"></textarea>
-    <p style="font-size:10px; color:#94a3b8; margin:6px 0 0 0; text-align:center;">On iPhone: copy the plan first, then tap the box above and long-press to choose <strong>Paste</strong></p>
-    <p style="font-size:10px; color:#94a3b8; margin:2px 0 0 0; text-align:center;">Add as many pages as you need — e.g. First Floor, Second Floor, Options</p>
-
-    <!-- Thumbnail strip of saved pages -->
-    <div id="planPagesStrip" style="display:flex; gap:8px; overflow-x:auto; margin-top:10px; padding-bottom:4px;"></div>
-
-    <!-- Full-size viewer for whichever page is selected -->
-    <div id="planPhotoWrap" style="display:none; margin-top:8px; position:relative;">
-      <div id="planPhotoLabel" style="font-weight:800; font-size:12px; color:var(--navy); margin-bottom:4px;"></div>
-      <div id="planPhotoMedia"></div>
-      <button onclick="removeCurrentPlanPage()" style="position:absolute; top:24px; right:6px; background:var(--bfs-red); color:white; border:none; border-radius:50%; width:30px; height:30px; font-weight:900; font-size:14px;">✕</button>
-    </div>
-  </div>
 </div>
 
 <div id="app-content"></div>
@@ -301,6 +265,19 @@
   </div>
 </div>
 
+<!-- RECAP MODAL -->
+<div id="recapModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:480px;">
+    <h2 style="margin:0 0 4px 0; color:var(--navy); font-size:1.3rem;">📋 Quick Recap</h2>
+    <p style="color:#64748b; font-size:12px; margin:0 0 4px 0;">Does this match what you counted on the walk? Tap any tile to jump back and fix it.</p>
+    <div id="recap-grid" class="recap-grid"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeRecapModal()">Go Back & Fix</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="confirmGenerateFromRecap()">✓ Looks Right — Generate</button>
+    </div>
+  </div>
+</div>
+
 <!-- SUMMARY -->
 <div class="header-card" style="margin-top:15px;" id="summary-section">
   <label>General Project Notes</label>
@@ -309,7 +286,7 @@
 
   <!-- Row 1: Generate + Copy side by side -->
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-    <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
+    <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="openRecap()">⚡ Generate</button>
     <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
   </div>
 
@@ -354,33 +331,6 @@
   </div>
 </div>
 
-<!-- PLAN PAGE LABEL MODAL -->
-<div id="planLabelModal" class="modal-overlay">
-  <div class="modal-content" style="max-width:320px;">
-    <div style="font-size:2rem; margin-bottom:8px;">🏷️</div>
-    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Label This Page</h2>
-    <p style="color:#64748b; font-size:13px; margin:0 0 12px 0;">e.g. First Floor, Second Floor, Options, Elevation</p>
-    <input type="text" id="planLabelInput" placeholder="First Floor" style="margin-bottom:14px;">
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="cancelPlanLabel()">Cancel</button>
-      <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmPlanLabel()">Save Page</button>
-    </div>
-  </div>
-</div>
-
-<!-- PLAN TEMPLATE LOAD CONFIRMATION MODAL -->
-<div id="planLoadModal" class="modal-overlay">
-  <div class="modal-content" style="max-width:320px;">
-    <div style="font-size:2rem; margin-bottom:8px;">📂</div>
-    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Load Plan Template?</h2>
-    <p id="plan-load-text" style="color:#64748b; font-size:13px; margin:0 0 20px 0;"></p>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closePlanLoadModal()">Cancel</button>
-      <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmPlanLoad()">Yes, Load It</button>
-    </div>
-  </div>
-</div>
-
 <!-- REQUIRED FIELDS WARNING MODAL -->
 <div id="warningModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
@@ -389,7 +339,7 @@
     <p id="warning-text" style="color:#64748b; font-size:13px; margin:0 0 20px 0;"></p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeWarningModal()">Go Back</button>
-      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeWarningModal(); generateSummary(true)">Generate Anyway</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeWarningModal(); openRecap(true)">Generate Anyway</button>
     </div>
   </div>
 </div>
@@ -410,13 +360,14 @@
   </div>
 </div>
 
-<div class="version-tag">BETA — based on Version 3.2.1</div>
+<div class="version-tag">BETA 2 — Tap Feedback + Recap Screen</div>
 
 <script>
   let state = { fireRated: false };
   let activeSectionId = "";
   let activeItemLabel = "";
   let activeTypes = [];
+  let forceGenerateAfterRecap = false;
 
   const doorSizes    = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes     = ["4/0","4/8","5/0","5/4","6/0"];
@@ -456,7 +407,7 @@
 
   // ── HISTORY ─────────────────────────────────────────────────────
   window.loadHistory = function(index) {
-    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
     const h = history[index];
     if (!h) return;
     document.getElementById('summary').value = h.text;
@@ -475,15 +426,15 @@
   };
 
   window.deleteHistoryItem = function(index) {
-    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    let history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
     history.splice(index, 1);
-    localStorage.setItem('bfs_history', JSON.stringify(history));
+    localStorage.setItem('bfs_beta2_history', JSON.stringify(history));
     renderHistory();
   };
 
   window.clearHistory = function() {
     if (confirm('Clear all takeoff history?')) {
-      localStorage.removeItem('bfs_history');
+      localStorage.removeItem('bfs_beta2_history');
       renderHistory();
     }
   };
@@ -498,12 +449,12 @@
       summaryText: document.getElementById('summary').value,
       state: state
     };
-    localStorage.setItem('bfs_beta_active_work', JSON.stringify(fullData));
+    localStorage.setItem('bfs_beta2_active_work', JSON.stringify(fullData));
     updateSummaryStyle();
   }
 
   function loadActiveState() {
-    const saved = localStorage.getItem('bfs_beta_active_work');
+    const saved = localStorage.getItem('bfs_beta2_active_work');
     if (saved) {
       const data = JSON.parse(saved);
       document.getElementById('customer').value   = data.customer || "";
@@ -556,9 +507,9 @@
       let controlHtml = useDirectInput
         ? `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">`
         : `<div style="display:flex; align-items:center; gap:12px;">
-             <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
+             <button class="btn" id="mbtn-minus-${key}" onclick="updateModalQty('${key}', -1)">-</button>
              <span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span>
-             <button class="btn" onclick="updateModalQty('${key}', 1)">+</button>
+             <button class="btn" id="mbtn-plus-${key}" onclick="updateModalQty('${key}', 1)">+</button>
            </div>`;
 
       container.innerHTML += `
@@ -588,15 +539,42 @@
   document.getElementById('warningModal').addEventListener('click', function(e) {
     if (e.target === this) closeWarningModal();
   });
-  document.getElementById('planLoadModal').addEventListener('click', function(e) {
-    if (e.target === this) closePlanLoadModal();
+  document.getElementById('recapModal').addEventListener('click', function(e) {
+    if (e.target === this) closeRecapModal();
   });
+
+  // ── TAP FEEDBACK (vibration + visual pulse) ───────────────────────
+  // Makes a successful tap unmistakable — fixes the "tap didn't register
+  // and I didn't notice" failure mode that causes undercounts on a walk.
+  function tapFeedback(targetEl, btnEl) {
+    if (navigator.vibrate) {
+      try { navigator.vibrate(15); } catch (e) {}
+    }
+    if (targetEl) {
+      targetEl.classList.remove('tap-pulse');
+      void targetEl.offsetWidth; // restart animation if tapped rapidly
+      targetEl.classList.add('tap-pulse');
+      setTimeout(() => targetEl.classList.remove('tap-pulse'), 220);
+    }
+    if (btnEl) {
+      btnEl.classList.remove('tap-pulse');
+      void btnEl.offsetWidth;
+      btnEl.classList.add('tap-pulse');
+      setTimeout(() => btnEl.classList.remove('tap-pulse'), 220);
+    }
+  }
 
   function updateModalQty(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     const el = document.getElementById(`mqty-${key}`);
     el.innerText = state[key];
     el.classList.toggle('active-qty', state[key] > 0);
+    // Only pulse/vibrate on a genuine increment (the tap-to-count case);
+    // decrements (fixing a mistake) don't need the same "confirmed" feel.
+    if (delta > 0) {
+      const btnId = `mbtn-plus-${key}`;
+      tapFeedback(el, document.getElementById(btnId));
+    }
   }
 
   function closeModal() {
@@ -682,14 +660,49 @@
     saveState();
   }
 
-  // ── GENERATE SUMMARY ─────────────────────────────────────────────
-  function generateSummary(force) {
-    const cust = document.getElementById('customer').value.trim();
-    const sub  = document.getElementById('subdivision').value.trim();
-    const lot  = document.getElementById('lot').value.trim();
+  // ── RECAP SCREEN — shown before Generate so a PM can sanity-check
+  // the full list of counts at a glance, instead of catching mistakes
+  // only after Appwright/inside sales sends them back.  ────────────
+  function buildRecapItems() {
+    const groups = [
+      { id:"68",    types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"" },
+      { id:"DBL68", types:["DBL","T-AST"],      items:dblSizes,   suffix:"" },
+      { id:"80",    types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"x8/0" },
+      { id:"DBL80", types:["DBL","T-AST"],      items:dblSizes,   suffix:"x8/0" },
+      { id:"atws",  types:["LH","RH"],          items:doorSizes,  suffix:"" },
+      { id:"AS",    types:["QTY"],              items:["22x54","25x54","Scuttle"], suffix:"" },
+      { id:"HR",    types:["OPEN","WALL"],      items:railLengths, suffix:"" },
+      { id:"ST",    types:["QTY"],              items:stairItems.filter(i=>i!=="Shoes"), suffix:"" },
+      { id:"STSH",  types:["FLAT","ANGLE"],     items:["Shoes"],       suffix:"" },
+      { id:"LO",    types:["QTY"],              items:lockoutItems,    suffix:"" }
+    ];
+    const tiles = [];
+    groups.forEach(g => {
+      g.items.forEach(item => {
+        g.types.forEach(t => {
+          const key = (g.id === "HR" || g.id === "ST" || g.id === "STSH")
+            ? `${g.id}_${item.replace(/[\/ ']/g, "-")}_${t}`
+            : getSyncKey(g.id, item, t);
+          if (state[key] > 0) {
+            const fireLabel = (g.id === "AS" && state.fireRated) ? " 🔥" : "";
+            const cleanType = (t === "QTY") ? "" : ` ${t}`;
+            tiles.push({
+              label: `${item}${g.suffix}${cleanType}${fireLabel}`,
+              qty: state[key],
+              note: state[`NOTE_${key}`] || ""
+            });
+          }
+        });
+      });
+    });
+    return tiles;
+  }
 
-    // Required fields check — warn but allow override
+  function openRecap(force) {
     if (!force) {
+      const cust = document.getElementById('customer').value.trim();
+      const sub  = document.getElementById('subdivision').value.trim();
+      const lot  = document.getElementById('lot').value.trim();
       const missing = [];
       if (!cust) missing.push('<strong>Customer</strong>');
       if (!sub)  missing.push('<strong>Subdivision</strong>');
@@ -699,6 +712,37 @@
         return;
       }
     }
+    const tiles = buildRecapItems();
+    const grid = document.getElementById('recap-grid');
+    if (!tiles.length) {
+      grid.innerHTML = `<div class="recap-empty">No items entered yet — go back and tap the doors/items you counted.</div>`;
+    } else {
+      grid.innerHTML = tiles.map(t => `
+        <div class="recap-tile">
+          <div class="recap-label">${t.label}</div>
+          <div class="recap-qty">${t.qty}</div>
+          ${t.note ? `<div class="recap-note">"${t.note}"</div>` : ""}
+        </div>`).join('');
+    }
+    forceGenerateAfterRecap = !!force;
+    document.getElementById('recapModal').style.display = 'flex';
+  }
+
+  function closeRecapModal() {
+    document.getElementById('recapModal').style.display = 'none';
+  }
+
+  function confirmGenerateFromRecap() {
+    closeRecapModal();
+    generateSummary(forceGenerateAfterRecap);
+  }
+
+  // ── GENERATE SUMMARY ─────────────────────────────────────────────
+  function generateSummary(force) {
+    const cust = document.getElementById('customer').value.trim();
+    const sub  = document.getElementById('subdivision').value.trim();
+    const lot  = document.getElementById('lot').value.trim();
+
     const gNotes = document.getElementById('notes').value || "";
     const custVal = cust || "NA";
     const subVal  = sub  || "NA";
@@ -771,21 +815,20 @@
   // ── HISTORY SAVE / RENDER ─────────────────────────────────────────
   function saveToHistory(text, label, fullData) {
     learnFromJob(fullData.customer, fullData.subdivision);
-    let history = JSON.parse(localStorage.getItem('bfs_beta_history')) || [];
+    let history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
     const now     = new Date();
     const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
-    // Rich label includes customer name
     const richLabel = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
     history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
     if (history.length > 20) history.pop();
-    localStorage.setItem('bfs_beta_history', JSON.stringify(history));
+    localStorage.setItem('bfs_beta2_history', JSON.stringify(history));
     renderHistory();
   }
 
   function renderHistory() {
     const list    = document.getElementById('history-list');
-    const history = JSON.parse(localStorage.getItem('bfs_beta_history')) || [];
+    const history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
     const query   = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
     const filtered = query
       ? history.filter(item =>
@@ -799,7 +842,6 @@
       ? ""
       : `<p style='font-size:11px; color:#94a3b8;'>${query ? 'No matches found.' : 'No recent takeoffs.'}</p>`;
     filtered.forEach((item, index) => {
-      // Find the real index in full history for load/delete
       const realIndex = history.indexOf(item);
       list.innerHTML += `
         <div class="history-item">
@@ -831,12 +873,10 @@
     document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
     refreshAllCards();
     updateSummaryStyle();
-    // Restore customer and subdivision
     document.getElementById('customer').value = cust;
     document.getElementById('subdivision').value = sub;
     saveState();
     updateJobBanner();
-    // Focus the lot field so PM can type immediately
     document.getElementById('lot').focus();
     window.scrollTo(0, 0);
   }
@@ -868,11 +908,8 @@
     closeResetModal();
     state = { fireRated: false };
     document.getElementById('summary').value = "";
-    localStorage.removeItem('bfs_beta_active_work');
+    localStorage.removeItem('bfs_beta2_active_work');
     document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
-    document.getElementById('planHanding').value = "";
-    removeAllPlanPages();
-    // Collapse all open sections and reset chevrons
     document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
     refreshAllCards();
@@ -892,23 +929,6 @@
       ta.select();
       document.execCommand("copy");
       showToast("✓ COPIED TO CLIPBOARD");
-    });
-  }
-
-  // ── SEND TO APPWRIGHT — copy + open URL ───────────────────────────
-  function sendToAppWright() {
-    const text = document.getElementById("summary").value;
-    if (!text.trim()) {
-      showToast("⚠️ GENERATE TAKEOFF FIRST");
-      return;
-    }
-    navigator.clipboard.writeText(text).then(() => {
-      showToast("✓ COPIED — OPENING APPWRIGHT");
-      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
-    }).catch(() => {
-      // Fallback if clipboard fails — still open the URL
-      showToast("OPENING APPWRIGHT...");
-      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
     });
   }
 
@@ -969,17 +989,15 @@
   });
 
   // ── AUTOCOMPLETE KNOWLEDGE BASE ──────────────────────────────────
-  // Structure: { "CustomerName": Set(["Sub1","Sub2",...]) }
   function getKnowledge() {
-    try { return JSON.parse(localStorage.getItem('bfs_beta_knowledge')) || {}; }
+    try { return JSON.parse(localStorage.getItem('bfs_beta2_knowledge')) || {}; }
     catch(e) { return {}; }
   }
 
   function saveKnowledge(kb) {
-    // Convert Sets to arrays for JSON storage
     const plain = {};
     Object.keys(kb).forEach(k => { plain[k] = Array.isArray(kb[k]) ? kb[k] : Array.from(kb[k]); });
-    localStorage.setItem('bfs_beta_knowledge', JSON.stringify(plain));
+    localStorage.setItem('bfs_beta2_knowledge', JSON.stringify(plain));
   }
 
   function learnFromJob(customer, subdivision) {
@@ -999,7 +1017,6 @@
   function getSubdivisionsFor(customer) {
     const kb = getKnowledge();
     if (customer && kb[customer]) return kb[customer].sort();
-    // If no customer typed yet, return all known subdivisions
     const all = new Set();
     Object.values(kb).forEach(subs => subs.forEach(s => all.add(s)));
     return Array.from(all).sort();
@@ -1019,7 +1036,6 @@
     const kb = getKnowledge();
     if (kb[customer]) {
       kb[customer] = kb[customer].filter(s => s !== subdivision);
-      // If customer has no more subdivisions, keep the customer entry (they may add one later)
     }
     saveKnowledge(kb);
     showSubdivisionSuggestions();
@@ -1030,7 +1046,6 @@
     if (!items.length) { dd.classList.remove('open'); return; }
     dd.innerHTML = items.map(item => {
       const safeItem = item.replace(/'/g, "\\'");
-      const deleteCall = onDelete ? `onDelete('${safeItem}')` : '';
       const deleteBtnHtml = onDelete
         ? `<button class="ac-delete" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); (${onDelete.toString()})('${safeItem}'); ">✕</button>`
         : '';
@@ -1079,10 +1094,9 @@
     );
   }
 
-  // Close dropdowns when tapping anywhere else
   document.addEventListener('click', (e) => {
     const clickedWrap = e.target.closest('.ac-wrap');
-    ['ac-customer', 'ac-subdivision', 'ac-plan'].forEach(id => {
+    ['ac-customer', 'ac-subdivision'].forEach(id => {
       const dd = document.getElementById(id);
       if (dd && (!clickedWrap || !clickedWrap.contains(dd))) {
         dd.classList.remove('open');
@@ -1090,333 +1104,9 @@
     });
   });
 
-  // ── PLAN PAGES (reference images/PDFs, no AI — just local display) ──
-  // Stored in IndexedDB as Blobs (not localStorage) — localStorage caps out
-  // around 5MB per site and base64-encoding text adds ~37% overhead on top,
-  // which is why PDFs were hitting "too large to save." IndexedDB has a much
-  // higher ceiling (commonly hundreds of MB+) and stores the raw file bytes.
-  const PLAN_DB_NAME = 'bfs_beta_plan_db';
-  const PLAN_STORE = 'pages';
-  let planPages = [];           // [{id, label, type:'image'|'pdf', blob, name}]
-  let activePlanPageId = null;
-  let pendingPlanFile = null;   // file waiting on a label before being saved
-  let currentObjectUrl = null;  // tracked so we can revoke it and avoid memory leaks
-
-  function openPlanDB() {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(PLAN_DB_NAME, 1);
-      req.onupgradeneeded = () => req.result.createObjectStore(PLAN_STORE, { keyPath: 'id' });
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
-  async function dbPutPage(page) {
-    const db = await openPlanDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(PLAN_STORE, 'readwrite');
-      tx.objectStore(PLAN_STORE).put(page);
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-  async function dbGetAllPages() {
-    const db = await openPlanDB();
-    return new Promise((resolve, reject) => {
-      const req = db.transaction(PLAN_STORE, 'readonly').objectStore(PLAN_STORE).getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error);
-    });
-  }
-  async function dbDeletePage(id) {
-    const db = await openPlanDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(PLAN_STORE, 'readwrite');
-      tx.objectStore(PLAN_STORE).delete(id);
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-  async function dbClearAllPages() {
-    const db = await openPlanDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(PLAN_STORE, 'readwrite');
-      tx.objectStore(PLAN_STORE).clear();
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
-  function handlePlanFileUpload(event) {
-    const file = event.target.files[0];
-    event.target.value = ""; // allow re-selecting the same file later
-    if (!file) return;
-    promptForPlanLabel(file);
-  }
-
-  function promptForPlanLabel(file) {
-    pendingPlanFile = file;
-    const suggestions = ["First Floor", "Second Floor", "Options", "Elevation"];
-    const used = planPages.map(p => p.label);
-    const suggestion = suggestions.find(s => !used.includes(s)) || `Page ${planPages.length + 1}`;
-    document.getElementById('planLabelInput').value = suggestion;
-    document.getElementById('planLabelModal').style.display = 'flex';
-    setTimeout(() => document.getElementById('planLabelInput').select(), 50);
-  }
-
-  function cancelPlanLabel() {
-    pendingPlanFile = null;
-    document.getElementById('planLabelModal').style.display = 'none';
-  }
-
-  function confirmPlanLabel() {
-    const label = document.getElementById('planLabelInput').value.trim() || `Page ${planPages.length + 1}`;
-    const file = pendingPlanFile;
-    document.getElementById('planLabelModal').style.display = 'none';
-    pendingPlanFile = null;
-    if (!file) return;
-    processPlanFile(file, label);
-  }
-
-  function processPlanFile(file, label) {
-    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
-    if (isPdf) {
-      // PDFs are stored as-is (already a Blob) — no conversion needed
-      addPlanPage({ id: 'p' + Date.now(), label, type: 'pdf', blob: file, name: file.name || 'plan.pdf' });
-      return;
-    }
-    // Image — downscale large photos, then store as a JPEG Blob directly (skips base64 entirely)
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        const MAX_DIM = 1800;
-        let w = img.width, h = img.height;
-        if (w > MAX_DIM || h > MAX_DIM) {
-          const scale = MAX_DIM / Math.max(w, h);
-          w = Math.round(w * scale);
-          h = Math.round(h * scale);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob((blob) => {
-          addPlanPage({ id: 'p' + Date.now(), label, type: 'image', blob });
-        }, 'image/jpeg', 0.85);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  async function addPlanPage(page) {
-    try {
-      await dbPutPage(page);
-      planPages.push(page);
-      renderPlanPagesStrip();
-      showPlanPage(page.id);
-      showToast(`✓ "${page.label}" SAVED`);
-    } catch (err) {
-      console.error(err);
-      showToast("⚠️ COULDN'T SAVE — FILE MAY BE TOO LARGE OR DEVICE STORAGE IS FULL");
-    }
-  }
-
-  async function loadPlanPagesFromStorage() {
-    try {
-      planPages = await dbGetAllPages();
-    } catch (e) {
-      planPages = [];
-    }
-    renderPlanPagesStrip();
-    if (planPages.length) showPlanPage(planPages[0].id);
-  }
-
-  function renderPlanPagesStrip() {
-    const strip = document.getElementById('planPagesStrip');
-    if (!planPages.length) { strip.innerHTML = ''; return; }
-    strip.innerHTML = planPages.map(p => {
-      const thumbUrl = p.type === 'image' ? URL.createObjectURL(p.blob) : null;
-      const thumb = thumbUrl
-        ? `<img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;" />`
-        : `<div style="font-size:22px;">📄</div>`;
-      const activeStyle = p.id === activePlanPageId ? 'border-color:var(--green); box-shadow:0 0 0 2px rgba(22,163,74,0.3);' : 'border-color:#94a3b8;';
-      return `
-        <div onclick="showPlanPage('${p.id}')" style="flex-shrink:0; width:70px; cursor:pointer; text-align:center;">
-          <div style="width:70px; height:70px; border:2px solid; ${activeStyle} border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff;">${thumb}</div>
-          <div style="font-size:9px; font-weight:800; color:var(--navy); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.label}</div>
-        </div>`;
-    }).join('');
-  }
-
-  function showPlanPage(id) {
-    const page = planPages.find(p => p.id === id);
-    if (!page) return;
-    activePlanPageId = id;
-    document.getElementById('planPhotoLabel').innerText = page.label;
-    if (currentObjectUrl) { URL.revokeObjectURL(currentObjectUrl); currentObjectUrl = null; }
-    const url = URL.createObjectURL(page.blob);
-    currentObjectUrl = url;
-    const container = document.getElementById('planPhotoMedia');
-    if (page.type === 'pdf') {
-      container.innerHTML = `
-        <embed src="${url}" type="application/pdf" style="width:100%; height:480px; border-radius:8px; border:2px solid var(--navy);" />
-        <p style="font-size:11px; color:#64748b; margin:6px 0 0 0;">If the PDF doesn't preview above (some browsers block inline PDFs), <a href="${url}" download="${page.name || 'plan.pdf'}" style="color:var(--accent); font-weight:700;">tap here to open it</a>.</p>`;
-    } else {
-      container.innerHTML = `<img src="${url}" style="width:100%; border-radius:8px; border:2px solid var(--navy);" />`;
-    }
-    document.getElementById('planPhotoWrap').style.display = 'block';
-    renderPlanPagesStrip(); // refresh highlight on the active thumbnail
-  }
-
-  async function removeCurrentPlanPage() {
-    if (!activePlanPageId) return;
-    const idToRemove = activePlanPageId;
-    await dbDeletePage(idToRemove);
-    planPages = planPages.filter(p => p.id !== idToRemove);
-    document.getElementById('planPhotoWrap').style.display = 'none';
-    activePlanPageId = null;
-    renderPlanPagesStrip();
-    if (planPages.length) showPlanPage(planPages[0].id);
-    showToast("🗑 PAGE REMOVED");
-  }
-
-  async function removeAllPlanPages() {
-    await dbClearAllPages();
-    planPages = [];
-    activePlanPageId = null;
-    document.getElementById('planPhotoWrap').style.display = 'none';
-    renderPlanPagesStrip();
-  }
-
-  // Paste support — tap the paste zone, then Cmd/Ctrl+V a copied image or PDF
-  document.getElementById('planPasteZone').addEventListener('paste', function(e) {
-    const items = (e.clipboardData && e.clipboardData.items) || [];
-    let handled = false;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].kind === 'file') {
-        const file = items[i].getAsFile();
-        if (file) {
-          promptForPlanLabel(file);
-          handled = true;
-          break;
-        }
-      }
-    }
-    if (!handled) showToast("⚠️ NO IMAGE/PDF FOUND IN CLIPBOARD");
-    e.preventDefault();
-    setTimeout(() => { e.target.value = ""; }, 0);
-  });
-  document.getElementById('planLabelModal').addEventListener('click', function(e) {
-    if (e.target === this) cancelPlanLabel();
-  });
-
-  // ── PLAN TEMPLATES ────────────────────────────────────────────────
-  // Templates keyed by "PlanName||HANDING" so Left/Right/N-A variants of the same plan stay separate
-  function getPlanTemplates() {
-    try { return JSON.parse(localStorage.getItem('bfs_beta_plan_templates')) || {}; }
-    catch(e) { return {}; }
-  }
-
-  function savePlanTemplates(templates) {
-    localStorage.setItem('bfs_beta_plan_templates', JSON.stringify(templates));
-  }
-
-  function getPlanKey(name, handing) {
-    return `${name.trim()}||${handing || 'NA'}`;
-  }
-
-  function savePlanTemplate() {
-    const name = document.getElementById('planName').value.trim();
-    const handing = document.getElementById('planHanding').value;
-    if (!name) {
-      showToast("⚠️ ENTER A PLAN NAME FIRST");
-      document.getElementById('planName').focus();
-      return;
-    }
-    const templates = getPlanTemplates();
-    const key = getPlanKey(name, handing);
-    const existed = !!templates[key];
-    templates[key] = {
-      planName: name,
-      handing: handing,
-      state: JSON.parse(JSON.stringify(state)),
-      savedAt: new Date().toISOString()
-    };
-    savePlanTemplates(templates);
-    showToast(existed ? "✓ PLAN TEMPLATE UPDATED" : "✓ PLAN TEMPLATE SAVED");
-  }
-
-  function loadPlanTemplate() {
-    const name = document.getElementById('planName').value.trim();
-    const handing = document.getElementById('planHanding').value;
-    if (!name) {
-      showToast("⚠️ ENTER OR PICK A PLAN NAME");
-      document.getElementById('planName').focus();
-      return;
-    }
-    const templates = getPlanTemplates();
-    const key = getPlanKey(name, handing);
-    const tpl = templates[key];
-    if (!tpl) {
-      showToast("⚠️ NO TEMPLATE FOUND FOR THAT PLAN/HANDING");
-      return;
-    }
-    pendingPlanTemplate = tpl;
-    showPlanLoadModal(tpl);
-  }
-
-  function showPlanLoadModal(tpl) {
-    const handingLabel = tpl.handing === 'LEFT' ? 'Garage Left' : tpl.handing === 'RIGHT' ? 'Garage Right' : 'N/A';
-    document.getElementById('plan-load-text').innerHTML =
-      `This will replace your current door counts with the saved template for <strong>${tpl.planName}</strong> (${handingLabel}). Customer, Subdivision, Lot #, and Notes will NOT be changed. You can still edit any count after loading.`;
-    document.getElementById('planLoadModal').style.display = 'flex';
-  }
-  function closePlanLoadModal() {
-    document.getElementById('planLoadModal').style.display = 'none';
-    pendingPlanTemplate = null;
-  }
-  function confirmPlanLoad() {
-    if (!pendingPlanTemplate) return;
-    // Keep fireRated flag and door state from template, but preserve job info already typed in
-    state = JSON.parse(JSON.stringify(pendingPlanTemplate.state));
-    refreshAllCards();
-    saveState();
-    closePlanLoadModal();
-    showToast("✓ PLAN TEMPLATE LOADED");
-  }
-
-  function showPlanSuggestions() {
-    const val = document.getElementById('planName').value.trim().toLowerCase();
-    const templates = getPlanTemplates();
-    // De-duplicate plan names for the dropdown (handing is chosen separately)
-    const names = Array.from(new Set(Object.values(templates).map(t => t.planName))).sort();
-    const filtered = val ? names.filter(n => n.toLowerCase().includes(val)) : names;
-    showDropdown('ac-plan', filtered,
-      (selected) => {
-        document.getElementById('planName').value = selected;
-      },
-      (toDelete) => {
-        deletePlanByName(toDelete);
-      }
-    );
-  }
-
-  function deletePlanByName(name) {
-    const templates = getPlanTemplates();
-    Object.keys(templates).forEach(k => {
-      if (templates[k].planName === name) delete templates[k];
-    });
-    savePlanTemplates(templates);
-    showPlanSuggestions();
-    showToast("🗑 PLAN TEMPLATE(S) DELETED");
-  }
-
-  let pendingPlanTemplate = null;
-
   // ── INIT ──────────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
-  loadPlanPagesFromStorage();
 </script>
 </body>
 </html>
