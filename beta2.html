@@ -47,22 +47,22 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
     .lo-counter-card {
-      background: white; border-radius: 10px; padding: 16px; margin-bottom: 10px;
+      background: white; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px;
       border: 2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     }
     .lo-counter-card.has-count { border-color: var(--green); background: #f0fdf4; }
-    .lo-item-label { font-size: 20px; font-weight: 900; color: var(--navy); margin-bottom: 14px; }
+    .lo-item-label { font-size: 15px; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
     .lo-controls { display: flex; align-items: center; justify-content: space-between; }
     .lo-btn {
-      width: 72px; height: 72px; border-radius: 12px; border: 0;
-      background: var(--navy); color: white; font-weight: bold; font-size: 36px;
+      width: 52px; height: 52px; border-radius: 8px; border: 0;
+      background: var(--navy); color: white; font-weight: bold; font-size: 26px;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: transform 0.08s, background 0.15s;
     }
     .lo-btn.tap-flash { background: var(--green); transform: scale(1.1); }
     .lo-qty {
-      font-size: 56px; font-weight: 900; color: var(--navy);
-      min-width: 90px; text-align: center;
+      font-size: 36px; font-weight: 900; color: var(--navy);
+      min-width: 60px; text-align: center;
       transition: transform 0.15s, color 0.15s;
     }
     .lo-qty.has-count { color: var(--green); }
@@ -337,7 +337,7 @@
         <div class="input-group ac-wrap">
           <label>Customer</label>
           <input id="lo-customer" type="text" placeholder="Pulte" autocomplete="off"
-            oninput="saveLoState(); showLoCustomerSuggestions()"
+            oninput="saveLoState(); showLoCustomerSuggestions(); checkLoTrimMatch()"
             onfocus="showLoCustomerSuggestions()"
             onblur="setTimeout(()=>closeDropdown('lo-ac-customer'),200)">
           <div id="lo-ac-customer" class="ac-dropdown"></div>
@@ -347,24 +347,31 @@
         <div class="input-group ac-wrap" style="flex:0.75;">
           <label>Subdivision</label>
           <input id="lo-subdivision" type="text" placeholder="Huxley" autocomplete="off"
-            oninput="saveLoState(); showLoSubdivisionSuggestions()"
+            oninput="saveLoState(); showLoSubdivisionSuggestions(); checkLoTrimMatch()"
             onfocus="showLoSubdivisionSuggestions()"
             onblur="setTimeout(()=>closeDropdown('lo-ac-subdivision'),200)">
           <div id="lo-ac-subdivision" class="ac-dropdown"></div>
         </div>
         <div class="input-group" style="flex:0.25;">
           <label>Lot #</label>
-          <input id="lo-lot" type="text" placeholder="104A" oninput="saveLoState()">
+          <input id="lo-lot" type="text" placeholder="104A" oninput="saveLoState(); checkLoTrimMatch()">
         </div>
       </div>
     </div>
 
     <!-- Big counters -->
+    <!-- Trim takeoff cross-reference — auto-shows when lot matches a saved trim takeoff -->
+    <div id="lo-trim-match" style="display:none; background:#eff6ff; border:2px solid #1e40af; border-radius:8px; padding:12px; margin-bottom:8px;">
+      <div style="font-weight:900; font-size:11px; color:#1e40af; margin-bottom:8px; letter-spacing:0.5px;">📋 TRIM TAKEOFF FOUND FOR THIS LOT</div>
+      <div id="lo-trim-totals"></div>
+      <button onclick="showLoTrimDetail()" style="width:100%; margin-top:10px; background:#1e40af; color:white; border:none; border-radius:6px; padding:10px; font-weight:800; font-size:13px; cursor:pointer;">👁 View Full Trim Takeoff</button>
+    </div>
+
     <div id="lo-counters"></div>
 
     <!-- Notes + Generate + Summary -->
     <div class="header-card" style="margin-top:4px;">
-      <label>Notes</label>
+      <label>Post Walk Notes</label>
       <textarea id="lo-notes" placeholder="Notes..." oninput="saveLoState()" style="height:70px;"></textarea>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
         <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="openLoRecap()">⚡ Generate</button>
@@ -415,8 +422,18 @@
   </div>
 </div>
 
+<!-- TRIM TAKEOFF DETAIL MODAL -->
+<div id="loTrimDetailModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:480px;">
+    <h2 style="margin:0 0 6px 0; color:var(--navy); font-size:1.1rem;">📋 Trim Takeoff — Reference</h2>
+    <p style="color:#64748b; font-size:11px; margin:0 0 8px 0;">Original trim takeoff for this lot. Use to cross-reference your lockout walk counts.</p>
+    <textarea id="lo-trim-detail-text" readonly
+      style="height:340px; font-family:'Courier New',monospace; font-size:12px; border:1px solid #e2e8f0; width:100%; border-radius:4px; padding:10px; white-space:pre; background:#f8fafc; color:#000; line-height:1.4;"></textarea>
+    <button class="actionBtn" style="width:100%; background:#e2e8f0; color:var(--navy); margin-top:10px;" onclick="closeLoTrimDetail()">Close</button>
+  </div>
+</div>
+
 <script>
-  let state = { fireRated: false };
 
   const doorSizes    = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes     = ["4/0","4/8","5/0","5/4","6/0"];
@@ -504,8 +521,7 @@
       "80_d":   { prefix: "DBL80", sizes: dblSizes,    types: ["DBL","T-AST"] },
       "at_ws":  { prefix: "atws",  sizes: doorSizes,   types: ["LH","RH"] },
       "at_st":  { prefix: "AS",    sizes: ["22x54","25x54","Scuttle"], types: ["QTY"] },
-      "s_parts":{ prefix: null,    sizes: [...railLengths, ...stairItems], mixed: true },
-      "lockout":{ prefix: "LO",    sizes: lockoutItems, types: ["QTY"] }
+      "s_parts":{ prefix: null,    sizes: [...railLengths, ...stairItems], mixed: true }
     };
     Object.keys(sectionMap).forEach(secId => {
       const s = sectionMap[secId];
@@ -582,8 +598,7 @@
         railLengths.map(s => renderRow(s, "HR", ["OPEN","WALL"])).join('') +
         stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') +
         renderRow("Shoes", "STSH", ["FLAT","ANGLE"])
-    },
-    { title: "Lockout",      id: "lockout",color: "bg-red",  rows: () => lockoutItems.map(s => renderRow(s, "LO", ["QTY"])).join('') }
+    }
   ];
 
   document.getElementById('app-content').innerHTML = layout.map(sec => `
@@ -627,8 +642,7 @@
       { id:'AS',    head:'--- ATTIC STAIRS ---',      sizes:["22x54","25x54","Scuttle"], types:["QTY"], suffix:"" },
       { id:'HR',    head:'--- HANDRAIL ---',          sizes:railLengths,  types:["OPEN","WALL"],     suffix:"" },
       { id:'ST',    head:'--- STAIR HARDWARE ---',    sizes:stairItems.filter(i=>i!=="Shoes"), types:["QTY"], suffix:"" },
-      { id:'STSH',  head:'--- SHOES ---',             sizes:["Shoes"],    types:["FLAT","ANGLE"],    suffix:"" },
-      { id:'LO',    head:'--- LOCKOUT ---',           sizes:lockoutItems, types:["QTY"],             suffix:"" }
+      { id:'STSH',  head:'--- SHOES ---',             sizes:["Shoes"],    types:["FLAT","ANGLE"],    suffix:"" }
     ];
 
     sections.forEach(sec => {
@@ -660,6 +674,7 @@
       customer: custVal, subdivision: subVal, lot: lotVal, notes: gNotes,
       state: JSON.parse(JSON.stringify(state))
     });
+    saveTrimToIndex(state, custVal, subVal, lotVal, report);
   }
 
   function updateSummaryStyle() {
@@ -917,6 +932,7 @@
   document.getElementById('newLotModal').addEventListener('click', function(e) { if (e.target===this) closeNewLotModal(); });
   document.getElementById('warningModal').addEventListener('click', function(e) { if (e.target===this) closeWarningModal(); });
   document.getElementById('loRecapModal').addEventListener('click', function(e) { if (e.target===this) closeLoRecap(); });
+  document.getElementById('loTrimDetailModal').addEventListener('click', function(e) { if (e.target===this) closeLoTrimDetail(); });
 
   // ══════════════════════════════════════════════════════════════
   // LOCKOUT WALK
@@ -974,6 +990,7 @@
     const overlay = document.getElementById('lo-overlay');
     overlay.style.display = 'block';
     overlay.scrollTop = 0;
+    checkLoTrimMatch();
   }
 
   function closeLockoutWalk() {
@@ -1160,6 +1177,7 @@
     buildLoCounters();
     saveLoState();
     updateLoSummaryStyle();
+    checkLoTrimMatch();
   }
 
   function deleteLoHistory(index) {
@@ -1205,9 +1223,132 @@
     );
   }
 
+  // ── TAKEOFF INDEX — persistent lot cross-reference ────────────────
+  // Completely separate from browsable history. Not cleared by "Clear History"
+  // or "Reset All Fields". Auto-expires entries older than 90 days on load.
+  // Indexed by Customer|Subdivision|Lot (case-insensitive) so a PM who types
+  // the same lot on the lockout walk sees the original trim takeoff counts.
+  const TAKEOFF_INDEX_KEY = 'bfs_takeoff_index';
+  const EXPIRY_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+
+  function getTakeoffIndex() {
+    try { return JSON.parse(localStorage.getItem(TAKEOFF_INDEX_KEY)) || []; }
+    catch(e) { return []; }
+  }
+
+  function expireTakeoffIndex() {
+    const now   = Date.now();
+    const index = getTakeoffIndex();
+    const fresh = index.filter(e => (now - (e.timestamp || 0)) < EXPIRY_MS);
+    if (fresh.length !== index.length)
+      localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(fresh));
+  }
+
+  function computeTrimTotals(st) {
+    let singles = 0, dbl = 0, tast = 0;
+    Object.keys(st).forEach(key => {
+      const val = st[key];
+      if (typeof val !== 'number' || val <= 0) return;
+      // Single doors — 6/8, 8/0, Attic W/S — LH, RH, SLAB
+      if ((key.startsWith('68_') || key.startsWith('80_') || key.startsWith('atws_')) &&
+          (key.endsWith('_LH') || key.endsWith('_RH') || key.endsWith('_SLAB')))
+        singles += val;
+      if (key.endsWith('_DBL'))   dbl  += val;
+      if (key.endsWith('_T-AST')) tast += val;
+    });
+    return { singles, dbl, tast };
+  }
+
+  function saveTrimToIndex(st, customer, subdivision, lot, summaryText) {
+    if (!customer || !subdivision || !lot) return;
+    const totals    = computeTrimTotals(st);
+    const index     = getTakeoffIndex();
+    const lookupKey = `${customer.toLowerCase()}|${subdivision.toLowerCase()}|${lot.toLowerCase()}`;
+    const existing  = index.findIndex(e => e.key === lookupKey);
+    const entry     = { key: lookupKey, customer, subdivision, lot,
+                        timestamp: Date.now(), summaryText, ...totals };
+    if (existing >= 0) index[existing] = entry;
+    else index.push(entry);
+    localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
+  }
+
+  function lookupTrimTakeoff(customer, subdivision, lot) {
+    if (!customer || !subdivision || !lot) return null;
+    const key = `${customer.toLowerCase()}|${subdivision.toLowerCase()}|${lot.toLowerCase()}`;
+    return getTakeoffIndex().find(e => e.key === key) || null;
+  }
+
+  // Called whenever lo-customer / lo-subdivision / lo-lot change.
+  // Shows expected lock counts calculated from the saved trim takeoff for that lot.
+  function checkLoTrimMatch() {
+    const cust  = document.getElementById('lo-customer').value.trim();
+    const sub   = document.getElementById('lo-subdivision').value.trim();
+    const lot   = document.getElementById('lo-lot').value.trim();
+    const panel = document.getElementById('lo-trim-match');
+    if (!cust || !sub || !lot) { panel.style.display = 'none'; return; }
+    const match = lookupTrimTakeoff(cust, sub, lot);
+    if (!match) { panel.style.display = 'none'; return; }
+
+    // Lock math:
+    // Single doors → 1 Passage/Privacy/Keyed Entry each
+    // T-AST doors  → 2 Dummies + 1 Passage or Privacy each
+    // DBL doors    → 2 Dummies each
+    const expSingleLocks = match.singles + match.tast;
+    const expDummies     = (match.dbl * 2) + (match.tast * 2);
+
+    let rows = '';
+    if (match.singles > 0) rows += `
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
+        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Single Doors</span>
+        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.singles}</span>
+      </div>`;
+    if (match.dbl > 0) rows += `
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
+        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — DBL</span>
+        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.dbl}</span>
+      </div>`;
+    if (match.tast > 0) rows += `
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
+        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — T-AST</span>
+        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.tast}</span>
+      </div>`;
+
+    let expRows = '';
+    if (expSingleLocks > 0) expRows += `
+      <div style="display:flex;justify-content:space-between;padding:3px 0;">
+        <span style="font-size:12px;color:#1e3a8a;">Passage / Privacy / Keyed Entry</span>
+        <span style="font-size:15px;font-weight:900;color:var(--green);">${expSingleLocks}</span>
+      </div>`;
+    if (expDummies > 0) expRows += `
+      <div style="display:flex;justify-content:space-between;padding:3px 0;">
+        <span style="font-size:12px;color:#1e3a8a;">Dummy Knobs</span>
+        <span style="font-size:15px;font-weight:900;color:var(--green);">${expDummies}</span>
+      </div>`;
+
+    document.getElementById('lo-trim-totals').innerHTML = `
+      ${rows}
+      <div style="margin-top:8px;padding:8px;background:#dbeafe;border-radius:6px;">
+        <div style="font-size:10px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:0.5px;">EXPECTED LOCKS FROM TRIM TAKEOFF</div>
+        ${expRows}
+      </div>`;
+    window._loTrimMatch = match;
+    panel.style.display = 'block';
+  }
+
+  function showLoTrimDetail() {
+    if (!window._loTrimMatch) return;
+    document.getElementById('lo-trim-detail-text').value =
+      window._loTrimMatch.summaryText || 'No trim takeoff text saved for this lot.';
+    document.getElementById('loTrimDetailModal').style.display = 'flex';
+  }
+  function closeLoTrimDetail() {
+    document.getElementById('loTrimDetailModal').style.display = 'none';
+  }
+
   // ── INIT ─────────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
+  expireTakeoffIndex();
 </script>
 </body>
 </html>
