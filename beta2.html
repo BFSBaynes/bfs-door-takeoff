@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script>
+    if (localStorage.getItem('preferred_mode') === 'modern') {
+      window.location.href = 'index.html';
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0A2E4E">
@@ -8,32 +13,65 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>Elevate Trim - BETA 2</title>
+  <title>Elevate Trim - CLASSIC</title>
   <style>
-    :root{
-      --navy:#0A2E4E;
-      --bfs-red:#E31837;
-      --bg:#cbd5e1;
-      --accent: #1e40af;
-      --slate: #334155;
-      --green: #16a34a;
-    }
+    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 30px; overflow-x: hidden; }
 
-    .beta-tag {
+    .mode-switch {
       position: fixed; top: 6px; left: 8px; z-index: 700;
-      background: var(--bfs-red); color: white; padding: 5px 10px;
+      background: rgba(0,0,0,0.25); color: white; padding: 5px 10px;
       border-radius: 20px; font-size: 9px; font-weight: 800;
-      border: 1.5px solid rgba(255,255,255,0.6);
+      text-decoration: none; border: 1.5px solid rgba(255,255,255,0.6);
       white-space: nowrap; letter-spacing: 0.3px;
     }
 
-    /* ── STICKY JOB BANNER — fixed to top ── */
+    /* ── LOCKOUT WALK BUTTON ── */
+    .lo-walk-btn {
+      position: fixed; top: 6px; right: 8px; z-index: 700;
+      background: #d97706; color: white; padding: 5px 10px;
+      border-radius: 20px; font-size: 9px; font-weight: 800;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      white-space: nowrap; letter-spacing: 0.3px; cursor: pointer;
+    }
+
+    /* ── LOCKOUT WALK OVERLAY ── */
+    #lo-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1500; background: var(--bg); overflow-y: auto;
+    }
+    .lo-header {
+      background: #d97706; padding: 10px 12px; position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .lo-counter-card {
+      background: white; border-radius: 10px; padding: 16px; margin-bottom: 10px;
+      border: 2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .lo-counter-card.has-count { border-color: var(--green); background: #f0fdf4; }
+    .lo-item-label { font-size: 20px; font-weight: 900; color: var(--navy); margin-bottom: 14px; }
+    .lo-controls { display: flex; align-items: center; justify-content: space-between; }
+    .lo-btn {
+      width: 72px; height: 72px; border-radius: 12px; border: 0;
+      background: var(--navy); color: white; font-weight: bold; font-size: 36px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: transform 0.08s, background 0.15s;
+    }
+    .lo-btn.tap-flash { background: var(--green); transform: scale(1.1); }
+    .lo-qty {
+      font-size: 56px; font-weight: 900; color: var(--navy);
+      min-width: 90px; text-align: center;
+      transition: transform 0.15s, color 0.15s;
+    }
+    .lo-qty.has-count { color: var(--green); }
+    .lo-qty.tap-flash { transform: scale(1.25); color: var(--green); }
+
     #job-banner {
       display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 600;
       background: var(--bfs-red); color: white; font-size: 11px; font-weight: 800;
-      text-align: center; padding: 8px 12px 8px 16px;
+      text-align: center; padding: 8px 12px 8px 140px;
       letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.2);
       min-height: 36px; align-items: center; justify-content: center;
@@ -41,123 +79,15 @@
     #job-banner.visible { display: flex; }
     #job-banner span { opacity: 0.75; font-weight: 600; margin: 0 4px; }
 
-    /* ── HEADER ── */
-    .header-card {
-      background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center;
-    }
+    .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
     .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
     label { font-weight: 700; font-size: 10px; color: #475569; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     .input-row { display: flex; gap: 8px; margin-bottom: 4px; }
     .input-group { flex: 1; }
+    .w-75 { flex: 0 0 75%; }
+    .w-25 { flex: 0 0 22%; }
 
-    /* ── SECTIONS ── */
-    .section-title {
-      color: #fff; padding: 14px; font-weight: 800; font-size: 14px;
-      margin: 8px -8px; cursor: pointer; display: flex;
-      justify-content: space-between; align-items: center;
-      text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
-      position: sticky; top: 33px; z-index: 100;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .section-check {
-      display: none; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
-      border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 900;
-      color: #fff; margin-right: 8px; letter-spacing: 0;
-    }
-    .section-check.active { display: inline-block; background: var(--green); border-color: var(--green); }
-    .bg-navy { background: var(--navy); }
-    .bg-red { background: var(--bfs-red); }
-    .section-content { display: none; padding: 8px 0; }
-    .section-content.active { display: block; }
-
-    /* ── ITEM GRID ── */
-    .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px; }
-    .item-card {
-      background: #fff; border: 2px solid #94a3b8; border-radius: 8px;
-      padding: 15px 4px 22px 4px; text-align: center; font-weight: 800;
-      color: var(--navy); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      font-size: 13px; cursor: pointer; position: relative;
-      min-height: 65px; display: flex; align-items: center; justify-content: center;
-      transition: transform 0.1s, background 0.15s;
-    }
-    .badge {
-      position: absolute; bottom: 2px; font-size: 9px; font-weight: 900;
-      background: rgba(226, 232, 240, 0.9); padding: 1px 3px; border-radius: 3px;
-      color: var(--navy); display: none; white-space: nowrap;
-    }
-    .badge.active { display: block; color: var(--green); border: 1px solid var(--green); }
-    .badge-left { left: 3px; }
-    .badge-right { right: 3px; }
-    .badge-center { left: 50%; transform: translateX(-50%); }
-    .item-card:active { transform: scale(0.95); background: #f1f5f9; }
-    .item-card.has-data { border-color: var(--green); background: #f0fdf4; color: var(--green); }
-    .note-badge {
-      position: absolute; top: 3px; right: 3px; font-size: 9px;
-      display: none; line-height: 1;
-    }
-    .note-badge.active { display: block; }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); z-index: 2000;
-      align-items: center; justify-content: center;
-    }
-    .modal-content {
-      background: white; padding: 20px; border-radius: 12px; width: 95%;
-      max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto;
-      position: relative;
-    }
-    .modal-type-block {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
-      padding: 10px; margin-bottom: 12px; text-align: left;
-    }
-    .modal-counter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; transition: transform 0.08s, background 0.15s; }
-    .btn.tap-pulse { background: var(--green); transform: scale(1.12); }
-    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; transition: transform 0.15s, color 0.15s; }
-    .qty-display.tap-pulse { color: var(--green); transform: scale(1.3); }
-    .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); }
-    .active-qty { color: var(--green) !important; border-color: var(--green) !important; }
-
-    /* ── ACTIONS / SUMMARY ── */
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    #summary {
-      background: #fff; height: 350px; margin-top: 8px; font-family: sans-serif;
-      font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px;
-      padding:12px; white-space: pre-wrap;
-    }
-    #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227, 24, 55, 0.1); }
-    #summary.flash {
-      animation: summaryFlash 0.6s ease-out;
-    }
-    @keyframes summaryFlash {
-      0%   { border-color: var(--green); box-shadow: 0 0 0 4px rgba(22,163,74,0.3); }
-      60%  { border-color: var(--green); box-shadow: 0 0 0 8px rgba(22,163,74,0.1); }
-      100% { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
-    }
-
-    /* ── EMPTY STATE ── */
-    #summary-empty-state {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      pointer-events: none; margin-top: 8px;
-    }
-    #summary-empty-state span { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
-    #summary-empty-state p { font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.6; margin: 0; }
-    #summary-empty-state.hidden { display: none; }
-
-    /* ── HISTORY ── */
-    .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
-    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
-    .history-controls { display: flex; gap: 8px; align-items: center; }
-    .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
-    .load-btn { padding: 10px 15px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 70px; }
-
-    /* ── AUTOCOMPLETE ── */
     .ac-wrap { position: relative; }
     .ac-dropdown {
       display: none; position: absolute; top: 100%; left: 0; right: 0;
@@ -172,21 +102,82 @@
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
     .ac-item:last-child { border-bottom: none; }
-    .ac-item:active, .ac-item.highlighted { background: #f0f9ff; color: var(--accent); }
+    .ac-item:active { background: #f0f9ff; color: var(--accent); }
     .ac-item-label { flex: 1; }
     .ac-delete {
       flex-shrink: 0; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
-      border-radius: 5px; font-size: 11px; font-weight: 900; padding: 3px 8px;
-      cursor: pointer; line-height: 1;
+      border-radius: 5px; font-size: 11px; font-weight: 900; padding: 3px 8px; cursor: pointer;
     }
-    .ac-delete:active { background: #fecaca; }
 
-    /* ── MISC ── */
-    .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
+    .section-title {
+      color: #fff; padding: 14px; font-weight: 800; font-size: 14px;
+      margin: 8px -8px; cursor: pointer; display: flex;
+      justify-content: space-between; align-items: center;
+      text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
+      position: sticky; top: 33px; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .section-check {
+      display: none; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
+      border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 900;
+      color: #fff; margin-right: 8px;
+    }
+    .section-check.active { display: inline-block; background: var(--green); border-color: var(--green); }
+    .bg-navy { background: var(--navy); }
+    .bg-red { background: var(--bfs-red); }
+    .section-content { display: none; padding-top: 8px; }
+    .section-content.active { display: block; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
 
-    /* ── SCROLL TO TOP ── */
+    .door-row {
+      background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px; border: 1px solid #94a3b8;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .size-label { font-weight: 900; font-size: 13px; width: 48px; flex-shrink: 0; color: var(--navy); text-align: center; }
+    .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
+    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px 2px; border: 1px solid #e2e8f0; border-radius: 4px; }
+    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #64748b; font-weight: 900; text-transform: uppercase; }
+    .btn-wrap { display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
+    .btn { width: 30px; height: 30px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+    .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; color: var(--navy); }
+    .has-qty { color: var(--green) !important; font-size: 17px; }
+    .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
+    .note-box { width: 95%; height: 28px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 4px 6px; font-size: 13px; text-align: center; margin-top: 4px; }
+    .door-row:nth-child(even) { background: #e8edf2; }
+    .door-row:nth-child(odd)  { background: #ffffff; }
+
+    #summary {
+      background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace;
+      font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px;
+      padding:12px; line-height: 1.4; color: #000; white-space: pre;
+    }
+    #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
+    #summary.flash { animation: summaryFlash 0.6s ease-out; }
+    @keyframes summaryFlash {
+      0%   { border-color: var(--green); box-shadow: 0 0 0 4px rgba(22,163,74,0.3); }
+      60%  { border-color: var(--green); box-shadow: 0 0 0 8px rgba(22,163,74,0.1); }
+      100% { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
+    }
+
+    #summary-empty-state {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      pointer-events: none; margin-top: 8px;
+    }
+    #summary-empty-state span { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
+    #summary-empty-state p { font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.6; margin: 0; }
+    #summary-empty-state.hidden { display: none; }
+
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
+    .history-controls { display: flex; gap: 8px; align-items: center; }
+    .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
+    .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto; }
+    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
+
     #scroll-top {
       display: none; position: fixed; bottom: 20px; right: 16px; z-index: 998;
       background: var(--navy); color: white; border: none; border-radius: 50%;
@@ -194,36 +185,26 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.3); align-items: center; justify-content: center;
     }
     #scroll-top.visible { display: flex; }
+
     #toast {
-      visibility: hidden; min-width: 200px; background-color: #1e293b;
-      color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px;
-      position: fixed; z-index: 3000; left: 50%; bottom: 30px;
-      transform: translateX(-50%); font-weight: bold; font-size: 13px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      visibility: hidden; min-width: 200px; background-color: #1e293b; color: #fff;
+      text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed;
+      z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%);
+      font-weight: bold; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
     #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.4s 1.4s forwards; }
-    @keyframes fadein { from { opacity:0; bottom: 20px; } to { opacity:1; bottom: 30px; } }
+    @keyframes fadein { from { opacity:0; bottom:20px; } to { opacity:1; bottom:30px; } }
     @keyframes fadeout { from { opacity:1; } to { opacity:0; } }
 
-    /* ── RECAP SCREEN ── */
-    .recap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0; max-height: 50vh; overflow-y: auto; padding-right: 2px; }
-    .recap-tile {
-      background: #f0fdf4; border: 2px solid var(--green); border-radius: 10px;
-      padding: 10px 8px; text-align: center;
-    }
-    .recap-tile .recap-label { font-size: 11px; font-weight: 800; color: var(--navy); text-transform: uppercase; }
-    .recap-tile .recap-qty { font-size: 26px; font-weight: 900; color: var(--green); margin-top: 2px; }
-    .recap-tile .recap-note { font-size: 10px; color: #64748b; margin-top: 2px; font-style: italic; }
-    .recap-empty { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
+    .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
   </style>
 </head>
 <body>
 
-<div class="beta-tag">BETA 2 — TAP FEEDBACK + RECAP</div>
+<a href="index.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'modern')">SWITCH TO MODERN</a>
+<button class="lo-walk-btn" onclick="openLockoutWalk()">🔒 LOCKOUT WALK</button>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
-
-<!-- STICKY JOB BANNER — shown after user scrolls past header -->
 <div id="job-banner"></div>
 
 <div class="header-card">
@@ -232,64 +213,38 @@
     <div class="input-group ac-wrap">
       <label>Customer</label>
       <input id="customer" type="text" placeholder="Pulte" autocomplete="off"
-        oninput="saveState(); updateJobBanner(); showCustomerSuggestions()"
+        oninput="saveActiveState(); updateJobBanner(); showCustomerSuggestions()"
         onfocus="showCustomerSuggestions()"
         onblur="setTimeout(()=>closeDropdown('ac-customer'),200)">
       <div id="ac-customer" class="ac-dropdown"></div>
     </div>
   </div>
   <div class="input-row">
-    <div class="input-group ac-wrap" style="flex: 0.75;">
+    <div class="input-group ac-wrap w-75">
       <label>Subdivision</label>
       <input id="subdivision" type="text" placeholder="Huxley" autocomplete="off"
-        oninput="saveState(); updateJobBanner(); showSubdivisionSuggestions()"
+        oninput="saveActiveState(); updateJobBanner(); showSubdivisionSuggestions()"
         onfocus="showSubdivisionSuggestions()"
         onblur="setTimeout(()=>closeDropdown('ac-subdivision'),200)">
       <div id="ac-subdivision" class="ac-dropdown"></div>
     </div>
-    <div class="input-group" style="flex: 0.25;">
+    <div class="input-group w-25">
       <label>Lot #</label>
-      <input id="lot" type="text" placeholder="104A" oninput="saveState(); updateJobBanner()">
+      <input id="lot" type="text" placeholder="104A" oninput="saveActiveState(); updateJobBanner()">
     </div>
   </div>
 </div>
 
 <div id="app-content"></div>
 
-<!-- MODAL -->
-<div id="itemModal" class="modal-overlay">
-  <div class="modal-content" id="modal-inner">
-    <h2 id="m-title" style="margin:0 0 15px 0; color:var(--navy); font-size: 1.4rem;">Item Name</h2>
-    <div id="m-blocks"></div>
-    <button class="actionBtn" style="width:100%; background:var(--green); color:white; margin-top:10px; font-size: 1.1rem;" onclick="closeModal()">SAVE ENTRY</button>
-  </div>
-</div>
-
-<!-- RECAP MODAL -->
-<div id="recapModal" class="modal-overlay">
-  <div class="modal-content" style="max-width:480px;">
-    <h2 style="margin:0 0 4px 0; color:var(--navy); font-size:1.3rem;">📋 Quick Recap</h2>
-    <p style="color:#64748b; font-size:12px; margin:0 0 4px 0;">Does this match what you counted on the walk? Tap any tile to jump back and fix it.</p>
-    <div id="recap-grid" class="recap-grid"></div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;">
-      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeRecapModal()">Go Back & Fix</button>
-      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="confirmGenerateFromRecap()">✓ Looks Right — Generate</button>
-    </div>
-  </div>
-</div>
-
 <!-- SUMMARY -->
 <div class="header-card" style="margin-top:15px;" id="summary-section">
-  <label>General Project Notes</label>
-  <textarea id="notes" placeholder="Notes..." oninput="saveState()"></textarea>
-
-
-  <!-- Row 1: Generate + Copy side by side -->
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-    <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="openRecap()">⚡ Generate</button>
-    <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
+  <label>Notes & Summary</label>
+  <textarea id="notes" placeholder="General Notes..." oninput="saveActiveState()"></textarea>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+    <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
+    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
   </div>
-
   <div style="position:relative;">
     <textarea id="summary" readonly></textarea>
     <div id="summary-empty-state">
@@ -297,15 +252,13 @@
       <p>Tap <strong>Generate Takeoff</strong><br>to build your report</p>
     </div>
   </div>
-
-  <!-- Row 3: New Lot + Reset side by side -->
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
     <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Lot, Same Cust/Sub</button>
     <button class="actionBtn" style="background:#fee2e2; color:#b91c1c;" onclick="showResetModal()">🗑 Reset All Fields</button>
   </div>
 </div>
 
-<!-- RESET CONFIRMATION MODAL -->
+<!-- RESET MODAL -->
 <div id="resetModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
     <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
@@ -318,7 +271,7 @@
   </div>
 </div>
 
-<!-- NEW LOT SAME JOB MODAL -->
+<!-- NEW LOT MODAL -->
 <div id="newLotModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
     <div style="font-size:2rem; margin-bottom:8px;">🏠</div>
@@ -339,13 +292,13 @@
     <p id="warning-text" style="color:#64748b; font-size:13px; margin:0 0 20px 0;"></p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeWarningModal()">Go Back</button>
-      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeWarningModal(); openRecap(true)">Generate Anyway</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeWarningModal(); generateSummary(true)">Generate Anyway</button>
     </div>
   </div>
 </div>
 
 <!-- HISTORY -->
-<div class="history-section">
+<div class="header-card" style="margin-top:20px; text-align:left;">
   <div id="history-toggle" onclick="toggleHistorySection()"
     style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
     <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">RECENT TAKEOFFS (LAST 20)</label>
@@ -356,38 +309,122 @@
       style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
       oninput="renderHistory()">
     <div id="history-list"></div>
-    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
+    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
   </div>
 </div>
 
-<div class="version-tag">BETA 2 — Tap Feedback + Recap Screen</div>
+<div class="version-tag">Version 3.3.0 — Lockout Walk</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LOCKOUT WALK OVERLAY
+     Full-screen overlay, separate from main takeoff,
+     separate history key (bfs_lo_history)
+══════════════════════════════════════════════════════════════ -->
+<div id="lo-overlay">
+  <!-- Header bar -->
+  <div class="lo-header">
+    <span style="color:white; font-weight:900; font-size:15px; letter-spacing:0.5px;">🔒 LOCKOUT WALK</span>
+    <button onclick="closeLockoutWalk()"
+      style="background:rgba(0,0,0,0.25); color:white; border:1.5px solid rgba(255,255,255,0.6); border-radius:20px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer;">
+      ✕ BACK TO TAKEOFF
+    </button>
+  </div>
+
+  <div style="padding:8px;">
+    <!-- Job info — pre-populates from main app if available -->
+    <div class="header-card">
+      <div class="input-row">
+        <div class="input-group ac-wrap">
+          <label>Customer</label>
+          <input id="lo-customer" type="text" placeholder="Pulte" autocomplete="off"
+            oninput="saveLoState(); showLoCustomerSuggestions()"
+            onfocus="showLoCustomerSuggestions()"
+            onblur="setTimeout(()=>closeDropdown('lo-ac-customer'),200)">
+          <div id="lo-ac-customer" class="ac-dropdown"></div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group ac-wrap" style="flex:0.75;">
+          <label>Subdivision</label>
+          <input id="lo-subdivision" type="text" placeholder="Huxley" autocomplete="off"
+            oninput="saveLoState(); showLoSubdivisionSuggestions()"
+            onfocus="showLoSubdivisionSuggestions()"
+            onblur="setTimeout(()=>closeDropdown('lo-ac-subdivision'),200)">
+          <div id="lo-ac-subdivision" class="ac-dropdown"></div>
+        </div>
+        <div class="input-group" style="flex:0.25;">
+          <label>Lot #</label>
+          <input id="lo-lot" type="text" placeholder="104A" oninput="saveLoState()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Big counters -->
+    <div id="lo-counters"></div>
+
+    <!-- Notes + Generate + Summary -->
+    <div class="header-card" style="margin-top:4px;">
+      <label>Notes</label>
+      <textarea id="lo-notes" placeholder="Notes..." oninput="saveLoState()" style="height:70px;"></textarea>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+        <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="openLoRecap()">⚡ Generate</button>
+        <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copyLoSummary()">📋 Copy</button>
+      </div>
+      <div style="position:relative; margin-top:8px;">
+        <textarea id="lo-summary" readonly
+          style="height:200px; font-family:'Courier New',monospace; font-size:13px; border:2px solid var(--navy); width:100%; border-radius:4px; padding:10px; white-space:pre; background:#fff; line-height:1.4; color:#000;"></textarea>
+        <div id="lo-summary-empty"
+          style="position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;">
+          <span style="font-size:2rem; opacity:0.4;">🔑</span>
+          <p style="font-size:12px; color:#94a3b8; text-align:center; margin:8px 0 0 0;">Tap Generate to build your lockout report</p>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+        <button class="actionBtn" style="background:#dbeafe; color:#1e40af; font-size:13px;" onclick="loNewLot()">🏠 New Lot, Same Cust/Sub</button>
+        <button class="actionBtn" style="background:#fee2e2; color:#b91c1c; font-size:13px;" onclick="loReset()">🗑 Reset</button>
+      </div>
+    </div>
+
+    <!-- Lockout History -->
+    <div class="header-card" style="margin-top:12px; text-align:left;">
+      <div onclick="toggleLoHistory()" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
+        <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">LOCKOUT WALK HISTORY (LAST 20)</label>
+        <span id="lo-history-chevron" style="font-size:11px; color:#475569; font-weight:800;">▼ SHOW</span>
+      </div>
+      <div id="lo-history-body" style="display:none;">
+        <div id="lo-history-list"></div>
+        <button onclick="clearLoHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:12px; cursor:pointer;">Clear Lockout History</button>
+      </div>
+    </div>
+
+    <div class="version-tag">Lockout Walk — separate from full takeoff history</div>
+  </div>
+</div>
+
+<!-- LOCKOUT RECAP MODAL -->
+<div id="loRecapModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:6px;">🔒</div>
+    <h2 style="margin:0 0 4px 0; color:var(--navy); font-size:1.2rem;">Lockout Recap</h2>
+    <p style="color:#64748b; font-size:12px; margin:0 0 12px 0;">Does this match what you counted on the walk?</p>
+    <div id="lo-recap-content" style="margin-bottom:16px; text-align:left;"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeLoRecap()">Go Back & Fix</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="confirmLoGenerate()">✓ Looks Right</button>
+    </div>
+  </div>
+</div>
 
 <script>
   let state = { fireRated: false };
-  let activeSectionId = "";
-  let activeItemLabel = "";
-  let activeTypes = [];
-  let forceGenerateAfterRecap = false;
 
   const doorSizes    = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes     = ["4/0","4/8","5/0","5/4","6/0"];
   const railLengths  = ["8'", "12'", "16'", "18'"];
   const stairItems   = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
-  const directInputItems = ["Brackets", "Balusters", "Shoes"];
   const lockoutItems = ["Passage", "Privacy", "Dummy", "Keyed Entry", "Deadbolt", "Hinge Bumps", "Base Bumps"];
 
-  const layout = [
-    { title: "6/8 Doors",    id: "68",    color: "bg-navy", items: doorSizes,    types: ["LH", "RH", "SLAB"] },
-    { title: "6/8 Double",   id: "DBL68", color: "bg-red",  items: dblSizes,     types: ["DBL", "T-AST"] },
-    { title: "8/0 Doors",    id: "80",    color: "bg-navy", items: doorSizes,    types: ["LH", "RH", "SLAB"] },
-    { title: "8/0 Double",   id: "DBL80", color: "bg-red",  items: dblSizes,     types: ["DBL", "T-AST"] },
-    { title: "Attic W/S",    id: "atws",  color: "bg-navy", items: doorSizes,    types: ["LH", "RH"] },
-    { title: "Attic Stairs", id: "AS",    color: "bg-red",  items: ["22x54","25x54","Scuttle"], types: ["QTY"] },
-    { title: "Stair Parts",  id: "sp",    color: "bg-navy", items: [...railLengths, ...stairItems] },
-    { title: "Lockout",      id: "LO",    color: "bg-red",  items: lockoutItems, types: ["QTY"] }
-  ];
-
-  // ── JOB BANNER ──────────────────────────────────────────────────
+  // ── JOB BANNER ───────────────────────────────────────────────────
   function updateJobBanner() {
     const cust = document.getElementById('customer').value.trim();
     const sub  = document.getElementById('subdivision').value.trim();
@@ -405,42 +442,15 @@
     }
   }
 
-  // ── HISTORY ─────────────────────────────────────────────────────
-  window.loadHistory = function(index) {
-    const history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
-    const h = history[index];
-    if (!h) return;
-    document.getElementById('summary').value = h.text;
-    if (h.fullData) {
-      document.getElementById('customer').value    = h.fullData.customer || "";
-      document.getElementById('subdivision').value = h.fullData.subdivision || "";
-      document.getElementById('lot').value          = h.fullData.lot || "";
-      document.getElementById('notes').value        = h.fullData.notes || "";
-      state = JSON.parse(JSON.stringify(h.fullData.state));
-      learnFromJob(h.fullData.customer, h.fullData.subdivision);
-      refreshAllCards();
-      saveState();
-      updateJobBanner();
-    }
-    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
-  };
-
-  window.deleteHistoryItem = function(index) {
-    let history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
-    history.splice(index, 1);
-    localStorage.setItem('bfs_beta2_history', JSON.stringify(history));
-    renderHistory();
-  };
-
-  window.clearHistory = function() {
-    if (confirm('Clear all takeoff history?')) {
-      localStorage.removeItem('bfs_beta2_history');
-      renderHistory();
-    }
-  };
-
   // ── STATE ────────────────────────────────────────────────────────
-  function saveState() {
+  function saveActiveState() {
+    document.querySelectorAll('.qty-input').forEach(inp => {
+      const key = inp.id.replace('inp-', '');
+      state[key] = parseInt(inp.value) || 0;
+    });
+    document.querySelectorAll('.note-box').forEach(note => {
+      state[note.id] = note.value;
+    });
     const fullData = {
       customer:    document.getElementById('customer').value,
       subdivision: document.getElementById('subdivision').value,
@@ -449,280 +459,150 @@
       summaryText: document.getElementById('summary').value,
       state: state
     };
-    localStorage.setItem('bfs_beta2_active_work', JSON.stringify(fullData));
+    localStorage.setItem('bfs_active_work', JSON.stringify(fullData));
     updateSummaryStyle();
   }
 
   function loadActiveState() {
-    const saved = localStorage.getItem('bfs_beta2_active_work');
+    const saved = localStorage.getItem('bfs_active_work');
     if (saved) {
       const data = JSON.parse(saved);
-      document.getElementById('customer').value   = data.customer || "";
+      document.getElementById('customer').value    = data.customer || "";
       document.getElementById('subdivision').value = data.subdivision || "";
-      document.getElementById('lot').value         = data.lot || "";
-      document.getElementById('notes').value       = data.notes || "";
-      document.getElementById('summary').value     = data.summaryText || "";
+      document.getElementById('lot').value          = data.lot || "";
+      document.getElementById('notes').value        = data.notes || "";
+      document.getElementById('summary').value      = data.summaryText || "";
       state = data.state || { fireRated: false };
-      refreshAllCards();
+      refreshUI();
       updateSummaryStyle();
       updateJobBanner();
     }
   }
 
-  // ── KEY HELPERS ──────────────────────────────────────────────────
-  function getSyncKey(sectionId, label, type) {
-    let sId = sectionId;
-    if (sectionId === "sp") {
-      if (railLengths.includes(label))  sId = "HR";
-      else if (label === "Shoes")        sId = "STSH";
-      else                               sId = "ST";
-    }
-    return `${sId}_${label.replace(/[\/ ']/g, "-")}_${type}`;
+  function refreshUI() {
+    Object.keys(state).forEach(key => {
+      const el = document.getElementById('qty-' + key);
+      if (el) {
+        el.innerText = state[key];
+        state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
+      }
+      const inp = document.getElementById('inp-' + key);
+      if (inp) inp.value = state[key] || "";
+      const noteBox = document.getElementById('NOTE_' + key);
+      if (noteBox) noteBox.value = state['NOTE_' + key] || "";
+    });
+    if (document.getElementById('fire-status'))
+      document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    updateSectionCheckmarks();
   }
 
-  // ── SECTIONS ─────────────────────────────────────────────────────
+  function updateSectionCheckmarks() {
+    const sectionMap = {
+      "68_s":   { prefix: "68",    sizes: doorSizes,   types: ["LH","RH","SLAB"] },
+      "68_d":   { prefix: "DBL68", sizes: dblSizes,    types: ["DBL","T-AST"] },
+      "80_s":   { prefix: "80",    sizes: doorSizes,   types: ["LH","RH","SLAB"] },
+      "80_d":   { prefix: "DBL80", sizes: dblSizes,    types: ["DBL","T-AST"] },
+      "at_ws":  { prefix: "atws",  sizes: doorSizes,   types: ["LH","RH"] },
+      "at_st":  { prefix: "AS",    sizes: ["22x54","25x54","Scuttle"], types: ["QTY"] },
+      "s_parts":{ prefix: null,    sizes: [...railLengths, ...stairItems], mixed: true },
+      "lockout":{ prefix: "LO",    sizes: lockoutItems, types: ["QTY"] }
+    };
+    Object.keys(sectionMap).forEach(secId => {
+      const s = sectionMap[secId];
+      let hasData = false;
+      s.sizes.forEach(sz => {
+        let types = s.types;
+        if (s.mixed) {
+          types = railLengths.includes(sz) ? ["OPEN","WALL"] : sz === "Shoes" ? ["FLAT","ANGLE"] : ["QTY"];
+          const prefix = railLengths.includes(sz) ? "HR" : sz === "Shoes" ? "STSH" : "ST";
+          types.forEach(t => {
+            const key = `${prefix}_${sz.replace(/[\/ ']/g,"-")}_${t}`;
+            if (state[key] > 0) hasData = true;
+          });
+          return;
+        }
+        types.forEach(t => {
+          const key = `${s.prefix}_${sz.replace(/[\/ ']/g,"-")}_${t}`;
+          if (state[key] > 0) hasData = true;
+        });
+      });
+      if (secId === "at_st" && state.fireRated) hasData = true;
+      const checkEl = document.getElementById(`check-${secId}`);
+      if (checkEl) hasData ? checkEl.classList.add('active') : checkEl.classList.remove('active');
+    });
+  }
+
+  function update(key, delta) {
+    state[key] = Math.max(0, (state[key] || 0) + delta);
+    refreshUI();
+    saveActiveState();
+  }
+
+  function toggleFire() {
+    state.fireRated = !state.fireRated;
+    document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
+    updateSectionCheckmarks();
+    saveActiveState();
+  }
+
   function toggleSection(id, headerEl) {
     document.getElementById('content-' + id).classList.toggle('active');
     headerEl.classList.toggle('active-header');
   }
 
-  // ── MODAL ────────────────────────────────────────────────────────
-  function openModal(sectionId, label, types) {
-    activeSectionId  = sectionId;
-    activeItemLabel  = label;
-    activeTypes      = types;
-    const displayHeader = (sectionId === "80" || sectionId === "DBL80") ? `${label}x8/0` : label;
-    document.getElementById('m-title').innerText = displayHeader;
-
-    const container = document.getElementById('m-blocks');
-    container.innerHTML = "";
-    const useDirectInput = directInputItems.includes(label);
-
+  function renderRow(label, prefix, types) {
+    let displayLabel = (prefix === "80" || prefix === "DBL80") ? label + "x8/0" : label;
+    let html = `<div class="door-row"><div class="size-label">${displayLabel}</div><div class="controls-grid">`;
     types.forEach(type => {
-      const key       = getSyncKey(sectionId, label, type);
-      const qty       = state[key] || 0;
-      const savedNote = state[`NOTE_${key}`] || "";
-      const greenClass = qty > 0 ? 'active-qty' : '';
-
-      let controlHtml = useDirectInput
-        ? `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">`
-        : `<div style="display:flex; align-items:center; gap:12px;">
-             <button class="btn" id="mbtn-minus-${key}" onclick="updateModalQty('${key}', -1)">-</button>
-             <span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span>
-             <button class="btn" id="mbtn-plus-${key}" onclick="updateModalQty('${key}', 1)">+</button>
-           </div>`;
-
-      container.innerHTML += `
-        <div class="modal-type-block">
-          <div class="modal-counter-row">
-            <label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>
-            ${controlHtml}
-          </div>
-          <input type="text" id="mnote-${key}" value="${savedNote}" placeholder="Notes..."
-            style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;">
-        </div>`;
+      const key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type;
+      const isHigh = (label === "Balusters" || label === "Shoes" || label === "Brackets");
+      html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">`;
+      html += isHigh
+        ? `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState(); updateSectionCheckmarks()">`
+        : `<button class="btn" onclick="update('${key}', -1)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1)">+</button>`;
+      html += `</div><input type="text" id="NOTE_${key}" class="note-box" placeholder="Note" oninput="saveActiveState()"></div>`;
     });
-
-    document.getElementById('itemModal').style.display = 'flex';
+    return html + `</div></div>`;
   }
 
-  // TAP OUTSIDE MODAL TO CLOSE
-  document.getElementById('itemModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
-  document.getElementById('resetModal').addEventListener('click', function(e) {
-    if (e.target === this) closeResetModal();
-  });
-  document.getElementById('newLotModal').addEventListener('click', function(e) {
-    if (e.target === this) closeNewLotModal();
-  });
-  document.getElementById('warningModal').addEventListener('click', function(e) {
-    if (e.target === this) closeWarningModal();
-  });
-  document.getElementById('recapModal').addEventListener('click', function(e) {
-    if (e.target === this) closeRecapModal();
-  });
+  const layout = [
+    { title: "6/8 Doors",    id: "68_s",   color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68",    ["LH","RH","SLAB"])).join('') },
+    { title: "6/8 Double",   id: "68_d",   color: "bg-red",  rows: () => dblSizes.map(s  => renderRow(s, "DBL68", ["DBL","T-AST"])).join('') },
+    { title: "8/0 Doors",    id: "80_s",   color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80",    ["LH","RH","SLAB"])).join('') },
+    { title: "8/0 Double",   id: "80_d",   color: "bg-red",  rows: () => dblSizes.map(s  => renderRow(s, "DBL80", ["DBL","T-AST"])).join('') },
+    { title: "Attic W/S",    id: "at_ws",  color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "atws",  ["LH","RH"])).join('') },
+    { title: "Attic Stairs", id: "at_st",  color: "bg-red",  rows: () =>
+        renderRow("22x54",  "AS", ["QTY"]) +
+        renderRow("25x54",  "AS", ["QTY"]) +
+        renderRow("Scuttle","AS", ["QTY"]) +
+        `<div style="padding:8px;"><span style="font-weight:800; font-size:13px; color:var(--navy);">FIRE RATED?</span>
+         <button class="btn" style="width:60px; font-size:10px; margin-left:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>`
+    },
+    { title: "Stair Parts",  id: "s_parts",color: "bg-navy", rows: () =>
+        railLengths.map(s => renderRow(s, "HR", ["OPEN","WALL"])).join('') +
+        stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') +
+        renderRow("Shoes", "STSH", ["FLAT","ANGLE"])
+    },
+    { title: "Lockout",      id: "lockout",color: "bg-red",  rows: () => lockoutItems.map(s => renderRow(s, "LO", ["QTY"])).join('') }
+  ];
 
-  // ── TAP FEEDBACK (audio tick + visual pulse) ──────────────────────
-  // Makes a successful tap unmistakable — fixes the "tap didn't register
-  // and I didn't notice" failure mode that causes undercounts on a walk.
-  // NOTE: navigator.vibrate() does NOT work on iPhone — Safari/WebKit has
-  // never implemented the Vibration API on iOS, on any website. That's a
-  // platform limitation, not a bug here, so we use a short audio tick
-  // instead, which iOS does support.
-  let tapAudioCtx = null;
-  function playTapTick() {
-    try {
-      if (!tapAudioCtx) tapAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (tapAudioCtx.state === 'suspended') tapAudioCtx.resume();
-      const osc = tapAudioCtx.createOscillator();
-      const gain = tapAudioCtx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(880, tapAudioCtx.currentTime);
-      gain.gain.setValueAtTime(0.15, tapAudioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, tapAudioCtx.currentTime + 0.08);
-      osc.connect(gain);
-      gain.connect(tapAudioCtx.destination);
-      osc.start();
-      osc.stop(tapAudioCtx.currentTime + 0.08);
-    } catch (e) { /* audio not available — visual pulse still covers it */ }
-  }
+  document.getElementById('app-content').innerHTML = layout.map(sec => `
+    <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
+      <span>${sec.title}</span>
+      <span style="display:flex;align-items:center;gap:6px;">
+        <span class="section-check" id="check-${sec.id}">✓</span>
+        <span class="chevron"></span>
+      </span>
+    </div>
+    <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
+  `).join('');
 
-  function tapFeedback(targetEl, btnEl) {
-    playTapTick();
-    if (targetEl) {
-      targetEl.classList.remove('tap-pulse');
-      void targetEl.offsetWidth; // restart animation if tapped rapidly
-      targetEl.classList.add('tap-pulse');
-      setTimeout(() => targetEl.classList.remove('tap-pulse'), 220);
-    }
-    if (btnEl) {
-      btnEl.classList.remove('tap-pulse');
-      void btnEl.offsetWidth;
-      btnEl.classList.add('tap-pulse');
-      setTimeout(() => btnEl.classList.remove('tap-pulse'), 220);
-    }
-  }
-
-  function updateModalQty(key, delta) {
-    state[key] = Math.max(0, (state[key] || 0) + delta);
-    const el = document.getElementById(`mqty-${key}`);
-    el.innerText = state[key];
-    el.classList.toggle('active-qty', state[key] > 0);
-    // Only pulse/vibrate on a genuine increment (the tap-to-count case);
-    // decrements (fixing a mistake) don't need the same "confirmed" feel.
-    if (delta > 0) {
-      const btnId = `mbtn-plus-${key}`;
-      tapFeedback(el, document.getElementById(btnId));
-    }
-  }
-
-  function closeModal() {
-    activeTypes.forEach(t => {
-      const key = getSyncKey(activeSectionId, activeItemLabel, t);
-      const qtyElement = document.getElementById(`mqty-${key}`);
-      if (qtyElement.tagName === "INPUT") {
-        state[key] = parseInt(qtyElement.value) || 0;
-      }
-      const noteInput = document.getElementById(`mnote-${key}`);
-      if (noteInput) state[`NOTE_${key}`] = noteInput.value.trim();
-    });
-    refreshAllCards();
-    saveState();
-    document.getElementById('itemModal').style.display = 'none';
-  }
-
-  // ── CARD REFRESH ─────────────────────────────────────────────────
-  function refreshAllCards() {
-    layout.forEach(sec => {
-      let sectionHasData = false;
-      sec.items.forEach(item => {
-        let types = sec.types || [];
-        if (sec.id === "sp") {
-          types = railLengths.includes(item) ? ["OPEN", "WALL"]
-                : item === "Shoes"           ? ["FLAT", "ANGLE"]
-                :                             ["QTY"];
-        }
-        const cardId = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
-        const card = document.getElementById(cardId);
-        if (card) {
-          const hasData = types.some(t => state[getSyncKey(sec.id, item, t)] > 0);
-          if (hasData) sectionHasData = true;
-          hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
-          updateCardBadges(card, sec.id, item, types);
-        }
-      });
-      // Special case: Attic Stairs section also checks fire rated
-      if (sec.id === "AS" && state.fireRated) sectionHasData = true;
-      // Update section header checkmark
-      const checkEl = document.getElementById(`check-${sec.id}`);
-      if (checkEl) sectionHasData ? checkEl.classList.add('active') : checkEl.classList.remove('active');
-    });
-    const fireBtn = document.getElementById('fire-status');
-    if (fireBtn) {
-      fireBtn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO";
-      state.fireRated ? fireBtn.classList.add('has-data') : fireBtn.classList.remove('has-data');
-    }
-  }
-
-  function updateCardBadges(card, sectionId, label, types) {
-    const leftB   = card.querySelector('.badge-left');
-    const rightB  = card.querySelector('.badge-right');
-    const centerB = card.querySelector('.badge-center');
-    const noteB   = card.querySelector('.note-badge');
-    if (!leftB) return;
-    [leftB, rightB, centerB].forEach(b => { b.innerText = ""; b.classList.remove('active'); });
-
-    let hasNote = false;
-    types.forEach((t, index) => {
-      const key = getSyncKey(sectionId, label, t);
-      const qty = state[key] || 0;
-      if (state[`NOTE_${key}`]) hasNote = true;
-      if (qty > 0) {
-        if (types.length === 2) {
-          if (index === 0) { leftB.innerText = `${t}:${qty}`;  leftB.classList.add('active'); }
-          else             { rightB.innerText = `${t}:${qty}`; rightB.classList.add('active'); }
-        } else if (types.length === 3) {
-          if (t === "LH")      { leftB.innerText   = `L:${qty}`;  leftB.classList.add('active'); }
-          else if (t === "RH") { rightB.innerText  = `R:${qty}`;  rightB.classList.add('active'); }
-          else                 { centerB.innerText = `S:${qty}`;  centerB.classList.add('active'); }
-        } else {
-          centerB.innerText = qty; centerB.classList.add('active');
-        }
-      }
-    });
-    if (noteB) hasNote ? noteB.classList.add('active') : noteB.classList.remove('active');
-  }
-
-  function toggleFire() {
-    state.fireRated = !state.fireRated;
-    refreshAllCards();
-    saveState();
-  }
-
-  // ── RECAP SCREEN — shown before Generate so a PM can sanity-check
-  // the full list of counts at a glance, instead of catching mistakes
-  // only after Appwright/inside sales sends them back.  ────────────
-  function buildRecapItems() {
-    const groups = [
-      { id:"68",    types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"" },
-      { id:"DBL68", types:["DBL","T-AST"],      items:dblSizes,   suffix:"" },
-      { id:"80",    types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"x8/0" },
-      { id:"DBL80", types:["DBL","T-AST"],      items:dblSizes,   suffix:"x8/0" },
-      { id:"atws",  types:["LH","RH"],          items:doorSizes,  suffix:"" },
-      { id:"AS",    types:["QTY"],              items:["22x54","25x54","Scuttle"], suffix:"" },
-      { id:"HR",    types:["OPEN","WALL"],      items:railLengths, suffix:"" },
-      { id:"ST",    types:["QTY"],              items:stairItems.filter(i=>i!=="Shoes"), suffix:"" },
-      { id:"STSH",  types:["FLAT","ANGLE"],     items:["Shoes"],       suffix:"" },
-      { id:"LO",    types:["QTY"],              items:lockoutItems,    suffix:"" }
-    ];
-    const tiles = [];
-    groups.forEach(g => {
-      g.items.forEach(item => {
-        g.types.forEach(t => {
-          const key = (g.id === "HR" || g.id === "ST" || g.id === "STSH")
-            ? `${g.id}_${item.replace(/[\/ ']/g, "-")}_${t}`
-            : getSyncKey(g.id, item, t);
-          if (state[key] > 0) {
-            const fireLabel = (g.id === "AS" && state.fireRated) ? " 🔥" : "";
-            const cleanType = (t === "QTY") ? "" : ` ${t}`;
-            tiles.push({
-              label: `${item}${g.suffix}${cleanType}${fireLabel}`,
-              qty: state[key],
-              note: state[`NOTE_${key}`] || ""
-            });
-          }
-        });
-      });
-    });
-    return tiles;
-  }
-
-  function openRecap(force) {
+  // ── GENERATE SUMMARY ─────────────────────────────────────────────
+  function generateSummary(force) {
+    const cust   = document.getElementById('customer').value.trim();
+    const sub    = document.getElementById('subdivision').value.trim();
+    const lot    = document.getElementById('lot').value.trim();
     if (!force) {
-      const cust = document.getElementById('customer').value.trim();
-      const sub  = document.getElementById('subdivision').value.trim();
-      const lot  = document.getElementById('lot').value.trim();
       const missing = [];
       if (!cust) missing.push('<strong>Customer</strong>');
       if (!sub)  missing.push('<strong>Subdivision</strong>');
@@ -732,82 +612,49 @@
         return;
       }
     }
-    const tiles = buildRecapItems();
-    const grid = document.getElementById('recap-grid');
-    if (!tiles.length) {
-      grid.innerHTML = `<div class="recap-empty">No items entered yet — go back and tap the doors/items you counted.</div>`;
-    } else {
-      grid.innerHTML = tiles.map(t => `
-        <div class="recap-tile">
-          <div class="recap-label">${t.label}</div>
-          <div class="recap-qty">${t.qty}</div>
-          ${t.note ? `<div class="recap-note">"${t.note}"</div>` : ""}
-        </div>`).join('');
-    }
-    forceGenerateAfterRecap = !!force;
-    document.getElementById('recapModal').style.display = 'flex';
-  }
-
-  function closeRecapModal() {
-    document.getElementById('recapModal').style.display = 'none';
-  }
-
-  function confirmGenerateFromRecap() {
-    closeRecapModal();
-    generateSummary(forceGenerateAfterRecap);
-  }
-
-  // ── GENERATE SUMMARY ─────────────────────────────────────────────
-  function generateSummary(force) {
-    const cust = document.getElementById('customer').value.trim();
-    const sub  = document.getElementById('subdivision').value.trim();
-    const lot  = document.getElementById('lot').value.trim();
-
-    const gNotes = document.getElementById('notes').value || "";
     const custVal = cust || "NA";
     const subVal  = sub  || "NA";
     const lotVal  = lot  || "NA";
+    const gNotes  = document.getElementById('notes').value || "";
     let report = `TAKEOFF -- ${custVal} -- ${subVal} -- LOT ${lotVal}\n----------------------------\n\n`;
 
-    const groups = [
-      { id:"68",    head:"--- 6/8 SINGLE DOORS ---",  types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"" },
-      { id:"DBL68", head:"--- 6/8 DOUBLE DOORS ---",  types:["DBL","T-AST"],      items:dblSizes,   suffix:"" },
-      { id:"80",    head:"--- 8/0 SINGLE DOORS ---",  types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"x8/0" },
-      { id:"DBL80", head:"--- 8/0 DOUBLE DOORS ---",  types:["DBL","T-AST"],      items:dblSizes,   suffix:"x8/0" },
-      { id:"atws",  head:"--- ATTIC WS DOORS ---",    types:["LH","RH"],          items:doorSizes,  suffix:"" },
-      { id:"AS",    head:"--- ATTIC STAIRS ---",      types:["QTY"],              items:["22x54","25x54","Scuttle"], suffix:"" },
-      { id:"HR",    head:"--- HANDRAIL ---",          types:["OPEN","WALL"],      items:railLengths, suffix:"" },
-      { id:"ST",    head:"--- STAIR HARDWARE ---",    types:["QTY"],              items:stairItems.filter(i=>i!=="Shoes"), suffix:"" },
-      { id:"STSH",  head:"--- SHOES ---",             types:["FLAT","ANGLE"],     items:["Shoes"],       suffix:"" },
-      { id:"LO",    head:"--- LOCKOUT ---",            types:["QTY"],              items:lockoutItems,    suffix:"" }
+    const sections = [
+      { id:'68',    head:'--- 6/8 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"" },
+      { id:'DBL68', head:'--- 6/8 DOUBLE DOORS ---',  sizes:dblSizes,     types:["DBL","T-AST"],     suffix:"" },
+      { id:'80',    head:'--- 8/0 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"x8/0" },
+      { id:'DBL80', head:'--- 8/0 DOUBLE DOORS ---',  sizes:dblSizes,     types:["DBL","T-AST"],     suffix:"x8/0" },
+      { id:'atws',  head:'--- ATTIC WS DOORS ---',    sizes:doorSizes,    types:["LH","RH"],         suffix:"" },
+      { id:'AS',    head:'--- ATTIC STAIRS ---',      sizes:["22x54","25x54","Scuttle"], types:["QTY"], suffix:"" },
+      { id:'HR',    head:'--- HANDRAIL ---',          sizes:railLengths,  types:["OPEN","WALL"],     suffix:"" },
+      { id:'ST',    head:'--- STAIR HARDWARE ---',    sizes:stairItems.filter(i=>i!=="Shoes"), types:["QTY"], suffix:"" },
+      { id:'STSH',  head:'--- SHOES ---',             sizes:["Shoes"],    types:["FLAT","ANGLE"],    suffix:"" },
+      { id:'LO',    head:'--- LOCKOUT ---',           sizes:lockoutItems, types:["QTY"],             suffix:"" }
     ];
 
-    groups.forEach(g => {
-      let groupContent = "";
-      g.items.forEach(item => {
-        g.types.forEach(t => {
-          const key = (g.id === "HR" || g.id === "ST" || g.id === "STSH")
-            ? `${g.id}_${item.replace(/[\/ ']/g, "-")}_${t}`
-            : getSyncKey(g.id, item, t);
-          if (state[key] > 0) {
-            const fireLabel = (g.id === "AS" && state.fireRated) ? " (FIRE RATED)" : "";
-            const cleanType = (t === "QTY") ? "" : ` ${t}`;
-            groupContent += `- ${item}${g.suffix}${cleanType}: ${state[key]}${fireLabel}`;
-            if (state[`NOTE_${key}`]) groupContent += ` *${state[`NOTE_${key}`]}`;
-            groupContent += `\n`;
+    sections.forEach(sec => {
+      let sectionText = "";
+      sec.sizes.forEach(sz => {
+        sec.types.forEach(tp => {
+          const key = sec.id + '_' + sz.replace(/[\/ ']/g, "-") + '_' + tp;
+          const val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
+          if (val > 0) {
+            const note    = state['NOTE_' + key] || "";
+            const fireTag = (state.fireRated && sec.id==='AS') ? ' (FIRE RATED)' : '';
+            const typeStr = tp === "QTY" ? "" : ` ${tp}`;
+            sectionText  += `- ${sz}${sec.suffix}${typeStr}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
           }
         });
       });
-      if (groupContent) report += `${g.head}\n${groupContent}\n`;
+      if (sectionText) report += sec.head + "\n" + sectionText + "\n";
     });
 
-    if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
+    if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}`;
     document.getElementById('summary').value = report;
-    saveState();
     const summaryEl = document.getElementById('summary');
     summaryEl.classList.remove('flash');
     void summaryEl.offsetWidth;
     summaryEl.classList.add('flash');
+    saveActiveState();
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
     saveToHistory(report, `${subVal} L${lotVal}`, {
       customer: custVal, subdivision: subVal, lot: lotVal, notes: gNotes,
@@ -816,140 +663,11 @@
   }
 
   function updateSummaryStyle() {
-    const s = document.getElementById('summary');
+    const s     = document.getElementById('summary');
     const empty = document.getElementById('summary-empty-state');
     const hasText = s.value.length > 0;
-    hasText ? s.classList.add('has-text') : s.classList.remove('has-text');
-    hasText ? empty.classList.add('hidden') : empty.classList.remove('hidden');
-  }
-
-  // ── HISTORY TOGGLE ───────────────────────────────────────────────
-  function toggleHistorySection() {
-    const body    = document.getElementById('history-body');
-    const chevron = document.getElementById('history-chevron');
-    const isOpen  = body.style.display !== 'none';
-    body.style.display    = isOpen ? 'none' : 'block';
-    chevron.innerText     = isOpen ? '▼ SHOW' : '▲ HIDE';
-  }
-
-  // ── HISTORY SAVE / RENDER ─────────────────────────────────────────
-  function saveToHistory(text, label, fullData) {
-    learnFromJob(fullData.customer, fullData.subdivision);
-    let history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
-    const now     = new Date();
-    const dateStr = (now.getMonth() + 1) + '/' + now.getDate();
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
-    const richLabel = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
-    history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
-    if (history.length > 20) history.pop();
-    localStorage.setItem('bfs_beta2_history', JSON.stringify(history));
-    renderHistory();
-  }
-
-  function renderHistory() {
-    const list    = document.getElementById('history-list');
-    const history = JSON.parse(localStorage.getItem('bfs_beta2_history')) || [];
-    const query   = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
-    const filtered = query
-      ? history.filter(item =>
-          item.label.toLowerCase().includes(query) ||
-          (item.fullData?.customer || '').toLowerCase().includes(query) ||
-          (item.fullData?.subdivision || '').toLowerCase().includes(query) ||
-          (item.fullData?.lot || '').toLowerCase().includes(query)
-        )
-      : history;
-    list.innerHTML = filtered.length
-      ? ""
-      : `<p style='font-size:11px; color:#94a3b8;'>${query ? 'No matches found.' : 'No recent takeoffs.'}</p>`;
-    filtered.forEach((item, index) => {
-      const realIndex = history.indexOf(item);
-      list.innerHTML += `
-        <div class="history-item">
-          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ''}</small></span>
-          <div class="history-controls">
-            <button class="load-btn" onclick="loadHistory(${realIndex})">LOAD</button>
-            <button class="del-btn"  onclick="deleteHistoryItem(${realIndex})">✕</button>
-          </div>
-        </div>`;
-    });
-  }
-
-  // ── NEW LOT SAME JOB ─────────────────────────────────────────────
-  function showNewLotModal() {
-    document.getElementById('newLotModal').style.display = 'flex';
-  }
-  function closeNewLotModal() {
-    document.getElementById('newLotModal').style.display = 'none';
-  }
-  function confirmNewLot() {
-    closeNewLotModal();
-    const cust = document.getElementById('customer').value;
-    const sub  = document.getElementById('subdivision').value;
-    state = { fireRated: false };
-    document.getElementById('summary').value = "";
-    document.getElementById('lot').value = "";
-    document.getElementById('notes').value = "";
-    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
-    refreshAllCards();
-    updateSummaryStyle();
-    document.getElementById('customer').value = cust;
-    document.getElementById('subdivision').value = sub;
-    saveState();
-    updateJobBanner();
-    document.getElementById('lot').focus();
-    window.scrollTo(0, 0);
-  }
-
-  // ── REQUIRED FIELDS WARNING ──────────────────────────────────────
-  function showWarningModal(msg) {
-    document.getElementById('warning-text').innerHTML = msg;
-    document.getElementById('warningModal').style.display = 'flex';
-  }
-  function closeWarningModal() {
-    document.getElementById('warningModal').style.display = 'none';
-  }
-
-  // ── SCROLL TO TOP ────────────────────────────────────────────────
-  window.addEventListener('scroll', () => {
-    const btn = document.getElementById('scroll-top');
-    if (window.scrollY > 300) btn.classList.add('visible');
-    else btn.classList.remove('visible');
-  });
-
-  // ── RESET MODAL ───────────────────────────────────────────────────
-  function showResetModal() {
-    document.getElementById('resetModal').style.display = 'flex';
-  }
-  function closeResetModal() {
-    document.getElementById('resetModal').style.display = 'none';
-  }
-  function confirmReset() {
-    closeResetModal();
-    state = { fireRated: false };
-    document.getElementById('summary').value = "";
-    localStorage.removeItem('bfs_beta2_active_work');
-    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
-    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
-    refreshAllCards();
-    updateSummaryStyle();
-    updateJobBanner();
-    window.scrollTo(0, 0);
-  }
-
-  // ── COPY — uses modern Clipboard API ─────────────────────────────
-  function copySummary() {
-    const text = document.getElementById("summary").value;
-    if (!text.trim()) return;
-    navigator.clipboard.writeText(text).then(() => {
-      showToast("✓ COPIED TO CLIPBOARD");
-    }).catch(() => {
-      const ta = document.getElementById("summary");
-      ta.select();
-      document.execCommand("copy");
-      showToast("✓ COPIED TO CLIPBOARD");
-    });
+    hasText ? s.classList.add('has-text')    : s.classList.remove('has-text');
+    hasText ? empty.classList.add('hidden')  : empty.classList.remove('hidden');
   }
 
   function showToast(msg) {
@@ -961,79 +679,135 @@
     setTimeout(() => t.classList.remove("show"), 2000);
   }
 
-  // ── BUILD LAYOUT ──────────────────────────────────────────────────
-  const appContainer = document.getElementById('app-content');
-  layout.forEach(sec => {
-    const title = document.createElement('div');
-    title.className = `section-title ${sec.color}`;
-    title.innerHTML = `<span>${sec.title}</span><span style="display:flex;align-items:center;gap:6px;"><span class="section-check" id="check-${sec.id}">✓</span><span class="chevron"></span></span>`;
-    title.onclick = () => toggleSection(sec.id, title);
-
-    const content = document.createElement('div');
-    content.id = `content-${sec.id}`;
-    content.className = 'section-content';
-
-    const grid = document.createElement('div');
-    grid.className = 'item-grid';
-
-    sec.items.forEach(item => {
-      let itemTypes = sec.types || [];
-      if (sec.id === "sp") {
-        itemTypes = railLengths.includes(item) ? ["OPEN", "WALL"]
-                  : item === "Shoes"            ? ["FLAT", "ANGLE"]
-                  :                             ["QTY"];
-      }
-      const card = document.createElement('div');
-      card.className = 'item-card';
-      card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
-      card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div><div class="note-badge">📝</div>`;
-      card.onclick = () => openModal(sec.id, item, itemTypes);
-      grid.appendChild(card);
+  function copySummary() {
+    const text = document.getElementById("summary").value;
+    if (!text.trim()) return;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("✓ COPIED TO CLIPBOARD");
+    }).catch(() => {
+      document.getElementById("summary").select();
+      document.execCommand("copy");
+      showToast("✓ COPIED TO CLIPBOARD");
     });
+  }
 
-    content.appendChild(grid);
+  function showResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
+  function closeResetModal() { document.getElementById('resetModal').style.display = 'none'; }
+  function confirmReset() {
+    closeResetModal();
+    state = { fireRated: false };
+    document.getElementById('summary').value = "";
+    localStorage.removeItem('bfs_active_work');
+    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
+    document.querySelectorAll('.qty').forEach(el => { el.innerText = '0'; el.classList.remove('has-qty'); });
+    document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
+    document.querySelectorAll('.note-box').forEach(el => { el.value = ""; });
+    if (document.getElementById('fire-status')) document.getElementById('fire-status').innerText = "NO";
+    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
+    updateSummaryStyle();
+    updateSectionCheckmarks();
+    updateJobBanner();
+    window.scrollTo(0, 0);
+  }
 
-    if (sec.id === "AS") {
-      const fireBtn = document.createElement('button');
-      fireBtn.id = "fire-status";
-      fireBtn.className = "item-card";
-      fireBtn.style.width = "calc(100% - 16px)";
-      fireBtn.style.margin = "8px";
-      fireBtn.innerText = "FIRE RATED: NO";
-      fireBtn.onclick = toggleFire;
-      content.appendChild(fireBtn);
+  function toggleHistorySection() {
+    const body = document.getElementById('history-body');
+    const chevron = document.getElementById('history-chevron');
+    const isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    chevron.innerText  = isOpen ? '▼ SHOW' : '▲ HIDE';
+  }
+
+  function saveToHistory(text, label, fullData) {
+    learnFromJob(fullData.customer, fullData.subdivision);
+    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const now = new Date();
+    const dateStr = (now.getMonth()+1) + '/' + now.getDate();
+    const timeStr = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const richLabel = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
+    history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
+    if (history.length > 20) history.pop();
+    localStorage.setItem('bfs_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const query = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
+    const filtered = query
+      ? history.filter(item =>
+          item.label.toLowerCase().includes(query) ||
+          (item.fullData?.customer || '').toLowerCase().includes(query) ||
+          (item.fullData?.subdivision || '').toLowerCase().includes(query) ||
+          (item.fullData?.lot || '').toLowerCase().includes(query))
+      : history;
+    list.innerHTML = filtered.length ? ""
+      : `<p style='font-size:11px; padding:10px; color:#94a3b8;'>${query ? 'No matches found.' : 'No history.'}</p>`;
+    filtered.forEach(item => {
+      const realIndex = history.indexOf(item);
+      list.innerHTML += `
+        <div class="history-item">
+          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ""}</small></span>
+          <div class="history-controls">
+            <button class="load-btn" onclick="loadHistory(${realIndex})">LOAD</button>
+            <button class="del-btn"  onclick="deleteHistoryItem(${realIndex})">✕</button>
+          </div>
+        </div>`;
+    });
+  }
+
+  function loadHistory(index) {
+    const h = JSON.parse(localStorage.getItem('bfs_history'))[index];
+    document.getElementById('summary').value = h.text;
+    if (h.fullData) {
+      document.getElementById('customer').value    = h.fullData.customer || "";
+      document.getElementById('subdivision').value = h.fullData.subdivision || "";
+      document.getElementById('lot').value          = h.fullData.lot || "";
+      document.getElementById('notes').value        = h.fullData.notes || "";
+      state = JSON.parse(JSON.stringify(h.fullData.state));
+      learnFromJob(h.fullData.customer, h.fullData.subdivision);
+      refreshUI();
+      saveActiveState();
+      updateJobBanner();
+      updateSummaryStyle();
     }
+    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
+  }
 
-    appContainer.appendChild(title);
-    appContainer.appendChild(content);
-  });
+  function deleteHistoryItem(index) {
+    let h = JSON.parse(localStorage.getItem('bfs_history'));
+    h.splice(index, 1);
+    localStorage.setItem('bfs_history', JSON.stringify(h));
+    renderHistory();
+  }
+
+  function clearHistory() {
+    if (confirm('Clear all takeoff history?')) {
+      localStorage.removeItem('bfs_history');
+      renderHistory();
+    }
+  }
 
   // ── AUTOCOMPLETE KNOWLEDGE BASE ──────────────────────────────────
   function getKnowledge() {
-    try { return JSON.parse(localStorage.getItem('bfs_beta2_knowledge')) || {}; }
+    try { return JSON.parse(localStorage.getItem('bfs_knowledge')) || {}; }
     catch(e) { return {}; }
   }
-
   function saveKnowledge(kb) {
     const plain = {};
     Object.keys(kb).forEach(k => { plain[k] = Array.isArray(kb[k]) ? kb[k] : Array.from(kb[k]); });
-    localStorage.setItem('bfs_beta2_knowledge', JSON.stringify(plain));
+    localStorage.setItem('bfs_knowledge', JSON.stringify(plain));
   }
-
   function learnFromJob(customer, subdivision) {
     if (!customer) return;
     const kb = getKnowledge();
     if (!kb[customer]) kb[customer] = [];
-    if (subdivision && !kb[customer].includes(subdivision)) {
-      kb[customer].push(subdivision);
-    }
+    if (subdivision && !kb[customer].includes(subdivision)) kb[customer].push(subdivision);
     saveKnowledge(kb);
   }
-
-  function getCustomers() {
-    return Object.keys(getKnowledge()).sort();
-  }
-
+  function getCustomers() { return Object.keys(getKnowledge()).sort(); }
   function getSubdivisionsFor(customer) {
     const kb = getKnowledge();
     if (customer && kb[customer]) return kb[customer].sort();
@@ -1041,90 +815,397 @@
     Object.values(kb).forEach(subs => subs.forEach(s => all.add(s)));
     return Array.from(all).sort();
   }
-
   function deleteCustomer(customer) {
     const kb = getKnowledge();
     delete kb[customer];
     saveKnowledge(kb);
     document.getElementById('customer').value = "";
     document.getElementById('subdivision').value = "";
-    saveState(); updateJobBanner();
+    saveActiveState(); updateJobBanner();
     showCustomerSuggestions();
   }
-
   function deleteSubdivision(customer, subdivision) {
     const kb = getKnowledge();
-    if (kb[customer]) {
-      kb[customer] = kb[customer].filter(s => s !== subdivision);
-    }
+    if (kb[customer]) kb[customer] = kb[customer].filter(s => s !== subdivision);
     saveKnowledge(kb);
     showSubdivisionSuggestions();
   }
-
   function showDropdown(dropdownId, items, onSelect, onDelete) {
     const dd = document.getElementById(dropdownId);
     if (!items.length) { dd.classList.remove('open'); return; }
     dd.innerHTML = items.map(item => {
-      const safeItem = item.replace(/'/g, "\\'");
-      const deleteBtnHtml = onDelete
-        ? `<button class="ac-delete" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); (${onDelete.toString()})('${safeItem}'); ">✕</button>`
+      const safe = item.replace(/'/g, "\\'");
+      const deleteBtn = onDelete
+        ? `<button class="ac-delete" onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();(${onDelete.toString()})('${safe}')">✕</button>`
         : '';
-      return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${safeItem}'); closeDropdown('${dropdownId}')">
-        <span class="ac-item-label">${item}</span>
-        ${deleteBtnHtml}
+      return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${safe}');closeDropdown('${dropdownId}')">
+        <span class="ac-item-label">${item}</span>${deleteBtn}
       </div>`;
     }).join('');
     dd.classList.add('open');
   }
-
   function closeDropdown(id) {
     const dd = document.getElementById(id);
     if (dd) dd.classList.remove('open');
   }
-
   function showCustomerSuggestions() {
     const val = document.getElementById('customer').value.trim().toLowerCase();
-    const all = getCustomers();
-    const filtered = val ? all.filter(c => c.toLowerCase().includes(val)) : all;
+    const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
     showDropdown('ac-customer', filtered,
-      (selected) => {
-        document.getElementById('customer').value = selected;
-        saveState(); updateJobBanner();
-        showSubdivisionSuggestions();
-      },
-      (toDelete) => {
-        deleteCustomer(toDelete);
-      }
+      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); showSubdivisionSuggestions(); },
+      (s) => deleteCustomer(s)
     );
   }
-
   function showSubdivisionSuggestions() {
     const customer = document.getElementById('customer').value.trim();
     const val = document.getElementById('subdivision').value.trim().toLowerCase();
     const all = getSubdivisionsFor(customer);
     const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
     showDropdown('ac-subdivision', filtered,
-      (selected) => {
-        document.getElementById('subdivision').value = selected;
-        saveState(); updateJobBanner();
-      },
-      (toDelete) => {
-        deleteSubdivision(customer, toDelete);
+      (s) => { document.getElementById('subdivision').value = s; saveActiveState(); updateJobBanner(); },
+      (s) => deleteSubdivision(customer, s)
+    );
+  }
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.ac-wrap')) {
+      closeDropdown('ac-customer');
+      closeDropdown('ac-subdivision');
+      closeDropdown('lo-ac-customer');
+      closeDropdown('lo-ac-subdivision');
+    }
+  });
+
+  function showNewLotModal() { document.getElementById('newLotModal').style.display = 'flex'; }
+  function closeNewLotModal() { document.getElementById('newLotModal').style.display = 'none'; }
+  function confirmNewLot() {
+    closeNewLotModal();
+    const cust = document.getElementById('customer').value;
+    const sub  = document.getElementById('subdivision').value;
+    state = { fireRated: false };
+    document.getElementById('summary').value = "";
+    document.getElementById('lot').value = "";
+    document.getElementById('notes').value = "";
+    document.querySelectorAll('.qty').forEach(el => { el.innerText = '0'; el.classList.remove('has-qty'); });
+    document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
+    document.querySelectorAll('.note-box').forEach(el => { el.value = ""; });
+    if (document.getElementById('fire-status')) document.getElementById('fire-status').innerText = "NO";
+    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
+    updateSummaryStyle();
+    updateSectionCheckmarks();
+    document.getElementById('customer').value = cust;
+    document.getElementById('subdivision').value = sub;
+    saveActiveState();
+    updateJobBanner();
+    document.getElementById('lot').focus();
+    window.scrollTo(0, 0);
+  }
+
+  function showWarningModal(msg) {
+    document.getElementById('warning-text').innerHTML = msg;
+    document.getElementById('warningModal').style.display = 'flex';
+  }
+  function closeWarningModal() { document.getElementById('warningModal').style.display = 'none'; }
+
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scroll-top');
+    if (window.scrollY > 300) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+
+  document.getElementById('resetModal').addEventListener('click', function(e) { if (e.target===this) closeResetModal(); });
+  document.getElementById('newLotModal').addEventListener('click', function(e) { if (e.target===this) closeNewLotModal(); });
+  document.getElementById('warningModal').addEventListener('click', function(e) { if (e.target===this) closeWarningModal(); });
+  document.getElementById('loRecapModal').addEventListener('click', function(e) { if (e.target===this) closeLoRecap(); });
+
+  // ══════════════════════════════════════════════════════════════
+  // LOCKOUT WALK
+  // Separate state, separate history (bfs_lo_history),
+  // pre-populates job info from main app state if available.
+  // Items: Passage, Privacy, Dummy, Deadbolt only.
+  // ══════════════════════════════════════════════════════════════
+  const LO_ITEMS = ['Passage', 'Privacy', 'Dummy', 'Deadbolt'];
+  let loState = {};
+  let loAudioCtx = null;
+
+  function playLoTick() {
+    try {
+      if (!loAudioCtx) loAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (loAudioCtx.state === 'suspended') loAudioCtx.resume();
+      const osc = loAudioCtx.createOscillator();
+      const gain = loAudioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(880, loAudioCtx.currentTime);
+      gain.gain.setValueAtTime(0.15, loAudioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, loAudioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(loAudioCtx.destination);
+      osc.start();
+      osc.stop(loAudioCtx.currentTime + 0.08);
+    } catch(e) {}
+  }
+
+  function openLockoutWalk() {
+    // Load saved lockout state, or pre-populate from main takeoff
+    const loSaved = localStorage.getItem('bfs_lo_active_work');
+    if (loSaved) {
+      const d = JSON.parse(loSaved);
+      document.getElementById('lo-customer').value   = d.customer || '';
+      document.getElementById('lo-subdivision').value = d.subdivision || '';
+      document.getElementById('lo-lot').value         = d.lot || '';
+      document.getElementById('lo-notes').value       = d.notes || '';
+      document.getElementById('lo-summary').value     = d.summaryText || '';
+      loState = d.loState || {};
+    } else {
+      const mainSaved = localStorage.getItem('bfs_active_work');
+      if (mainSaved) {
+        const d = JSON.parse(mainSaved);
+        document.getElementById('lo-customer').value   = d.customer || '';
+        document.getElementById('lo-subdivision').value = d.subdivision || '';
+        document.getElementById('lo-lot').value         = d.lot || '';
       }
+      document.getElementById('lo-notes').value   = '';
+      document.getElementById('lo-summary').value = '';
+      loState = {};
+    }
+    buildLoCounters();
+    renderLoHistory();
+    updateLoSummaryStyle();
+    const overlay = document.getElementById('lo-overlay');
+    overlay.style.display = 'block';
+    overlay.scrollTop = 0;
+  }
+
+  function closeLockoutWalk() {
+    document.getElementById('lo-overlay').style.display = 'none';
+  }
+
+  function buildLoCounters() {
+    const container = document.getElementById('lo-counters');
+    container.innerHTML = LO_ITEMS.map(item => {
+      const qty = loState[item] || 0;
+      const hasCount = qty > 0;
+      return `
+        <div class="lo-counter-card ${hasCount ? 'has-count' : ''}" id="lo-card-${item}">
+          <div class="lo-item-label">${item}</div>
+          <div class="lo-controls">
+            <button class="lo-btn" onclick="updateLoQty('${item}', -1)">−</button>
+            <span class="lo-qty ${hasCount ? 'has-count' : ''}" id="lo-qty-${item}">${qty}</span>
+            <button class="lo-btn" id="lo-plus-${item}" onclick="updateLoQty('${item}', 1)">+</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateLoQty(item, delta) {
+    loState[item] = Math.max(0, (loState[item] || 0) + delta);
+    const qty = loState[item];
+    const qtyEl  = document.getElementById(`lo-qty-${item}`);
+    const cardEl = document.getElementById(`lo-card-${item}`);
+    const btnEl  = document.getElementById(`lo-plus-${item}`);
+    qtyEl.innerText = qty;
+    qtyEl.classList.toggle('has-count', qty > 0);
+    cardEl.classList.toggle('has-count', qty > 0);
+    if (delta > 0) {
+      playLoTick();
+      [qtyEl, btnEl].forEach(el => {
+        if (!el) return;
+        el.classList.remove('tap-flash');
+        void el.offsetWidth;
+        el.classList.add('tap-flash');
+        setTimeout(() => el.classList.remove('tap-flash'), 220);
+      });
+    }
+    saveLoState();
+  }
+
+  function saveLoState() {
+    const data = {
+      customer:    document.getElementById('lo-customer').value,
+      subdivision: document.getElementById('lo-subdivision').value,
+      lot:         document.getElementById('lo-lot').value,
+      notes:       document.getElementById('lo-notes').value,
+      summaryText: document.getElementById('lo-summary').value,
+      loState
+    };
+    localStorage.setItem('bfs_lo_active_work', JSON.stringify(data));
+    updateLoSummaryStyle();
+  }
+
+  function updateLoSummaryStyle() {
+    const s     = document.getElementById('lo-summary');
+    const empty = document.getElementById('lo-summary-empty');
+    if (s && empty) {
+      empty.style.display = s.value.length > 0 ? 'none' : 'flex';
+      s.style.borderColor = s.value.length > 0 ? 'var(--bfs-red)' : 'var(--navy)';
+    }
+  }
+
+  function openLoRecap() {
+    const cust = document.getElementById('lo-customer').value.trim();
+    const sub  = document.getElementById('lo-subdivision').value.trim();
+    const lot  = document.getElementById('lo-lot').value.trim();
+    if (!cust || !sub || !lot) { showToast('⚠️ ENTER CUSTOMER, SUBDIVISION & LOT #'); return; }
+    const hasAny = LO_ITEMS.some(i => (loState[i] || 0) > 0);
+    if (!hasAny) { showToast('⚠️ NO COUNTS ENTERED YET'); return; }
+    const content = document.getElementById('lo-recap-content');
+    content.innerHTML = LO_ITEMS.map(item => {
+      const qty = loState[item] || 0;
+      if (qty === 0) return '';
+      return `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #e2e8f0;">
+        <span style="font-weight:900; font-size:18px; color:var(--navy);">${item}</span>
+        <span style="font-size:36px; font-weight:900; color:var(--green);">${qty}</span>
+      </div>`;
+    }).filter(Boolean).join('');
+    document.getElementById('loRecapModal').style.display = 'flex';
+  }
+
+  function closeLoRecap() { document.getElementById('loRecapModal').style.display = 'none'; }
+
+  function confirmLoGenerate() {
+    closeLoRecap();
+    generateLoSummary();
+  }
+
+  function generateLoSummary() {
+    const cust  = document.getElementById('lo-customer').value.trim() || 'NA';
+    const sub   = document.getElementById('lo-subdivision').value.trim() || 'NA';
+    const lot   = document.getElementById('lo-lot').value.trim() || 'NA';
+    const notes = document.getElementById('lo-notes').value.trim();
+    let report = `LOCKOUT WALK -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n--- LOCKOUT ---\n`;
+    LO_ITEMS.forEach(item => {
+      if ((loState[item] || 0) > 0) report += `- ${item}: ${loState[item]}\n`;
+    });
+    if (notes) report += `\n----------------------------\nNOTES\n${notes}`;
+    const summaryEl = document.getElementById('lo-summary');
+    summaryEl.value = report;
+    summaryEl.style.borderColor = 'var(--green)';
+    setTimeout(() => { summaryEl.style.borderColor = 'var(--bfs-red)'; }, 600);
+    updateLoSummaryStyle();
+    saveLoToHistory(report, { customer: cust, subdivision: sub, lot, notes, loState: JSON.parse(JSON.stringify(loState)) });
+    saveLoState();
+    learnFromJob(cust, sub);
+  }
+
+  function copyLoSummary() {
+    const text = document.getElementById('lo-summary').value;
+    if (!text.trim()) { showToast('⚠️ GENERATE FIRST'); return; }
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('✓ COPIED TO CLIPBOARD'))
+      .catch(() => { document.getElementById('lo-summary').select(); document.execCommand('copy'); showToast('✓ COPIED'); });
+  }
+
+  function loNewLot() {
+    const cust = document.getElementById('lo-customer').value;
+    const sub  = document.getElementById('lo-subdivision').value;
+    loState = {};
+    document.getElementById('lo-lot').value         = '';
+    document.getElementById('lo-notes').value       = '';
+    document.getElementById('lo-summary').value     = '';
+    document.getElementById('lo-customer').value    = cust;
+    document.getElementById('lo-subdivision').value = sub;
+    buildLoCounters();
+    saveLoState();
+    document.getElementById('lo-lot').focus();
+    showToast('✓ READY FOR NEW LOT');
+  }
+
+  function loReset() {
+    if (!confirm('Reset all lockout walk fields?')) return;
+    loState = {};
+    ['lo-customer','lo-subdivision','lo-lot','lo-notes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('lo-summary').value = '';
+    localStorage.removeItem('bfs_lo_active_work');
+    buildLoCounters();
+    updateLoSummaryStyle();
+  }
+
+  // Lockout walk history (separate key: bfs_lo_history)
+  function saveLoToHistory(text, fullData) {
+    let history = JSON.parse(localStorage.getItem('bfs_lo_history')) || [];
+    const now = new Date();
+    const dateStr = (now.getMonth()+1) + '/' + now.getDate();
+    const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const label = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
+    history.unshift({ label: `${dateStr} — ${label}`, text, time: timeStr, fullData });
+    if (history.length > 20) history.pop();
+    localStorage.setItem('bfs_lo_history', JSON.stringify(history));
+    renderLoHistory();
+  }
+
+  function renderLoHistory() {
+    const list = document.getElementById('lo-history-list');
+    const history = JSON.parse(localStorage.getItem('bfs_lo_history')) || [];
+    list.innerHTML = history.length ? '' : `<p style="font-size:11px; color:#94a3b8; padding:8px 0;">No lockout walks yet.</p>`;
+    history.forEach((item, index) => {
+      list.innerHTML += `
+        <div class="history-item">
+          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ''}</small></span>
+          <div class="history-controls">
+            <button class="load-btn" onclick="loadLoHistory(${index})">LOAD</button>
+            <button class="del-btn"  onclick="deleteLoHistory(${index})">✕</button>
+          </div>
+        </div>`;
+    });
+  }
+
+  function loadLoHistory(index) {
+    const h = JSON.parse(localStorage.getItem('bfs_lo_history'))[index];
+    document.getElementById('lo-customer').value    = h.fullData.customer || '';
+    document.getElementById('lo-subdivision').value = h.fullData.subdivision || '';
+    document.getElementById('lo-lot').value          = h.fullData.lot || '';
+    document.getElementById('lo-notes').value        = h.fullData.notes || '';
+    document.getElementById('lo-summary').value      = h.text || '';
+    loState = JSON.parse(JSON.stringify(h.fullData.loState || {}));
+    buildLoCounters();
+    saveLoState();
+    updateLoSummaryStyle();
+  }
+
+  function deleteLoHistory(index) {
+    let h = JSON.parse(localStorage.getItem('bfs_lo_history'));
+    h.splice(index, 1);
+    localStorage.setItem('bfs_lo_history', JSON.stringify(h));
+    renderLoHistory();
+  }
+
+  function clearLoHistory() {
+    if (confirm('Clear all lockout walk history?')) {
+      localStorage.removeItem('bfs_lo_history');
+      renderLoHistory();
+    }
+  }
+
+  function toggleLoHistory() {
+    const body = document.getElementById('lo-history-body');
+    const chevron = document.getElementById('lo-history-chevron');
+    const isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    chevron.innerText = isOpen ? '▼ SHOW' : '▲ HIDE';
+  }
+
+  // Lockout walk autocomplete (shares the main app's knowledge base)
+  function showLoCustomerSuggestions() {
+    const val = document.getElementById('lo-customer').value.trim().toLowerCase();
+    const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
+    showDropdown('lo-ac-customer', filtered,
+      (s) => { document.getElementById('lo-customer').value = s; saveLoState(); showLoSubdivisionSuggestions(); },
+      null
     );
   }
 
-  document.addEventListener('click', (e) => {
-    const clickedWrap = e.target.closest('.ac-wrap');
-    ['ac-customer', 'ac-subdivision'].forEach(id => {
-      const dd = document.getElementById(id);
-      if (dd && (!clickedWrap || !clickedWrap.contains(dd))) {
-        dd.classList.remove('open');
-      }
-    });
-  });
+  function showLoSubdivisionSuggestions() {
+    const customer = document.getElementById('lo-customer').value.trim();
+    const val = document.getElementById('lo-subdivision').value.trim().toLowerCase();
+    const all = getSubdivisionsFor(customer);
+    const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
+    showDropdown('lo-ac-subdivision', filtered,
+      (s) => { document.getElementById('lo-subdivision').value = s; saveLoState(); },
+      null
+    );
+  }
 
-  // ── INIT ──────────────────────────────────────────────────────────
+  // ── INIT ─────────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
 </script>
