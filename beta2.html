@@ -422,6 +422,19 @@
   </div>
 </div>
 
+<!-- LOCKOUT MISMATCH WARNING MODAL -->
+<div id="loMismatchModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:6px;">⚠️</div>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Counts Don't Match</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">Doesn't match your door takeoff — doors changed on site?</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeLoMismatch()">Go Back & Fix</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeLoMismatch(); _openLoRecapScreen();">Yes, Proceed</button>
+    </div>
+  </div>
+</div>
+
 <!-- TRIM TAKEOFF DETAIL MODAL -->
 <div id="loTrimDetailModal" class="modal-overlay">
   <div class="modal-content" style="max-width:480px;">
@@ -933,6 +946,7 @@
   document.getElementById('newLotModal').addEventListener('click', function(e) { if (e.target===this) closeNewLotModal(); });
   document.getElementById('warningModal').addEventListener('click', function(e) { if (e.target===this) closeWarningModal(); });
   document.getElementById('loRecapModal').addEventListener('click', function(e) { if (e.target===this) closeLoRecap(); });
+  document.getElementById('loMismatchModal').addEventListener('click', function(e) { if (e.target===this) closeLoMismatch(); });
   document.getElementById('loTrimDetailModal').addEventListener('click', function(e) { if (e.target===this) closeLoTrimDetail(); });
 
   // ══════════════════════════════════════════════════════════════
@@ -1066,6 +1080,26 @@
     if (!cust || !sub || !lot) { showToast('⚠️ ENTER CUSTOMER, SUBDIVISION & LOT #'); return; }
     const hasAny = LO_ITEMS.some(i => (loState[i] || 0) > 0);
     if (!hasAny) { showToast('⚠️ NO COUNTS ENTERED YET'); return; }
+
+    // ── MISMATCH CHECK against trim takeoff index ──────────────────
+    const match = lookupTrimTakeoff(cust, sub, lot);
+    if (match) {
+      const expSingle  = match.singles + match.tast;
+      const expDummies = (match.dbl * 2) + (match.tast * 2);
+      const gotSingle  = (loState['Passage'] || 0) + (loState['Privacy'] || 0);
+      const gotDummies = loState['Dummy'] || 0;
+      const singleOff  = gotSingle  !== expSingle;
+      const dummyOff   = gotDummies !== expDummies;
+      if (singleOff || dummyOff) {
+        document.getElementById('loMismatchModal').style.display = 'flex';
+        return;
+      }
+    }
+
+    _openLoRecapScreen();
+  }
+
+  function _openLoRecapScreen() {
     const content = document.getElementById('lo-recap-content');
     content.innerHTML = LO_ITEMS.map(item => {
       const qty = loState[item] || 0;
@@ -1079,6 +1113,7 @@
   }
 
   function closeLoRecap() { document.getElementById('loRecapModal').style.display = 'none'; }
+  function closeLoMismatch() { document.getElementById('loMismatchModal').style.display = 'none'; }
 
   function confirmLoGenerate() {
     closeLoRecap();
@@ -1317,7 +1352,7 @@
     let expRows = '';
     if (expSingleLocks > 0) expRows += `
       <div style="display:flex;justify-content:space-between;padding:3px 0;">
-        <span style="font-size:12px;color:#1e3a8a;">Passage / Privacy / Keyed Entry</span>
+        <span style="font-size:12px;color:#1e3a8a;">Passage / Privacy</span>
         <span style="font-size:15px;font-weight:900;color:var(--green);">${expSingleLocks}</span>
       </div>`;
     if (expDummies > 0) expRows += `
