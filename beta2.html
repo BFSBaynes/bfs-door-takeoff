@@ -19,7 +19,8 @@
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 30px; overflow-x: hidden; }
     body.banner-visible { padding-top: 80px; }
-    body.banner-visible .section-title { top: 80px; }
+    body.banner-visible .section-title { top: var(--section-top, 44px); }
+    :root { --header-top: 44px; --section-top: 44px; }
 
     /* ── SOLID RED TOP BAR ── */
     #top-bar {
@@ -122,7 +123,7 @@
       margin: 8px -8px; cursor: pointer; display: flex;
       justify-content: space-between; align-items: center;
       text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
-      position: sticky; top: 44px; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: sticky; top: var(--section-top, 44px); z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .section-check {
       display: none; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
@@ -216,7 +217,7 @@
 <div id="toast"></div>
 <div id="job-banner"></div>
 
-<div class="header-card" style="margin-top:8px;">
+<div id="main-header" class="header-card" style="margin-top:8px;">
   <img src="icon-512.png" alt="Logo" class="app-logo">
   <div class="input-row">
     <div class="input-group ac-wrap">
@@ -333,9 +334,9 @@
   <!-- Header bar -->
   <div class="lo-header">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span style="color:white; font-weight:900; font-size:15px; letter-spacing:0.5px;">🔒 LOCKOUT WALK</span>
+      <span style="color:white; font-weight:800; font-size:9px; letter-spacing:0.3px;">🔒 LOCKOUT WALK</span>
       <button onclick="closeLockoutWalk()"
-        style="background:rgba(0,0,0,0.25); color:white; border:1.5px solid rgba(255,255,255,0.6); border-radius:20px; padding:6px 14px; font-size:11px; font-weight:800; cursor:pointer;">
+        style="background:rgba(0,0,0,0.25); color:white; border:1.5px solid rgba(255,255,255,0.6); border-radius:20px; padding:5px 10px; font-size:9px; font-weight:800; cursor:pointer; white-space:nowrap;">
         ✕ BACK TO TAKEOFF
       </button>
     </div>
@@ -470,6 +471,13 @@
   const lockoutItems = ["Passage", "Privacy", "Dummy", "Keyed Entry", "Deadbolt", "Hinge Bumps", "Base Bumps"];
 
   // ── JOB BANNER ───────────────────────────────────────────────────
+  function updateStickyOffsets() {
+    const bannerVisible = document.body.classList.contains('banner-visible');
+    const bannerH = bannerVisible ? (document.getElementById('job-banner').offsetHeight || 36) : 0;
+    const secTop  = 44 + bannerH;
+    document.documentElement.style.setProperty('--section-top', secTop + 'px');
+  }
+
   function updateJobBanner() {
     const cust = document.getElementById('customer').value.trim();
     const sub  = document.getElementById('subdivision').value.trim();
@@ -487,6 +495,7 @@
       banner.classList.remove('visible');
       document.body.classList.remove('banner-visible');
     }
+    updateStickyOffsets();
   }
 
   // ── STATE ────────────────────────────────────────────────────────
@@ -1403,14 +1412,16 @@
     const match = lookupTrimTakeoff(cust, sub, lot);
     if (!match) { panel.style.display = 'none'; return; }
 
-    // Lock math:
-    // Single doors → 1 Passage/Privacy/Keyed Entry each
-    // T-AST doors  → 2 Dummies + 1 Passage or Privacy each
-    // DBL doors    → 2 Dummies each
+
+    document.getElementById('lo-trim-totals').innerHTML = _buildTrimMatchHTML(match);
+    window._loTrimMatch = match;
+    panel.style.display = 'block';
+  }
+
+  function _buildTrimMatchHTML(match) {
     const expSingleLocks = match.singles + match.tast;
     const expDummies     = (match.dbl * 2) + (match.tast * 2);
-
-    let rows = '';
+    let rows = `<div style="font-size:12px;font-weight:900;color:var(--navy);margin-bottom:8px;">${match.customer} — ${match.subdivision} — LOT ${match.lot}</div>`;
     if (match.singles > 0) rows += `
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
         <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Single Doors</span>
@@ -1426,7 +1437,6 @@
         <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — T-AST</span>
         <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.tast}</span>
       </div>`;
-
     let expRows = '';
     if (expSingleLocks > 0) expRows += `
       <div style="display:flex;justify-content:space-between;padding:3px 0;">
@@ -1438,15 +1448,10 @@
         <span style="font-size:12px;color:#1e3a8a;">Dummy Knobs</span>
         <span style="font-size:15px;font-weight:900;color:var(--green);">${expDummies}</span>
       </div>`;
-
-    document.getElementById('lo-trim-totals').innerHTML = `
-      ${rows}
-      <div style="margin-top:8px;padding:8px;background:#dbeafe;border-radius:6px;">
-        <div style="font-size:10px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:0.5px;">EXPECTED LOCKS FROM TRIM TAKEOFF</div>
-        ${expRows}
-      </div>`;
-    window._loTrimMatch = match;
-    panel.style.display = 'block';
+    return rows + `<div style="margin-top:8px;padding:8px;background:#dbeafe;border-radius:6px;">
+      <div style="font-size:10px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:0.5px;">EXPECTED LOCKS FROM TRIM TAKEOFF</div>
+      ${expRows}
+    </div>`;
   }
 
   function showLoTrimDetail() {
@@ -1483,6 +1488,8 @@
   loadActiveState();
   expireTakeoffIndex();
   backfillTakeoffIndex();
+  requestAnimationFrame(updateStickyOffsets);
+  window.addEventListener('resize', updateStickyOffsets);
 </script>
 </body>
 </html>
