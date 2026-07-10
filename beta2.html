@@ -229,17 +229,10 @@
     </div>
   </div>
   <div class="input-row">
-    <div class="input-group ac-wrap w-75">
-      <label>Subdivision</label>
-      <input id="subdivision" type="text" placeholder="Huxley" autocomplete="off"
-        oninput="saveActiveState(); updateJobBanner(); showSubdivisionSuggestions()"
-        onfocus="showSubdivisionSuggestions()"
-        onblur="setTimeout(()=>closeDropdown('ac-subdivision'),200)">
-      <div id="ac-subdivision" class="ac-dropdown"></div>
-    </div>
-    <div class="input-group w-25">
-      <label>Lot #</label>
-      <input id="lot" type="text" placeholder="104A" oninput="saveActiveState(); updateJobBanner()">
+    <div class="input-group">
+      <label>Job ID</label>
+      <input id="job-id" type="text" placeholder="LOT 104A" autocomplete="off"
+        oninput="saveActiveState(); updateJobBanner()">
     </div>
   </div>
 </div>
@@ -262,7 +255,7 @@
     </div>
   </div>
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Lot, Same Cust/Sub</button>
+    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Job, Same Customer</button>
     <button class="actionBtn" style="background:#fee2e2; color:#b91c1c;" onclick="showResetModal()">🗑 Reset All Fields</button>
   </div>
 </div>
@@ -284,8 +277,8 @@
 <div id="newLotModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
     <div style="font-size:2rem; margin-bottom:8px;">🏠</div>
-    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">New Lot, Same Cust/Sub?</h2>
-    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts and notes but keep <strong>Customer</strong> and <strong>Subdivision</strong> filled in.</p>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">New Job, Same Customer?</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts and notes but keep <strong>Customer</strong> filled in.</p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeNewLotModal()">Cancel</button>
       <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmNewLot()">Yes, New Lot</button>
@@ -314,7 +307,7 @@
     <span id="history-chevron" style="font-size:11px; color:#475569; font-weight:800;">▼ SHOW</span>
   </div>
   <div id="history-body" style="display:none;">
-    <input type="text" id="history-search" placeholder="🔍  Search customer, subdivision or lot..."
+    <input type="text" id="history-search" placeholder="🔍  Search customer or job ID..."
       style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
       oninput="renderHistory()">
     <div id="history-list"></div>
@@ -357,17 +350,10 @@
         </div>
       </div>
       <div class="input-row">
-        <div class="input-group ac-wrap" style="flex:0.75;">
-          <label>Subdivision</label>
-          <input id="lo-subdivision" type="text" placeholder="Huxley" autocomplete="off"
-            oninput="saveLoState(); showLoSubdivisionSuggestions(); checkLoTrimMatch()"
-            onfocus="showLoSubdivisionSuggestions()"
-            onblur="setTimeout(()=>closeDropdown('lo-ac-subdivision'),200)">
-          <div id="lo-ac-subdivision" class="ac-dropdown"></div>
-        </div>
-        <div class="input-group" style="flex:0.25;">
-          <label>Lot #</label>
-          <input id="lo-lot" type="text" placeholder="104A" oninput="saveLoState(); checkLoTrimMatch()">
+        <div class="input-group">
+          <label>Job ID</label>
+          <input id="lo-job-id" type="text" placeholder="LOT 104A" autocomplete="off"
+            oninput="saveLoState(); checkLoTrimMatch()">
         </div>
       </div>
     </div>
@@ -400,7 +386,7 @@
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-        <button class="actionBtn" style="background:#dbeafe; color:#1e40af; font-size:13px;" onclick="loNewLot()">🏠 New Lot, Same Cust/Sub</button>
+        <button class="actionBtn" style="background:#dbeafe; color:#1e40af; font-size:13px;" onclick="loNewLot()">🏠 New Job, Same Customer</button>
         <button class="actionBtn" style="background:#fee2e2; color:#b91c1c; font-size:13px;" onclick="loReset()">🗑 Reset</button>
       </div>
     </div>
@@ -479,14 +465,12 @@
 
   function updateJobBanner() {
     const cust = document.getElementById('customer').value.trim();
-    const sub  = document.getElementById('subdivision').value.trim();
-    const lot  = document.getElementById('lot').value.trim();
+    const jobId = document.getElementById('job-id').value.trim();
     const banner = document.getElementById('job-banner');
-    if (cust || sub || lot) {
+    if (cust || jobId) {
       const parts = [];
-      if (cust) parts.push(cust);
-      if (sub)  parts.push(sub);
-      if (lot)  parts.push(`LOT ${lot}`);
+      if (cust)  parts.push(cust);
+      if (jobId) parts.push(jobId);
       banner.innerHTML = `📋 <span>ACTIVE JOB:</span> ${parts.join(' — ')}`;
       banner.classList.add('visible');
       document.body.classList.add('banner-visible');
@@ -508,8 +492,7 @@
     });
     const fullData = {
       customer:    document.getElementById('customer').value,
-      subdivision: document.getElementById('subdivision').value,
-      lot:         document.getElementById('lot').value,
+      jobId:       document.getElementById('job-id').value,
       notes:       document.getElementById('notes').value,
       summaryText: document.getElementById('summary').value,
       state: state
@@ -523,8 +506,7 @@
     if (saved) {
       const data = JSON.parse(saved);
       document.getElementById('customer').value    = data.customer || "";
-      document.getElementById('subdivision').value = data.subdivision || "";
-      document.getElementById('lot').value          = data.lot || "";
+      document.getElementById('job-id').value = data.jobId || data.lot || data.subdivision || "";
       document.getElementById('notes').value        = data.notes || "";
       document.getElementById('summary').value      = data.summaryText || "";
       state = data.state || { fireRated: false };
@@ -691,24 +673,21 @@
 
   // ── GENERATE SUMMARY ─────────────────────────────────────────────
   function generateSummary(force) {
-    const cust   = document.getElementById('customer').value.trim();
-    const sub    = document.getElementById('subdivision').value.trim();
-    const lot    = document.getElementById('lot').value.trim();
+    const cust  = document.getElementById('customer').value.trim();
+    const jobId = document.getElementById('job-id').value.trim();
     if (!force) {
       const missing = [];
-      if (!cust) missing.push('<strong>Customer</strong>');
-      if (!sub)  missing.push('<strong>Subdivision</strong>');
-      if (!lot)  missing.push('<strong>Lot #</strong>');
+      if (!cust)  missing.push('<strong>Customer</strong>');
+      if (!jobId) missing.push('<strong>Job ID</strong>');
       if (missing.length) {
         showWarningModal(`Missing: ${missing.join(', ')}. Please fill these in before generating, or tap <em>Generate Anyway</em> to continue.`);
         return;
       }
     }
-    const custVal = cust || "NA";
-    const subVal  = sub  || "NA";
-    const lotVal  = lot  || "NA";
-    const gNotes  = document.getElementById('notes').value || "";
-    let report = `TAKEOFF -- ${custVal} -- ${subVal} -- LOT ${lotVal}\n----------------------------\n\n`;
+    const custVal  = cust  || "NA";
+    const jobIdVal = jobId || "NA";
+    const gNotes   = document.getElementById('notes').value || "";
+    let report = `TAKEOFF -- ${custVal} -- ${jobIdVal}\n----------------------------\n\n`;
 
     const sections = [
       { id:'68',    head:'--- 6/8 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"" },
@@ -747,11 +726,11 @@
     summaryEl.classList.add('flash');
     saveActiveState();
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
-    saveToHistory(report, `${subVal} L${lotVal}`, {
-      customer: custVal, subdivision: subVal, lot: lotVal, notes: gNotes,
+    saveToHistory(report, `${custVal} — ${jobIdVal}`, {
+      customer: custVal, jobId: jobIdVal, notes: gNotes,
       state: JSON.parse(JSON.stringify(state))
     });
-    saveTrimToIndex(state, custVal, subVal, lotVal, report);
+    saveTrimToIndex(state, custVal, jobIdVal, report);
   }
 
   function updateSummaryStyle() {
@@ -812,12 +791,12 @@
   }
 
   function saveToHistory(text, label, fullData) {
-    learnFromJob(fullData.customer, fullData.subdivision);
+    learnFromJob(fullData.customer);
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     const now = new Date();
     const dateStr = (now.getMonth()+1) + '/' + now.getDate();
     const timeStr = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    const richLabel = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
+    const richLabel = [fullData.customer, fullData.jobId || fullData.lot || fullData.subdivision].filter(Boolean).join(' — ');
     history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
     if (history.length > 20) history.pop();
     localStorage.setItem('bfs_history', JSON.stringify(history));
@@ -832,8 +811,7 @@
       ? history.filter(item =>
           item.label.toLowerCase().includes(query) ||
           (item.fullData?.customer || '').toLowerCase().includes(query) ||
-          (item.fullData?.subdivision || '').toLowerCase().includes(query) ||
-          (item.fullData?.lot || '').toLowerCase().includes(query))
+          (item.fullData?.jobId || item.fullData?.lot || item.fullData?.subdivision || '').toLowerCase().includes(query))
       : history;
     list.innerHTML = filtered.length ? ""
       : `<p style='font-size:11px; padding:10px; color:#94a3b8;'>${query ? 'No matches found.' : 'No history.'}</p>`;
@@ -855,11 +833,10 @@
     document.getElementById('summary').value = h.text;
     if (h.fullData) {
       document.getElementById('customer').value    = h.fullData.customer || "";
-      document.getElementById('subdivision').value = h.fullData.subdivision || "";
-      document.getElementById('lot').value          = h.fullData.lot || "";
+      document.getElementById('job-id').value = h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || "";
       document.getElementById('notes').value        = h.fullData.notes || "";
       state = JSON.parse(JSON.stringify(h.fullData.state));
-      learnFromJob(h.fullData.customer, h.fullData.subdivision);
+      learnFromJob(h.fullData.customer);
       refreshUI();
       saveActiveState();
       updateJobBanner();
@@ -892,11 +869,10 @@
     Object.keys(kb).forEach(k => { plain[k] = Array.isArray(kb[k]) ? kb[k] : Array.from(kb[k]); });
     localStorage.setItem('bfs_knowledge', JSON.stringify(plain));
   }
-  function learnFromJob(customer, subdivision) {
+  function learnFromJob(customer) {
     if (!customer) return;
     const kb = getKnowledge();
     if (!kb[customer]) kb[customer] = [];
-    if (subdivision && !kb[customer].includes(subdivision)) kb[customer].push(subdivision);
     saveKnowledge(kb);
   }
   function getCustomers() { return Object.keys(getKnowledge()).sort(); }
@@ -912,7 +888,6 @@
     delete kb[customer];
     saveKnowledge(kb);
     document.getElementById('customer').value = "";
-    document.getElementById('subdivision').value = "";
     saveActiveState(); updateJobBanner();
     showCustomerSuggestions();
   }
@@ -920,7 +895,7 @@
     const kb = getKnowledge();
     if (kb[customer]) kb[customer] = kb[customer].filter(s => s !== subdivision);
     saveKnowledge(kb);
-    showSubdivisionSuggestions();
+    // subdivision removed
   }
   function showDropdown(dropdownId, items, onSelect, onDelete) {
     const dd = document.getElementById(dropdownId);
@@ -944,26 +919,17 @@
     const val = document.getElementById('customer').value.trim().toLowerCase();
     const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
     showDropdown('ac-customer', filtered,
-      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); showSubdivisionSuggestions(); },
+      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); // subdivision removed },
       (s) => deleteCustomer(s)
     );
   }
   function showSubdivisionSuggestions() {
-    const customer = document.getElementById('customer').value.trim();
-    const val = document.getElementById('subdivision').value.trim().toLowerCase();
-    const all = getSubdivisionsFor(customer);
-    const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
-    showDropdown('ac-subdivision', filtered,
-      (s) => { document.getElementById('subdivision').value = s; saveActiveState(); updateJobBanner(); },
-      (s) => deleteSubdivision(customer, s)
-    );
+    // Subdivision field removed - Job ID field has no autocomplete
   }
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.ac-wrap')) {
       closeDropdown('ac-customer');
-      closeDropdown('ac-subdivision');
       closeDropdown('lo-ac-customer');
-      closeDropdown('lo-ac-subdivision');
     }
   });
 
@@ -972,10 +938,9 @@
   function confirmNewLot() {
     closeNewLotModal();
     const cust = document.getElementById('customer').value;
-    const sub  = document.getElementById('subdivision').value;
     state = { fireRated: false };
     document.getElementById('summary').value = "";
-    document.getElementById('lot').value = "";
+    document.getElementById('job-id').value = "";
     document.getElementById('notes').value = "";
     document.querySelectorAll('.qty').forEach(el => { el.innerText = '0'; el.classList.remove('has-qty'); });
     document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
@@ -986,10 +951,9 @@
     updateSummaryStyle();
     updateSectionCheckmarks();
     document.getElementById('customer').value = cust;
-    document.getElementById('subdivision').value = sub;
     saveActiveState();
     updateJobBanner();
-    document.getElementById('lot').focus();
+    document.getElementById('job-id').focus();
     window.scrollTo(0, 0);
   }
 
@@ -1028,8 +992,7 @@
     if (loSaved) {
       const d = JSON.parse(loSaved);
       document.getElementById('lo-customer').value   = d.customer || '';
-      document.getElementById('lo-subdivision').value = d.subdivision || '';
-      document.getElementById('lo-lot').value         = d.lot || '';
+      document.getElementById('lo-job-id').value = d.jobId || d.lot || d.subdivision || '';
       document.getElementById('lo-notes').value       = d.notes || '';
       document.getElementById('lo-summary').value     = d.summaryText || '';
       loState = d.loState || {};
@@ -1038,8 +1001,7 @@
       if (mainSaved) {
         const d = JSON.parse(mainSaved);
         document.getElementById('lo-customer').value   = d.customer || '';
-        document.getElementById('lo-subdivision').value = d.subdivision || '';
-        document.getElementById('lo-lot').value         = d.lot || '';
+        document.getElementById('lo-job-id').value = d.jobId || d.lot || d.subdivision || '';
       }
       document.getElementById('lo-notes').value   = '';
       document.getElementById('lo-summary').value = '';
@@ -1103,8 +1065,7 @@
   function saveLoState() {
     const data = {
       customer:    document.getElementById('lo-customer').value,
-      subdivision: document.getElementById('lo-subdivision').value,
-      lot:         document.getElementById('lo-lot').value,
+      jobId:       document.getElementById('lo-job-id').value,
       notes:       document.getElementById('lo-notes').value,
       summaryText: document.getElementById('lo-summary').value,
       loState
@@ -1116,15 +1077,13 @@
 
   function updateLoJobBanner() {
     const cust   = document.getElementById('lo-customer').value.trim();
-    const sub    = document.getElementById('lo-subdivision').value.trim();
-    const lot    = document.getElementById('lo-lot').value.trim();
+    const jobId  = document.getElementById('lo-job-id').value.trim();
     const banner = document.getElementById('lo-job-banner');
     if (!banner) return;
-    if (cust || sub || lot) {
+    if (cust || jobId) {
       const parts = [];
-      if (cust) parts.push(cust);
-      if (sub)  parts.push(sub);
-      if (lot)  parts.push(`LOT ${lot}`);
+      if (cust)  parts.push(cust);
+      if (jobId) parts.push(jobId);
       banner.innerHTML = `📋 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${parts.join(' — ')}`;
       banner.style.display = 'flex';
     } else {
@@ -1143,9 +1102,8 @@
 
   function openLoRecap() {
     const cust = document.getElementById('lo-customer').value.trim();
-    const sub  = document.getElementById('lo-subdivision').value.trim();
-    const lot  = document.getElementById('lo-lot').value.trim();
-    if (!cust || !sub || !lot) { showToast('⚠️ ENTER CUSTOMER, SUBDIVISION & LOT #'); return; }
+    const jobId = document.getElementById('lo-job-id').value.trim();
+    if (!cust || !jobId) { showToast('⚠️ ENTER CUSTOMER & JOB ID'); return; }
     const hasAny = LO_ITEMS.some(i => (loState[i] || 0) > 0);
     if (!hasAny) { showToast('⚠️ NO COUNTS ENTERED YET'); return; }
 
@@ -1208,10 +1166,9 @@
 
   function generateLoSummary() {
     const cust  = document.getElementById('lo-customer').value.trim() || 'NA';
-    const sub   = document.getElementById('lo-subdivision').value.trim() || 'NA';
-    const lot   = document.getElementById('lo-lot').value.trim() || 'NA';
+    const jobId = document.getElementById('lo-job-id').value.trim() || 'NA';
     const notes = document.getElementById('lo-notes').value.trim();
-    let report = `LOCKOUT WALK -- ${cust} -- ${sub} -- LOT ${lot}\n----------------------------\n\n--- LOCKOUT ---\n`;
+    let report = `LOCKOUT WALK -- ${cust} -- ${jobId}\n----------------------------\n\n--- LOCKOUT ---\n`;
     LO_ITEMS.forEach(item => {
       if ((loState[item] || 0) > 0) report += `- ${item}: ${loState[item]}\n`;
     });
@@ -1221,7 +1178,7 @@
     summaryEl.style.borderColor = 'var(--green)';
     setTimeout(() => { summaryEl.style.borderColor = 'var(--bfs-red)'; }, 600);
     updateLoSummaryStyle();
-    saveLoToHistory(report, { customer: cust, subdivision: sub, lot, notes, loState: JSON.parse(JSON.stringify(loState)) });
+    saveLoToHistory(report, { customer: cust, jobId, notes, loState: JSON.parse(JSON.stringify(loState)) });
     saveLoState();
     learnFromJob(cust, sub);
   }
@@ -1236,23 +1193,21 @@
 
   function loNewLot() {
     const cust = document.getElementById('lo-customer').value;
-    const sub  = document.getElementById('lo-subdivision').value;
     loState = {};
-    document.getElementById('lo-lot').value         = '';
+    document.getElementById('lo-job-id').value = '';
     document.getElementById('lo-notes').value       = '';
     document.getElementById('lo-summary').value     = '';
-    document.getElementById('lo-customer').value    = cust;
-    document.getElementById('lo-subdivision').value = sub;
+    document.getElementById('lo-customer').value = cust;
     buildLoCounters();
     saveLoState();
-    document.getElementById('lo-lot').focus();
+    document.getElementById('lo-job-id').focus();
     showToast('✓ READY FOR NEW LOT');
   }
 
   function loReset() {
     if (!confirm('Reset all lockout walk fields?')) return;
     loState = {};
-    ['lo-customer','lo-subdivision','lo-lot','lo-notes'].forEach(id => document.getElementById(id).value = '');
+    ['lo-customer','lo-job-id','lo-notes'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('lo-summary').value = '';
     localStorage.removeItem('bfs_lo_active_work');
     buildLoCounters();
@@ -1265,7 +1220,7 @@
     const now = new Date();
     const dateStr = (now.getMonth()+1) + '/' + now.getDate();
     const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    const label = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
+    const label = [fullData.customer, fullData.jobId || fullData.lot || fullData.subdivision].filter(Boolean).join(' — ');
     history.unshift({ label: `${dateStr} — ${label}`, text, time: timeStr, fullData });
     if (history.length > 20) history.pop();
     localStorage.setItem('bfs_lo_history', JSON.stringify(history));
@@ -1291,8 +1246,7 @@
   function loadLoHistory(index) {
     const h = JSON.parse(localStorage.getItem('bfs_lo_history'))[index];
     document.getElementById('lo-customer').value    = h.fullData.customer || '';
-    document.getElementById('lo-subdivision').value = h.fullData.subdivision || '';
-    document.getElementById('lo-lot').value          = h.fullData.lot || '';
+    document.getElementById('lo-job-id').value = h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '';
     document.getElementById('lo-notes').value        = h.fullData.notes || '';
     document.getElementById('lo-summary').value      = h.text || '';
     loState = JSON.parse(JSON.stringify(h.fullData.loState || {}));
@@ -1329,20 +1283,14 @@
     const val = document.getElementById('lo-customer').value.trim().toLowerCase();
     const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
     showDropdown('lo-ac-customer', filtered,
-      (s) => { document.getElementById('lo-customer').value = s; saveLoState(); showLoSubdivisionSuggestions(); },
+      (s) => { document.getElementById('lo-customer').value = s; saveLoState(); // subdivision removed },
       null
     );
   }
 
   function showLoSubdivisionSuggestions() {
     const customer = document.getElementById('lo-customer').value.trim();
-    const val = document.getElementById('lo-subdivision').value.trim().toLowerCase();
-    const all = getSubdivisionsFor(customer);
-    const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
-    showDropdown('lo-ac-subdivision', filtered,
-      (s) => { document.getElementById('lo-subdivision').value = s; saveLoState(); },
-      null
-    );
+    // Job ID field has no autocomplete - subdivision removed
   }
 
   // ── TAKEOFF INDEX — persistent lot cross-reference ────────────────
@@ -1381,31 +1329,29 @@
     return { singles, dbl, tast };
   }
 
-  function saveTrimToIndex(st, customer, subdivision, lot, summaryText) {
+  function saveTrimToIndex(st, customer, jobId, summaryText) {
     if (!customer || !subdivision || !lot) return;
     const totals    = computeTrimTotals(st);
     const index     = getTakeoffIndex();
-    const lookupKey = `${customer.toLowerCase()}|${subdivision.toLowerCase()}|${lot.toLowerCase()}`;
+    const lookupKey = `${customer.toLowerCase()}|${(jobId||'').toLowerCase()}`;
     const existing  = index.findIndex(e => e.key === lookupKey);
-    const entry     = { key: lookupKey, customer, subdivision, lot,
+    const entry     = { key: lookupKey, customer, jobId,
                         timestamp: Date.now(), summaryText, ...totals };
     if (existing >= 0) index[existing] = entry;
     else index.push(entry);
     localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
   }
 
-  function lookupTrimTakeoff(customer, subdivision, lot) {
-    if (!customer || !subdivision || !lot) return null;
-    const key = `${customer.toLowerCase()}|${subdivision.toLowerCase()}|${lot.toLowerCase()}`;
+  function lookupTrimTakeoff(customer, jobId) {
+    if (!customer || !jobId) return null;
+    const key = `${customer.toLowerCase()}|${jobId.toLowerCase()}`;
     return getTakeoffIndex().find(e => e.key === key) || null;
   }
 
-  // Called whenever lo-customer / lo-subdivision / lo-lot change.
+  // Called whenever lo-customer / lo-job-id change.
   // Shows expected lock counts calculated from the saved trim takeoff for that lot.
   function checkLoTrimMatch() {
     const cust  = document.getElementById('lo-customer').value.trim();
-    const sub   = document.getElementById('lo-subdivision').value.trim();
-    const lot   = document.getElementById('lo-lot').value.trim();
     const panel = document.getElementById('lo-trim-match');
     if (!cust || !sub || !lot) { panel.style.display = 'none'; return; }
     const match = lookupTrimTakeoff(cust, sub, lot);
@@ -1420,7 +1366,7 @@
   function _buildTrimMatchHTML(match) {
     const expSingleLocks = match.singles + match.tast;
     const expDummies     = (match.dbl * 2) + (match.tast * 2);
-    let rows = `<div style="font-size:12px;font-weight:900;color:var(--navy);margin-bottom:8px;">${match.customer} — ${match.subdivision} — LOT ${match.lot}</div>`;
+    let rows = `<div style="font-size:12px;font-weight:900;color:var(--navy);margin-bottom:8px;">${match.customer} — ${match.jobId || match.lot || match.subdivision || ''}</div>`;
     if (match.singles > 0) rows += `
       <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
         <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Single Doors</span>
@@ -1471,12 +1417,13 @@
     const index = getTakeoffIndex();
     let changed = false;
     history.forEach(h => {
-      if (!h.fullData?.state || !h.fullData.customer || !h.fullData.subdivision || !h.fullData.lot) return;
-      const key = `${h.fullData.customer.toLowerCase()}|${h.fullData.subdivision.toLowerCase()}|${h.fullData.lot.toLowerCase()}`;
+      if (!h.fullData?.state || !h.fullData.customer || (!h.fullData.jobId && !h.fullData.lot && !h.fullData.subdivision)) return;
+      const bfJobId = (h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '').toLowerCase();
+      const key = `${h.fullData.customer.toLowerCase()}|${bfJobId}`;
       if (index.find(e => e.key === key)) return; // already indexed
       const totals = computeTrimTotals(h.fullData.state);
-      index.push({ key, customer: h.fullData.customer, subdivision: h.fullData.subdivision,
-                   lot: h.fullData.lot, timestamp: Date.now(), summaryText: h.text || '', ...totals });
+      index.push({ key, customer: h.fullData.customer, jobId: h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '',
+                   timestamp: Date.now(), summaryText: h.text || '', ...totals });
       changed = true;
     });
     if (changed) localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
