@@ -426,8 +426,9 @@
 <div id="loMismatchModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
     <div style="font-size:2rem; margin-bottom:6px;">⚠️</div>
-    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">Counts Don't Match</h2>
-    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">Doesn't match your door takeoff — doors changed on site?</p>
+    <h2 style="margin:0 0 6px 0; color:var(--navy); font-size:1.2rem;">Counts Don't Match</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 12px 0;">Has there been a change from the original door takeoff?</p>
+    <div id="lo-mismatch-detail" style="background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:10px; margin-bottom:16px; text-align:left;"></div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeLoMismatch()">Go Back & Fix</button>
       <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeLoMismatch(); _openLoRecapScreen();">Yes, Proceed</button>
@@ -1091,6 +1092,24 @@
       const singleOff  = gotSingle  !== expSingle;
       const dummyOff   = gotDummies !== expDummies;
       if (singleOff || dummyOff) {
+        let detail = '';
+        if (singleOff) {
+          const diff = gotSingle - expSingle;
+          const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
+          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #fcd34d;">
+            <span style="font-size:12px;font-weight:700;color:#92400e;">Passage / Privacy</span>
+            <span style="font-size:13px;font-weight:900;">${dir} (got ${gotSingle}, expected ${expSingle})</span>
+          </div>`;
+        }
+        if (dummyOff) {
+          const diff = gotDummies - expDummies;
+          const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
+          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;">
+            <span style="font-size:12px;font-weight:700;color:#92400e;">Dummy</span>
+            <span style="font-size:13px;font-weight:900;">${dir} (got ${gotDummies}, expected ${expDummies})</span>
+          </div>`;
+        }
+        document.getElementById('lo-mismatch-detail').innerHTML = detail;
         document.getElementById('loMismatchModal').style.display = 'flex';
         return;
       }
