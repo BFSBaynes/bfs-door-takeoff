@@ -987,26 +987,17 @@
   // Lockout walk uses the shared playTapUp / playTapDown defined above
 
   function openLockoutWalk() {
-    // Load saved lockout state, or pre-populate from main takeoff
+    // Only restore previously saved lockout state — do NOT pre-populate from
+    // the main takeoff (PMs do lockout walks days/weeks after the trim takeoff)
     const loSaved = localStorage.getItem('bfs_lo_active_work');
-    if (loSaved) {
-      const d = JSON.parse(loSaved);
-      document.getElementById('lo-customer').value   = d.customer || '';
-      document.getElementById('lo-job-id').value = d.jobId || d.lot || d.subdivision || '';
-      document.getElementById('lo-notes').value       = d.notes || '';
-      document.getElementById('lo-summary').value     = d.summaryText || '';
-      loState = d.loState || {};
-    } else {
-      const mainSaved = localStorage.getItem('bfs_active_work');
-      if (mainSaved) {
-        const d = JSON.parse(mainSaved);
-        document.getElementById('lo-customer').value   = d.customer || '';
-        document.getElementById('lo-job-id').value = d.jobId || d.lot || d.subdivision || '';
-      }
-      document.getElementById('lo-notes').value   = '';
-      document.getElementById('lo-summary').value = '';
-      loState = {};
-    }
+    // Always start with blank Customer + Job ID — PM types these fresh each walk.
+    // Restore counter values only so a mid-walk isn't lost if overlay is closed.
+    const d = loSaved ? JSON.parse(loSaved) : {};
+    document.getElementById('lo-customer').value = '';
+    document.getElementById('lo-job-id').value   = '';
+    document.getElementById('lo-notes').value    = '';
+    document.getElementById('lo-summary').value  = '';
+    loState = d.loState || {};
     buildLoCounters();
     renderLoHistory();
     updateLoSummaryStyle();
@@ -1209,9 +1200,12 @@
     loState = {};
     ['lo-customer','lo-job-id','lo-notes'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('lo-summary').value = '';
+    document.getElementById('lo-trim-match').style.display = 'none';
+    window._loTrimMatch = null;
     localStorage.removeItem('bfs_lo_active_work');
     buildLoCounters();
     updateLoSummaryStyle();
+    updateLoJobBanner();
   }
 
   // Lockout walk history (separate key: bfs_lo_history)
@@ -1346,7 +1340,7 @@
       if (typeof val !== 'number' || val <= 0) return;
       // Single doors — 6/8, 8/0, Attic W/S — LH, RH, SLAB
       if ((key.startsWith('68_') || key.startsWith('80_') || key.startsWith('atws_')) &&
-          (key.endsWith('_LH') || key.endsWith('_RH') || key.endsWith('_SLAB')))
+          (key.endsWith('_LH') || key.endsWith('_RH')))
         singles += val;
       if (key.endsWith('_DBL'))   dbl  += val;
       if (key.endsWith('_T-AST')) tast += val;
