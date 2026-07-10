@@ -339,13 +339,13 @@
         ✕ BACK TO TAKEOFF
       </button>
     </div>
-    <div id="lo-job-banner" style="display:none; min-height:36px; padding:8px 16px; font-size:11px; font-weight:800; color:white; text-align:center; letter-spacing:0.5px; text-transform:uppercase; border-top:2px solid rgba(255,255,255,0.2); align-items:center; justify-content:center;"></div>
+    <div id="lo-job-banner" style="display:none; min-height:34px; padding:8px 16px; font-size:11px; font-weight:800; color:white; text-align:center; letter-spacing:0.5px; text-transform:uppercase; border-top:1px solid rgba(255,255,255,0.2); border-bottom:2px solid rgba(255,255,255,0.2); align-items:center; justify-content:center;"></div>
   </div>
 
   <div style="padding:8px;">
     <!-- Job info — pre-populates from main app if available -->
-    <div class="header-card" style="text-align:left; box-shadow: 0 -2px 4px rgba(0,0,0,0.06), 0 4px 6px rgba(0,0,0,0.1)">
-      <img src="icon-512.png" alt="Elevate Trim" class="app-logo" style="margin-bottom:8px;">
+    <div class="header-card" style="margin-top:8px;">
+      <img src="icon-512.png" alt="Elevate Trim" class="app-logo">
       <div class="input-row">
         <div class="input-group ac-wrap">
           <label>Customer</label>
@@ -1125,7 +1125,7 @@
       if (cust) parts.push(cust);
       if (sub)  parts.push(sub);
       if (lot)  parts.push(`LOT ${lot}`);
-      banner.innerHTML = `📋 <span style="opacity:0.75;font-weight:600;">ACTIVE JOB:</span> ${parts.join(' — ')}`;
+      banner.innerHTML = `📋 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${parts.join(' — ')}`;
       banner.style.display = 'flex';
     } else {
       banner.style.display = 'none';
