@@ -578,10 +578,49 @@
     });
   }
 
+  // ── TAP AUDIO FEEDBACK ───────────────────────────────────────────
+  // + tap: short high tick (880Hz square) — "count went up"
+  // - tap: descending soft tone (440→220Hz triangle) — "count went down"
+  // Shared across trim takeoff AND lockout walk in this file.
+  let _tapCtx = null;
+  function _getCtx() {
+    try {
+      if (!_tapCtx) _tapCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (_tapCtx.state === 'suspended') _tapCtx.resume();
+      return _tapCtx;
+    } catch(e) { return null; }
+  }
+  function playTapUp() {
+    const ctx = _getCtx(); if (!ctx) return;
+    try {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'square'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.08);
+    } catch(e) {}
+  }
+  function playTapDown() {
+    const ctx = _getCtx(); if (!ctx) return;
+    try {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(440, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.1);
+      g.gain.setValueAtTime(0.12, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.1);
+    } catch(e) {}
+  }
+
   function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     refreshUI();
     saveActiveState();
+    if (delta > 0) playTapUp();
+    else playTapDown();
   }
 
   function toggleFire() {
@@ -973,24 +1012,7 @@
   // ══════════════════════════════════════════════════════════════
   const LO_ITEMS = ['Passage', 'Privacy', 'Dummy', 'Deadbolt', 'Hinge Bumps', 'Base Bumps'];
   let loState = {};
-  let loAudioCtx = null;
-
-  function playLoTick() {
-    try {
-      if (!loAudioCtx) loAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (loAudioCtx.state === 'suspended') loAudioCtx.resume();
-      const osc = loAudioCtx.createOscillator();
-      const gain = loAudioCtx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(880, loAudioCtx.currentTime);
-      gain.gain.setValueAtTime(0.15, loAudioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, loAudioCtx.currentTime + 0.08);
-      osc.connect(gain);
-      gain.connect(loAudioCtx.destination);
-      osc.start();
-      osc.stop(loAudioCtx.currentTime + 0.08);
-    } catch(e) {}
-  }
+  // Lockout walk uses the shared playTapUp / playTapDown defined above
 
   function openLockoutWalk() {
     // Load saved lockout state, or pre-populate from main takeoff
@@ -1056,7 +1078,7 @@
     qtyEl.classList.toggle('has-count', qty > 0);
     cardEl.classList.toggle('has-count', qty > 0);
     if (delta > 0) {
-      playLoTick();
+      playTapUp();
       [qtyEl, btnEl].forEach(el => {
         if (!el) return;
         el.classList.remove('tap-flash');
@@ -1064,6 +1086,8 @@
         el.classList.add('tap-flash');
         setTimeout(() => el.classList.remove('tap-flash'), 220);
       });
+    } else {
+      playTapDown();
     }
     saveLoState();
   }
