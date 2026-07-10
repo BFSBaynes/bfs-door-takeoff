@@ -990,14 +990,22 @@
     // Only restore previously saved lockout state — do NOT pre-populate from
     // the main takeoff (PMs do lockout walks days/weeks after the trim takeoff)
     const loSaved = localStorage.getItem('bfs_lo_active_work');
-    // Always start with blank Customer + Job ID — PM types these fresh each walk.
-    // Restore counter values only so a mid-walk isn't lost if overlay is closed.
-    const d = loSaved ? JSON.parse(loSaved) : {};
-    document.getElementById('lo-customer').value = '';
-    document.getElementById('lo-job-id').value   = '';
-    document.getElementById('lo-notes').value    = '';
-    document.getElementById('lo-summary').value  = '';
-    loState = d.loState || {};
+    if (loSaved) {
+      // Restore in-progress lockout walk (customer, job-id, counters, notes)
+      const d = JSON.parse(loSaved);
+      document.getElementById('lo-customer').value = d.customer || '';
+      document.getElementById('lo-job-id').value   = d.jobId || d.lot || d.subdivision || '';
+      document.getElementById('lo-notes').value    = d.notes || '';
+      document.getElementById('lo-summary').value  = d.summaryText || '';
+      loState = d.loState || {};
+    } else {
+      // No previous lockout walk — start completely blank
+      document.getElementById('lo-customer').value = '';
+      document.getElementById('lo-job-id').value   = '';
+      document.getElementById('lo-notes').value    = '';
+      document.getElementById('lo-summary').value  = '';
+      loState = {};
+    }
     buildLoCounters();
     renderLoHistory();
     updateLoSummaryStyle();
