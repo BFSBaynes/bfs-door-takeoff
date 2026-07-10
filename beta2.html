@@ -1306,6 +1306,31 @@
     catch(e) { return []; }
   }
 
+  // Migrate old 3-part index keys (customer|subdivision|lot) to new 2-part (customer|jobId)
+  // Runs once on load — converts existing entries so lookups still work after the field rename
+  function migrateOldIndexKeys() {
+    const index = getTakeoffIndex();
+    if (!index.length) return;
+    const newEntries = [];
+    const removeKeys = [];
+    index.forEach(entry => {
+      const parts = (entry.key || '').split('|');
+      if (parts.length === 3) {
+        // Old format: customer|subdivision|lot — use lot as jobId
+        const newKey = `${parts[0]}|${parts[2]}`;
+        const alreadyExists = index.some(e => e.key === newKey) || newEntries.some(e => e.key === newKey);
+        if (!alreadyExists) {
+          newEntries.push({ ...entry, key: newKey, jobId: entry.lot || entry.subdivision || parts[2] });
+        }
+        removeKeys.push(entry.key);
+      }
+    });
+    if (newEntries.length || removeKeys.length) {
+      const migrated = [...index.filter(e => !removeKeys.includes(e.key)), ...newEntries];
+      localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(migrated));
+    }
+  }
+
   function expireTakeoffIndex() {
     const now   = Date.now();
     const index = getTakeoffIndex();
@@ -1433,6 +1458,7 @@
   renderHistory();
   loadActiveState();
   expireTakeoffIndex();
+  migrateOldIndexKeys();
   backfillTakeoffIndex();
   requestAnimationFrame(updateStickyOffsets);
   window.addEventListener('resize', updateStickyOffsets);
