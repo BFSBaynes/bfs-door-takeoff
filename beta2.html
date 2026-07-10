@@ -895,7 +895,7 @@
     const kb = getKnowledge();
     if (kb[customer]) kb[customer] = kb[customer].filter(s => s !== subdivision);
     saveKnowledge(kb);
-    // subdivision removed
+    
   }
   function showDropdown(dropdownId, items, onSelect, onDelete) {
     const dd = document.getElementById(dropdownId);
@@ -919,7 +919,7 @@
     const val = document.getElementById('customer').value.trim().toLowerCase();
     const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
     showDropdown('ac-customer', filtered,
-      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); // subdivision removed },
+      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); },
       (s) => deleteCustomer(s)
     );
   }
@@ -1283,7 +1283,7 @@
     const val = document.getElementById('lo-customer').value.trim().toLowerCase();
     const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
     showDropdown('lo-ac-customer', filtered,
-      (s) => { document.getElementById('lo-customer').value = s; saveLoState(); // subdivision removed },
+      (s) => { document.getElementById('lo-customer').value = s; saveLoState(); },
       null
     );
   }
@@ -1330,7 +1330,7 @@
   }
 
   function saveTrimToIndex(st, customer, jobId, summaryText) {
-    if (!customer || !subdivision || !lot) return;
+    if (!customer || !jobId) return;
     const totals    = computeTrimTotals(st);
     const index     = getTakeoffIndex();
     const lookupKey = `${customer.toLowerCase()}|${(jobId||'').toLowerCase()}`;
