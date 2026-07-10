@@ -1108,7 +1108,7 @@
     if (!hasAny) { showToast('⚠️ NO COUNTS ENTERED YET'); return; }
 
     // ── MISMATCH CHECK against trim takeoff index ──────────────────
-    const match = lookupTrimTakeoff(cust, sub, lot);
+    const match = lookupTrimTakeoff(cust, jobId);
     if (match) {
       const expSingle  = match.singles + match.tast;
       const expDummies = (match.dbl * 2) + (match.tast * 2);
@@ -1377,11 +1377,11 @@
   // Shows expected lock counts calculated from the saved trim takeoff for that lot.
   function checkLoTrimMatch() {
     const cust  = document.getElementById('lo-customer').value.trim();
+    const jobId = document.getElementById('lo-job-id').value.trim();
     const panel = document.getElementById('lo-trim-match');
-    if (!cust || !sub || !lot) { panel.style.display = 'none'; return; }
-    const match = lookupTrimTakeoff(cust, sub, lot);
+    if (!cust || !jobId) { panel.style.display = 'none'; return; }
+    const match = lookupTrimTakeoff(cust, jobId);
     if (!match) { panel.style.display = 'none'; return; }
-
 
     document.getElementById('lo-trim-totals').innerHTML = _buildTrimMatchHTML(match);
     window._loTrimMatch = match;
