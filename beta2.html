@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <script>
-    if (localStorage.getItem('preferred_mode') === 'modern') {
-      window.location.href = 'index.html';
+    if (localStorage.getItem('preferred_mode') === 'classic') {
+      window.location.href = 'classic.html';
     }
   </script>
   <meta charset="UTF-8" />
@@ -13,9 +13,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>Elevate Trim - CLASSIC</title>
+  <title>Elevate Trim - BFS Pro</title>
   <style>
-    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
+    :root{
+      --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1;
+      --accent: #1e40af; --slate: #334155; --green: #16a34a;
+    }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 30px; overflow-x: hidden; }
     body.banner-visible { padding-top: 80px; }
@@ -87,80 +90,85 @@
     #job-banner.visible { display: flex; }
     #job-banner span { opacity: 0.75; font-weight: 600; margin: 0 4px; }
 
-    .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
+    .header-card {
+      background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center;
+    }
     .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
     label { font-weight: 700; font-size: 10px; color: #475569; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
     input, textarea { width:100%; padding: 10px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     .input-row { display: flex; gap: 8px; margin-bottom: 4px; }
     .input-group { flex: 1; }
-    .w-75 { flex: 0 0 75%; }
-    .w-25 { flex: 0 0 22%; }
-
-    .ac-wrap { position: relative; }
-    .ac-dropdown {
-      display: none; position: absolute; top: 100%; left: 0; right: 0;
-      background: #fff; border: 2px solid var(--navy); border-top: none;
-      border-radius: 0 0 8px 8px; z-index: 800; max-height: 180px;
-      overflow-y: auto; box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-    }
-    .ac-dropdown.open { display: block; }
-    .ac-item {
-      padding: 11px 14px; font-size: 15px; font-weight: 600; color: var(--navy);
-      border-bottom: 1px solid #e2e8f0; cursor: pointer;
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    }
-    .ac-item:last-child { border-bottom: none; }
-    .ac-item:active { background: #f0f9ff; color: var(--accent); }
-    .ac-item-label { flex: 1; }
-    .ac-delete {
-      flex-shrink: 0; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
-      border-radius: 5px; font-size: 11px; font-weight: 900; padding: 3px 8px; cursor: pointer;
-    }
 
     .section-title {
       color: #fff; padding: 14px; font-weight: 800; font-size: 14px;
       margin: 8px -8px; cursor: pointer; display: flex;
       justify-content: space-between; align-items: center;
       text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
-      position: sticky; top: var(--section-top, 44px); z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: sticky; top: var(--section-top, 44px); z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .section-check {
       display: none; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
       border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 900;
-      color: #fff; margin-right: 8px;
+      color: #fff; margin-right: 8px; letter-spacing: 0;
     }
     .section-check.active { display: inline-block; background: var(--green); border-color: var(--green); }
     .bg-navy { background: var(--navy); }
     .bg-red { background: var(--bfs-red); }
-    .section-content { display: none; padding-top: 8px; }
+    .section-content { display: none; padding: 8px 0; }
     .section-content.active { display: block; }
-    .chevron::after { content: '▼'; font-size: 10px; }
-    .active-header .chevron::after { content: '▲'; }
 
-    .door-row {
-      background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 8px;
-      display: flex; align-items: center; gap: 8px; border: 1px solid #94a3b8;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px; }
+    .item-card {
+      background: #fff; border: 2px solid #94a3b8; border-radius: 8px;
+      padding: 15px 4px 22px 4px; text-align: center; font-weight: 800;
+      color: var(--navy); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 13px; cursor: pointer; position: relative;
+      min-height: 65px; display: flex; align-items: center; justify-content: center;
+      transition: transform 0.1s, background 0.15s;
     }
-    .size-label { font-weight: 900; font-size: 13px; width: 48px; flex-shrink: 0; color: var(--navy); text-align: center; }
-    .controls-grid { display: grid; gap: 4px; flex-grow: 1; grid-auto-flow: column; grid-auto-columns: 1fr; }
-    .counter-box { display: flex; flex-direction: column; align-items: center; background: #fdfdfd; padding: 4px 2px; border: 1px solid #e2e8f0; border-radius: 4px; }
-    .counter-box label { font-size: 8px; margin-bottom: 2px; color: #64748b; font-weight: 900; text-transform: uppercase; }
-    .btn-wrap { display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; }
-    .btn { width: 30px; height: 30px; border-radius: 4px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-    .qty { font-weight: 800; font-size: 15px; min-width: 14px; text-align: center; color: var(--navy); }
-    .has-qty { color: var(--green) !important; font-size: 17px; }
-    .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
-    .note-box { width: 95%; height: 28px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 4px 6px; font-size: 13px; text-align: center; margin-top: 4px; }
-    .door-row:nth-child(even) { background: #e8edf2; }
-    .door-row:nth-child(odd)  { background: #ffffff; }
+    .badge {
+      position: absolute; bottom: 2px; font-size: 9px; font-weight: 900;
+      background: rgba(226, 232, 240, 0.9); padding: 1px 3px; border-radius: 3px;
+      color: var(--navy); display: none; white-space: nowrap;
+    }
+    .badge.active { display: block; color: var(--green); border: 1px solid var(--green); }
+    .badge-left { left: 3px; }
+    .badge-right { right: 3px; }
+    .badge-center { left: 50%; transform: translateX(-50%); }
+    .item-card:active { transform: scale(0.95); background: #f1f5f9; }
+    .item-card.has-data { border-color: var(--green); background: #f0fdf4; color: var(--green); }
+    .note-badge { position: absolute; top: 3px; right: 3px; font-size: 9px; display: none; line-height: 1; }
+    .note-badge.active { display: block; }
 
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); z-index: 2000;
+      align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: white; padding: 20px; border-radius: 12px; width: 95%;
+      max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto;
+      position: relative;
+    }
+    .modal-type-block {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: 10px; margin-bottom: 12px; text-align: left;
+    }
+    .modal-counter-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .btn { width: 44px; height: 44px; border-radius: 6px; border: 0; background: var(--navy); color: white; font-weight: bold; font-size: 22px; }
+    .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; }
+    .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); }
+    .active-qty { color: var(--green) !important; border-color: var(--green) !important; }
+
+    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     #summary {
-      background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace;
+      background: #fff; height: 350px; margin-top: 8px; font-family: sans-serif;
       font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px;
-      padding:12px; line-height: 1.4; color: #000; white-space: pre;
+      padding:12px; white-space: pre-wrap;
     }
-    #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
+    #summary.has-text { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227, 24, 55, 0.1); }
     #summary.flash { animation: summaryFlash 0.6s ease-out; }
     @keyframes summaryFlash {
       0%   { border-color: var(--green); box-shadow: 0 0 0 4px rgba(22,163,74,0.3); }
@@ -177,14 +185,38 @@
     #summary-empty-state p { font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.6; margin: 0; }
     #summary-empty-state.hidden { display: none; }
 
-    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
+    .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
     .history-controls { display: flex; gap: 8px; align-items: center; }
-    .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
+    .load-btn { padding: 10px 15px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 70px; }
 
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; }
-    .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto; }
-    .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .ac-wrap { position: relative; }
+    .ac-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: #fff; border: 2px solid var(--navy); border-top: none;
+      border-radius: 0 0 8px 8px; z-index: 800; max-height: 180px;
+      overflow-y: auto; box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+    .ac-dropdown.open { display: block; }
+    .ac-item {
+      padding: 11px 14px; font-size: 15px; font-weight: 600; color: var(--navy);
+      border-bottom: 1px solid #e2e8f0; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:active, .ac-item.highlighted { background: #f0f9ff; color: var(--accent); }
+    .ac-item-label { flex: 1; }
+    .ac-delete {
+      flex-shrink: 0; background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
+      border-radius: 5px; font-size: 11px; font-weight: 900; padding: 3px 8px;
+      cursor: pointer; line-height: 1;
+    }
+    .ac-delete:active { background: #fecaca; }
+
+    .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
+    .chevron::after { content: '▼'; font-size: 10px; }
+    .active-header .chevron::after { content: '▲'; }
 
     #scroll-top {
       display: none; position: fixed; bottom: 20px; right: 16px; z-index: 998;
@@ -193,24 +225,22 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.3); align-items: center; justify-content: center;
     }
     #scroll-top.visible { display: flex; }
-
     #toast {
-      visibility: hidden; min-width: 200px; background-color: #1e293b; color: #fff;
-      text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed;
-      z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%);
-      font-weight: bold; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      visibility: hidden; min-width: 200px; background-color: #1e293b;
+      color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px;
+      position: fixed; z-index: 3000; left: 50%; bottom: 30px;
+      transform: translateX(-50%); font-weight: bold; font-size: 13px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
     #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.4s 1.4s forwards; }
-    @keyframes fadein { from { opacity:0; bottom:20px; } to { opacity:1; bottom:30px; } }
+    @keyframes fadein { from { opacity:0; bottom: 20px; } to { opacity:1; bottom: 30px; } }
     @keyframes fadeout { from { opacity:1; } to { opacity:0; } }
-
-    .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div id="top-bar"></div>
-<a href="index.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'modern')">SWITCH TO MODERN</a>
+<a href="classic.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'classic')">SWITCH TO CLASSIC</a>
 <button class="lo-walk-btn" onclick="openLockoutWalk()">🔒 LOCKOUT WALK</button>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
@@ -222,7 +252,7 @@
     <div class="input-group ac-wrap">
       <label>Customer</label>
       <input id="customer" type="text" placeholder="Pulte" autocomplete="off"
-        oninput="saveActiveState(); updateJobBanner(); showCustomerSuggestions()"
+        oninput="saveState(); updateJobBanner(); showCustomerSuggestions()"
         onfocus="showCustomerSuggestions()"
         onblur="setTimeout(()=>closeDropdown('ac-customer'),200)">
       <div id="ac-customer" class="ac-dropdown"></div>
@@ -232,20 +262,29 @@
     <div class="input-group">
       <label>Job ID</label>
       <input id="job-id" type="text" placeholder="LOT 104A" autocomplete="off"
-        oninput="saveActiveState(); updateJobBanner()">
+        oninput="saveState(); updateJobBanner()">
     </div>
   </div>
 </div>
 
 <div id="app-content"></div>
 
+<!-- MODAL -->
+<div id="itemModal" class="modal-overlay">
+  <div class="modal-content" id="modal-inner">
+    <h2 id="m-title" style="margin:0 0 15px 0; color:var(--navy); font-size: 1.4rem;">Item Name</h2>
+    <div id="m-blocks"></div>
+    <button class="actionBtn" style="width:100%; background:var(--green); color:white; margin-top:10px; font-size: 1.1rem;" onclick="closeModal()">SAVE ENTRY</button>
+  </div>
+</div>
+
 <!-- SUMMARY -->
 <div class="header-card" style="margin-top:15px;" id="summary-section">
-  <label>Notes & Summary</label>
-  <textarea id="notes" placeholder="General Notes..." oninput="saveActiveState()"></textarea>
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+  <label>General Project Notes</label>
+  <textarea id="notes" placeholder="Notes..." oninput="saveState()"></textarea>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
     <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
-    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
+    <button id="copyBtn" class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
   </div>
   <div style="position:relative;">
     <textarea id="summary" readonly></textarea>
@@ -286,7 +325,7 @@
   </div>
 </div>
 
-<!-- REQUIRED FIELDS WARNING MODAL -->
+<!-- WARNING MODAL -->
 <div id="warningModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
     <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
@@ -300,7 +339,7 @@
 </div>
 
 <!-- HISTORY -->
-<div class="header-card" style="margin-top:20px; text-align:left;">
+<div class="history-section">
   <div id="history-toggle" onclick="toggleHistorySection()"
     style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
     <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">RECENT TAKEOFFS (LAST 20)</label>
@@ -311,7 +350,7 @@
       style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
       oninput="renderHistory()">
     <div id="history-list"></div>
-    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer;">Clear All History</button>
+    <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:15px; cursor:pointer; padding: 10px;">Clear All History</button>
   </div>
 </div>
 
@@ -319,11 +358,8 @@
 
 <!-- ══════════════════════════════════════════════════════════════
      LOCKOUT WALK OVERLAY
-     Full-screen overlay, separate from main takeoff,
-     separate history key (bfs_lo_history)
 ══════════════════════════════════════════════════════════════ -->
 <div id="lo-overlay">
-  <!-- Header bar -->
   <div class="lo-header">
     <div style="height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 12px;">
       <span style="color:white; font-weight:800; font-size:11px; letter-spacing:0.3px;">🔒 LOCKOUT WALK</span>
@@ -357,7 +393,6 @@
       </div>
     </div>
 
-    <!-- Big counters -->
     <!-- Trim takeoff cross-reference — auto-shows when lot matches a saved trim takeoff -->
     <div id="lo-trim-match" style="display:none; background:#eff6ff; border:2px solid #1e40af; border-radius:8px; padding:12px; margin-bottom:8px;">
       <div style="font-weight:900; font-size:11px; color:#1e40af; margin-bottom:8px; letter-spacing:0.5px;">📋 TRIM TAKEOFF FOUND FOR THIS LOT</div>
@@ -367,7 +402,6 @@
 
     <div id="lo-counters"></div>
 
-    <!-- Notes + Generate + Summary -->
     <div class="header-card" style="margin-top:4px;">
       <label>Post Walk Notes</label>
       <textarea id="lo-notes" placeholder="Notes..." oninput="saveLoState()" style="height:70px;"></textarea>
@@ -390,15 +424,14 @@
       </div>
     </div>
 
-    <!-- Lockout History -->
-    <div class="header-card" style="margin-top:12px; text-align:left;">
+    <div class="history-section" style="margin-top:12px;">
       <div onclick="toggleLoHistory()" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
         <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">LOCKOUT WALK HISTORY (LAST 20)</label>
         <span id="lo-history-chevron" style="font-size:11px; color:#475569; font-weight:800;">▼ SHOW</span>
       </div>
       <div id="lo-history-body" style="display:none;">
         <div id="lo-history-list"></div>
-        <button onclick="clearLoHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:12px; cursor:pointer;">Clear Lockout History</button>
+        <button onclick="clearLoHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:12px; cursor:pointer; padding:10px;">Clear Lockout History</button>
       </div>
     </div>
 
@@ -447,14 +480,27 @@
 
 <script>
   let state = { fireRated: false };
+  let activeSectionId = "";
+  let activeItemLabel = "";
+  let activeTypes = [];
 
   const doorSizes    = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes     = ["4/0","4/8","5/0","5/4","6/0"];
+  const dblSizes     = ["3/0","3/4","4/0","4/8","5/0","5/4","6/0"];
   const railLengths  = ["8'", "12'", "16'", "18'"];
   const stairItems   = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
+  const directInputItems = ["Brackets", "Balusters", "Shoes"];
   const lockoutItems = ["Passage", "Privacy", "Dummy", "Keyed Entry", "Deadbolt", "Hinge Bumps", "Base Bumps"];
 
-  // ── JOB BANNER ───────────────────────────────────────────────────
+  const layout = [
+    { title: "6/8 Doors",    id: "68",    color: "bg-navy", items: doorSizes,    types: ["LH", "RH", "SLAB"] },
+    { title: "6/8 Double",   id: "DBL68", color: "bg-red",  items: dblSizes,     types: ["DBL", "T-AST"] },
+    { title: "8/0 Doors",    id: "80",    color: "bg-navy", items: doorSizes,    types: ["LH", "RH", "SLAB"] },
+    { title: "8/0 Double",   id: "DBL80", color: "bg-red",  items: dblSizes,     types: ["DBL", "T-AST"] },
+    { title: "Attic W/S",    id: "atws",  color: "bg-navy", items: doorSizes,    types: ["LH", "RH"] },
+    { title: "Attic Stairs", id: "AS",    color: "bg-red",  items: ["22x54","25x54","Scuttle"], types: ["QTY"] },
+    { title: "Stair Parts",  id: "sp",    color: "bg-navy", items: [...railLengths, ...stairItems] }
+  ];
+
   function updateStickyOffsets() {
     const bannerVisible = document.body.classList.contains('banner-visible');
     const bannerH = bannerVisible ? (document.getElementById('job-banner').offsetHeight || 36) : 0;
@@ -480,15 +526,39 @@
     updateStickyOffsets();
   }
 
-  // ── STATE ────────────────────────────────────────────────────────
-  function saveActiveState() {
-    document.querySelectorAll('.qty-input').forEach(inp => {
-      const key = inp.id.replace('inp-', '');
-      state[key] = parseInt(inp.value) || 0;
-    });
-    document.querySelectorAll('.note-box').forEach(note => {
-      state[note.id] = note.value;
-    });
+  window.loadHistory = function(index) {
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const h = history[index];
+    if (!h) return;
+    document.getElementById('summary').value = h.text;
+    if (h.fullData) {
+      document.getElementById('customer').value    = h.fullData.customer || "";
+      document.getElementById('job-id').value = h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || "";
+      document.getElementById('notes').value        = h.fullData.notes || "";
+      state = JSON.parse(JSON.stringify(h.fullData.state));
+      learnFromJob(h.fullData.customer);
+      refreshAllCards();
+      saveState();
+      updateJobBanner();
+    }
+    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  window.deleteHistoryItem = function(index) {
+    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    history.splice(index, 1);
+    localStorage.setItem('bfs_history', JSON.stringify(history));
+    renderHistory();
+  };
+
+  window.clearHistory = function() {
+    if (confirm('Clear all takeoff history?')) {
+      localStorage.removeItem('bfs_history');
+      renderHistory();
+    }
+  };
+
+  function saveState() {
     const fullData = {
       customer:    document.getElementById('customer').value,
       jobId:       document.getElementById('job-id').value,
@@ -504,73 +574,75 @@
     const saved = localStorage.getItem('bfs_active_work');
     if (saved) {
       const data = JSON.parse(saved);
-      document.getElementById('customer').value    = data.customer || "";
+      document.getElementById('customer').value   = data.customer || "";
       document.getElementById('job-id').value = data.jobId || data.lot || data.subdivision || "";
-      document.getElementById('notes').value        = data.notes || "";
-      document.getElementById('summary').value      = data.summaryText || "";
+      document.getElementById('notes').value       = data.notes || "";
+      document.getElementById('summary').value     = data.summaryText || "";
       state = data.state || { fireRated: false };
-      refreshUI();
+      refreshAllCards();
       updateSummaryStyle();
       updateJobBanner();
     }
   }
 
-  function refreshUI() {
-    Object.keys(state).forEach(key => {
-      const el = document.getElementById('qty-' + key);
-      if (el) {
-        el.innerText = state[key];
-        state[key] > 0 ? el.classList.add('has-qty') : el.classList.remove('has-qty');
-      }
-      const inp = document.getElementById('inp-' + key);
-      if (inp) inp.value = state[key] || "";
-      const noteBox = document.getElementById('NOTE_' + key);
-      if (noteBox) noteBox.value = state['NOTE_' + key] || "";
-    });
-    if (document.getElementById('fire-status'))
-      document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
-    updateSectionCheckmarks();
+  function getSyncKey(sectionId, label, type) {
+    let sId = sectionId;
+    if (sectionId === "sp") {
+      if (railLengths.includes(label))  sId = "HR";
+      else if (label === "Shoes")        sId = "STSH";
+      else                               sId = "ST";
+    }
+    return `${sId}_${label.replace(/[\/ ']/g, "-")}_${type}`;
   }
 
-  function updateSectionCheckmarks() {
-    const sectionMap = {
-      "68_s":   { prefix: "68",    sizes: doorSizes,   types: ["LH","RH","SLAB"] },
-      "68_d":   { prefix: "DBL68", sizes: dblSizes,    types: ["DBL","T-AST"] },
-      "80_s":   { prefix: "80",    sizes: doorSizes,   types: ["LH","RH","SLAB"] },
-      "80_d":   { prefix: "DBL80", sizes: dblSizes,    types: ["DBL","T-AST"] },
-      "at_ws":  { prefix: "atws",  sizes: doorSizes,   types: ["LH","RH"] },
-      "at_st":  { prefix: "AS",    sizes: ["22x54","25x54","Scuttle"], types: ["QTY"] },
-      "s_parts":{ prefix: null,    sizes: [...railLengths, ...stairItems], mixed: true }
-    };
-    Object.keys(sectionMap).forEach(secId => {
-      const s = sectionMap[secId];
-      let hasData = false;
-      s.sizes.forEach(sz => {
-        let types = s.types;
-        if (s.mixed) {
-          types = railLengths.includes(sz) ? ["OPEN","WALL"] : sz === "Shoes" ? ["FLAT","ANGLE"] : ["QTY"];
-          const prefix = railLengths.includes(sz) ? "HR" : sz === "Shoes" ? "STSH" : "ST";
-          types.forEach(t => {
-            const key = `${prefix}_${sz.replace(/[\/ ']/g,"-")}_${t}`;
-            if (state[key] > 0) hasData = true;
-          });
-          return;
-        }
-        types.forEach(t => {
-          const key = `${s.prefix}_${sz.replace(/[\/ ']/g,"-")}_${t}`;
-          if (state[key] > 0) hasData = true;
-        });
-      });
-      if (secId === "at_st" && state.fireRated) hasData = true;
-      const checkEl = document.getElementById(`check-${secId}`);
-      if (checkEl) hasData ? checkEl.classList.add('active') : checkEl.classList.remove('active');
-    });
+  function toggleSection(id, headerEl) {
+    document.getElementById('content-' + id).classList.toggle('active');
+    headerEl.classList.toggle('active-header');
   }
+
+  function openModal(sectionId, label, types) {
+    activeSectionId  = sectionId;
+    activeItemLabel  = label;
+    activeTypes      = types;
+    const displayHeader = (sectionId === "80" || sectionId === "DBL80") ? `${label}x8/0` : label;
+    document.getElementById('m-title').innerText = displayHeader;
+    const container = document.getElementById('m-blocks');
+    container.innerHTML = "";
+    const useDirectInput = directInputItems.includes(label);
+    types.forEach(type => {
+      const key       = getSyncKey(sectionId, label, type);
+      const qty       = state[key] || 0;
+      const savedNote = state[`NOTE_${key}`] || "";
+      const greenClass = qty > 0 ? 'active-qty' : '';
+      let controlHtml = useDirectInput
+        ? `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty', this.value > 0)">`
+        : `<div style="display:flex; align-items:center; gap:12px;">
+             <button class="btn" onclick="updateModalQty('${key}', -1)">-</button>
+             <span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span>
+             <button class="btn" onclick="updateModalQty('${key}', 1)">+</button>
+           </div>`;
+      container.innerHTML += `
+        <div class="modal-type-block">
+          <div class="modal-counter-row">
+            <label style="font-size:16px; font-weight:800; color:var(--navy);">${type}</label>
+            ${controlHtml}
+          </div>
+          <input type="text" id="mnote-${key}" value="${savedNote}" placeholder="Notes..."
+            style="margin: 5px 0 0 0; font-size: 14px; padding: 8px; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;">
+        </div>`;
+    });
+    document.getElementById('itemModal').style.display = 'flex';
+  }
+
+  document.getElementById('itemModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  document.getElementById('resetModal').addEventListener('click', function(e) { if (e.target === this) closeResetModal(); });
+  document.getElementById('newLotModal').addEventListener('click', function(e) { if (e.target === this) closeNewLotModal(); });
+  document.getElementById('warningModal').addEventListener('click', function(e) { if (e.target === this) closeWarningModal(); });
+  document.getElementById('loRecapModal').addEventListener('click', function(e) { if (e.target === this) closeLoRecap(); });
+  document.getElementById('loMismatchModal').addEventListener('click', function(e) { if (e.target === this) closeLoMismatch(); });
+  document.getElementById('loTrimDetailModal').addEventListener('click', function(e) { if (e.target === this) closeLoTrimDetail(); });
 
   // ── TAP AUDIO FEEDBACK ───────────────────────────────────────────
-  // + tap: short high tick (880Hz square) — "count went up"
-  // - tap: descending soft tone (440→220Hz triangle) — "count went down"
-  // Shared across trim takeoff AND lockout walk in this file.
   let _tapCtx = null;
   function _getCtx() {
     try {
@@ -604,126 +676,146 @@
     } catch(e) {}
   }
 
-  function update(key, delta) {
+  function updateModalQty(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
-    refreshUI();
-    saveActiveState();
+    const el = document.getElementById(`mqty-${key}`);
+    el.innerText = state[key];
+    el.classList.toggle('active-qty', state[key] > 0);
     if (delta > 0) playTapUp();
     else playTapDown();
   }
 
+  function closeModal() {
+    activeTypes.forEach(t => {
+      const key = getSyncKey(activeSectionId, activeItemLabel, t);
+      const qtyElement = document.getElementById(`mqty-${key}`);
+      if (qtyElement.tagName === "INPUT") {
+        state[key] = parseInt(qtyElement.value) || 0;
+      }
+      const noteInput = document.getElementById(`mnote-${key}`);
+      if (noteInput) state[`NOTE_${key}`] = noteInput.value.trim();
+    });
+    refreshAllCards();
+    saveState();
+    document.getElementById('itemModal').style.display = 'none';
+  }
+
+  function refreshAllCards() {
+    layout.forEach(sec => {
+      let sectionHasData = false;
+      sec.items.forEach(item => {
+        let types = sec.types || [];
+        if (sec.id === "sp") {
+          types = railLengths.includes(item) ? ["OPEN", "WALL"]
+                : item === "Shoes"           ? ["FLAT", "ANGLE"]
+                :                             ["QTY"];
+        }
+        const cardId = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
+        const card = document.getElementById(cardId);
+        if (card) {
+          const hasData = types.some(t => state[getSyncKey(sec.id, item, t)] > 0);
+          if (hasData) sectionHasData = true;
+          hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
+          updateCardBadges(card, sec.id, item, types);
+        }
+      });
+      if (sec.id === "AS" && state.fireRated) sectionHasData = true;
+      const checkEl = document.getElementById(`check-${sec.id}`);
+      if (checkEl) sectionHasData ? checkEl.classList.add('active') : checkEl.classList.remove('active');
+    });
+    const fireBtn = document.getElementById('fire-status');
+    if (fireBtn) {
+      fireBtn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO";
+      state.fireRated ? fireBtn.classList.add('has-data') : fireBtn.classList.remove('has-data');
+    }
+  }
+
+  function updateCardBadges(card, sectionId, label, types) {
+    const leftB   = card.querySelector('.badge-left');
+    const rightB  = card.querySelector('.badge-right');
+    const centerB = card.querySelector('.badge-center');
+    const noteB   = card.querySelector('.note-badge');
+    if (!leftB) return;
+    [leftB, rightB, centerB].forEach(b => { b.innerText = ""; b.classList.remove('active'); });
+    let hasNote = false;
+    types.forEach((t, index) => {
+      const key = getSyncKey(sectionId, label, t);
+      const qty = state[key] || 0;
+      if (state[`NOTE_${key}`]) hasNote = true;
+      if (qty > 0) {
+        if (types.length === 2) {
+          if (index === 0) { leftB.innerText = `${t}:${qty}`;  leftB.classList.add('active'); }
+          else             { rightB.innerText = `${t}:${qty}`; rightB.classList.add('active'); }
+        } else if (types.length === 3) {
+          if (t === "LH")      { leftB.innerText   = `L:${qty}`;  leftB.classList.add('active'); }
+          else if (t === "RH") { rightB.innerText  = `R:${qty}`;  rightB.classList.add('active'); }
+          else                 { centerB.innerText = `S:${qty}`;  centerB.classList.add('active'); }
+        } else {
+          centerB.innerText = qty; centerB.classList.add('active');
+        }
+      }
+    });
+    if (noteB) hasNote ? noteB.classList.add('active') : noteB.classList.remove('active');
+  }
+
   function toggleFire() {
     state.fireRated = !state.fireRated;
-    document.getElementById('fire-status').innerText = state.fireRated ? "YES" : "NO";
-    updateSectionCheckmarks();
-    saveActiveState();
+    refreshAllCards();
+    saveState();
   }
 
-  function toggleSection(id, headerEl) {
-    document.getElementById('content-' + id).classList.toggle('active');
-    headerEl.classList.toggle('active-header');
-  }
-
-  function renderRow(label, prefix, types) {
-    let displayLabel = (prefix === "80" || prefix === "DBL80") ? label + "x8/0" : label;
-    let html = `<div class="door-row"><div class="size-label">${displayLabel}</div><div class="controls-grid">`;
-    types.forEach(type => {
-      const key = prefix + '_' + label.replace(/[\/ ']/g, "-") + '_' + type;
-      const isHigh = (label === "Balusters" || label === "Shoes" || label === "Brackets");
-      html += `<div class="counter-box"><label>${type}</label><div class="btn-wrap">`;
-      html += isHigh
-        ? `<input type="number" class="qty-input" id="inp-${key}" oninput="saveActiveState(); updateSectionCheckmarks()">`
-        : `<button class="btn" onclick="update('${key}', -1)">−</button><span class="qty" id="qty-${key}">0</span><button class="btn" onclick="update('${key}', 1)">+</button>`;
-      html += `</div><input type="text" id="NOTE_${key}" class="note-box" placeholder="Note" oninput="saveActiveState()"></div>`;
-    });
-    return html + `</div></div>`;
-  }
-
-  const layout = [
-    { title: "6/8 Doors",    id: "68_s",   color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68",    ["LH","RH","SLAB"])).join('') },
-    { title: "6/8 Double",   id: "68_d",   color: "bg-red",  rows: () => dblSizes.map(s  => renderRow(s, "DBL68", ["DBL","T-AST"])).join('') },
-    { title: "8/0 Doors",    id: "80_s",   color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "80",    ["LH","RH","SLAB"])).join('') },
-    { title: "8/0 Double",   id: "80_d",   color: "bg-red",  rows: () => dblSizes.map(s  => renderRow(s, "DBL80", ["DBL","T-AST"])).join('') },
-    { title: "Attic W/S",    id: "at_ws",  color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "atws",  ["LH","RH"])).join('') },
-    { title: "Attic Stairs", id: "at_st",  color: "bg-red",  rows: () =>
-        renderRow("22x54",  "AS", ["QTY"]) +
-        renderRow("25x54",  "AS", ["QTY"]) +
-        renderRow("Scuttle","AS", ["QTY"]) +
-        `<div style="padding:8px;"><span style="font-weight:800; font-size:13px; color:var(--navy);">FIRE RATED?</span>
-         <button class="btn" style="width:60px; font-size:10px; margin-left:10px;" onclick="toggleFire()" id="fire-status">NO</button></div>`
-    },
-    { title: "Stair Parts",  id: "s_parts",color: "bg-navy", rows: () =>
-        railLengths.map(s => renderRow(s, "HR", ["OPEN","WALL"])).join('') +
-        stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') +
-        renderRow("Shoes", "STSH", ["FLAT","ANGLE"])
-    }
-  ];
-
-  document.getElementById('app-content').innerHTML = layout.map(sec => `
-    <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
-      <span>${sec.title}</span>
-      <span style="display:flex;align-items:center;gap:6px;">
-        <span class="section-check" id="check-${sec.id}">✓</span>
-        <span class="chevron"></span>
-      </span>
-    </div>
-    <div id="content-${sec.id}" class="section-content">${sec.rows()}</div>
-  `).join('');
-
-  // ── GENERATE SUMMARY ─────────────────────────────────────────────
   function generateSummary(force) {
-    const cust  = document.getElementById('customer').value.trim();
-    const jobId = document.getElementById('job-id').value.trim();
+    const cust = document.getElementById('customer').value.trim();
     if (!force) {
       const missing = [];
-      if (!cust)  missing.push('<strong>Customer</strong>');
-      if (!jobId) missing.push('<strong>Job ID</strong>');
+      if (!cust) missing.push('<strong>Customer</strong>');
+      if (!sub)  missing.push('<strong>Subdivision</strong>');
+      if (!lot)  missing.push('<strong>Lot #</strong>');
       if (missing.length) {
         showWarningModal(`Missing: ${missing.join(', ')}. Please fill these in before generating, or tap <em>Generate Anyway</em> to continue.`);
         return;
       }
     }
+    const gNotes   = document.getElementById('notes').value || "";
     const custVal  = cust  || "NA";
     const jobIdVal = jobId || "NA";
-    const gNotes   = document.getElementById('notes').value || "";
     let report = `TAKEOFF -- ${custVal} -- ${jobIdVal}\n----------------------------\n\n`;
-
-    const sections = [
-      { id:'68',    head:'--- 6/8 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"" },
-      { id:'DBL68', head:'--- 6/8 DOUBLE DOORS ---',  sizes:dblSizes,     types:["DBL","T-AST"],     suffix:"" },
-      { id:'80',    head:'--- 8/0 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"x8/0" },
-      { id:'DBL80', head:'--- 8/0 DOUBLE DOORS ---',  sizes:dblSizes,     types:["DBL","T-AST"],     suffix:"x8/0" },
-      { id:'atws',  head:'--- ATTIC WS DOORS ---',    sizes:doorSizes,    types:["LH","RH"],         suffix:"" },
-      { id:'AS',    head:'--- ATTIC STAIRS ---',      sizes:["22x54","25x54","Scuttle"], types:["QTY"], suffix:"" },
-      { id:'HR',    head:'--- HANDRAIL ---',          sizes:railLengths,  types:["OPEN","WALL"],     suffix:"" },
-      { id:'ST',    head:'--- STAIR HARDWARE ---',    sizes:stairItems.filter(i=>i!=="Shoes"), types:["QTY"], suffix:"" },
-      { id:'STSH',  head:'--- SHOES ---',             sizes:["Shoes"],    types:["FLAT","ANGLE"],    suffix:"" }
+    const groups = [
+      { id:"68",    head:"--- 6/8 SINGLE DOORS ---",  types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"" },
+      { id:"DBL68", head:"--- 6/8 DOUBLE DOORS ---",  types:["DBL","T-AST"],      items:dblSizes,   suffix:"" },
+      { id:"80",    head:"--- 8/0 SINGLE DOORS ---",  types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"x8/0" },
+      { id:"DBL80", head:"--- 8/0 DOUBLE DOORS ---",  types:["DBL","T-AST"],      items:dblSizes,   suffix:"x8/0" },
+      { id:"atws",  head:"--- ATTIC WS DOORS ---",    types:["LH","RH"],          items:doorSizes,  suffix:"" },
+      { id:"AS",    head:"--- ATTIC STAIRS ---",      types:["QTY"],              items:["22x54","25x54","Scuttle"], suffix:"" },
+      { id:"HR",    head:"--- HANDRAIL ---",          types:["OPEN","WALL"],      items:railLengths, suffix:"" },
+      { id:"ST",    head:"--- STAIR HARDWARE ---",    types:["QTY"],              items:stairItems.filter(i=>i!=="Shoes"), suffix:"" },
+      { id:"STSH",  head:"--- SHOES ---",             types:["FLAT","ANGLE"],     items:["Shoes"],       suffix:"" }
     ];
-
-    sections.forEach(sec => {
-      let sectionText = "";
-      sec.sizes.forEach(sz => {
-        sec.types.forEach(tp => {
-          const key = sec.id + '_' + sz.replace(/[\/ ']/g, "-") + '_' + tp;
-          const val = state[key] || (document.getElementById('inp-'+key) ? parseInt(document.getElementById('inp-'+key).value)||0 : 0);
-          if (val > 0) {
-            const note    = state['NOTE_' + key] || "";
-            const fireTag = (state.fireRated && sec.id==='AS') ? ' (FIRE RATED)' : '';
-            const typeStr = tp === "QTY" ? "" : ` ${tp}`;
-            sectionText  += `- ${sz}${sec.suffix}${typeStr}: ${val}${fireTag}${note ? ' *'+note : ''}\n`;
+    groups.forEach(g => {
+      let groupContent = "";
+      g.items.forEach(item => {
+        g.types.forEach(t => {
+          const key = (g.id === "HR" || g.id === "ST" || g.id === "STSH")
+            ? `${g.id}_${item.replace(/[\/ ']/g, "-")}_${t}`
+            : getSyncKey(g.id, item, t);
+          if (state[key] > 0) {
+            const fireLabel = (g.id === "AS" && state.fireRated) ? " (FIRE RATED)" : "";
+            const cleanType = (t === "QTY") ? "" : ` ${t}`;
+            groupContent += `- ${item}${g.suffix}${cleanType}: ${state[key]}${fireLabel}`;
+            if (state[`NOTE_${key}`]) groupContent += ` *${state[`NOTE_${key}`]}`;
+            groupContent += `\n`;
           }
         });
       });
-      if (sectionText) report += sec.head + "\n" + sectionText + "\n";
+      if (groupContent) report += `${g.head}\n${groupContent}\n`;
     });
-
-    if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}`;
+    if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
     document.getElementById('summary').value = report;
+    saveState();
     const summaryEl = document.getElementById('summary');
     summaryEl.classList.remove('flash');
     void summaryEl.offsetWidth;
     summaryEl.classList.add('flash');
-    saveActiveState();
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
     saveToHistory(report, `${custVal} — ${jobIdVal}`, {
       customer: custVal, jobId: jobIdVal, notes: gNotes,
@@ -733,11 +825,118 @@
   }
 
   function updateSummaryStyle() {
-    const s     = document.getElementById('summary');
+    const s = document.getElementById('summary');
     const empty = document.getElementById('summary-empty-state');
     const hasText = s.value.length > 0;
-    hasText ? s.classList.add('has-text')    : s.classList.remove('has-text');
-    hasText ? empty.classList.add('hidden')  : empty.classList.remove('hidden');
+    hasText ? s.classList.add('has-text') : s.classList.remove('has-text');
+    hasText ? empty.classList.add('hidden') : empty.classList.remove('hidden');
+  }
+
+  function toggleHistorySection() {
+    const body    = document.getElementById('history-body');
+    const chevron = document.getElementById('history-chevron');
+    const isOpen  = body.style.display !== 'none';
+    body.style.display    = isOpen ? 'none' : 'block';
+    chevron.innerText     = isOpen ? '▼ SHOW' : '▲ HIDE';
+  }
+
+  function saveToHistory(text, label, fullData) {
+    learnFromJob(fullData.customer);
+    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const now = new Date();
+    const dateStr = (now.getMonth()+1) + '/' + now.getDate();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+    const richLabel = [fullData.customer, fullData.jobId || fullData.lot || fullData.subdivision].filter(Boolean).join(' — ');
+    history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
+    if (history.length > 20) history.pop();
+    localStorage.setItem('bfs_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list    = document.getElementById('history-list');
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    const query   = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
+    const filtered = query
+      ? history.filter(item =>
+          item.label.toLowerCase().includes(query) ||
+          (item.fullData?.customer || '').toLowerCase().includes(query) ||
+          (item.fullData?.jobId || item.fullData?.lot || item.fullData?.subdivision || '').toLowerCase().includes(query))
+      : history;
+    list.innerHTML = filtered.length ? ""
+      : `<p style='font-size:11px; color:#94a3b8;'>${query ? 'No matches found.' : 'No recent takeoffs.'}</p>`;
+    filtered.forEach((item, index) => {
+      const realIndex = history.indexOf(item);
+      list.innerHTML += `
+        <div class="history-item">
+          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ''}</small></span>
+          <div class="history-controls">
+            <button class="load-btn" onclick="loadHistory(${realIndex})">LOAD</button>
+            <button class="del-btn"  onclick="deleteHistoryItem(${realIndex})">✕</button>
+          </div>
+        </div>`;
+    });
+  }
+
+  function showNewLotModal() { document.getElementById('newLotModal').style.display = 'flex'; }
+  function closeNewLotModal() { document.getElementById('newLotModal').style.display = 'none'; }
+  function confirmNewLot() {
+    closeNewLotModal();
+    const cust = document.getElementById('customer').value;
+    state = { fireRated: false };
+    document.getElementById('summary').value = "";
+    document.getElementById('job-id').value = "";
+    document.getElementById('notes').value = "";
+    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
+    refreshAllCards();
+    updateSummaryStyle();
+    document.getElementById('customer').value = cust;
+    saveState();
+    updateJobBanner();
+    document.getElementById('job-id').focus();
+    window.scrollTo(0, 0);
+  }
+
+  function showWarningModal(msg) {
+    document.getElementById('warning-text').innerHTML = msg;
+    document.getElementById('warningModal').style.display = 'flex';
+  }
+  function closeWarningModal() { document.getElementById('warningModal').style.display = 'none'; }
+
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scroll-top');
+    if (window.scrollY > 300) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
+
+  function showResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
+  function closeResetModal() { document.getElementById('resetModal').style.display = 'none'; }
+  function confirmReset() {
+    closeResetModal();
+    state = { fireRated: false };
+    document.getElementById('summary').value = "";
+    localStorage.removeItem('bfs_active_work');
+    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
+    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
+    refreshAllCards();
+    updateSummaryStyle();
+    updateJobBanner();
+    window.scrollTo(0, 0);
+  }
+
+  function copySummary() {
+    const text = document.getElementById("summary").value;
+    if (!text.trim()) return;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("✓ COPIED TO CLIPBOARD");
+    }).catch(() => {
+      const ta = document.getElementById("summary");
+      ta.select();
+      document.execCommand("copy");
+      showToast("✓ COPIED TO CLIPBOARD");
+    });
   }
 
   function showToast(msg) {
@@ -749,114 +948,45 @@
     setTimeout(() => t.classList.remove("show"), 2000);
   }
 
-  function copySummary() {
-    const text = document.getElementById("summary").value;
-    if (!text.trim()) return;
-    navigator.clipboard.writeText(text).then(() => {
-      showToast("✓ COPIED TO CLIPBOARD");
-    }).catch(() => {
-      document.getElementById("summary").select();
-      document.execCommand("copy");
-      showToast("✓ COPIED TO CLIPBOARD");
+  const appContainer = document.getElementById('app-content');
+  layout.forEach(sec => {
+    const title = document.createElement('div');
+    title.className = `section-title ${sec.color}`;
+    title.innerHTML = `<span>${sec.title}</span><span style="display:flex;align-items:center;gap:6px;"><span class="section-check" id="check-${sec.id}">✓</span><span class="chevron"></span></span>`;
+    title.onclick = () => toggleSection(sec.id, title);
+    const content = document.createElement('div');
+    content.id = `content-${sec.id}`;
+    content.className = 'section-content';
+    const grid = document.createElement('div');
+    grid.className = 'item-grid';
+    sec.items.forEach(item => {
+      let itemTypes = sec.types || [];
+      if (sec.id === "sp") {
+        itemTypes = railLengths.includes(item) ? ["OPEN", "WALL"]
+                  : item === "Shoes"            ? ["FLAT", "ANGLE"]
+                  :                             ["QTY"];
+      }
+      const card = document.createElement('div');
+      card.className = 'item-card';
+      card.id = `card-${sec.id}-${item.replace(/[\/ ']/g, "-")}`;
+      card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div><div class="note-badge">📝</div>`;
+      card.onclick = () => openModal(sec.id, item, itemTypes);
+      grid.appendChild(card);
     });
-  }
-
-  function showResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
-  function closeResetModal() { document.getElementById('resetModal').style.display = 'none'; }
-  function confirmReset() {
-    closeResetModal();
-    state = { fireRated: false };
-    document.getElementById('summary').value = "";
-    localStorage.removeItem('bfs_active_work');
-    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
-    document.querySelectorAll('.qty').forEach(el => { el.innerText = '0'; el.classList.remove('has-qty'); });
-    document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
-    document.querySelectorAll('.note-box').forEach(el => { el.value = ""; });
-    if (document.getElementById('fire-status')) document.getElementById('fire-status').innerText = "NO";
-    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
-    updateSummaryStyle();
-    updateSectionCheckmarks();
-    updateJobBanner();
-    window.scrollTo(0, 0);
-  }
-
-  function toggleHistorySection() {
-    const body = document.getElementById('history-body');
-    const chevron = document.getElementById('history-chevron');
-    const isOpen = body.style.display !== 'none';
-    body.style.display = isOpen ? 'none' : 'block';
-    chevron.innerText  = isOpen ? '▼ SHOW' : '▲ HIDE';
-  }
-
-  function saveToHistory(text, label, fullData) {
-    learnFromJob(fullData.customer);
-    let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    const now = new Date();
-    const dateStr = (now.getMonth()+1) + '/' + now.getDate();
-    const timeStr = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    const richLabel = [fullData.customer, fullData.jobId || fullData.lot || fullData.subdivision].filter(Boolean).join(' — ');
-    history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
-    if (history.length > 20) history.pop();
-    localStorage.setItem('bfs_history', JSON.stringify(history));
-    renderHistory();
-  }
-
-  function renderHistory() {
-    const list = document.getElementById('history-list');
-    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    const query = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
-    const filtered = query
-      ? history.filter(item =>
-          item.label.toLowerCase().includes(query) ||
-          (item.fullData?.customer || '').toLowerCase().includes(query) ||
-          (item.fullData?.jobId || item.fullData?.lot || item.fullData?.subdivision || '').toLowerCase().includes(query))
-      : history;
-    list.innerHTML = filtered.length ? ""
-      : `<p style='font-size:11px; padding:10px; color:#94a3b8;'>${query ? 'No matches found.' : 'No history.'}</p>`;
-    filtered.forEach(item => {
-      const realIndex = history.indexOf(item);
-      list.innerHTML += `
-        <div class="history-item">
-          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ""}</small></span>
-          <div class="history-controls">
-            <button class="load-btn" onclick="loadHistory(${realIndex})">LOAD</button>
-            <button class="del-btn"  onclick="deleteHistoryItem(${realIndex})">✕</button>
-          </div>
-        </div>`;
-    });
-  }
-
-  function loadHistory(index) {
-    const h = JSON.parse(localStorage.getItem('bfs_history'))[index];
-    document.getElementById('summary').value = h.text;
-    if (h.fullData) {
-      document.getElementById('customer').value    = h.fullData.customer || "";
-      document.getElementById('job-id').value = h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || "";
-      document.getElementById('notes').value        = h.fullData.notes || "";
-      state = JSON.parse(JSON.stringify(h.fullData.state));
-      learnFromJob(h.fullData.customer);
-      refreshUI();
-      saveActiveState();
-      updateJobBanner();
-      updateSummaryStyle();
+    content.appendChild(grid);
+    if (sec.id === "AS") {
+      const fireBtn = document.createElement('button');
+      fireBtn.id = "fire-status";
+      fireBtn.className = "item-card";
+      fireBtn.style.width = "calc(100% - 16px)";
+      fireBtn.style.margin = "8px";
+      fireBtn.innerText = "FIRE RATED: NO";
+      fireBtn.onclick = toggleFire;
+      content.appendChild(fireBtn);
     }
-    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function deleteHistoryItem(index) {
-    let h = JSON.parse(localStorage.getItem('bfs_history'));
-    h.splice(index, 1);
-    localStorage.setItem('bfs_history', JSON.stringify(h));
-    renderHistory();
-  }
-
-  function clearHistory() {
-    if (confirm('Clear all takeoff history?')) {
-      localStorage.removeItem('bfs_history');
-      renderHistory();
-    }
-  }
+    appContainer.appendChild(title);
+    appContainer.appendChild(content);
+  });
 
   // ── AUTOCOMPLETE KNOWLEDGE BASE ──────────────────────────────────
   function getKnowledge() {
@@ -887,7 +1017,7 @@
     delete kb[customer];
     saveKnowledge(kb);
     document.getElementById('customer').value = "";
-    saveActiveState(); updateJobBanner();
+    saveState(); updateJobBanner();
     showCustomerSuggestions();
   }
   function deleteSubdivision(customer, subdivision) {
@@ -900,12 +1030,13 @@
     const dd = document.getElementById(dropdownId);
     if (!items.length) { dd.classList.remove('open'); return; }
     dd.innerHTML = items.map(item => {
-      const safe = item.replace(/'/g, "\\'");
-      const deleteBtn = onDelete
-        ? `<button class="ac-delete" onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();(${onDelete.toString()})('${safe}')">✕</button>`
+      const safeItem = item.replace(/'/g, "\\'");
+      const deleteBtnHtml = onDelete
+        ? `<button class="ac-delete" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); (${onDelete.toString()})('${safeItem}');">✕</button>`
         : '';
-      return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${safe}');closeDropdown('${dropdownId}')">
-        <span class="ac-item-label">${item}</span>${deleteBtn}
+      return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${safeItem}'); closeDropdown('${dropdownId}')">
+        <span class="ac-item-label">${item}</span>
+        ${deleteBtnHtml}
       </div>`;
     }).join('');
     dd.classList.add('open');
@@ -916,14 +1047,16 @@
   }
   function showCustomerSuggestions() {
     const val = document.getElementById('customer').value.trim().toLowerCase();
-    const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
+    const all = getCustomers();
+    const filtered = val ? all.filter(c => c.toLowerCase().includes(val)) : all;
     showDropdown('ac-customer', filtered,
-      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); },
-      (s) => deleteCustomer(s)
+      (selected) => { document.getElementById('customer').value = selected; saveState(); updateJobBanner(); },
+      (toDelete) => { deleteCustomer(toDelete); }
     );
   }
   function showSubdivisionSuggestions() {
-    // Subdivision field removed - Job ID field has no autocomplete
+    const customer = document.getElementById('customer').value.trim();
+    // Subdivision removed - no suggestions
   }
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.ac-wrap')) {
@@ -932,62 +1065,14 @@
     }
   });
 
-  function showNewLotModal() { document.getElementById('newLotModal').style.display = 'flex'; }
-  function closeNewLotModal() { document.getElementById('newLotModal').style.display = 'none'; }
-  function confirmNewLot() {
-    closeNewLotModal();
-    const cust = document.getElementById('customer').value;
-    state = { fireRated: false };
-    document.getElementById('summary').value = "";
-    document.getElementById('job-id').value = "";
-    document.getElementById('notes').value = "";
-    document.querySelectorAll('.qty').forEach(el => { el.innerText = '0'; el.classList.remove('has-qty'); });
-    document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
-    document.querySelectorAll('.note-box').forEach(el => { el.value = ""; });
-    if (document.getElementById('fire-status')) document.getElementById('fire-status').innerText = "NO";
-    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
-    updateSummaryStyle();
-    updateSectionCheckmarks();
-    document.getElementById('customer').value = cust;
-    saveActiveState();
-    updateJobBanner();
-    document.getElementById('job-id').focus();
-    window.scrollTo(0, 0);
-  }
-
-  function showWarningModal(msg) {
-    document.getElementById('warning-text').innerHTML = msg;
-    document.getElementById('warningModal').style.display = 'flex';
-  }
-  function closeWarningModal() { document.getElementById('warningModal').style.display = 'none'; }
-
-  window.addEventListener('scroll', () => {
-    const btn = document.getElementById('scroll-top');
-    if (window.scrollY > 300) btn.classList.add('visible');
-    else btn.classList.remove('visible');
-  });
-
-  document.getElementById('resetModal').addEventListener('click', function(e) { if (e.target===this) closeResetModal(); });
-  document.getElementById('newLotModal').addEventListener('click', function(e) { if (e.target===this) closeNewLotModal(); });
-  document.getElementById('warningModal').addEventListener('click', function(e) { if (e.target===this) closeWarningModal(); });
-  document.getElementById('loRecapModal').addEventListener('click', function(e) { if (e.target===this) closeLoRecap(); });
-  document.getElementById('loMismatchModal').addEventListener('click', function(e) { if (e.target===this) closeLoMismatch(); });
-  document.getElementById('loTrimDetailModal').addEventListener('click', function(e) { if (e.target===this) closeLoTrimDetail(); });
-
   // ══════════════════════════════════════════════════════════════
-  // LOCKOUT WALK
-  // Separate state, separate history (bfs_lo_history),
-  // pre-populates job info from main app state if available.
-  // Items: Passage, Privacy, Dummy, Deadbolt only.
+  // LOCKOUT WALK — same logic as classic, shared knowledge base
   // ══════════════════════════════════════════════════════════════
   const LO_ITEMS = ['Passage', 'Privacy', 'Dummy', 'Deadbolt', 'Hinge Bumps', 'Base Bumps'];
   let loState = {};
   // Lockout walk uses the shared playTapUp / playTapDown defined above
 
   function openLockoutWalk() {
-    // Only restore previously saved lockout state — do NOT pre-populate from
-    // the main takeoff (PMs do lockout walks days/weeks after the trim takeoff)
     const loSaved = localStorage.getItem('bfs_lo_active_work');
     if (loSaved) {
       // Restore in-progress lockout walk (customer, job-id, counters, notes)
@@ -1023,13 +1108,12 @@
     const container = document.getElementById('lo-counters');
     container.innerHTML = LO_ITEMS.map(item => {
       const qty = loState[item] || 0;
-      const hasCount = qty > 0;
       return `
-        <div class="lo-counter-card ${hasCount ? 'has-count' : ''}" id="lo-card-${item}">
+        <div class="lo-counter-card ${qty > 0 ? 'has-count' : ''}" id="lo-card-${item}">
           <div class="lo-item-label">${item}</div>
           <div class="lo-controls">
             <button class="lo-btn" onclick="updateLoQty('${item}', -1)">−</button>
-            <span class="lo-qty ${hasCount ? 'has-count' : ''}" id="lo-qty-${item}">${qty}</span>
+            <span class="lo-qty ${qty > 0 ? 'has-count' : ''}" id="lo-qty-${item}">${qty}</span>
             <button class="lo-btn" id="lo-plus-${item}" onclick="updateLoQty('${item}', 1)">+</button>
           </div>
         </div>`;
@@ -1038,7 +1122,7 @@
 
   function updateLoQty(item, delta) {
     loState[item] = Math.max(0, (loState[item] || 0) + delta);
-    const qty = loState[item];
+    const qty    = loState[item];
     const qtyEl  = document.getElementById(`lo-qty-${item}`);
     const cardEl = document.getElementById(`lo-card-${item}`);
     const btnEl  = document.getElementById(`lo-plus-${item}`);
@@ -1093,8 +1177,8 @@
     const s     = document.getElementById('lo-summary');
     const empty = document.getElementById('lo-summary-empty');
     if (s && empty) {
-      empty.style.display = s.value.length > 0 ? 'none' : 'flex';
-      s.style.borderColor = s.value.length > 0 ? 'var(--bfs-red)' : 'var(--navy)';
+      empty.style.display     = s.value.length > 0 ? 'none' : 'flex';
+      s.style.borderColor     = s.value.length > 0 ? 'var(--bfs-red)' : 'var(--navy)';
     }
   }
 
@@ -1112,11 +1196,9 @@
       const expDummies = (match.dbl * 2) + (match.tast * 2);
       const gotSingle  = (loState['Passage'] || 0) + (loState['Privacy'] || 0);
       const gotDummies = loState['Dummy'] || 0;
-      const singleOff  = gotSingle  !== expSingle;
-      const dummyOff   = gotDummies !== expDummies;
-      if (singleOff || dummyOff) {
+      if (gotSingle !== expSingle || gotDummies !== expDummies) {
         let detail = '';
-        if (singleOff) {
+        if (gotSingle !== expSingle) {
           const diff = gotSingle - expSingle;
           const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
           detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #fcd34d;">
@@ -1124,7 +1206,7 @@
             <span style="font-size:13px;font-weight:900;">${dir} (got ${gotSingle}, expected ${expSingle})</span>
           </div>`;
         }
-        if (dummyOff) {
+        if (gotDummies !== expDummies) {
           const diff = gotDummies - expDummies;
           const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
           detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;">
@@ -1215,7 +1297,6 @@
     updateLoJobBanner();
   }
 
-  // Lockout walk history (separate key: bfs_lo_history)
   function saveLoToHistory(text, fullData) {
     let history = JSON.parse(localStorage.getItem('bfs_lo_history')) || [];
     const now = new Date();
@@ -1229,7 +1310,7 @@
   }
 
   function renderLoHistory() {
-    const list = document.getElementById('lo-history-list');
+    const list    = document.getElementById('lo-history-list');
     const history = JSON.parse(localStorage.getItem('bfs_lo_history')) || [];
     list.innerHTML = history.length ? '' : `<p style="font-size:11px; color:#94a3b8; padding:8px 0;">No lockout walks yet.</p>`;
     history.forEach((item, index) => {
@@ -1272,14 +1353,13 @@
   }
 
   function toggleLoHistory() {
-    const body = document.getElementById('lo-history-body');
+    const body    = document.getElementById('lo-history-body');
     const chevron = document.getElementById('lo-history-chevron');
-    const isOpen = body.style.display !== 'none';
+    const isOpen  = body.style.display !== 'none';
     body.style.display = isOpen ? 'none' : 'block';
-    chevron.innerText = isOpen ? '▼ SHOW' : '▲ HIDE';
+    chevron.innerText  = isOpen ? '▼ SHOW' : '▲ HIDE';
   }
 
-  // Lockout walk autocomplete (shares the main app's knowledge base)
   function showLoCustomerSuggestions() {
     const val = document.getElementById('lo-customer').value.trim().toLowerCase();
     const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
@@ -1295,10 +1375,6 @@
   }
 
   // ── TAKEOFF INDEX — persistent lot cross-reference ────────────────
-  // Completely separate from browsable history. Not cleared by "Clear History"
-  // or "Reset All Fields". Auto-expires entries older than 90 days on load.
-  // Indexed by Customer|Subdivision|Lot (case-insensitive) so a PM who types
-  // the same lot on the lockout walk sees the original trim takeoff counts.
   const TAKEOFF_INDEX_KEY = 'bfs_takeoff_index';
   const EXPIRY_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
 
@@ -1307,8 +1383,6 @@
     catch(e) { return []; }
   }
 
-  // Migrate old 3-part index keys (customer|subdivision|lot) to new 2-part (customer|jobId)
-  // Runs once on load — converts existing entries so lookups still work after the field rename
   function migrateOldIndexKeys() {
     const index = getTakeoffIndex();
     if (!index.length) return;
@@ -1317,7 +1391,6 @@
     index.forEach(entry => {
       const parts = (entry.key || '').split('|');
       if (parts.length === 3) {
-        // Old format: customer|subdivision|lot — use lot as jobId
         const newKey = `${parts[0]}|${parts[2]}`;
         const alreadyExists = index.some(e => e.key === newKey) || newEntries.some(e => e.key === newKey);
         if (!alreadyExists) {
@@ -1345,7 +1418,6 @@
     Object.keys(st).forEach(key => {
       const val = st[key];
       if (typeof val !== 'number' || val <= 0) return;
-      // Single doors — 6/8, 8/0, Attic W/S — LH, RH, SLAB
       if ((key.startsWith('68_') || key.startsWith('80_') || key.startsWith('atws_')) &&
           (key.endsWith('_LH') || key.endsWith('_RH')))
         singles += val;
@@ -1374,8 +1446,6 @@
     return getTakeoffIndex().find(e => e.key === key) || null;
   }
 
-  // Called whenever lo-customer / lo-job-id change.
-  // Shows expected lock counts calculated from the saved trim takeoff for that lot.
   function checkLoTrimMatch() {
     const cust  = document.getElementById('lo-customer').value.trim();
     const jobId = document.getElementById('lo-job-id').value.trim();
@@ -1436,8 +1506,6 @@
   }
 
   function backfillTakeoffIndex() {
-    // Silently indexes any history entries not yet in the takeoff index.
-    // Runs on every load — safe to call repeatedly, never overwrites existing entries.
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
     if (!history.length) return;
     const index = getTakeoffIndex();
@@ -1446,7 +1514,7 @@
       if (!h.fullData?.state || !h.fullData.customer || (!h.fullData.jobId && !h.fullData.lot && !h.fullData.subdivision)) return;
       const bfJobId = (h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '').toLowerCase();
       const key = `${h.fullData.customer.toLowerCase()}|${bfJobId}`;
-      if (index.find(e => e.key === key)) return; // already indexed
+      if (index.find(e => e.key === key)) return;
       const totals = computeTrimTotals(h.fullData.state);
       index.push({ key, customer: h.fullData.customer, jobId: h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '',
                    timestamp: Date.now(), summaryText: h.text || '', ...totals });
@@ -1455,7 +1523,7 @@
     if (changed) localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
   }
 
-  // ── INIT ─────────────────────────────────────────────────────────
+  // ── INIT ──────────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
   expireTakeoffIndex();
