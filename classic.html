@@ -18,21 +18,68 @@
     :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent: #1e40af; --slate: #334155; --green: #16a34a; }
     *{ box-sizing:border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     body{ margin:0; background: var(--bg); padding: 8px; padding-top: 44px; padding-bottom: 30px; overflow-x: hidden; }
+    body.banner-visible { padding-top: 80px; }
+    body.banner-visible .section-title { top: var(--section-top, 44px); }
+    :root { --header-top: 44px; --section-top: 44px; }
 
-    /* ── MODE SWITCH — lives inside the banner row ── */
+    /* ── SOLID RED TOP BAR ── */
+    #top-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 44px; z-index: 650;
+      background: var(--bfs-red); box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
     .mode-switch {
       position: fixed; top: 6px; left: 8px; z-index: 700;
-      background: rgba(0,0,0,0.25); color: white; padding: 5px 10px;
-      border-radius: 20px; font-size: 9px; font-weight: 800;
-      text-decoration: none; border: 1.5px solid rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.15); color: white; padding: 5px 12px;
+      border-radius: 20px; font-size: 11px; font-weight: 800;
+      text-decoration: none; border: 1.5px solid rgba(255,255,255,0.5);
       white-space: nowrap; letter-spacing: 0.3px;
     }
 
-    /* ── STICKY JOB BANNER ── */
+    /* ── LOCKOUT WALK BUTTON ── */
+    .lo-walk-btn {
+      position: fixed; top: 6px; right: 8px; z-index: 700;
+      background: #d97706; color: white; padding: 5px 12px;
+      border-radius: 20px; font-size: 11px; font-weight: 800;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      white-space: nowrap; letter-spacing: 0.3px; cursor: pointer;
+    }
+
+    /* ── LOCKOUT WALK OVERLAY ── */
+    #lo-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1500; background: var(--bg); overflow-y: auto;
+    }
+    .lo-header {
+      background: #d97706; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .lo-counter-card {
+      background: white; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px;
+      border: 2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .lo-counter-card.has-count { border-color: var(--green); background: #f0fdf4; }
+    .lo-item-label { font-size: 15px; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
+    .lo-controls { display: flex; align-items: center; justify-content: space-between; }
+    .lo-btn {
+      width: 52px; height: 52px; border-radius: 8px; border: 0;
+      background: var(--navy); color: white; font-weight: bold; font-size: 26px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: transform 0.08s, background 0.15s;
+    }
+    .lo-btn.tap-flash { background: var(--green); transform: scale(1.1); }
+    .lo-qty {
+      font-size: 36px; font-weight: 900; color: var(--navy);
+      min-width: 60px; text-align: center;
+      transition: transform 0.15s, color 0.15s;
+    }
+    .lo-qty.has-count { color: var(--green); }
+    .lo-qty.tap-flash { transform: scale(1.25); color: var(--green); }
+
     #job-banner {
-      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 600;
+      display: none; position: fixed; top: 44px; left: 0; right: 0; z-index: 660;
       background: var(--bfs-red); color: white; font-size: 11px; font-weight: 800;
-      text-align: center; padding: 8px 12px 8px 140px;
+      text-align: center; padding: 8px 16px;
       letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.2);
       min-height: 36px; align-items: center; justify-content: center;
@@ -40,7 +87,6 @@
     #job-banner.visible { display: flex; }
     #job-banner span { opacity: 0.75; font-weight: 600; margin: 0 4px; }
 
-    /* ── HEADER ── */
     .header-card { background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center; }
     .app-logo { width: 160px; height: auto; margin: 5px auto; display: block; }
     label { font-weight: 700; font-size: 10px; color: #475569; display: block; margin-bottom: 3px; text-transform: uppercase; text-align: left; }
@@ -50,7 +96,6 @@
     .w-75 { flex: 0 0 75%; }
     .w-25 { flex: 0 0 22%; }
 
-    /* ── AUTOCOMPLETE ── */
     .ac-wrap { position: relative; }
     .ac-dropdown {
       display: none; position: absolute; top: 100%; left: 0; right: 0;
@@ -72,13 +117,12 @@
       border-radius: 5px; font-size: 11px; font-weight: 900; padding: 3px 8px; cursor: pointer;
     }
 
-    /* ── SECTIONS ── */
     .section-title {
       color: #fff; padding: 14px; font-weight: 800; font-size: 14px;
       margin: 8px -8px; cursor: pointer; display: flex;
       justify-content: space-between; align-items: center;
       text-transform: uppercase; border-bottom: 3px solid rgba(0,0,0,0.2);
-      position: sticky; top: 33px; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      position: sticky; top: var(--section-top, 44px); z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .section-check {
       display: none; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
@@ -93,7 +137,6 @@
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
 
-    /* ── CLASSIC ROWS ── */
     .door-row {
       background: #fff; border-radius: 6px; padding: 8px; margin-bottom: 8px;
       display: flex; align-items: center; gap: 8px; border: 1px solid #94a3b8;
@@ -109,12 +152,9 @@
     .has-qty { color: var(--green) !important; font-size: 17px; }
     .qty-input { width: 100%; height: 30px; padding: 2px; text-align: center; border: 2px solid var(--navy); border-radius: 4px; font-weight: 800; font-size: 14px; color: var(--navy); }
     .note-box { width: 95%; height: 28px; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 3px; padding: 4px 6px; font-size: 13px; text-align: center; margin-top: 4px; }
-
-    /* ── ALTERNATING ROW COLORS ── */
     .door-row:nth-child(even) { background: #e8edf2; }
     .door-row:nth-child(odd)  { background: #ffffff; }
 
-    /* ── SUMMARY ── */
     #summary {
       background: #fff; height: 400px; margin-top: 8px; font-family: 'Courier New', monospace;
       font-size: 14px; border: 2px solid var(--navy); width:100%; border-radius:4px;
@@ -128,7 +168,6 @@
       100% { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
     }
 
-    /* ── EMPTY STATE ── */
     #summary-empty-state {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -138,18 +177,15 @@
     #summary-empty-state p { font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.6; margin: 0; }
     #summary-empty-state.hidden { display: none; }
 
-    /* ── HISTORY ── */
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; background: #fff; }
     .history-controls { display: flex; gap: 8px; align-items: center; }
     .load-btn { padding: 10px 20px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 80px; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
 
-    /* ── MODAL OVERLAY (reset) ── */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; }
     .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 420px; text-align: center; max-height: 90vh; overflow-y: auto; }
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
 
-    /* ── SCROLL TO TOP ── */
     #scroll-top {
       display: none; position: fixed; bottom: 20px; right: 16px; z-index: 998;
       background: var(--navy); color: white; border: none; border-radius: 50%;
@@ -158,7 +194,6 @@
     }
     #scroll-top.visible { display: flex; }
 
-    /* ── TOAST ── */
     #toast {
       visibility: hidden; min-width: 200px; background-color: #1e293b; color: #fff;
       text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed;
@@ -174,12 +209,14 @@
 </head>
 <body>
 
+<div id="top-bar"></div>
 <a href="index.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'modern')">SWITCH TO MODERN</a>
+<button class="lo-walk-btn" onclick="openLockoutWalk()">🔒 LOCKOUT WALK</button>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
 <div id="job-banner"></div>
 
-<div class="header-card">
+<div id="main-header" class="header-card" style="margin-top:8px;">
   <img src="icon-512.png" alt="Logo" class="app-logo">
   <div class="input-row">
     <div class="input-group ac-wrap">
@@ -192,17 +229,10 @@
     </div>
   </div>
   <div class="input-row">
-    <div class="input-group ac-wrap w-75">
-      <label>Subdivision</label>
-      <input id="subdivision" type="text" placeholder="Huxley" autocomplete="off"
-        oninput="saveActiveState(); updateJobBanner(); showSubdivisionSuggestions()"
-        onfocus="showSubdivisionSuggestions()"
-        onblur="setTimeout(()=>closeDropdown('ac-subdivision'),200)">
-      <div id="ac-subdivision" class="ac-dropdown"></div>
-    </div>
-    <div class="input-group w-25">
-      <label>Lot #</label>
-      <input id="lot" type="text" placeholder="104A" oninput="saveActiveState(); updateJobBanner()">
+    <div class="input-group">
+      <label>Job ID</label>
+      <input id="job-id" type="text" placeholder="LOT 104A" autocomplete="off"
+        oninput="saveActiveState(); updateJobBanner()">
     </div>
   </div>
 </div>
@@ -213,13 +243,10 @@
 <div class="header-card" style="margin-top:15px;" id="summary-section">
   <label>Notes & Summary</label>
   <textarea id="notes" placeholder="General Notes..." oninput="saveActiveState()"></textarea>
-
-  <!-- Row 1: Generate + Copy side by side -->
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
     <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
     <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
   </div>
-
   <div style="position:relative;">
     <textarea id="summary" readonly></textarea>
     <div id="summary-empty-state">
@@ -227,10 +254,8 @@
       <p>Tap <strong>Generate Takeoff</strong><br>to build your report</p>
     </div>
   </div>
-
-  <!-- Row 3: New Lot + Reset -->
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Lot, Same Cust/Sub</button>
+    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="showNewLotModal()">🏠 New Job, Same Customer</button>
     <button class="actionBtn" style="background:#fee2e2; color:#b91c1c;" onclick="showResetModal()">🗑 Reset All Fields</button>
   </div>
 </div>
@@ -248,12 +273,12 @@
   </div>
 </div>
 
-<!-- NEW LOT SAME JOB MODAL -->
+<!-- NEW LOT MODAL -->
 <div id="newLotModal" class="modal-overlay">
   <div class="modal-content" style="max-width:320px;">
     <div style="font-size:2rem; margin-bottom:8px;">🏠</div>
-    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">New Lot, Same Cust/Sub?</h2>
-    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts and notes but keep <strong>Customer</strong> and <strong>Subdivision</strong> filled in.</p>
+    <h2 style="margin:0 0 8px 0; color:var(--navy); font-size:1.2rem;">New Job, Same Customer?</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 20px 0;">This will clear all door counts and notes but keep <strong>Customer</strong> filled in.</p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeNewLotModal()">Cancel</button>
       <button class="actionBtn" style="background:#1e40af; color:white;" onclick="confirmNewLot()">Yes, New Lot</button>
@@ -282,7 +307,7 @@
     <span id="history-chevron" style="font-size:11px; color:#475569; font-weight:800;">▼ SHOW</span>
   </div>
   <div id="history-body" style="display:none;">
-    <input type="text" id="history-search" placeholder="🔍  Search customer, subdivision or lot..."
+    <input type="text" id="history-search" placeholder="🔍  Search customer or job ID..."
       style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
       oninput="renderHistory()">
     <div id="history-list"></div>
@@ -290,33 +315,169 @@
   </div>
 </div>
 
-<div class="version-tag">Version 3.2.1 - Classic Row & Note Polish</div>
+<div class="version-tag">Version 3.3.0 — Lockout Walk</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LOCKOUT WALK OVERLAY
+     Full-screen overlay, separate from main takeoff,
+     separate history key (bfs_lo_history)
+══════════════════════════════════════════════════════════════ -->
+<div id="lo-overlay">
+  <!-- Header bar -->
+  <div class="lo-header">
+    <div style="height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 12px;">
+      <span style="color:white; font-weight:800; font-size:11px; letter-spacing:0.3px;">🔒 LOCKOUT WALK</span>
+      <button onclick="closeLockoutWalk()"
+        style="background:rgba(0,0,0,0.25); color:white; border:1.5px solid rgba(255,255,255,0.6); border-radius:20px; padding:5px 12px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap;">
+        ✕ BACK TO TAKEOFF
+      </button>
+    </div>
+    <div id="lo-job-banner" style="display:none; min-height:34px; padding:8px 16px; font-size:11px; font-weight:800; color:white; text-align:center; letter-spacing:0.5px; text-transform:uppercase; border-top:1px solid rgba(255,255,255,0.2); border-bottom:2px solid rgba(255,255,255,0.2); align-items:center; justify-content:center;"></div>
+  </div>
+
+  <div style="padding:0 8px 8px 8px;">
+    <div class="header-card" style="margin-top:8px;">
+      <img src="icon-512.png" alt="Elevate Trim" class="app-logo">
+      <div class="input-row">
+        <div class="input-group ac-wrap">
+          <label>Customer</label>
+          <input id="lo-customer" type="text" placeholder="Pulte" autocomplete="off"
+            oninput="saveLoState(); showLoCustomerSuggestions(); checkLoTrimMatch()"
+            onfocus="showLoCustomerSuggestions()"
+            onblur="setTimeout(()=>closeDropdown('lo-ac-customer'),200)">
+          <div id="lo-ac-customer" class="ac-dropdown"></div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Job ID</label>
+          <input id="lo-job-id" type="text" placeholder="LOT 104A" autocomplete="off"
+            oninput="saveLoState(); checkLoTrimMatch()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Big counters -->
+    <!-- Trim takeoff cross-reference — auto-shows when lot matches a saved trim takeoff -->
+    <div id="lo-trim-match" style="display:none; background:#eff6ff; border:2px solid #1e40af; border-radius:8px; padding:12px; margin-bottom:8px;">
+      <div style="font-weight:900; font-size:11px; color:#1e40af; margin-bottom:8px; letter-spacing:0.5px;">📋 TRIM TAKEOFF FOUND FOR THIS LOT</div>
+      <div id="lo-trim-totals"></div>
+      <button onclick="showLoTrimDetail()" style="width:100%; margin-top:10px; background:#1e40af; color:white; border:none; border-radius:6px; padding:10px; font-weight:800; font-size:13px; cursor:pointer;">👁 View Full Trim Takeoff</button>
+    </div>
+
+    <div id="lo-counters"></div>
+
+    <!-- Notes + Generate + Summary -->
+    <div class="header-card" style="margin-top:4px;">
+      <label>Post Walk Notes</label>
+      <textarea id="lo-notes" placeholder="Notes..." oninput="saveLoState()" style="height:70px;"></textarea>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+        <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="openLoRecap()">⚡ Generate</button>
+        <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copyLoSummary()">📋 Copy</button>
+      </div>
+      <div style="position:relative; margin-top:8px;">
+        <textarea id="lo-summary" readonly
+          style="height:200px; font-family:'Courier New',monospace; font-size:13px; border:2px solid var(--navy); width:100%; border-radius:4px; padding:10px; white-space:pre; background:#fff; line-height:1.4; color:#000;"></textarea>
+        <div id="lo-summary-empty"
+          style="position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;">
+          <span style="font-size:2rem; opacity:0.4;">🔑</span>
+          <p style="font-size:12px; color:#94a3b8; text-align:center; margin:8px 0 0 0;">Tap Generate to build your lockout report</p>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+        <button class="actionBtn" style="background:#dbeafe; color:#1e40af; font-size:13px;" onclick="loNewLot()">🏠 New Job, Same Customer</button>
+        <button class="actionBtn" style="background:#fee2e2; color:#b91c1c; font-size:13px;" onclick="loReset()">🗑 Reset</button>
+      </div>
+    </div>
+
+    <!-- Lockout History -->
+    <div class="header-card" style="margin-top:12px; text-align:left;">
+      <div onclick="toggleLoHistory()" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
+        <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">LOCKOUT WALK HISTORY (LAST 20)</label>
+        <span id="lo-history-chevron" style="font-size:11px; color:#475569; font-weight:800;">▼ SHOW</span>
+      </div>
+      <div id="lo-history-body" style="display:none;">
+        <div id="lo-history-list"></div>
+        <button onclick="clearLoHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:12px; cursor:pointer;">Clear Lockout History</button>
+      </div>
+    </div>
+
+    <div class="version-tag">Lockout Walk — separate from full takeoff history</div>
+  </div>
+</div>
+
+<!-- LOCKOUT RECAP MODAL -->
+<div id="loRecapModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:6px;">🔒</div>
+    <h2 style="margin:0 0 4px 0; color:var(--navy); font-size:1.2rem;">Lockout Recap</h2>
+    <p style="color:#64748b; font-size:12px; margin:0 0 12px 0;">Does this match what you counted on the walk?</p>
+    <div id="lo-recap-content" style="margin-bottom:16px; text-align:left;"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeLoRecap()">Go Back & Fix</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="confirmLoGenerate()">✓ Looks Right</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCKOUT MISMATCH WARNING MODAL -->
+<div id="loMismatchModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem; margin-bottom:6px;">⚠️</div>
+    <h2 style="margin:0 0 6px 0; color:var(--navy); font-size:1.2rem;">Counts Don't Match</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 12px 0;">Has there been a change from the original door takeoff?</p>
+    <div id="lo-mismatch-detail" style="background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:10px; margin-bottom:16px; text-align:left;"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="closeLoMismatch()">Go Back & Fix</button>
+      <button class="actionBtn" style="background:var(--bfs-red); color:white;" onclick="closeLoMismatch(); _openLoRecapScreen();">Yes, Proceed</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRIM TAKEOFF DETAIL MODAL -->
+<div id="loTrimDetailModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:480px;">
+    <h2 style="margin:0 0 6px 0; color:var(--navy); font-size:1.1rem;">📋 Trim Takeoff — Reference</h2>
+    <p style="color:#64748b; font-size:11px; margin:0 0 8px 0;">Original trim takeoff for this lot. Use to cross-reference your lockout walk counts.</p>
+    <textarea id="lo-trim-detail-text" readonly
+      style="height:340px; font-family:'Courier New',monospace; font-size:12px; border:1px solid #e2e8f0; width:100%; border-radius:4px; padding:10px; white-space:pre; background:#f8fafc; color:#000; line-height:1.4;"></textarea>
+    <button class="actionBtn" style="width:100%; background:#e2e8f0; color:var(--navy); margin-top:10px;" onclick="closeLoTrimDetail()">Close</button>
+  </div>
+</div>
 
 <script>
   let state = { fireRated: false };
 
   const doorSizes    = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
-  const dblSizes     = ["4/0","4/8","5/0","5/4","6/0"];
+  const dblSizes     = ["3/0","3/4","4/0","4/8","5/0","5/4","6/0"];
   const railLengths  = ["8'", "12'", "16'", "18'"];
   const stairItems   = ["Brackets", "Newels", "Anchor", "Rosettes", "Balusters", "Shoes", "Epoxy"];
   const lockoutItems = ["Passage", "Privacy", "Dummy", "Keyed Entry", "Deadbolt", "Hinge Bumps", "Base Bumps"];
 
   // ── JOB BANNER ───────────────────────────────────────────────────
+  function updateStickyOffsets() {
+    const bannerVisible = document.body.classList.contains('banner-visible');
+    const bannerH = bannerVisible ? (document.getElementById('job-banner').offsetHeight || 36) : 0;
+    const secTop  = 44 + bannerH;
+    document.documentElement.style.setProperty('--section-top', secTop + 'px');
+  }
+
   function updateJobBanner() {
     const cust = document.getElementById('customer').value.trim();
-    const sub  = document.getElementById('subdivision').value.trim();
-    const lot  = document.getElementById('lot').value.trim();
+    const jobId = document.getElementById('job-id').value.trim();
     const banner = document.getElementById('job-banner');
-    if (cust || sub || lot) {
+    if (cust || jobId) {
       const parts = [];
-      if (cust) parts.push(cust);
-      if (sub)  parts.push(sub);
-      if (lot)  parts.push(`LOT ${lot}`);
+      if (cust)  parts.push(cust);
+      if (jobId) parts.push(jobId);
       banner.innerHTML = `📋 <span>ACTIVE JOB:</span> ${parts.join(' — ')}`;
       banner.classList.add('visible');
+      document.body.classList.add('banner-visible');
     } else {
       banner.classList.remove('visible');
+      document.body.classList.remove('banner-visible');
     }
+    updateStickyOffsets();
   }
 
   // ── STATE ────────────────────────────────────────────────────────
@@ -330,8 +491,7 @@
     });
     const fullData = {
       customer:    document.getElementById('customer').value,
-      subdivision: document.getElementById('subdivision').value,
-      lot:         document.getElementById('lot').value,
+      jobId:       document.getElementById('job-id').value,
       notes:       document.getElementById('notes').value,
       summaryText: document.getElementById('summary').value,
       state: state
@@ -345,8 +505,7 @@
     if (saved) {
       const data = JSON.parse(saved);
       document.getElementById('customer').value    = data.customer || "";
-      document.getElementById('subdivision').value = data.subdivision || "";
-      document.getElementById('lot').value          = data.lot || "";
+      document.getElementById('job-id').value = data.jobId || data.lot || data.subdivision || "";
       document.getElementById('notes').value        = data.notes || "";
       document.getElementById('summary').value      = data.summaryText || "";
       state = data.state || { fireRated: false };
@@ -373,7 +532,6 @@
     updateSectionCheckmarks();
   }
 
-  // ── SECTION CHECKMARKS ───────────────────────────────────────────
   function updateSectionCheckmarks() {
     const sectionMap = {
       "68_s":   { prefix: "68",    sizes: doorSizes,   types: ["LH","RH","SLAB"] },
@@ -382,8 +540,7 @@
       "80_d":   { prefix: "DBL80", sizes: dblSizes,    types: ["DBL","T-AST"] },
       "at_ws":  { prefix: "atws",  sizes: doorSizes,   types: ["LH","RH"] },
       "at_st":  { prefix: "AS",    sizes: ["22x54","25x54","Scuttle"], types: ["QTY"] },
-      "s_parts":{ prefix: null,    sizes: [...railLengths, ...stairItems], mixed: true },
-      "lockout":{ prefix: "LO",    sizes: lockoutItems, types: ["QTY"] }
+      "s_parts":{ prefix: null,    sizes: [...railLengths, ...stairItems], mixed: true }
     };
     Object.keys(sectionMap).forEach(secId => {
       const s = sectionMap[secId];
@@ -410,10 +567,49 @@
     });
   }
 
+  // ── TAP AUDIO FEEDBACK ───────────────────────────────────────────
+  // + tap: short high tick (880Hz square) — "count went up"
+  // - tap: descending soft tone (440→220Hz triangle) — "count went down"
+  // Shared across trim takeoff AND lockout walk in this file.
+  let _tapCtx = null;
+  function _getCtx() {
+    try {
+      if (!_tapCtx) _tapCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (_tapCtx.state === 'suspended') _tapCtx.resume();
+      return _tapCtx;
+    } catch(e) { return null; }
+  }
+  function playTapUp() {
+    const ctx = _getCtx(); if (!ctx) return;
+    try {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'square'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.08);
+    } catch(e) {}
+  }
+  function playTapDown() {
+    const ctx = _getCtx(); if (!ctx) return;
+    try {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(440, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.1);
+      g.gain.setValueAtTime(0.12, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.1);
+    } catch(e) {}
+  }
+
   function update(key, delta) {
     state[key] = Math.max(0, (state[key] || 0) + delta);
     refreshUI();
     saveActiveState();
+    if (delta > 0) playTapUp();
+    else playTapDown();
   }
 
   function toggleFire() {
@@ -428,7 +624,6 @@
     headerEl.classList.toggle('active-header');
   }
 
-  // ── ROW BUILDER ──────────────────────────────────────────────────
   function renderRow(label, prefix, types) {
     let displayLabel = (prefix === "80" || prefix === "DBL80") ? label + "x8/0" : label;
     let html = `<div class="door-row"><div class="size-label">${displayLabel}</div><div class="controls-grid">`;
@@ -444,7 +639,6 @@
     return html + `</div></div>`;
   }
 
-  // ── LAYOUT ───────────────────────────────────────────────────────
   const layout = [
     { title: "6/8 Doors",    id: "68_s",   color: "bg-navy", rows: () => doorSizes.map(s => renderRow(s, "68",    ["LH","RH","SLAB"])).join('') },
     { title: "6/8 Double",   id: "68_d",   color: "bg-red",  rows: () => dblSizes.map(s  => renderRow(s, "DBL68", ["DBL","T-AST"])).join('') },
@@ -462,11 +656,9 @@
         railLengths.map(s => renderRow(s, "HR", ["OPEN","WALL"])).join('') +
         stairItems.filter(i=>i!=="Shoes").map(s => renderRow(s, "ST", ["QTY"])).join('') +
         renderRow("Shoes", "STSH", ["FLAT","ANGLE"])
-    },
-    { title: "Lockout",      id: "lockout",color: "bg-red",  rows: () => lockoutItems.map(s => renderRow(s, "LO", ["QTY"])).join('') }
+    }
   ];
 
-  // ── BUILD DOM ────────────────────────────────────────────────────
   document.getElementById('app-content').innerHTML = layout.map(sec => `
     <div class="section-title ${sec.color}" onclick="toggleSection('${sec.id}', this)">
       <span>${sec.title}</span>
@@ -480,24 +672,21 @@
 
   // ── GENERATE SUMMARY ─────────────────────────────────────────────
   function generateSummary(force) {
-    const cust   = document.getElementById('customer').value.trim();
-    const sub    = document.getElementById('subdivision').value.trim();
-    const lot    = document.getElementById('lot').value.trim();
+    const cust  = document.getElementById('customer').value.trim();
+    const jobId = document.getElementById('job-id').value.trim();
     if (!force) {
       const missing = [];
-      if (!cust) missing.push('<strong>Customer</strong>');
-      if (!sub)  missing.push('<strong>Subdivision</strong>');
-      if (!lot)  missing.push('<strong>Lot #</strong>');
+      if (!cust)  missing.push('<strong>Customer</strong>');
+      if (!jobId) missing.push('<strong>Job ID</strong>');
       if (missing.length) {
         showWarningModal(`Missing: ${missing.join(', ')}. Please fill these in before generating, or tap <em>Generate Anyway</em> to continue.`);
         return;
       }
     }
-    const custVal = cust || "NA";
-    const subVal  = sub  || "NA";
-    const lotVal  = lot  || "NA";
-    const gNotes  = document.getElementById('notes').value || "";
-    let report = `TAKEOFF -- ${custVal} -- ${subVal} -- LOT ${lotVal}\n----------------------------\n\n`;
+    const custVal  = cust  || "NA";
+    const jobIdVal = jobId || "NA";
+    const gNotes   = document.getElementById('notes').value || "";
+    let report = `TAKEOFF -- ${custVal} -- ${jobIdVal}\n----------------------------\n\n`;
 
     const sections = [
       { id:'68',    head:'--- 6/8 SINGLE DOORS ---',  sizes:doorSizes,    types:["LH","RH","SLAB"],  suffix:"" },
@@ -508,8 +697,7 @@
       { id:'AS',    head:'--- ATTIC STAIRS ---',      sizes:["22x54","25x54","Scuttle"], types:["QTY"], suffix:"" },
       { id:'HR',    head:'--- HANDRAIL ---',          sizes:railLengths,  types:["OPEN","WALL"],     suffix:"" },
       { id:'ST',    head:'--- STAIR HARDWARE ---',    sizes:stairItems.filter(i=>i!=="Shoes"), types:["QTY"], suffix:"" },
-      { id:'STSH',  head:'--- SHOES ---',             sizes:["Shoes"],    types:["FLAT","ANGLE"],    suffix:"" },
-      { id:'LO',    head:'--- LOCKOUT ---',           sizes:lockoutItems, types:["QTY"],             suffix:"" }
+      { id:'STSH',  head:'--- SHOES ---',             sizes:["Shoes"],    types:["FLAT","ANGLE"],    suffix:"" }
     ];
 
     sections.forEach(sec => {
@@ -537,10 +725,11 @@
     summaryEl.classList.add('flash');
     saveActiveState();
     document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
-    saveToHistory(report, `${subVal} L${lotVal}`, {
-      customer: custVal, subdivision: subVal, lot: lotVal, notes: gNotes,
+    saveToHistory(report, `${custVal} — ${jobIdVal}`, {
+      customer: custVal, jobId: jobIdVal, notes: gNotes,
       state: JSON.parse(JSON.stringify(state))
     });
+    saveTrimToIndex(state, custVal, jobIdVal, report);
   }
 
   function updateSummaryStyle() {
@@ -551,7 +740,6 @@
     hasText ? empty.classList.add('hidden')  : empty.classList.remove('hidden');
   }
 
-  // ── TOAST ────────────────────────────────────────────────────────
   function showToast(msg) {
     const t = document.getElementById("toast");
     t.innerText = msg;
@@ -561,7 +749,6 @@
     setTimeout(() => t.classList.remove("show"), 2000);
   }
 
-  // ── COPY ─────────────────────────────────────────────────────────
   function copySummary() {
     const text = document.getElementById("summary").value;
     if (!text.trim()) return;
@@ -574,44 +761,18 @@
     });
   }
 
-  // ── APPWRIGHT ────────────────────────────────────────────────────
-  function sendToAppWright() {
-    const text = document.getElementById("summary").value;
-    if (!text.trim()) {
-      showToast("⚠️ GENERATE TAKEOFF FIRST");
-      return;
-    }
-    navigator.clipboard.writeText(text).then(() => {
-      showToast("✓ COPIED — OPENING APPWRIGHT");
-      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
-    }).catch(() => {
-      showToast("OPENING APPWRIGHT...");
-      setTimeout(() => window.open("https://appwright.bldr.com/am/am400_WorkQueues.asp?F00_HMC=Y", "_blank"), 400);
-    });
-  }
-
-  // ── RESET MODAL ──────────────────────────────────────────────────
-  function showResetModal() {
-    document.getElementById('resetModal').style.display = 'flex';
-  }
-  function closeResetModal() {
-    document.getElementById('resetModal').style.display = 'none';
-  }
+  function showResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
+  function closeResetModal() { document.getElementById('resetModal').style.display = 'none'; }
   function confirmReset() {
     closeResetModal();
     state = { fireRated: false };
     document.getElementById('summary').value = "";
     localStorage.removeItem('bfs_active_work');
     document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value = "");
-    // Explicitly zero all visible counters — same fix as New Lot
-    document.querySelectorAll('.qty').forEach(el => {
-      el.innerText = '0';
-      el.classList.remove('has-qty');
-    });
+    document.querySelectorAll('.qty').forEach(el => { el.innerText = '0'; el.classList.remove('has-qty'); });
     document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
     document.querySelectorAll('.note-box').forEach(el => { el.value = ""; });
-    if (document.getElementById('fire-status'))
-      document.getElementById('fire-status').innerText = "NO";
+    if (document.getElementById('fire-status')) document.getElementById('fire-status').innerText = "NO";
     document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
     updateSummaryStyle();
@@ -619,27 +780,22 @@
     updateJobBanner();
     window.scrollTo(0, 0);
   }
-  document.getElementById('resetModal').addEventListener('click', function(e) {
-    if (e.target === this) closeResetModal();
-  });
 
-  // ── HISTORY TOGGLE ───────────────────────────────────────────────
   function toggleHistorySection() {
-    const body    = document.getElementById('history-body');
+    const body = document.getElementById('history-body');
     const chevron = document.getElementById('history-chevron');
-    const isOpen  = body.style.display !== 'none';
+    const isOpen = body.style.display !== 'none';
     body.style.display = isOpen ? 'none' : 'block';
     chevron.innerText  = isOpen ? '▼ SHOW' : '▲ HIDE';
   }
 
-  // ── HISTORY ──────────────────────────────────────────────────────
   function saveToHistory(text, label, fullData) {
-    learnFromJob(fullData.customer, fullData.subdivision);
+    learnFromJob(fullData.customer);
     let history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    const now      = new Date();
-    const dateStr  = (now.getMonth() + 1) + '/' + now.getDate();
-    const timeStr  = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    const richLabel = [fullData.customer, fullData.subdivision, fullData.lot ? `LOT ${fullData.lot}` : ''].filter(Boolean).join(' — ');
+    const now = new Date();
+    const dateStr = (now.getMonth()+1) + '/' + now.getDate();
+    const timeStr = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const richLabel = [fullData.customer, fullData.jobId || fullData.lot || fullData.subdivision].filter(Boolean).join(' — ');
     history.unshift({ label: `${dateStr} — ${richLabel}`, text, time: timeStr, fullData });
     if (history.length > 20) history.pop();
     localStorage.setItem('bfs_history', JSON.stringify(history));
@@ -647,21 +803,18 @@
   }
 
   function renderHistory() {
-    const list    = document.getElementById('history-list');
+    const list = document.getElementById('history-list');
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
-    const query   = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
+    const query = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
     const filtered = query
       ? history.filter(item =>
           item.label.toLowerCase().includes(query) ||
           (item.fullData?.customer || '').toLowerCase().includes(query) ||
-          (item.fullData?.subdivision || '').toLowerCase().includes(query) ||
-          (item.fullData?.lot || '').toLowerCase().includes(query)
-        )
+          (item.fullData?.jobId || item.fullData?.lot || item.fullData?.subdivision || '').toLowerCase().includes(query))
       : history;
-    list.innerHTML = filtered.length
-      ? ""
+    list.innerHTML = filtered.length ? ""
       : `<p style='font-size:11px; padding:10px; color:#94a3b8;'>${query ? 'No matches found.' : 'No history.'}</p>`;
-    filtered.forEach((item) => {
+    filtered.forEach(item => {
       const realIndex = history.indexOf(item);
       list.innerHTML += `
         <div class="history-item">
@@ -679,11 +832,10 @@
     document.getElementById('summary').value = h.text;
     if (h.fullData) {
       document.getElementById('customer').value    = h.fullData.customer || "";
-      document.getElementById('subdivision').value = h.fullData.subdivision || "";
-      document.getElementById('lot').value          = h.fullData.lot || "";
+      document.getElementById('job-id').value = h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || "";
       document.getElementById('notes').value        = h.fullData.notes || "";
       state = JSON.parse(JSON.stringify(h.fullData.state));
-      learnFromJob(h.fullData.customer, h.fullData.subdivision);
+      learnFromJob(h.fullData.customer);
       refreshUI();
       saveActiveState();
       updateJobBanner();
@@ -716,16 +868,13 @@
     Object.keys(kb).forEach(k => { plain[k] = Array.isArray(kb[k]) ? kb[k] : Array.from(kb[k]); });
     localStorage.setItem('bfs_knowledge', JSON.stringify(plain));
   }
-  function learnFromJob(customer, subdivision) {
+  function learnFromJob(customer) {
     if (!customer) return;
     const kb = getKnowledge();
     if (!kb[customer]) kb[customer] = [];
-    if (subdivision && !kb[customer].includes(subdivision)) kb[customer].push(subdivision);
     saveKnowledge(kb);
   }
-  function getCustomers() {
-    return Object.keys(getKnowledge()).sort();
-  }
+  function getCustomers() { return Object.keys(getKnowledge()).sort(); }
   function getSubdivisionsFor(customer) {
     const kb = getKnowledge();
     if (customer && kb[customer]) return kb[customer].sort();
@@ -738,7 +887,6 @@
     delete kb[customer];
     saveKnowledge(kb);
     document.getElementById('customer').value = "";
-    document.getElementById('subdivision').value = "";
     saveActiveState(); updateJobBanner();
     showCustomerSuggestions();
   }
@@ -746,7 +894,7 @@
     const kb = getKnowledge();
     if (kb[customer]) kb[customer] = kb[customer].filter(s => s !== subdivision);
     saveKnowledge(kb);
-    showSubdivisionSuggestions();
+    
   }
   function showDropdown(dropdownId, items, onSelect, onDelete) {
     const dd = document.getElementById(dropdownId);
@@ -767,87 +915,554 @@
     if (dd) dd.classList.remove('open');
   }
   function showCustomerSuggestions() {
-    const val      = document.getElementById('customer').value.trim().toLowerCase();
+    const val = document.getElementById('customer').value.trim().toLowerCase();
     const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
     showDropdown('ac-customer', filtered,
-      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); showSubdivisionSuggestions(); },
+      (s) => { document.getElementById('customer').value = s; saveActiveState(); updateJobBanner(); },
       (s) => deleteCustomer(s)
     );
   }
   function showSubdivisionSuggestions() {
-    const customer = document.getElementById('customer').value.trim();
-    const val      = document.getElementById('subdivision').value.trim().toLowerCase();
-    const all      = getSubdivisionsFor(customer);
-    const filtered = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
-    showDropdown('ac-subdivision', filtered,
-      (s) => { document.getElementById('subdivision').value = s; saveActiveState(); updateJobBanner(); },
-      (s) => deleteSubdivision(customer, s)
-    );
+    // Subdivision field removed - Job ID field has no autocomplete
   }
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.ac-wrap')) {
       closeDropdown('ac-customer');
-      closeDropdown('ac-subdivision');
+      closeDropdown('lo-ac-customer');
     }
   });
 
-  // ── NEW LOT SAME JOB ─────────────────────────────────────────────
   function showNewLotModal() { document.getElementById('newLotModal').style.display = 'flex'; }
   function closeNewLotModal() { document.getElementById('newLotModal').style.display = 'none'; }
   function confirmNewLot() {
     closeNewLotModal();
     const cust = document.getElementById('customer').value;
-    const sub  = document.getElementById('subdivision').value;
-    // Reset state first
     state = { fireRated: false };
     document.getElementById('summary').value = "";
-    document.getElementById('lot').value = "";
+    document.getElementById('job-id').value = "";
     document.getElementById('notes').value = "";
-    // Explicitly zero all visible counters and inputs
-    document.querySelectorAll('.qty').forEach(el => {
-      el.innerText = '0';
-      el.classList.remove('has-qty');
-    });
+    document.querySelectorAll('.qty').forEach(el => { el.innerText = '0'; el.classList.remove('has-qty'); });
     document.querySelectorAll('.qty-input').forEach(el => { el.value = ""; });
     document.querySelectorAll('.note-box').forEach(el => { el.value = ""; });
-    if (document.getElementById('fire-status'))
-      document.getElementById('fire-status').innerText = "NO";
-    // Collapse all sections
+    if (document.getElementById('fire-status')) document.getElementById('fire-status').innerText = "NO";
     document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.section-title').forEach(el => el.classList.remove('active-header'));
     updateSummaryStyle();
     updateSectionCheckmarks();
-    // Restore customer and subdivision
     document.getElementById('customer').value = cust;
-    document.getElementById('subdivision').value = sub;
     saveActiveState();
     updateJobBanner();
-    document.getElementById('lot').focus();
+    document.getElementById('job-id').focus();
     window.scrollTo(0, 0);
   }
 
-  // ── REQUIRED FIELDS WARNING ──────────────────────────────────────
   function showWarningModal(msg) {
     document.getElementById('warning-text').innerHTML = msg;
     document.getElementById('warningModal').style.display = 'flex';
   }
   function closeWarningModal() { document.getElementById('warningModal').style.display = 'none'; }
 
-  // ── SCROLL TO TOP ────────────────────────────────────────────────
   window.addEventListener('scroll', () => {
     const btn = document.getElementById('scroll-top');
     if (window.scrollY > 300) btn.classList.add('visible');
     else btn.classList.remove('visible');
   });
 
-  // ── MODAL CLOSE ON TAP OUTSIDE ───────────────────────────────────
   document.getElementById('resetModal').addEventListener('click', function(e) { if (e.target===this) closeResetModal(); });
   document.getElementById('newLotModal').addEventListener('click', function(e) { if (e.target===this) closeNewLotModal(); });
   document.getElementById('warningModal').addEventListener('click', function(e) { if (e.target===this) closeWarningModal(); });
+  document.getElementById('loRecapModal').addEventListener('click', function(e) { if (e.target===this) closeLoRecap(); });
+  document.getElementById('loMismatchModal').addEventListener('click', function(e) { if (e.target===this) closeLoMismatch(); });
+  document.getElementById('loTrimDetailModal').addEventListener('click', function(e) { if (e.target===this) closeLoTrimDetail(); });
+
+  // ══════════════════════════════════════════════════════════════
+  // LOCKOUT WALK
+  // Separate state, separate history (bfs_lo_history),
+  // pre-populates job info from main app state if available.
+  // Items: Passage, Privacy, Dummy, Deadbolt only.
+  // ══════════════════════════════════════════════════════════════
+  const LO_ITEMS = ['Passage', 'Privacy', 'Dummy', 'Deadbolt', 'Hinge Bumps', 'Base Bumps'];
+  let loState = {};
+  // Lockout walk uses the shared playTapUp / playTapDown defined above
+
+  function openLockoutWalk() {
+    // Only restore previously saved lockout state — do NOT pre-populate from
+    // the main takeoff (PMs do lockout walks days/weeks after the trim takeoff)
+    const loSaved = localStorage.getItem('bfs_lo_active_work');
+    if (loSaved) {
+      // Restore in-progress lockout walk (customer, job-id, counters, notes)
+      const d = JSON.parse(loSaved);
+      document.getElementById('lo-customer').value = d.customer || '';
+      document.getElementById('lo-job-id').value   = d.jobId || d.lot || d.subdivision || '';
+      document.getElementById('lo-notes').value    = d.notes || '';
+      document.getElementById('lo-summary').value  = d.summaryText || '';
+      loState = d.loState || {};
+    } else {
+      // No previous lockout walk — start completely blank
+      document.getElementById('lo-customer').value = '';
+      document.getElementById('lo-job-id').value   = '';
+      document.getElementById('lo-notes').value    = '';
+      document.getElementById('lo-summary').value  = '';
+      loState = {};
+    }
+    buildLoCounters();
+    renderLoHistory();
+    updateLoSummaryStyle();
+    updateLoJobBanner();
+    const overlay = document.getElementById('lo-overlay');
+    overlay.style.display = 'block';
+    overlay.scrollTop = 0;
+    checkLoTrimMatch();
+  }
+
+  function closeLockoutWalk() {
+    document.getElementById('lo-overlay').style.display = 'none';
+  }
+
+  function buildLoCounters() {
+    const container = document.getElementById('lo-counters');
+    container.innerHTML = LO_ITEMS.map(item => {
+      const qty = loState[item] || 0;
+      const hasCount = qty > 0;
+      return `
+        <div class="lo-counter-card ${hasCount ? 'has-count' : ''}" id="lo-card-${item}">
+          <div class="lo-item-label">${item}</div>
+          <div class="lo-controls">
+            <button class="lo-btn" onclick="updateLoQty('${item}', -1)">−</button>
+            <span class="lo-qty ${hasCount ? 'has-count' : ''}" id="lo-qty-${item}">${qty}</span>
+            <button class="lo-btn" id="lo-plus-${item}" onclick="updateLoQty('${item}', 1)">+</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateLoQty(item, delta) {
+    loState[item] = Math.max(0, (loState[item] || 0) + delta);
+    const qty = loState[item];
+    const qtyEl  = document.getElementById(`lo-qty-${item}`);
+    const cardEl = document.getElementById(`lo-card-${item}`);
+    const btnEl  = document.getElementById(`lo-plus-${item}`);
+    qtyEl.innerText = qty;
+    qtyEl.classList.toggle('has-count', qty > 0);
+    cardEl.classList.toggle('has-count', qty > 0);
+    if (delta > 0) {
+      playTapUp();
+      [qtyEl, btnEl].forEach(el => {
+        if (!el) return;
+        el.classList.remove('tap-flash');
+        void el.offsetWidth;
+        el.classList.add('tap-flash');
+        setTimeout(() => el.classList.remove('tap-flash'), 220);
+      });
+    } else {
+      playTapDown();
+    }
+    saveLoState();
+  }
+
+  function saveLoState() {
+    const data = {
+      customer:    document.getElementById('lo-customer').value,
+      jobId:       document.getElementById('lo-job-id').value,
+      notes:       document.getElementById('lo-notes').value,
+      summaryText: document.getElementById('lo-summary').value,
+      loState
+    };
+    localStorage.setItem('bfs_lo_active_work', JSON.stringify(data));
+    updateLoSummaryStyle();
+    updateLoJobBanner();
+  }
+
+  function updateLoJobBanner() {
+    const cust   = document.getElementById('lo-customer').value.trim();
+    const jobId  = document.getElementById('lo-job-id').value.trim();
+    const banner = document.getElementById('lo-job-banner');
+    if (!banner) return;
+    if (cust || jobId) {
+      const parts = [];
+      if (cust)  parts.push(cust);
+      if (jobId) parts.push(jobId);
+      banner.innerHTML = `📋 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${parts.join(' — ')}`;
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  function updateLoSummaryStyle() {
+    const s     = document.getElementById('lo-summary');
+    const empty = document.getElementById('lo-summary-empty');
+    if (s && empty) {
+      empty.style.display = s.value.length > 0 ? 'none' : 'flex';
+      s.style.borderColor = s.value.length > 0 ? 'var(--bfs-red)' : 'var(--navy)';
+    }
+  }
+
+  function openLoRecap() {
+    const cust = document.getElementById('lo-customer').value.trim();
+    const jobId = document.getElementById('lo-job-id').value.trim();
+    if (!cust || !jobId) { showToast('⚠️ ENTER CUSTOMER & JOB ID'); return; }
+    const hasAny = LO_ITEMS.some(i => (loState[i] || 0) > 0);
+    if (!hasAny) { showToast('⚠️ NO COUNTS ENTERED YET'); return; }
+
+    // ── MISMATCH CHECK against trim takeoff index ──────────────────
+    const match = lookupTrimTakeoff(cust, jobId);
+    if (match) {
+      const expSingle  = match.singles + match.tast;
+      const expDummies = (match.dbl * 2) + (match.tast * 2);
+      const gotSingle  = (loState['Passage'] || 0) + (loState['Privacy'] || 0);
+      const gotDummies = loState['Dummy'] || 0;
+      const singleOff  = gotSingle  !== expSingle;
+      const dummyOff   = gotDummies !== expDummies;
+      if (singleOff || dummyOff) {
+        let detail = '';
+        if (singleOff) {
+          const diff = gotSingle - expSingle;
+          const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
+          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #fcd34d;">
+            <span style="font-size:12px;font-weight:700;color:#92400e;">Passage / Privacy</span>
+            <span style="font-size:13px;font-weight:900;">${dir} (got ${gotSingle}, expected ${expSingle})</span>
+          </div>`;
+        }
+        if (dummyOff) {
+          const diff = gotDummies - expDummies;
+          const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
+          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;">
+            <span style="font-size:12px;font-weight:700;color:#92400e;">Dummy</span>
+            <span style="font-size:13px;font-weight:900;">${dir} (got ${gotDummies}, expected ${expDummies})</span>
+          </div>`;
+        }
+        document.getElementById('lo-mismatch-detail').innerHTML = detail;
+        document.getElementById('loMismatchModal').style.display = 'flex';
+        return;
+      }
+    }
+
+    _openLoRecapScreen();
+  }
+
+  function _openLoRecapScreen() {
+    const content = document.getElementById('lo-recap-content');
+    content.innerHTML = LO_ITEMS.map(item => {
+      const qty = loState[item] || 0;
+      if (qty === 0) return '';
+      return `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #e2e8f0;">
+        <span style="font-weight:900; font-size:18px; color:var(--navy);">${item}</span>
+        <span style="font-size:36px; font-weight:900; color:var(--green);">${qty}</span>
+      </div>`;
+    }).filter(Boolean).join('');
+    document.getElementById('loRecapModal').style.display = 'flex';
+  }
+
+  function closeLoRecap() { document.getElementById('loRecapModal').style.display = 'none'; }
+  function closeLoMismatch() { document.getElementById('loMismatchModal').style.display = 'none'; }
+
+  function confirmLoGenerate() {
+    closeLoRecap();
+    generateLoSummary();
+  }
+
+  function generateLoSummary() {
+    const cust  = document.getElementById('lo-customer').value.trim() || 'NA';
+    const jobId = document.getElementById('lo-job-id').value.trim() || 'NA';
+    const notes = document.getElementById('lo-notes').value.trim();
+    let report = `LOCKOUT WALK -- ${cust} -- ${jobId}\n----------------------------\n\n--- LOCKOUT ---\n`;
+    LO_ITEMS.forEach(item => {
+      if ((loState[item] || 0) > 0) report += `- ${item}: ${loState[item]}\n`;
+    });
+    if (notes) report += `\n----------------------------\nNOTES\n${notes}`;
+    const summaryEl = document.getElementById('lo-summary');
+    summaryEl.value = report;
+    summaryEl.style.borderColor = 'var(--green)';
+    setTimeout(() => { summaryEl.style.borderColor = 'var(--bfs-red)'; }, 600);
+    updateLoSummaryStyle();
+    saveLoToHistory(report, { customer: cust, jobId, notes, loState: JSON.parse(JSON.stringify(loState)) });
+    saveLoState();
+    learnFromJob(cust, sub);
+  }
+
+  function copyLoSummary() {
+    const text = document.getElementById('lo-summary').value;
+    if (!text.trim()) { showToast('⚠️ GENERATE FIRST'); return; }
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('✓ COPIED TO CLIPBOARD'))
+      .catch(() => { document.getElementById('lo-summary').select(); document.execCommand('copy'); showToast('✓ COPIED'); });
+  }
+
+  function loNewLot() {
+    const cust = document.getElementById('lo-customer').value;
+    loState = {};
+    document.getElementById('lo-job-id').value = '';
+    document.getElementById('lo-notes').value       = '';
+    document.getElementById('lo-summary').value     = '';
+    document.getElementById('lo-customer').value = cust;
+    buildLoCounters();
+    saveLoState();
+    document.getElementById('lo-job-id').focus();
+    showToast('✓ READY FOR NEW LOT');
+  }
+
+  function loReset() {
+    if (!confirm('Reset all lockout walk fields?')) return;
+    loState = {};
+    ['lo-customer','lo-job-id','lo-notes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('lo-summary').value = '';
+    document.getElementById('lo-trim-match').style.display = 'none';
+    window._loTrimMatch = null;
+    localStorage.removeItem('bfs_lo_active_work');
+    buildLoCounters();
+    updateLoSummaryStyle();
+    updateLoJobBanner();
+  }
+
+  // Lockout walk history (separate key: bfs_lo_history)
+  function saveLoToHistory(text, fullData) {
+    let history = JSON.parse(localStorage.getItem('bfs_lo_history')) || [];
+    const now = new Date();
+    const dateStr = (now.getMonth()+1) + '/' + now.getDate();
+    const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const label = [fullData.customer, fullData.jobId || fullData.lot || fullData.subdivision].filter(Boolean).join(' — ');
+    history.unshift({ label: `${dateStr} — ${label}`, text, time: timeStr, fullData });
+    if (history.length > 20) history.pop();
+    localStorage.setItem('bfs_lo_history', JSON.stringify(history));
+    renderLoHistory();
+  }
+
+  function renderLoHistory() {
+    const list = document.getElementById('lo-history-list');
+    const history = JSON.parse(localStorage.getItem('bfs_lo_history')) || [];
+    list.innerHTML = history.length ? '' : `<p style="font-size:11px; color:#94a3b8; padding:8px 0;">No lockout walks yet.</p>`;
+    history.forEach((item, index) => {
+      list.innerHTML += `
+        <div class="history-item">
+          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ''}</small></span>
+          <div class="history-controls">
+            <button class="load-btn" onclick="loadLoHistory(${index})">LOAD</button>
+            <button class="del-btn"  onclick="deleteLoHistory(${index})">✕</button>
+          </div>
+        </div>`;
+    });
+  }
+
+  function loadLoHistory(index) {
+    const h = JSON.parse(localStorage.getItem('bfs_lo_history'))[index];
+    document.getElementById('lo-customer').value    = h.fullData.customer || '';
+    document.getElementById('lo-job-id').value = h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '';
+    document.getElementById('lo-notes').value        = h.fullData.notes || '';
+    document.getElementById('lo-summary').value      = h.text || '';
+    loState = JSON.parse(JSON.stringify(h.fullData.loState || {}));
+    buildLoCounters();
+    saveLoState();
+    updateLoSummaryStyle();
+    checkLoTrimMatch();
+  }
+
+  function deleteLoHistory(index) {
+    let h = JSON.parse(localStorage.getItem('bfs_lo_history'));
+    h.splice(index, 1);
+    localStorage.setItem('bfs_lo_history', JSON.stringify(h));
+    renderLoHistory();
+  }
+
+  function clearLoHistory() {
+    if (confirm('Clear all lockout walk history?')) {
+      localStorage.removeItem('bfs_lo_history');
+      renderLoHistory();
+    }
+  }
+
+  function toggleLoHistory() {
+    const body = document.getElementById('lo-history-body');
+    const chevron = document.getElementById('lo-history-chevron');
+    const isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    chevron.innerText = isOpen ? '▼ SHOW' : '▲ HIDE';
+  }
+
+  // Lockout walk autocomplete (shares the main app's knowledge base)
+  function showLoCustomerSuggestions() {
+    const val = document.getElementById('lo-customer').value.trim().toLowerCase();
+    const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
+    showDropdown('lo-ac-customer', filtered,
+      (s) => { document.getElementById('lo-customer').value = s; saveLoState(); },
+      null
+    );
+  }
+
+  function showLoSubdivisionSuggestions() {
+    const customer = document.getElementById('lo-customer').value.trim();
+    // Job ID field has no autocomplete - subdivision removed
+  }
+
+  // ── TAKEOFF INDEX — persistent lot cross-reference ────────────────
+  // Completely separate from browsable history. Not cleared by "Clear History"
+  // or "Reset All Fields". Auto-expires entries older than 90 days on load.
+  // Indexed by Customer|Subdivision|Lot (case-insensitive) so a PM who types
+  // the same lot on the lockout walk sees the original trim takeoff counts.
+  const TAKEOFF_INDEX_KEY = 'bfs_takeoff_index';
+  const EXPIRY_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+
+  function getTakeoffIndex() {
+    try { return JSON.parse(localStorage.getItem(TAKEOFF_INDEX_KEY)) || []; }
+    catch(e) { return []; }
+  }
+
+  // Migrate old 3-part index keys (customer|subdivision|lot) to new 2-part (customer|jobId)
+  // Runs once on load — converts existing entries so lookups still work after the field rename
+  function migrateOldIndexKeys() {
+    const index = getTakeoffIndex();
+    if (!index.length) return;
+    const newEntries = [];
+    const removeKeys = [];
+    index.forEach(entry => {
+      const parts = (entry.key || '').split('|');
+      if (parts.length === 3) {
+        // Old format: customer|subdivision|lot — use lot as jobId
+        const newKey = `${parts[0]}|${parts[2]}`;
+        const alreadyExists = index.some(e => e.key === newKey) || newEntries.some(e => e.key === newKey);
+        if (!alreadyExists) {
+          newEntries.push({ ...entry, key: newKey, jobId: entry.lot || entry.subdivision || parts[2] });
+        }
+        removeKeys.push(entry.key);
+      }
+    });
+    if (newEntries.length || removeKeys.length) {
+      const migrated = [...index.filter(e => !removeKeys.includes(e.key)), ...newEntries];
+      localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(migrated));
+    }
+  }
+
+  function expireTakeoffIndex() {
+    const now   = Date.now();
+    const index = getTakeoffIndex();
+    const fresh = index.filter(e => (now - (e.timestamp || 0)) < EXPIRY_MS);
+    if (fresh.length !== index.length)
+      localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(fresh));
+  }
+
+  function computeTrimTotals(st) {
+    let singles = 0, dbl = 0, tast = 0;
+    Object.keys(st).forEach(key => {
+      const val = st[key];
+      if (typeof val !== 'number' || val <= 0) return;
+      // Single doors — 6/8, 8/0, Attic W/S — LH, RH, SLAB
+      if ((key.startsWith('68_') || key.startsWith('80_') || key.startsWith('atws_')) &&
+          (key.endsWith('_LH') || key.endsWith('_RH')))
+        singles += val;
+      if (key.endsWith('_DBL'))   dbl  += val;
+      if (key.endsWith('_T-AST')) tast += val;
+    });
+    return { singles, dbl, tast };
+  }
+
+  function saveTrimToIndex(st, customer, jobId, summaryText) {
+    if (!customer || !jobId) return;
+    const totals    = computeTrimTotals(st);
+    const index     = getTakeoffIndex();
+    const lookupKey = `${customer.toLowerCase()}|${(jobId||'').toLowerCase()}`;
+    const existing  = index.findIndex(e => e.key === lookupKey);
+    const entry     = { key: lookupKey, customer, jobId,
+                        timestamp: Date.now(), summaryText, ...totals };
+    if (existing >= 0) index[existing] = entry;
+    else index.push(entry);
+    localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
+  }
+
+  function lookupTrimTakeoff(customer, jobId) {
+    if (!customer || !jobId) return null;
+    const key = `${customer.toLowerCase()}|${jobId.toLowerCase()}`;
+    return getTakeoffIndex().find(e => e.key === key) || null;
+  }
+
+  // Called whenever lo-customer / lo-job-id change.
+  // Shows expected lock counts calculated from the saved trim takeoff for that lot.
+  function checkLoTrimMatch() {
+    const cust  = document.getElementById('lo-customer').value.trim();
+    const jobId = document.getElementById('lo-job-id').value.trim();
+    const panel = document.getElementById('lo-trim-match');
+    if (!cust || !jobId) { panel.style.display = 'none'; return; }
+    const match = lookupTrimTakeoff(cust, jobId);
+    if (!match) { panel.style.display = 'none'; return; }
+
+    document.getElementById('lo-trim-totals').innerHTML = _buildTrimMatchHTML(match);
+    window._loTrimMatch = match;
+    panel.style.display = 'block';
+  }
+
+  function _buildTrimMatchHTML(match) {
+    const expSingleLocks = match.singles + match.tast;
+    const expDummies     = (match.dbl * 2) + (match.tast * 2);
+    let rows = `<div style="font-size:12px;font-weight:900;color:var(--navy);margin-bottom:8px;">${match.customer} — ${match.jobId || match.lot || match.subdivision || ''}</div>`;
+    if (match.singles > 0) rows += `
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
+        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Single Doors</span>
+        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.singles}</span>
+      </div>`;
+    if (match.dbl > 0) rows += `
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
+        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — DBL</span>
+        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.dbl}</span>
+      </div>`;
+    if (match.tast > 0) rows += `
+      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
+        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — T-AST</span>
+        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.tast}</span>
+      </div>`;
+    let expRows = '';
+    if (expSingleLocks > 0) expRows += `
+      <div style="display:flex;justify-content:space-between;padding:3px 0;">
+        <span style="font-size:12px;color:#1e3a8a;">Passage / Privacy</span>
+        <span style="font-size:15px;font-weight:900;color:var(--green);">${expSingleLocks}</span>
+      </div>`;
+    if (expDummies > 0) expRows += `
+      <div style="display:flex;justify-content:space-between;padding:3px 0;">
+        <span style="font-size:12px;color:#1e3a8a;">Dummy Knobs</span>
+        <span style="font-size:15px;font-weight:900;color:var(--green);">${expDummies}</span>
+      </div>`;
+    return rows + `<div style="margin-top:8px;padding:8px;background:#dbeafe;border-radius:6px;">
+      <div style="font-size:10px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:0.5px;">EXPECTED LOCKS FROM TRIM TAKEOFF</div>
+      ${expRows}
+    </div>`;
+  }
+
+  function showLoTrimDetail() {
+    if (!window._loTrimMatch) return;
+    document.getElementById('lo-trim-detail-text').value =
+      window._loTrimMatch.summaryText || 'No trim takeoff text saved for this lot.';
+    document.getElementById('loTrimDetailModal').style.display = 'flex';
+  }
+  function closeLoTrimDetail() {
+    document.getElementById('loTrimDetailModal').style.display = 'none';
+  }
+
+  function backfillTakeoffIndex() {
+    // Silently indexes any history entries not yet in the takeoff index.
+    // Runs on every load — safe to call repeatedly, never overwrites existing entries.
+    const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
+    if (!history.length) return;
+    const index = getTakeoffIndex();
+    let changed = false;
+    history.forEach(h => {
+      if (!h.fullData?.state || !h.fullData.customer || (!h.fullData.jobId && !h.fullData.lot && !h.fullData.subdivision)) return;
+      const bfJobId = (h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '').toLowerCase();
+      const key = `${h.fullData.customer.toLowerCase()}|${bfJobId}`;
+      if (index.find(e => e.key === key)) return; // already indexed
+      const totals = computeTrimTotals(h.fullData.state);
+      index.push({ key, customer: h.fullData.customer, jobId: h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '',
+                   timestamp: Date.now(), summaryText: h.text || '', ...totals });
+      changed = true;
+    });
+    if (changed) localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
+  }
 
   // ── INIT ─────────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
+  expireTakeoffIndex();
+  migrateOldIndexKeys();
+  backfillTakeoffIndex();
+  requestAnimationFrame(updateStickyOffsets);
+  window.addEventListener('resize', updateStickyOffsets);
 </script>
 </body>
 </html>
