@@ -765,12 +765,12 @@
   }
 
   function generateSummary(force) {
-    const cust = document.getElementById('customer').value.trim();
+    const cust  = document.getElementById('customer').value.trim();
+    const jobId = document.getElementById('job-id').value.trim();
     if (!force) {
       const missing = [];
-      if (!cust) missing.push('<strong>Customer</strong>');
-      if (!sub)  missing.push('<strong>Subdivision</strong>');
-      if (!lot)  missing.push('<strong>Lot #</strong>');
+      if (!cust)  missing.push('<strong>Customer</strong>');
+      if (!jobId) missing.push('<strong>Job ID</strong>');
       if (missing.length) {
         showWarningModal(`Missing: ${missing.join(', ')}. Please fill these in before generating, or tap <em>Generate Anyway</em> to continue.`);
         return;
