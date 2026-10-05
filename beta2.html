@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Elevate Trim - TEST</title>
   <style>
-    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent:#1e40af; --slate:#334155; --green:#16a34a; }
+    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent:#1e40af; --slate:#334155; --green:#16a34a; --pw-green:#16a34a; }
     *{ box-sizing:border-box; font-family:-apple-system,sans-serif; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
     body{ margin:0; background:var(--bg); padding:8px; padding-top:44px; padding-bottom:30px; overflow-x:hidden; }
     body.banner-visible { padding-top:80px; }
@@ -13,24 +13,29 @@
     :root { --section-top:44px; }
 
     #top-bar { position:fixed; top:0; left:0; right:0; height:44px; z-index:650; background:var(--bfs-red); box-shadow:0 2px 6px rgba(0,0,0,0.3); }
-    .mode-switch { position:fixed; top:6px; left:8px; z-index:700; background:rgba(255,255,255,0.15); color:white; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:800; text-decoration:none; border:1.5px solid rgba(255,255,255,0.5); white-space:nowrap; letter-spacing:0.3px; }
-
-    /* TEST BADGE */
-    .test-badge { position:fixed; top:6px; right:8px; z-index:700; background:#7c3aed; color:white; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:800; border:1.5px solid rgba(255,255,255,0.6); white-space:nowrap; letter-spacing:0.3px; }
+    .mode-switch { position:fixed; top:6px; left:8px; z-index:700; background:rgba(255,255,255,0.15); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; text-decoration:none; border:1.5px solid rgba(255,255,255,0.5); white-space:nowrap; }
+    .pw-btn { position:fixed; top:6px; right:8px; z-index:700; background:var(--pw-green); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.6); white-space:nowrap; cursor:pointer; }
+    .test-badge { position:fixed; top:6px; right:140px; z-index:700; background:#7c3aed; color:white; padding:5px 8px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.6); white-space:nowrap; }
 
     #job-banner { display:none; position:fixed; top:44px; left:0; right:0; z-index:660; background:var(--bfs-red); color:white; font-size:11px; font-weight:800; text-align:center; padding:8px 16px; letter-spacing:0.5px; box-shadow:0 2px 6px rgba(0,0,0,0.3); text-transform:uppercase; border-bottom:2px solid rgba(255,255,255,0.2); min-height:36px; align-items:center; justify-content:center; }
     #job-banner.visible { display:flex; }
     #job-banner span { opacity:0.75; font-weight:600; margin:0 4px; }
 
     .header-card { background:#fff; border-radius:8px; padding:12px; margin-bottom:12px; box-shadow:0 4px 6px rgba(0,0,0,0.1); border:1px solid #94a3b8; text-align:center; }
-    .app-logo { width:160px; height:auto; margin:5px auto; display:block; }
+    .app-logo { width:120px; height:auto; margin:5px auto 8px; display:block; }
     label { font-weight:700; font-size:10px; color:#475569; display:block; margin-bottom:3px; text-transform:uppercase; text-align:left; }
     input,textarea { width:100%; padding:10px; border:1px solid #94a3b8; border-radius:6px; font-size:16px; margin-bottom:8px; outline:none; background:#fff; }
     .input-row { display:flex; gap:8px; margin-bottom:4px; }
     .input-group { flex:1; }
 
+    /* Door total counter */
+    #door-total-row { display:none; background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:8px 12px; margin-top:4px; align-items:center; justify-content:center; gap:8px; }
+    #door-total-row.visible { display:flex; }
+    #door-total-label { font-size:11px; font-weight:700; color:#166534; text-transform:uppercase; letter-spacing:0.5px; }
+    #door-total-count { font-size:22px; font-weight:900; color:var(--green); }
+
     .section-title { color:#fff; padding:14px; font-weight:800; font-size:14px; margin:8px -8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; border-bottom:3px solid rgba(0,0,0,0.2); position:sticky; top:var(--section-top,44px); z-index:100; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-    .section-check { display:none; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.6); border-radius:20px; padding:2px 9px; font-size:11px; font-weight:900; color:#fff; margin-right:8px; letter-spacing:0; }
+    .section-check { display:none; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.6); border-radius:20px; padding:2px 9px; font-size:11px; font-weight:900; color:#fff; margin-right:8px; }
     .section-check.active { display:inline-block; background:var(--green); border-color:var(--green); }
     .bg-navy { background:var(--navy); }
     .bg-red { background:var(--bfs-red); }
@@ -41,105 +46,127 @@
     .item-card { background:#fff; border:2px solid #94a3b8; border-radius:8px; padding:15px 4px 22px 4px; text-align:center; font-weight:800; color:var(--navy); box-shadow:0 2px 4px rgba(0,0,0,0.1); font-size:13px; cursor:pointer; position:relative; min-height:65px; display:flex; align-items:center; justify-content:center; transition:transform 0.1s,background 0.15s; }
     .badge { position:absolute; bottom:2px; font-size:9px; font-weight:900; background:rgba(226,232,240,0.9); padding:1px 3px; border-radius:3px; color:var(--navy); display:none; white-space:nowrap; }
     .badge.active { display:block; color:var(--green); border:1px solid var(--green); }
-    .badge-left { left:3px; }
-    .badge-right { right:3px; }
-    .badge-center { left:50%; transform:translateX(-50%); }
+    .badge-left{left:3px;} .badge-right{right:3px;} .badge-center{left:50%;transform:translateX(-50%);}
     .item-card:active { transform:scale(0.95); background:#f1f5f9; }
     .item-card.has-data { border-color:var(--green); background:#f0fdf4; color:var(--green); }
-    .note-badge { position:absolute; top:3px; right:3px; font-size:9px; display:none; line-height:1; }
+    .note-badge { position:absolute; top:3px; right:3px; font-size:9px; display:none; }
     .note-badge.active { display:block; }
 
     .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; }
-    .modal-content { background:white; padding:20px; border-radius:12px; width:95%; max-width:420px; text-align:center; max-height:90vh; overflow-y:auto; position:relative; }
+    .modal-content { background:white; padding:20px; border-radius:12px; width:95%; max-width:420px; text-align:center; max-height:90vh; overflow-y:auto; }
     .modal-type-block { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:12px; text-align:left; }
     .modal-counter-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
     .btn { width:44px; height:44px; border-radius:6px; border:0; background:var(--navy); color:white; font-weight:bold; font-size:22px; }
     .qty-display { font-size:22px; font-weight:800; min-width:35px; color:var(--navy); text-align:center; }
     .qty-input { width:80px; text-align:center; font-size:20px; font-weight:800; color:var(--navy); border:2px solid var(--navy); }
-    .active-qty { color:var(--green) !important; border-color:var(--green) !important; }
-
-    /* ── INLINE NOTE FIELD (new feature) ── */
-    .modal-note-row { margin-top:6px; }
-    .modal-note-row textarea {
-      width:100%; height:52px; font-size:13px; padding:8px;
-      border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc;
-      color:#1e293b; resize:none; margin-bottom:0;
-      font-family:-apple-system,sans-serif; line-height:1.4;
-    }
-    .modal-note-row textarea:focus { border-color:var(--navy); background:#fff; outline:none; }
-    .modal-note-label { font-size:9px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:3px; display:block; }
-
-    /* Flag banner on note cards */
-    .note-flag { display:inline-block; background:#fef3c7; border:1px solid #fcd34d; color:#92400e; font-size:9px; font-weight:900; padding:1px 5px; border-radius:10px; margin-left:4px; vertical-align:middle; }
+    .active-qty { color:var(--green)!important; border-color:var(--green)!important; }
 
     .actionBtn { padding:14px; border:0; border-radius:6px; font-weight:700; font-size:14px; cursor:pointer; }
-    #summary { background:#fff; height:350px; margin-top:8px; font-family:sans-serif; font-size:14px; border:2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space:pre-wrap; }
-    #summary.has-text { border-color:var(--bfs-red); box-shadow:0 0 10px rgba(227,24,55,0.1); }
-    #summary.flash { animation:summaryFlash 0.6s ease-out; }
-    @keyframes summaryFlash {
-      0%   { border-color:var(--green); box-shadow:0 0 0 4px rgba(22,163,74,0.3); }
-      60%  { border-color:var(--green); box-shadow:0 0 0 8px rgba(22,163,74,0.1); }
-      100% { border-color:var(--bfs-red); box-shadow:0 0 10px rgba(227,24,55,0.1); }
-    }
+    #summary { background:#fff; height:300px; margin-top:8px; font-family:sans-serif; font-size:14px; border:2px solid var(--navy); width:100%; border-radius:4px; padding:12px; white-space:pre-wrap; }
+    #summary.has-text { border-color:var(--bfs-red); }
     #summary-empty-state { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; margin-top:8px; }
     #summary-empty-state span { font-size:2rem; margin-bottom:8px; opacity:0.4; }
-    #summary-empty-state p { font-size:13px; color:#94a3b8; text-align:center; line-height:1.6; margin:0; }
+    #summary-empty-state p { font-size:13px; color:#94a3b8; text-align:center; margin:0; }
     #summary-empty-state.hidden { display:none; }
 
     .history-section { background:#fff; border-radius:8px; padding:12px; margin-top:12px; border:1px solid #94a3b8; }
     .history-item { display:flex; justify-content:space-between; align-items:center; padding:12px 5px; border-bottom:1px solid #e2e8f0; font-size:12px; }
-    .history-controls { display:flex; gap:8px; align-items:center; }
+    .history-controls { display:flex; gap:8px; }
     .del-btn { background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; padding:8px 14px; border-radius:6px; font-weight:900; font-size:14px; cursor:pointer; }
-    .load-btn { padding:10px 15px; background:var(--navy); color:white; border:0; border-radius:4px; font-weight:800; font-size:13px; cursor:pointer; min-width:70px; }
-
+    .load-btn { padding:10px 15px; background:var(--navy); color:white; border:0; border-radius:4px; font-weight:800; font-size:13px; cursor:pointer; }
     .ac-wrap { position:relative; }
     .ac-dropdown { display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:2px solid var(--navy); border-top:none; border-radius:0 0 8px 8px; z-index:800; max-height:180px; overflow-y:auto; box-shadow:0 6px 16px rgba(0,0,0,0.15); }
     .ac-dropdown.open { display:block; }
     .ac-item { padding:11px 14px; font-size:15px; font-weight:600; color:var(--navy); border-bottom:1px solid #e2e8f0; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .ac-item:last-child { border-bottom:none; }
-    .ac-item:active { background:#f0f9ff; color:var(--accent); }
-    .ac-item-label { flex:1; }
-    .ac-delete { flex-shrink:0; background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; border-radius:5px; font-size:11px; font-weight:900; padding:3px 8px; cursor:pointer; }
-
+    .ac-item:last-child{border-bottom:none;} .ac-item:active{background:#f0f9ff;}
+    .ac-item-label{flex:1;} .ac-delete{flex-shrink:0;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;border-radius:5px;font-size:11px;font-weight:900;padding:3px 8px;cursor:pointer;}
     .version-tag { text-align:center; color:#475569; font-size:9px; margin:20px 0; font-weight:bold; }
-    .chevron::after { content:'▼'; font-size:10px; }
-    .active-header .chevron::after { content:'▲'; }
-
-    /* Test feedback banner */
-    #test-info { background:#7c3aed; color:white; border-radius:8px; padding:12px 16px; margin-bottom:12px; font-size:12px; line-height:1.6; }
-    #test-info strong { font-size:13px; display:block; margin-bottom:4px; }
-
+    .chevron::after{content:'▼';font-size:10px;} .active-header .chevron::after{content:'▲';}
     #scroll-top { display:none; position:fixed; bottom:20px; right:16px; z-index:998; background:var(--navy); color:white; border:none; border-radius:50%; width:44px; height:44px; font-size:20px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.3); align-items:center; justify-content:center; }
-    #scroll-top.visible { display:flex; }
+    #scroll-top.visible{display:flex;}
     #toast { visibility:hidden; min-width:200px; background-color:#1e293b; color:#fff; text-align:center; border-radius:30px; padding:12px 20px; position:fixed; z-index:3000; left:50%; bottom:30px; transform:translateX(-50%); font-weight:bold; font-size:13px; box-shadow:0 4px 15px rgba(0,0,0,0.4); }
     #toast.show { visibility:visible; animation:fadein 0.3s,fadeout 0.4s 1.4s forwards; }
-    @keyframes fadein { from{opacity:0;bottom:20px} to{opacity:1;bottom:30px} }
-    @keyframes fadeout { from{opacity:1} to{opacity:0} }
+    @keyframes fadein{from{opacity:0;bottom:20px}to{opacity:1;bottom:30px}}
+    @keyframes fadeout{from{opacity:1}to{opacity:0}}
+
+    /* ═══ POST WALK OVERLAY ═══ */
+    #pw-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:1500; background:var(--bg); overflow-y:auto; }
+    .pw-header { background:var(--pw-green); position:sticky; top:0; z-index:100; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+    .pw-header-row { height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; }
+    .pw-header-title { color:white; font-weight:800; font-size:11px; letter-spacing:0.3px; }
+    .pw-back-btn { background:rgba(0,0,0,0.2); color:white; border:1.5px solid rgba(255,255,255,0.6); border-radius:20px; padding:5px 12px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap; }
+    #pw-active-banner { display:none; min-height:34px; padding:8px 16px; font-size:11px; font-weight:800; color:white; text-align:center; letter-spacing:0.5px; text-transform:uppercase; border-top:1px solid rgba(255,255,255,0.2); border-bottom:2px solid rgba(255,255,255,0.2); align-items:center; justify-content:center; }
+
+    .pw-body { padding:0 8px 8px 8px; }
+    .pw-card { background:white; border-radius:8px; padding:16px; margin-top:8px; border:1px solid #94a3b8; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+
+    /* Type selection */
+    .pw-type-btn { width:100%; padding:20px; border:0; border-radius:10px; font-size:16px; font-weight:900; cursor:pointer; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:10px; }
+    .pw-type-btn-1st { background:var(--navy); color:white; }
+    .pw-type-btn-2nd { background:var(--pw-green); color:white; }
+
+    /* Search results */
+    .pw-result-item { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+    .pw-result-item:active { background:#eff6ff; border-color:var(--accent); }
+    .pw-result-label { font-weight:800; font-size:14px; color:var(--navy); }
+    .pw-result-sub { font-size:11px; color:#64748b; margin-top:2px; }
+    .pw-use-btn { background:var(--navy); color:white; border:0; border-radius:6px; padding:8px 14px; font-size:12px; font-weight:800; cursor:pointer; }
+
+    /* Result buttons (Complete / Incomplete) */
+    .pw-result-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+    .pw-result-choice { padding:18px; border:3px solid #e2e8f0; border-radius:10px; font-size:15px; font-weight:900; cursor:pointer; text-align:center; background:white; transition:all 0.15s; }
+    .pw-result-choice.selected-complete { background:#f0fdf4; border-color:var(--green); color:var(--green); }
+    .pw-result-choice.selected-incomplete { background:#fef2f2; border-color:#dc2626; color:#dc2626; }
+
+    /* Door check */
+    .pw-door-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0; }
+    .pw-door-choice { padding:12px; border:2px solid #e2e8f0; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; text-align:center; background:white; }
+    .pw-door-choice.selected { background:#f0fdf4; border-color:var(--green); color:var(--green); }
+    .pw-door-choice.selected-bad { background:#fef2f2; border-color:#dc2626; color:#dc2626; }
+
+    /* Reason checkboxes */
+    .pw-reason-grid { display:grid; gap:8px; margin:8px 0; }
+    .pw-reason { display:flex; align-items:center; gap:10px; padding:12px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:8px; cursor:pointer; font-size:14px; font-weight:700; color:var(--navy); }
+    .pw-reason.selected { background:#eff6ff; border-color:var(--accent); color:var(--accent); }
+    .pw-reason-check { width:22px; height:22px; border:2px solid #94a3b8; border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; }
+    .pw-reason.selected .pw-reason-check { background:var(--accent); border-color:var(--accent); color:white; }
+
+    /* 2nd trim checklist */
+    .pw-checklist-item { display:flex; align-items:center; gap:8px; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:6px; }
+    .pw-check-text { flex:1; font-size:14px; font-weight:600; color:var(--navy); }
+    .pw-check-done { background:var(--green); color:white; border:0; border-radius:6px; padding:6px 10px; font-size:12px; font-weight:800; cursor:pointer; }
+    .pw-check-notdone { background:#dc2626; color:white; border:0; border-radius:6px; padding:6px 10px; font-size:12px; font-weight:800; cursor:pointer; }
+    .pw-check-del { background:#e2e8f0; color:var(--slate); border:0; border-radius:6px; padding:6px 8px; font-size:12px; cursor:pointer; }
+    .pw-check-done.active,.pw-check-notdone.active { box-shadow:0 0 0 2px rgba(0,0,0,0.3); transform:scale(1.05); }
+    .pw-checklist-item.done { background:#f0fdf4; border-color:#86efac; }
+    .pw-checklist-item.notdone { background:#fef2f2; border-color:#fca5a5; }
+    .pw-add-item { width:100%; background:#e2e8f0; color:var(--navy); border:2px dashed #94a3b8; border-radius:8px; padding:14px; font-size:14px; font-weight:800; cursor:pointer; margin-top:4px; }
+
+    /* Summary screen */
+    #pw-summary-text { height:300px; font-family:'Courier New',monospace; font-size:13px; border:2px solid var(--navy); width:100%; border-radius:4px; padding:10px; white-space:pre; background:#fff; line-height:1.4; color:#000; }
+    .pw-history-item { background:#fff; border-radius:8px; padding:12px; margin-top:8px; border:1px solid #e2e8f0; }
+    .pw-history-entry { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #e2e8f0; font-size:12px; }
+    .pw-history-entry:last-child{border-bottom:none;}
   </style>
 </head>
 <body>
 
 <div id="top-bar"></div>
-<a href="index.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode','modern')">← BACK TO LIVE</a>
+<a href="index.html" class="mode-switch">← LIVE APP</a>
 <span class="test-badge">🧪 TEST</span>
+<button class="pw-btn" onclick="openPostWalk()">📋 POST WALK</button>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
 <div id="job-banner"></div>
 
+<!-- MAIN HEADER -->
 <div id="main-header" class="header-card" style="margin-top:8px;">
   <img src="icon-512.png" alt="Logo" class="app-logo">
-
-  <!-- TEST INFO BANNER -->
-  <div id="test-info">
-    <strong>🧪 What's new in this test:</strong>
-    When you tap a door size, the modal now has a <strong>note field for each type</strong> (LH, RH, SLAB etc.). Type a note — like "RO too small" or "verify handing" — and it appears <strong>inline next to that door line</strong> in the generated summary. Cards with notes show a 📝 badge. Voice dictation works — just tap the mic on your keyboard.
-  </div>
-
   <div class="input-row">
     <div class="input-group ac-wrap">
       <label>Customer</label>
       <input id="customer" type="text" placeholder="Pulte" autocomplete="off"
-        oninput="saveState(); updateJobBanner(); showCustomerSuggestions()"
+        oninput="saveState();updateJobBanner();showCustomerSuggestions()"
         onfocus="showCustomerSuggestions()"
         onblur="setTimeout(()=>closeDropdown('ac-customer'),200)">
       <div id="ac-customer" class="ac-dropdown"></div>
@@ -149,8 +176,13 @@
     <div class="input-group">
       <label>Job ID</label>
       <input id="job-id" type="text" placeholder="LOT 104A" autocomplete="off"
-        oninput="saveState(); updateJobBanner()">
+        oninput="saveState();updateJobBanner()">
     </div>
+  </div>
+  <!-- DOOR TOTAL COUNTER (new feature) -->
+  <div id="door-total-row">
+    <span class="door-total-label">🚪 Total Doors Counted:</span>
+    <span id="door-total-count">0</span>
   </div>
 </div>
 
@@ -158,10 +190,10 @@
 
 <!-- MODAL -->
 <div id="itemModal" class="modal-overlay">
-  <div class="modal-content" id="modal-inner">
-    <h2 id="m-title" style="margin:0 0 15px 0; color:var(--navy); font-size:1.4rem;">Item Name</h2>
+  <div class="modal-content">
+    <h2 id="m-title" style="margin:0 0 15px 0;color:var(--navy);font-size:1.4rem;"></h2>
     <div id="m-blocks"></div>
-    <button class="actionBtn" style="width:100%; background:var(--green); color:white; margin-top:10px; font-size:1.1rem;" onclick="closeModal()">SAVE ENTRY</button>
+    <button class="actionBtn" style="width:100%;background:var(--green);color:white;margin-top:10px;font-size:1.1rem;" onclick="closeModal()">SAVE ENTRY</button>
   </div>
 </div>
 
@@ -169,9 +201,9 @@
 <div class="header-card" style="margin-top:15px;" id="summary-section">
   <label>General Project Notes</label>
   <textarea id="notes" placeholder="Notes..." oninput="saveState()"></textarea>
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-    <button class="actionBtn" style="background:var(--bfs-red); color:white; font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
-    <button class="actionBtn" style="background:#e2e8f0; color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+    <button class="actionBtn" style="background:var(--bfs-red);color:white;font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
+    <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
   </div>
   <div style="position:relative;">
     <textarea id="summary" readonly></textarea>
@@ -180,37 +212,174 @@
       <p>Tap <strong>Generate Takeoff</strong><br>to build your report</p>
     </div>
   </div>
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-    <button class="actionBtn" style="background:#dbeafe; color:#1e40af;" onclick="confirmNewLot()">🏠 New Job, Same Customer</button>
-    <button class="actionBtn" style="background:#fee2e2; color:#b91c1c;" onclick="confirmReset()">🗑 Reset All Fields</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+    <button class="actionBtn" style="background:#dbeafe;color:#1e40af;" onclick="confirmNewLot()">🏠 New Job, Same Customer</button>
+    <button class="actionBtn" style="background:#fee2e2;color:#b91c1c;" onclick="confirmReset()">🗑 Reset All Fields</button>
   </div>
 </div>
 
-<!-- HISTORY -->
+<!-- TAKEOFF HISTORY -->
 <div class="history-section">
-  <div onclick="toggleHistorySection()" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
-    <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">RECENT TAKEOFFS (LAST 20)</label>
-    <span id="history-chevron" style="font-size:11px; color:#475569; font-weight:800;">▼ SHOW</span>
+  <div onclick="toggleSection('history')" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0 8px 0;">
+    <label style="cursor:pointer;margin:0;font-size:11px;color:#475569;">RECENT TAKEOFFS</label>
+    <span id="history-chevron" style="font-size:11px;color:#475569;font-weight:800;">▼ SHOW</span>
   </div>
   <div id="history-body" style="display:none;">
-    <input type="text" id="history-search" placeholder="🔍  Search customer or job ID..."
-      style="margin-bottom:8px; font-size:14px; padding:10px; border:1px solid #94a3b8; border-radius:6px; width:100%;"
-      oninput="renderHistory()">
+    <input type="text" id="history-search" placeholder="🔍  Search..." style="margin-bottom:8px;font-size:14px;padding:10px;border:1px solid #94a3b8;border-radius:6px;width:100%;" oninput="renderHistory()">
     <div id="history-list"></div>
   </div>
 </div>
 
-<div class="version-tag">TEST VERSION — Inline Door Notes Feature</div>
+<div class="version-tag">TEST — Post Walk + Door Counter</div>
+
+<!-- ═══════════════════════════════════════════════
+     POST WALK OVERLAY
+═══════════════════════════════════════════════ -->
+<div id="pw-overlay">
+  <div class="pw-header">
+    <div class="pw-header-row">
+      <span class="pw-header-title" id="pw-header-title">📋 POST WALK</span>
+      <button class="pw-back-btn" onclick="closePostWalk()">✕ BACK TO TAKEOFF</button>
+    </div>
+    <div id="pw-active-banner"></div>
+  </div>
+
+  <div class="pw-body">
+
+    <!-- SCREEN 1: Type Selection -->
+    <div id="pw-screen-type">
+      <div class="pw-card" style="text-align:center;">
+        <img src="icon-512.png" alt="Logo" class="app-logo">
+        <p style="color:#64748b;font-size:13px;margin:0 0 16px 0;">Select the type of post walk you are completing.</p>
+        <button class="pw-type-btn pw-type-btn-1st" onclick="selectPwType('1st')">
+          🏠 1st Trim Post Walk<br><span style="font-size:11px;opacity:0.8;font-weight:600;">After first trim install</span>
+        </button>
+        <button class="pw-type-btn pw-type-btn-2nd" onclick="selectPwType('2nd')">
+          ✅ 2nd Trim Post Walk<br><span style="font-size:11px;opacity:0.8;font-weight:600;">After shoe / quarter round</span>
+        </button>
+      </div>
+
+      <!-- Post Walk History tabs -->
+      <div class="pw-card" style="margin-top:8px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <button onclick="showPwHistory('1st')" style="background:var(--navy);color:white;border:0;border-radius:6px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;">1st Trim History</button>
+          <button onclick="showPwHistory('2nd')" style="background:var(--pw-green);color:white;border:0;border-radius:6px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;">2nd Trim History</button>
+        </div>
+        <div id="pw-history-list"><p style="font-size:11px;color:#94a3b8;text-align:center;">No post walk history yet.</p></div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: Search / Pre-fill -->
+    <div id="pw-screen-search" style="display:none;">
+      <div class="pw-card">
+        <label style="font-size:13px;font-weight:900;color:var(--navy);" id="pw-search-title">Find the trim takeoff for this job</label>
+        <input id="pw-search-input" type="text" placeholder="Type customer or job ID..."
+          oninput="searchPwJobs()" style="margin-top:8px;">
+        <div id="pw-search-results"></div>
+        <div style="margin-top:8px;padding-top:12px;border-top:1px solid #e2e8f0;">
+          <p style="font-size:11px;color:#94a3b8;margin:0 0 8px 0;">Or enter manually if not in history:</p>
+          <input id="pw-cust-manual" type="text" placeholder="Customer" style="margin-bottom:8px;">
+          <input id="pw-jobid-manual" type="text" placeholder="Job ID">
+          <button class="actionBtn" style="width:100%;background:var(--navy);color:white;" onclick="startPwFormManual()">Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3A: 1st Trim Form -->
+    <div id="pw-screen-1st" style="display:none;">
+      <div class="pw-card">
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:10px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">1st Trim Post Walk</div>
+          <div style="font-size:15px;font-weight:900;color:var(--navy);margin-top:2px;" id="pw1-job-display"></div>
+        </div>
+
+        <label style="font-size:13px;font-weight:900;color:var(--navy);">Result</label>
+        <div class="pw-result-row">
+          <div class="pw-result-choice" id="pw1-complete-btn" onclick="setPw1Result('complete')">✅ Complete</div>
+          <div class="pw-result-choice" id="pw1-incomplete-btn" onclick="setPw1Result('incomplete')">❌ Incomplete</div>
+        </div>
+
+        <label style="font-size:13px;font-weight:900;color:var(--navy);margin-top:8px;">Doors</label>
+        <div class="pw-door-row">
+          <div class="pw-door-choice" id="pw1-door-ok" onclick="setPw1DoorCheck('ok')">✅ All opening &amp; closing properly</div>
+          <div class="pw-door-choice" id="pw1-door-issues" onclick="setPw1DoorCheck('issues')">❌ Door issues noted</div>
+        </div>
+
+        <!-- Reasons (shown when incomplete) -->
+        <div id="pw1-reasons-section" style="display:none;">
+          <label style="font-size:13px;font-weight:900;color:var(--navy);margin-top:12px;">Reasons (select all that apply)</label>
+          <div class="pw-reason-grid" id="pw1-reasons-grid"></div>
+        </div>
+
+        <!-- Notes fields -->
+        <div style="margin-top:12px;">
+          <label>Installer Notes</label>
+          <textarea id="pw1-installer-notes" placeholder="e.g. Installer installed wrong swing door - getting back ASAP..." style="height:60px;"></textarea>
+          <label>Material On Site</label>
+          <textarea id="pw1-material-onsite" placeholder="e.g. Newel post, pickets, and shoes on site..." style="height:50px;"></textarea>
+          <label>General Notes</label>
+          <textarea id="pw1-general-notes" placeholder="Additional notes..." style="height:60px;"></textarea>
+        </div>
+
+        <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-top:8px;" onclick="generatePw1()">⚡ Generate Post Walk</button>
+        <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);margin-top:8px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3B: 2nd Trim Form -->
+    <div id="pw-screen-2nd" style="display:none;">
+      <div class="pw-card">
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:10px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">2nd Trim Post Walk</div>
+          <div style="font-size:15px;font-weight:900;color:var(--navy);margin-top:2px;" id="pw2-job-display"></div>
+        </div>
+
+        <label style="font-size:13px;font-weight:900;color:var(--navy);">Walk Checklist</label>
+        <p style="font-size:11px;color:#64748b;margin:4px 0 8px 0;">Tap + Add Item, speak or type each item as you walk, then mark ✅ or ❌.</p>
+        <div id="pw2-checklist"></div>
+        <button class="pw-add-item" onclick="addPwChecklistItem()">+ Add Item</button>
+
+        <div style="margin-top:16px;">
+          <label>Extra Material To Pick Up</label>
+          <textarea id="pw2-material-pickup" placeholder="e.g. (3) leftover doors in garage, extra base in laundry..." style="height:60px;"></textarea>
+          <label>General Notes</label>
+          <textarea id="pw2-general-notes" placeholder="Anything else to note..." style="height:60px;"></textarea>
+        </div>
+
+        <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-top:8px;" onclick="generatePw2()">⚡ Generate Post Walk</button>
+        <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);margin-top:8px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: Summary -->
+    <div id="pw-screen-summary" style="display:none;">
+      <div class="pw-card">
+        <div style="font-size:12px;font-weight:900;color:var(--pw-green);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">✅ Post Walk Generated</div>
+        <textarea id="pw-summary-text" readonly></textarea>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <button class="actionBtn" style="background:var(--pw-green);color:white;" onclick="copyPwSummary()">📋 Copy to AppWright</button>
+          <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- pw-body -->
+</div><!-- pw-overlay -->
 
 <script>
-  // ── Uses separate localStorage keys so it doesn't affect the live app ──
-  const TEST_STORAGE_KEY = 'bfs_test_active_work';
-  const TEST_HISTORY_KEY = 'bfs_test_history';
+  const TEST_KEY   = 'bfs_test_active';
+  const TEST_HIST  = 'bfs_test_history';
+  const PW1_HIST   = 'bfs_test_pw1_history';
+  const PW2_HIST   = 'bfs_test_pw2_history';
 
-  let state = { fireRated: false };
-  let activeSectionId = "";
-  let activeItemLabel = "";
-  let activeTypes = [];
+  let state = { fireRated:false };
+  let activeSectionId='', activeItemLabel='', activeTypes=[];
+  let pwType='', pwCustomer='', pwJobId='';
+  let pw1Result='', pw1DoorCheck='';
+  let pw1SelectedReasons = new Set();
+  let pw2Checklist = []; // [{text,status:'done'|'notdone'|null}]
+
+  const PW1_REASONS = ['Material Short / Missing','Wrong Product Delivered','Installer Error','Framing / RO Issue','Damaged Material','Door Adjustment Needed','Other'];
 
   const doorSizes  = ["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes   = ["3/0","3/4","4/0","4/8","5/0","5/4","6/0"];
@@ -228,406 +397,343 @@
     { title:"Stair Parts",  id:"sp",    color:"bg-navy", items:[...railLengths,...stairItems] }
   ];
 
-  function updateStickyOffsets() {
-    const bannerVisible = document.body.classList.contains('banner-visible');
-    const bannerH = bannerVisible ? (document.getElementById('job-banner').offsetHeight || 36) : 0;
-    document.documentElement.style.setProperty('--section-top', (44 + bannerH) + 'px');
+  // ── DOOR TOTAL COUNTER ─────────────────────────────────────────
+  function updateDoorTotal() {
+    let total = 0;
+    const doorSections = [
+      {id:'68',    items:doorSizes,  types:['LH','RH','SLAB']},
+      {id:'80',    items:doorSizes,  types:['LH','RH','SLAB']},
+      {id:'atws',  items:doorSizes,  types:['LH','RH']},
+      {id:'DBL68', items:dblSizes,   types:['DBL','T-AST']},
+      {id:'DBL80', items:dblSizes,   types:['DBL','T-AST']}
+    ];
+    doorSections.forEach(sec => {
+      sec.items.forEach(size => {
+        sec.types.forEach(t => {
+          const key = `${sec.id}_${size.replace(/[\/ ']/g,"-")}_${t}`;
+          total += state[key] || 0;
+        });
+      });
+    });
+    const row   = document.getElementById('door-total-row');
+    const count = document.getElementById('door-total-count');
+    count.innerText = total;
+    total > 0 ? row.classList.add('visible') : row.classList.remove('visible');
   }
 
+  // ── STICKY / BANNER ────────────────────────────────────────────
+  function updateStickyOffsets() {
+    const bv = document.body.classList.contains('banner-visible');
+    const bh = bv ? (document.getElementById('job-banner').offsetHeight||36) : 0;
+    document.documentElement.style.setProperty('--section-top',(44+bh)+'px');
+  }
   function updateJobBanner() {
-    const cust  = document.getElementById('customer').value.trim();
-    const jobId = document.getElementById('job-id').value.trim();
-    const banner = document.getElementById('job-banner');
-    if (cust || jobId) {
-      banner.innerHTML = `📋 <span>ACTIVE JOB:</span> ${[cust,jobId].filter(Boolean).join(' — ')}`;
-      banner.classList.add('visible');
-      document.body.classList.add('banner-visible');
-    } else {
-      banner.classList.remove('visible');
-      document.body.classList.remove('banner-visible');
-    }
+    const cust=document.getElementById('customer').value.trim(), jobId=document.getElementById('job-id').value.trim();
+    const banner=document.getElementById('job-banner');
+    if(cust||jobId){ banner.innerHTML=`📋 <span>ACTIVE JOB:</span> ${[cust,jobId].filter(Boolean).join(' — ')}`; banner.classList.add('visible'); document.body.classList.add('banner-visible'); }
+    else { banner.classList.remove('visible'); document.body.classList.remove('banner-visible'); }
     updateStickyOffsets();
   }
 
+  // ── STATE ──────────────────────────────────────────────────────
   function saveState() {
-    const fullData = {
-      customer: document.getElementById('customer').value,
-      jobId:    document.getElementById('job-id').value,
-      notes:    document.getElementById('notes').value,
-      summaryText: document.getElementById('summary').value,
-      state: state
-    };
-    localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(fullData));
-    updateSummaryStyle();
+    localStorage.setItem(TEST_KEY, JSON.stringify({ customer:document.getElementById('customer').value, jobId:document.getElementById('job-id').value, notes:document.getElementById('notes').value, summaryText:document.getElementById('summary').value, state }));
+    updateSummaryStyle(); updateDoorTotal();
   }
-
   function loadActiveState() {
-    const saved = localStorage.getItem(TEST_STORAGE_KEY);
-    if (saved) {
-      const data = JSON.parse(saved);
-      document.getElementById('customer').value = data.customer || "";
-      document.getElementById('job-id').value   = data.jobId || "";
-      document.getElementById('notes').value    = data.notes || "";
-      document.getElementById('summary').value  = data.summaryText || "";
-      state = data.state || { fireRated:false };
-      refreshAllCards();
-      updateSummaryStyle();
-      updateJobBanner();
-    }
+    const saved=localStorage.getItem(TEST_KEY);
+    if(saved){ const d=JSON.parse(saved); document.getElementById('customer').value=d.customer||''; document.getElementById('job-id').value=d.jobId||''; document.getElementById('notes').value=d.notes||''; document.getElementById('summary').value=d.summaryText||''; state=d.state||{fireRated:false}; refreshAllCards(); updateSummaryStyle(); updateJobBanner(); updateDoorTotal(); }
   }
-
-  function getSyncKey(sectionId, label, type) {
-    let sId = sectionId;
-    if (sectionId === "sp") {
-      if (railLengths.includes(label)) sId = "HR";
-      else if (label === "Shoes")       sId = "STSH";
-      else                              sId = "ST";
-    }
-    return `${sId}_${label.replace(/[\/ ']/g,"-")}_${type}`;
-  }
-
-  function toggleSection(id, headerEl) {
-    document.getElementById('content-'+id).classList.toggle('active');
-    headerEl.classList.toggle('active-header');
-  }
+  function getSyncKey(sId,label,type){ if(sId==="sp"){ sId=railLengths.includes(label)?'HR':label==='Shoes'?'STSH':'ST'; } return `${sId}_${label.replace(/[\/ ']/g,"-")}_${type}`; }
+  function toggleSection2(id,el){ document.getElementById('content-'+id).classList.toggle('active'); el.classList.toggle('active-header'); }
 
   // ── AUDIO ──────────────────────────────────────────────────────
-  let _tapCtx = null;
-  function _getCtx() {
-    try {
-      if (!_tapCtx) _tapCtx = new (window.AudioContext||window.webkitAudioContext)();
-      if (_tapCtx.state==='suspended') _tapCtx.resume();
-      return _tapCtx;
-    } catch(e) { return null; }
-  }
-  function playTapUp() {
-    const ctx = _getCtx(); if (!ctx) return;
-    try { const o=ctx.createOscillator(),g=ctx.createGain(); o.type='square'; o.frequency.value=880; g.gain.setValueAtTime(0.15,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08); o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.08); } catch(e) {}
-  }
-  function playTapDown() {
-    const ctx = _getCtx(); if (!ctx) return;
-    try { const o=ctx.createOscillator(),g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(440,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(220,ctx.currentTime+0.1); g.gain.setValueAtTime(0.12,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1); o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.1); } catch(e) {}
-  }
+  let _tapCtx=null;
+  function _getCtx(){ try{ if(!_tapCtx)_tapCtx=new(window.AudioContext||window.webkitAudioContext)(); if(_tapCtx.state==='suspended')_tapCtx.resume(); return _tapCtx; }catch(e){return null;} }
+  function playTapUp(){ const ctx=_getCtx(); if(!ctx)return; try{const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=880;g.gain.setValueAtTime(0.15,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+0.08);}catch(e){} }
+  function playTapDown(){ const ctx=_getCtx(); if(!ctx)return; try{const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(440,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(220,ctx.currentTime+0.1);g.gain.setValueAtTime(0.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+0.1);}catch(e){} }
 
-  // ── MODAL (with new inline note field) ─────────────────────────
-  function openModal(sectionId, label, types) {
-    activeSectionId = sectionId;
-    activeItemLabel = label;
-    activeTypes = types;
-    const displayHeader = (sectionId==="80"||sectionId==="DBL80") ? `${label}x8/0` : label;
-    document.getElementById('m-title').innerText = displayHeader;
-    const container = document.getElementById('m-blocks');
-    container.innerHTML = "";
-    const useDirectInput = directInputItems.includes(label);
-
-    types.forEach(type => {
-      const key       = getSyncKey(sectionId, label, type);
-      const qty       = state[key] || 0;
-      const savedNote = state[`NOTE_${key}`] || "";
-      const greenClass = qty > 0 ? 'active-qty' : '';
-
-      let controlHtml = useDirectInput
-        ? `<input type="number" inputmode="numeric" class="qty-input ${greenClass}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty',this.value>0)">`
-        : `<div style="display:flex;align-items:center;gap:12px;">
-             <button class="btn" onclick="updateModalQty('${key}',-1)">−</button>
-             <span class="qty-display ${greenClass}" id="mqty-${key}">${qty}</span>
-             <button class="btn" onclick="updateModalQty('${key}',1)">+</button>
-           </div>`;
-
-      // ── NEW: inline note field with voice-friendly placeholder ──
-      container.innerHTML += `
-        <div class="modal-type-block">
-          <div class="modal-counter-row">
-            <label style="font-size:16px;font-weight:800;color:var(--navy);">${type}</label>
-            ${controlHtml}
-          </div>
-          <div class="modal-note-row">
-            <span class="modal-note-label">📝 Note for ${type} — tap mic to speak</span>
-            <textarea id="mnote-${key}" placeholder="e.g. RO too small, verify handing, not on plans...">${savedNote}</textarea>
-          </div>
-        </div>`;
+  // ── MODAL ──────────────────────────────────────────────────────
+  function openModal(sId,label,types){ activeSectionId=sId; activeItemLabel=label; activeTypes=types; const dh=(sId==='80'||sId==='DBL80')?`${label}x8/0`:label; document.getElementById('m-title').innerText=dh; const c=document.getElementById('m-blocks'); c.innerHTML=''; const useDir=directInputItems.includes(label);
+    types.forEach(type=>{ const key=getSyncKey(sId,label,type),qty=state[key]||0,note=state[`NOTE_${key}`]||'',gc=qty>0?'active-qty':'';
+      let ctrl=useDir?`<input type="number" inputmode="numeric" class="qty-input ${gc}" id="mqty-${key}" value="${qty}" min="0" onfocus="this.select()" oninput="this.classList.toggle('active-qty',this.value>0)">`:`<div style="display:flex;align-items:center;gap:12px;"><button class="btn" onclick="updateMQty('${key}',-1)">−</button><span class="qty-display ${gc}" id="mqty-${key}">${qty}</span><button class="btn" onclick="updateMQty('${key}',1)">+</button></div>`;
+      c.innerHTML+=`<div class="modal-type-block"><div class="modal-counter-row"><label style="font-size:16px;font-weight:800;color:var(--navy);">${type}</label>${ctrl}</div><input type="text" id="mnote-${key}" value="${note}" placeholder="Notes... (tap mic to speak)" style="margin:5px 0 0 0;font-size:14px;padding:8px;width:100%;border:1px solid #94a3b8;border-radius:4px;"></div>`;
     });
-
-    document.getElementById('itemModal').style.display = 'flex';
+    document.getElementById('itemModal').style.display='flex';
   }
+  function updateMQty(key,delta){ state[key]=Math.max(0,(state[key]||0)+delta); const el=document.getElementById(`mqty-${key}`); el.innerText=state[key]; el.classList.toggle('active-qty',state[key]>0); delta>0?playTapUp():playTapDown(); }
+  function closeModal(){ activeTypes.forEach(t=>{ const key=getSyncKey(activeSectionId,activeItemLabel,t),qEl=document.getElementById(`mqty-${key}`),nEl=document.getElementById(`mnote-${key}`); if(qEl.tagName==='INPUT')state[key]=parseInt(qEl.value)||0; if(nEl)state[`NOTE_${key}`]=nEl.value.trim(); }); refreshAllCards(); saveState(); document.getElementById('itemModal').style.display='none'; }
+  document.getElementById('itemModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-  function updateModalQty(key, delta) {
-    state[key] = Math.max(0, (state[key]||0) + delta);
-    const el = document.getElementById(`mqty-${key}`);
-    el.innerText = state[key];
-    el.classList.toggle('active-qty', state[key] > 0);
-    if (delta > 0) playTapUp(); else playTapDown();
-  }
+  function refreshAllCards(){ layout.forEach(sec=>{ let has=false; sec.items.forEach(item=>{ let types=sec.types||[]; if(sec.id==='sp'){types=railLengths.includes(item)?['OPEN','WALL']:item==='Shoes'?['FLAT','ANGLE']:['QTY'];} const cid=`card-${sec.id}-${item.replace(/[\/ ']/g,"-")}`,card=document.getElementById(cid); if(card){const hd=types.some(t=>state[getSyncKey(sec.id,item,t)]>0);if(hd)has=true;hd?card.classList.add('has-data'):card.classList.remove('has-data');updateCardBadges(card,sec.id,item,types);} }); if(sec.id==='AS'&&state.fireRated)has=true; const ce=document.getElementById(`check-${sec.id}`);if(ce)has?ce.classList.add('active'):ce.classList.remove('active'); }); const fb=document.getElementById('fire-status');if(fb){fb.innerText=state.fireRated?'FIRE RATED: YES':'FIRE RATED: NO';state.fireRated?fb.classList.add('has-data'):fb.classList.remove('has-data');} }
+  function updateCardBadges(card,sId,label,types){ const lB=card.querySelector('.badge-left'),rB=card.querySelector('.badge-right'),cB=card.querySelector('.badge-center'),nB=card.querySelector('.note-badge'); if(!lB)return; [lB,rB,cB].forEach(b=>{b.innerText='';b.classList.remove('active');}); let hasNote=false; types.forEach((t,i)=>{ const key=getSyncKey(sId,label,t),qty=state[key]||0;if(state[`NOTE_${key}`])hasNote=true; if(qty>0){if(types.length===2){if(i===0){lB.innerText=`${t}:${qty}`;lB.classList.add('active');}else{rB.innerText=`${t}:${qty}`;rB.classList.add('active');}}else if(types.length===3){if(t==='LH'){lB.innerText=`L:${qty}`;lB.classList.add('active');}else if(t==='RH'){rB.innerText=`R:${qty}`;rB.classList.add('active');}else{cB.innerText=`S:${qty}`;cB.classList.add('active');}}else{cB.innerText=qty;cB.classList.add('active');}} }); if(nB)hasNote?nB.classList.add('active'):nB.classList.remove('active'); }
+  function toggleFire(){ state.fireRated=!state.fireRated; refreshAllCards(); saveState(); }
 
-  function closeModal() {
-    activeTypes.forEach(t => {
-      const key = getSyncKey(activeSectionId, activeItemLabel, t);
-      const qtyEl = document.getElementById(`mqty-${key}`);
-      if (qtyEl.tagName === "INPUT") state[key] = parseInt(qtyEl.value) || 0;
-      const noteEl = document.getElementById(`mnote-${key}`);
-      if (noteEl) state[`NOTE_${key}`] = noteEl.value.trim();
-    });
-    refreshAllCards();
-    saveState();
-    document.getElementById('itemModal').style.display = 'none';
-  }
-
-  document.getElementById('itemModal').addEventListener('click', function(e) { if (e.target===this) closeModal(); });
-
-  function refreshAllCards() {
-    layout.forEach(sec => {
-      let sectionHasData = false;
-      sec.items.forEach(item => {
-        let types = sec.types || [];
-        if (sec.id==="sp") {
-          types = railLengths.includes(item) ? ["OPEN","WALL"]
-                : item==="Shoes"             ? ["FLAT","ANGLE"]
-                :                             ["QTY"];
-        }
-        const cardId = `card-${sec.id}-${item.replace(/[\/ ']/g,"-")}`;
-        const card = document.getElementById(cardId);
-        if (card) {
-          const hasData = types.some(t => state[getSyncKey(sec.id,item,t)] > 0);
-          if (hasData) sectionHasData = true;
-          hasData ? card.classList.add('has-data') : card.classList.remove('has-data');
-          updateCardBadges(card, sec.id, item, types);
-        }
-      });
-      if (sec.id==="AS" && state.fireRated) sectionHasData = true;
-      const checkEl = document.getElementById(`check-${sec.id}`);
-      if (checkEl) sectionHasData ? checkEl.classList.add('active') : checkEl.classList.remove('active');
-    });
-    const fireBtn = document.getElementById('fire-status');
-    if (fireBtn) { fireBtn.innerText = state.fireRated ? "FIRE RATED: YES" : "FIRE RATED: NO"; state.fireRated ? fireBtn.classList.add('has-data') : fireBtn.classList.remove('has-data'); }
-  }
-
-  function updateCardBadges(card, sectionId, label, types) {
-    const leftB=card.querySelector('.badge-left'), rightB=card.querySelector('.badge-right'), centerB=card.querySelector('.badge-center'), noteB=card.querySelector('.note-badge');
-    if (!leftB) return;
-    [leftB,rightB,centerB].forEach(b=>{b.innerText="";b.classList.remove('active');});
-    let hasNote = false;
-    types.forEach((t,index) => {
-      const key = getSyncKey(sectionId,label,t);
-      const qty = state[key] || 0;
-      if (state[`NOTE_${key}`]) hasNote = true;
-      if (qty > 0) {
-        if (types.length===2) { if(index===0){leftB.innerText=`${t}:${qty}`;leftB.classList.add('active');}else{rightB.innerText=`${t}:${qty}`;rightB.classList.add('active');} }
-        else if (types.length===3) { if(t==="LH"){leftB.innerText=`L:${qty}`;leftB.classList.add('active');}else if(t==="RH"){rightB.innerText=`R:${qty}`;rightB.classList.add('active');}else{centerB.innerText=`S:${qty}`;centerB.classList.add('active');} }
-        else { centerB.innerText=qty; centerB.classList.add('active'); }
-      }
-    });
-    if (noteB) hasNote ? noteB.classList.add('active') : noteB.classList.remove('active');
-  }
-
-  function toggleFire() {
-    state.fireRated = !state.fireRated;
-    refreshAllCards();
-    saveState();
-  }
-
-  // ── GENERATE (notes appear inline next to their door line) ──────
-  function generateSummary(force) {
-    const cust  = document.getElementById('customer').value.trim();
-    const jobId = document.getElementById('job-id').value.trim();
-    if (!force && (!cust || !jobId)) {
-      showToast('⚠️ ENTER CUSTOMER & JOB ID FIRST');
-      return;
-    }
-    const gNotes   = document.getElementById('notes').value || "";
-    const custVal  = cust  || "NA";
-    const jobIdVal = jobId || "NA";
-    let report = `TAKEOFF -- ${custVal} -- ${jobIdVal}\n----------------------------\n\n`;
-
-    const groups = [
-      { id:"68",    head:"--- 6/8 SINGLE DOORS ---",  types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"" },
-      { id:"DBL68", head:"--- 6/8 DOUBLE DOORS ---",  types:["DBL","T-AST"],      items:dblSizes,   suffix:"" },
-      { id:"80",    head:"--- 8/0 SINGLE DOORS ---",  types:["LH","RH","SLAB"],   items:doorSizes,  suffix:"x8/0" },
-      { id:"DBL80", head:"--- 8/0 DOUBLE DOORS ---",  types:["DBL","T-AST"],      items:dblSizes,   suffix:"x8/0" },
-      { id:"atws",  head:"--- ATTIC WS DOORS ---",    types:["LH","RH"],          items:doorSizes,  suffix:"" },
-      { id:"AS",    head:"--- ATTIC STAIRS ---",      types:["QTY"],              items:["22x54","25x54","Scuttle"], suffix:"" },
-      { id:"HR",    head:"--- HANDRAIL ---",          types:["OPEN","WALL"],      items:railLengths, suffix:"" },
-      { id:"ST",    head:"--- STAIR HARDWARE ---",    types:["QTY"],              items:stairItems.filter(i=>i!=="Shoes"), suffix:"" },
-      { id:"STSH",  head:"--- SHOES ---",             types:["FLAT","ANGLE"],     items:["Shoes"],   suffix:"" }
-    ];
-
-    groups.forEach(g => {
-      let groupContent = "";
-      g.items.forEach(item => {
-        g.types.forEach(t => {
-          const key = (g.id==="HR"||g.id==="ST"||g.id==="STSH")
-            ? `${g.id}_${item.replace(/[\/ ']/g,"-")}_${t}`
-            : getSyncKey(g.id,item,t);
-          const qty = state[key] || 0;
-          if (qty > 0) {
-            const fireLabel = (g.id==="AS" && state.fireRated) ? " (FIRE RATED)" : "";
-            const cleanType = (t==="QTY") ? "" : ` ${t}`;
-            // ── NEW: inline note appended with * flag ──
-            const note = state[`NOTE_${key}`] || "";
-            groupContent += `- ${item}${g.suffix}${cleanType}: ${qty}${fireLabel}${note ? ' *'+note : ''}\n`;
-          }
-        });
-      });
-      if (groupContent) report += `${g.head}\n${groupContent}\n`;
-    });
-
-    if (gNotes) report += `----------------------------\nGENERAL NOTES\n${gNotes}\n`;
-
-    document.getElementById('summary').value = report;
-    saveState();
-    const summaryEl = document.getElementById('summary');
-    summaryEl.classList.remove('flash');
-    void summaryEl.offsetWidth;
-    summaryEl.classList.add('flash');
+  // ── GENERATE TAKEOFF ───────────────────────────────────────────
+  function generateSummary() {
+    const cust=document.getElementById('customer').value.trim(),jobId=document.getElementById('job-id').value.trim();
+    if(!cust||!jobId){showToast('⚠️ ENTER CUSTOMER & JOB ID');return;}
+    const gNotes=document.getElementById('notes').value||'',custVal=cust||'NA',jobIdVal=jobId||'NA';
+    let report=`TAKEOFF -- ${custVal} -- ${jobIdVal}\n----------------------------\n\n`;
+    const groups=[{id:"68",head:"--- 6/8 SINGLE DOORS ---",types:["LH","RH","SLAB"],items:doorSizes,suffix:""},{id:"DBL68",head:"--- 6/8 DOUBLE DOORS ---",types:["DBL","T-AST"],items:dblSizes,suffix:""},{id:"80",head:"--- 8/0 SINGLE DOORS ---",types:["LH","RH","SLAB"],items:doorSizes,suffix:"x8/0"},{id:"DBL80",head:"--- 8/0 DOUBLE DOORS ---",types:["DBL","T-AST"],items:dblSizes,suffix:"x8/0"},{id:"atws",head:"--- ATTIC WS DOORS ---",types:["LH","RH"],items:doorSizes,suffix:""},{id:"AS",head:"--- ATTIC STAIRS ---",types:["QTY"],items:["22x54","25x54","Scuttle"],suffix:""},{id:"HR",head:"--- HANDRAIL ---",types:["OPEN","WALL"],items:railLengths,suffix:""},{id:"ST",head:"--- STAIR HARDWARE ---",types:["QTY"],items:stairItems.filter(i=>i!=="Shoes"),suffix:""},{id:"STSH",head:"--- SHOES ---",types:["FLAT","ANGLE"],items:["Shoes"],suffix:""}];
+    groups.forEach(g=>{ let gc=''; g.items.forEach(item=>{ g.types.forEach(t=>{ const key=(g.id==='HR'||g.id==='ST'||g.id==='STSH')?`${g.id}_${item.replace(/[\/ ']/g,"-")}_${t}`:getSyncKey(g.id,item,t); if(state[key]>0){const fl=(g.id==='AS'&&state.fireRated)?' (FIRE RATED)':'',ct=(t==='QTY')?'':` ${t}`,note=state[`NOTE_${key}`]||''; gc+=`- ${item}${g.suffix}${ct}: ${state[key]}${fl}${note?' *'+note:''}\n`;} }); }); if(gc)report+=`${g.head}\n${gc}\n`; });
+    if(gNotes)report+=`----------------------------\nGENERAL NOTES\n${gNotes}\n`;
+    document.getElementById('summary').value=report; saveState();
+    const sEl=document.getElementById('summary'); sEl.classList.remove('flash'); void sEl.offsetWidth; sEl.classList.add('flash');
     document.getElementById('summary-section').scrollIntoView({behavior:'smooth'});
-    saveToHistory(report, `${custVal} — ${jobIdVal}`, { customer:custVal, jobId:jobIdVal, notes:gNotes, state:JSON.parse(JSON.stringify(state)) });
+    saveToHistory(report,`${custVal} — ${jobIdVal}`,{customer:custVal,jobId:jobIdVal,notes:gNotes,state:JSON.parse(JSON.stringify(state))});
   }
 
-  function updateSummaryStyle() {
-    const s = document.getElementById('summary');
-    const empty = document.getElementById('summary-empty-state');
-    const hasText = s.value.length > 0;
-    hasText ? s.classList.add('has-text') : s.classList.remove('has-text');
-    hasText ? empty.classList.add('hidden') : empty.classList.remove('hidden');
-  }
+  function updateSummaryStyle(){ const s=document.getElementById('summary'),e=document.getElementById('summary-empty-state'),h=s.value.length>0; h?s.classList.add('has-text'):s.classList.remove('has-text'); h?e.classList.add('hidden'):e.classList.remove('hidden'); }
+  function copySummary(){ const t=document.getElementById('summary').value; if(!t.trim())return; navigator.clipboard.writeText(t).then(()=>showToast('✓ COPIED')).catch(()=>{document.getElementById('summary').select();document.execCommand('copy');showToast('✓ COPIED');}); }
+  function confirmReset(){ if(!confirm('Reset all test fields?'))return; state={fireRated:false}; document.getElementById('summary').value=''; localStorage.removeItem(TEST_KEY); document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(el=>el.value=''); document.querySelectorAll('.section-content').forEach(el=>el.classList.remove('active')); document.querySelectorAll('.section-title').forEach(el=>el.classList.remove('active-header')); refreshAllCards();updateSummaryStyle();updateJobBanner();updateDoorTotal();window.scrollTo(0,0); }
+  function confirmNewLot(){ const cust=document.getElementById('customer').value; state={fireRated:false}; document.getElementById('summary').value=''; document.getElementById('job-id').value=''; document.getElementById('notes').value=''; document.querySelectorAll('.section-content').forEach(el=>el.classList.remove('active')); document.querySelectorAll('.section-title').forEach(el=>el.classList.remove('active-header')); refreshAllCards();updateSummaryStyle();document.getElementById('customer').value=cust;saveState();updateJobBanner();updateDoorTotal();document.getElementById('job-id').focus();window.scrollTo(0,0); }
+  function showToast(msg){ const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('show');void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000); }
+  function toggleSection(id){ const b=document.getElementById(id+'-body'),c=document.getElementById(id+'-chevron'),open=b.style.display!=='none';b.style.display=open?'none':'block';if(c)c.innerText=open?'▼ SHOW':'▲ HIDE'; }
 
-  function confirmReset() {
-    if (!confirm('Reset all test fields?')) return;
-    state = { fireRated:false };
-    document.getElementById('summary').value = "";
-    localStorage.removeItem(TEST_STORAGE_KEY);
-    document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(el=>el.value="");
-    document.querySelectorAll('.section-content').forEach(el=>el.classList.remove('active'));
-    document.querySelectorAll('.section-title').forEach(el=>el.classList.remove('active-header'));
-    refreshAllCards(); updateSummaryStyle(); updateJobBanner(); window.scrollTo(0,0);
-  }
-
-  function confirmNewLot() {
-    const cust = document.getElementById('customer').value;
-    state = { fireRated:false };
-    document.getElementById('summary').value = "";
-    document.getElementById('job-id').value = "";
-    document.getElementById('notes').value = "";
-    document.querySelectorAll('.section-content').forEach(el=>el.classList.remove('active'));
-    document.querySelectorAll('.section-title').forEach(el=>el.classList.remove('active-header'));
-    refreshAllCards(); updateSummaryStyle();
-    document.getElementById('customer').value = cust;
-    saveState(); updateJobBanner();
-    document.getElementById('job-id').focus();
-    window.scrollTo(0,0);
-  }
-
-  function copySummary() {
-    const text = document.getElementById("summary").value;
-    if (!text.trim()) return;
-    navigator.clipboard.writeText(text).then(()=>showToast("✓ COPIED")).catch(()=>{ document.getElementById("summary").select(); document.execCommand("copy"); showToast("✓ COPIED"); });
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.innerText = msg; t.classList.remove("show"); void t.offsetWidth; t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"),2000);
-  }
-
-  function toggleHistorySection() {
-    const body=document.getElementById('history-body'), chevron=document.getElementById('history-chevron'), isOpen=body.style.display!=='none';
-    body.style.display=isOpen?'none':'block'; chevron.innerText=isOpen?'▼ SHOW':'▲ HIDE';
-  }
-
-  function saveToHistory(text, label, fullData) {
-    let history = JSON.parse(localStorage.getItem(TEST_HISTORY_KEY)) || [];
-    const now = new Date();
-    const dateStr = (now.getMonth()+1)+'/'+now.getDate();
-    const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    history.unshift({ label:`${dateStr} — ${label}`, text, time:timeStr, fullData });
-    if (history.length > 20) history.pop();
-    localStorage.setItem(TEST_HISTORY_KEY, JSON.stringify(history));
-    renderHistory();
-  }
-
-  function renderHistory() {
-    const list    = document.getElementById('history-list');
-    const history = JSON.parse(localStorage.getItem(TEST_HISTORY_KEY)) || [];
-    const query   = (document.getElementById('history-search')?.value||'').trim().toLowerCase();
-    const filtered = query ? history.filter(item=>item.label.toLowerCase().includes(query)||(item.fullData?.customer||'').toLowerCase().includes(query)) : history;
-    list.innerHTML = filtered.length ? "" : `<p style='font-size:11px;color:#94a3b8;'>${query?'No matches.':'No test history yet.'}</p>`;
-    filtered.forEach((item,index) => {
-      list.innerHTML += `<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div class="history-controls"><button class="load-btn" onclick="loadHistory(${index})">LOAD</button><button class="del-btn" onclick="deleteHistory(${index})">✕</button></div></div>`;
-    });
-  }
-
-  function loadHistory(index) {
-    const h = JSON.parse(localStorage.getItem(TEST_HISTORY_KEY))[index];
-    if (!h) return;
-    document.getElementById('summary').value = h.text;
-    document.getElementById('customer').value = h.fullData.customer||"";
-    document.getElementById('job-id').value   = h.fullData.jobId||"";
-    document.getElementById('notes').value    = h.fullData.notes||"";
-    state = JSON.parse(JSON.stringify(h.fullData.state));
-    refreshAllCards(); saveState(); updateJobBanner(); updateSummaryStyle();
-    document.getElementById('summary-section').scrollIntoView({behavior:'smooth'});
-  }
-
-  function deleteHistory(index) {
-    let h = JSON.parse(localStorage.getItem(TEST_HISTORY_KEY));
-    h.splice(index,1); localStorage.setItem(TEST_HISTORY_KEY,JSON.stringify(h)); renderHistory();
-  }
+  // ── HISTORY ────────────────────────────────────────────────────
+  function saveToHistory(text,label,fullData){ let h=JSON.parse(localStorage.getItem(TEST_HIST))||[]; const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); h.unshift({label:`${ds} — ${label}`,text,time:ts,fullData}); if(h.length>20)h.pop(); localStorage.setItem(TEST_HIST,JSON.stringify(h)); renderHistory(); }
+  function renderHistory(){ const list=document.getElementById('history-list'),h=JSON.parse(localStorage.getItem(TEST_HIST))||[],q=(document.getElementById('history-search')?.value||'').trim().toLowerCase(); const f=q?h.filter(i=>i.label.toLowerCase().includes(q)||(i.fullData?.customer||'').toLowerCase().includes(q)):h; list.innerHTML=f.length?'': `<p style='font-size:11px;color:#94a3b8;'>${q?'No matches.':'No takeoffs yet.'}</p>`; f.forEach((item,i)=>{ const ri=h.indexOf(item); list.innerHTML+=`<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div class="history-controls"><button class="load-btn" onclick="loadHistory(${ri})">LOAD</button><button class="del-btn" onclick="delHistory(${ri})">✕</button></div></div>`; }); }
+  function loadHistory(i){ const h=JSON.parse(localStorage.getItem(TEST_HIST))[i]; if(!h)return; document.getElementById('summary').value=h.text; document.getElementById('customer').value=h.fullData.customer||''; document.getElementById('job-id').value=h.fullData.jobId||''; document.getElementById('notes').value=h.fullData.notes||''; state=JSON.parse(JSON.stringify(h.fullData.state)); refreshAllCards();saveState();updateJobBanner();updateSummaryStyle();updateDoorTotal(); document.getElementById('summary-section').scrollIntoView({behavior:'smooth'}); }
+  function delHistory(i){ let h=JSON.parse(localStorage.getItem(TEST_HIST));h.splice(i,1);localStorage.setItem(TEST_HIST,JSON.stringify(h));renderHistory(); }
 
   // ── AUTOCOMPLETE ───────────────────────────────────────────────
-  function getKnowledge() { try { return JSON.parse(localStorage.getItem('bfs_knowledge'))||{}; } catch(e) { return {}; } }
-  function getCustomers() { return Object.keys(getKnowledge()).sort(); }
-  function deleteCustomer(customer) { const kb=getKnowledge(); delete kb[customer]; localStorage.setItem('bfs_knowledge',JSON.stringify(kb)); document.getElementById('customer').value=""; saveState(); updateJobBanner(); showCustomerSuggestions(); }
-  function showDropdown(dropdownId, items, onSelect, onDelete) {
-    const dd=document.getElementById(dropdownId); if(!items.length){dd.classList.remove('open');return;}
-    dd.innerHTML=items.map(item=>{const safe=item.replace(/'/g,"\\'"); const del=onDelete?`<button class="ac-delete" onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();(${onDelete.toString()})('${safe}')">✕</button>`:''; return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSelect.toString()})('${safe}');closeDropdown('${dropdownId}')"><span class="ac-item-label">${item}</span>${del}</div>`;}).join('');
-    dd.classList.add('open');
-  }
-  function closeDropdown(id) { const dd=document.getElementById(id); if(dd) dd.classList.remove('open'); }
-  function showCustomerSuggestions() {
-    const val=document.getElementById('customer').value.trim().toLowerCase();
-    const filtered=val?getCustomers().filter(c=>c.toLowerCase().includes(val)):getCustomers();
-    showDropdown('ac-customer',filtered,(s)=>{document.getElementById('customer').value=s;saveState();updateJobBanner();},(s)=>deleteCustomer(s));
-  }
-  document.addEventListener('click',(e)=>{ if(!e.target.closest('.ac-wrap')) closeDropdown('ac-customer'); });
+  function getKnowledge(){ try{return JSON.parse(localStorage.getItem('bfs_knowledge'))||{};}catch(e){return{};} }
+  function getCustomers(){ return Object.keys(getKnowledge()).sort(); }
+  function deleteCustomer(c){ const kb=getKnowledge();delete kb[c];localStorage.setItem('bfs_knowledge',JSON.stringify(kb));document.getElementById('customer').value='';saveState();updateJobBanner();showCustomerSuggestions(); }
+  function showDropdown(id,items,onSel,onDel){ const dd=document.getElementById(id);if(!items.length){dd.classList.remove('open');return;} dd.innerHTML=items.map(item=>{const s=item.replace(/'/g,"\\'"),del=onDel?`<button class="ac-delete" onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();(${onDel.toString()})('${s}')">✕</button>`:'';return `<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSel.toString()})('${s}');closeDropdown('${id}')"><span class="ac-item-label">${item}</span>${del}</div>`;}).join('');dd.classList.add('open'); }
+  function closeDropdown(id){ const dd=document.getElementById(id);if(dd)dd.classList.remove('open'); }
+  function showCustomerSuggestions(){ const val=document.getElementById('customer').value.trim().toLowerCase(),f=val?getCustomers().filter(c=>c.toLowerCase().includes(val)):getCustomers();showDropdown('ac-customer',f,s=>{document.getElementById('customer').value=s;saveState();updateJobBanner();},s=>deleteCustomer(s)); }
+  document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap'))closeDropdown('ac-customer');});
+  window.addEventListener('scroll',()=>{const b=document.getElementById('scroll-top');window.scrollY>300?b.classList.add('visible'):b.classList.remove('visible');});
 
-  window.addEventListener('scroll',()=>{ const btn=document.getElementById('scroll-top'); window.scrollY>300?btn.classList.add('visible'):btn.classList.remove('visible'); });
+  // ════════════════════════════════════════════════════════════════
+  // POST WALK
+  // ════════════════════════════════════════════════════════════════
+  function openPostWalk(){
+    pw1Result=''; pw1DoorCheck=''; pw1SelectedReasons.clear();
+    pw2Checklist=[];
+    showPwScreen('pw-screen-type');
+    renderPwHistory();
+    document.getElementById('pw-overlay').style.display='block';
+    document.getElementById('pw-overlay').scrollTop=0;
+  }
+  function closePostWalk(){ document.getElementById('pw-overlay').style.display='none'; }
+  function showPwScreen(id){ ['pw-screen-type','pw-screen-search','pw-screen-1st','pw-screen-2nd','pw-screen-summary'].forEach(s=>document.getElementById(s).style.display='none'); document.getElementById(id).style.display='block'; document.getElementById('pw-overlay').scrollTop=0; }
+
+  function selectPwType(type){
+    pwType=type;
+    document.getElementById('pw-header-title').innerText = type==='1st' ? '📋 1ST TRIM POST WALK' : '📋 2ND TRIM POST WALK';
+    document.getElementById('pw-search-title').innerText = type==='1st' ? 'Find the trim takeoff for this job' : 'Find the trim takeoff for this job';
+    document.getElementById('pw-search-input').value='';
+    document.getElementById('pw-search-results').innerHTML='';
+    document.getElementById('pw-cust-manual').value='';
+    document.getElementById('pw-jobid-manual').value='';
+    showPwScreen('pw-screen-search');
+  }
+
+  // ── SEARCH ─────────────────────────────────────────────────────
+  function searchPwJobs(){
+    const q=document.getElementById('pw-search-input').value.trim().toLowerCase();
+    const results=[];
+    const seen=new Set();
+    // Search live history
+    const liveHist=JSON.parse(localStorage.getItem('bfs_history'))||[];
+    const testHist=JSON.parse(localStorage.getItem(TEST_HIST))||[];
+    const allHist=[...liveHist,...testHist];
+    allHist.forEach(h=>{
+      if(!h.fullData?.customer)return;
+      const cust=h.fullData.customer||'',jid=h.fullData.jobId||h.fullData.lot||'';
+      const key=`${cust}|${jid}`.toLowerCase();
+      if(seen.has(key))return;seen.add(key);
+      if(!q||cust.toLowerCase().includes(q)||jid.toLowerCase().includes(q)||(h.label||'').toLowerCase().includes(q)){
+        results.push({customer:cust,jobId:jid,label:h.label,time:h.time,summaryText:h.text});
+      }
+    });
+    // Also search takeoff index
+    try{
+      const idx=JSON.parse(localStorage.getItem('bfs_takeoff_index'))||[];
+      idx.forEach(e=>{
+        const key=`${e.customer}|${e.jobId||''}`.toLowerCase();
+        if(seen.has(key))return;seen.add(key);
+        if(!q||e.customer.toLowerCase().includes(q)||(e.jobId||'').toLowerCase().includes(q)){
+          results.push({customer:e.customer,jobId:e.jobId||'',label:`${e.customer} — ${e.jobId||''}`,time:'',summaryText:e.summaryText||''});
+        }
+      });
+    }catch(e){}
+    const el=document.getElementById('pw-search-results');
+    if(!results.length){ el.innerHTML=`<p style="font-size:12px;color:#94a3b8;margin:8px 0;">No matches found. Enter manually below.</p>`; return; }
+    el.innerHTML=results.slice(0,8).map((r,i)=>`<div class="pw-result-item" onclick="usePwResult(${i})"><div><div class="pw-result-label">${r.customer}</div><div class="pw-result-sub">${r.jobId}${r.time?' · '+r.time:''}</div></div><button class="pw-use-btn">Use →</button></div>`).join('');
+    el._results=results;
+  }
+
+  function usePwResult(i){
+    const r=document.getElementById('pw-search-results')._results[i];
+    pwCustomer=r.customer; pwJobId=r.jobId;
+    startPwForm();
+  }
+  function startPwFormManual(){
+    pwCustomer=document.getElementById('pw-cust-manual').value.trim();
+    pwJobId=document.getElementById('pw-jobid-manual').value.trim();
+    if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}
+    startPwForm();
+  }
+  function startPwForm(){
+    const banner=document.getElementById('pw-active-banner');
+    banner.innerHTML=`📋 <span style="opacity:0.75;font-weight:600;">ACTIVE JOB:</span> ${pwCustomer} — ${pwJobId}`;
+    banner.style.display='flex';
+    if(pwType==='1st'){
+      document.getElementById('pw1-job-display').innerText=`${pwCustomer} — ${pwJobId}`;
+      buildPw1Reasons();
+      resetPw1Buttons();
+      document.getElementById('pw1-installer-notes').value='';
+      document.getElementById('pw1-material-onsite').value='';
+      document.getElementById('pw1-general-notes').value='';
+      showPwScreen('pw-screen-1st');
+    } else {
+      document.getElementById('pw2-job-display').innerText=`${pwCustomer} — ${pwJobId}`;
+      pw2Checklist=[];
+      document.getElementById('pw2-material-pickup').value='';
+      document.getElementById('pw2-general-notes').value='';
+      renderPw2Checklist();
+      showPwScreen('pw-screen-2nd');
+    }
+  }
+
+  // ── 1ST TRIM FORM ───────────────────────────────────────────────
+  function buildPw1Reasons(){
+    const grid=document.getElementById('pw1-reasons-grid');
+    grid.innerHTML=PW1_REASONS.map(r=>`<div class="pw-reason" id="reason-${r.replace(/\s/g,'-')}" onclick="toggleReason('${r}')"><div class="pw-reason-check" id="check-${r.replace(/\s/g,'-')}"></div><span>${r}</span></div>`).join('');
+  }
+  function toggleReason(r){
+    if(pw1SelectedReasons.has(r))pw1SelectedReasons.delete(r);else pw1SelectedReasons.add(r);
+    const key=r.replace(/\s/g,'-');
+    const el=document.getElementById(`reason-${key}`),ch=document.getElementById(`check-${key}`);
+    if(pw1SelectedReasons.has(r)){el.classList.add('selected');ch.innerText='✓';}else{el.classList.remove('selected');ch.innerText='';}
+  }
+  function resetPw1Buttons(){
+    pw1Result=''; pw1DoorCheck=''; pw1SelectedReasons.clear();
+    ['pw1-complete-btn','pw1-incomplete-btn'].forEach(id=>document.getElementById(id).className='pw-result-choice');
+    ['pw1-door-ok','pw1-door-issues'].forEach(id=>document.getElementById(id).className='pw-door-choice');
+    document.getElementById('pw1-reasons-section').style.display='none';
+    if(document.getElementById('pw1-reasons-grid'))document.getElementById('pw1-reasons-grid').querySelectorAll('.pw-reason').forEach(el=>{el.classList.remove('selected');el.querySelector('.pw-reason-check').innerText='';});
+  }
+  function setPw1Result(r){
+    pw1Result=r;
+    document.getElementById('pw1-complete-btn').className='pw-result-choice'+(r==='complete'?' selected-complete':'');
+    document.getElementById('pw1-incomplete-btn').className='pw-result-choice'+(r==='incomplete'?' selected-incomplete':'');
+    document.getElementById('pw1-reasons-section').style.display=r==='incomplete'?'block':'none';
+  }
+  function setPw1DoorCheck(r){
+    pw1DoorCheck=r;
+    document.getElementById('pw1-door-ok').className='pw-door-choice'+(r==='ok'?' selected':'');
+    document.getElementById('pw1-door-issues').className='pw-door-choice'+(r==='issues'?' selected-bad':'');
+  }
+  function generatePw1(){
+    if(!pw1Result){showToast('⚠️ SELECT COMPLETE OR INCOMPLETE');return;}
+    if(!pw1DoorCheck){showToast('⚠️ SELECT DOOR STATUS');return;}
+    const installerNotes=document.getElementById('pw1-installer-notes').value.trim();
+    const materialOnSite=document.getElementById('pw1-material-onsite').value.trim();
+    const generalNotes=document.getElementById('pw1-general-notes').value.trim();
+    const doorLabel=pw1DoorCheck==='ok'?'✅ All opening and closing properly':'❌ Issues noted below';
+    let report=`POST WALK — 1ST TRIM -- ${pwCustomer} -- ${pwJobId}\n----------------------------\n`;
+    report+=`Result: ${pw1Result==='complete'?'✅ COMPLETE':'❌ INCOMPLETE'}\n`;
+    report+=`Doors: ${doorLabel}\n`;
+    if(pw1Result==='incomplete'&&pw1SelectedReasons.size>0){
+      report+=`---\nReasons: ${Array.from(pw1SelectedReasons).join(' / ')}\n`;
+    }
+    if(installerNotes){report+=`---\nInstaller Notes: ${installerNotes}\n`;}
+    if(materialOnSite){report+=`---\nMaterial On Site: ${materialOnSite}\n`;}
+    if(generalNotes){report+=`---\nNotes: ${generalNotes}\n`;}
+    report+=`---\n[Attach photos to AppWright reply if needed]`;
+    showPwSummary(report,'1st');
+  }
+
+  // ── 2ND TRIM FORM ───────────────────────────────────────────────
+  function addPwChecklistItem(){
+    const text=prompt('What was completed or checked?');
+    if(!text||!text.trim())return;
+    pw2Checklist.push({text:text.trim(),status:null});
+    renderPw2Checklist();
+  }
+  function setPw2ItemStatus(i,status){
+    pw2Checklist[i].status=pw2Checklist[i].status===status?null:status;
+    renderPw2Checklist();
+  }
+  function deletePw2Item(i){ pw2Checklist.splice(i,1); renderPw2Checklist(); }
+  function renderPw2Checklist(){
+    const el=document.getElementById('pw2-checklist');
+    el.innerHTML=pw2Checklist.map((item,i)=>{
+      const isDone=item.status==='done',isNotDone=item.status==='notdone';
+      const rowClass=isDone?'done':isNotDone?'notdone':'';
+      return `<div class="pw-checklist-item ${rowClass}">
+        <span class="pw-check-text">${isDone?'✅ ':isNotDone?'❌ ':'○ '}${item.text}</span>
+        <button class="pw-check-done${isDone?' active':''}" onclick="setPw2ItemStatus(${i},'done')">✅</button>
+        <button class="pw-check-notdone${isNotDone?' active':''}" onclick="setPw2ItemStatus(${i},'notdone')">❌</button>
+        <button class="pw-check-del" onclick="deletePw2Item(${i})">🗑</button>
+      </div>`;
+    }).join('');
+  }
+  function generatePw2(){
+    if(!pw2Checklist.length){showToast('⚠️ ADD AT LEAST ONE ITEM');return;}
+    const pickup=document.getElementById('pw2-material-pickup').value.trim();
+    const notes=document.getElementById('pw2-general-notes').value.trim();
+    let report=`POST WALK — 2ND TRIM -- ${pwCustomer} -- ${pwJobId}\n----------------------------\n`;
+    pw2Checklist.forEach(item=>{
+      const prefix=item.status==='done'?'✅':item.status==='notdone'?'❌':'○';
+      report+=`${prefix} ${item.text}\n`;
+    });
+    if(pickup){report+=`---\nExtra Material To Pick Up: ${pickup}\n`;}
+    if(notes){report+=`---\nNotes: ${notes}\n`;}
+    report+=`---\n[Attach photos to AppWright reply if needed]`;
+    showPwSummary(report,'2nd');
+  }
+
+  // ── SUMMARY + HISTORY ──────────────────────────────────────────
+  function showPwSummary(text,type){
+    document.getElementById('pw-summary-text').value=text;
+    showPwScreen('pw-screen-summary');
+    savePwToHistory(text,type);
+  }
+  function copyPwSummary(){ const t=document.getElementById('pw-summary-text').value; navigator.clipboard.writeText(t).then(()=>showToast('✓ COPIED — Paste into AppWright')).catch(()=>{document.getElementById('pw-summary-text').select();document.execCommand('copy');showToast('✓ COPIED');}); }
+  function newPostWalk(){ pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();pw2Checklist=[]; document.getElementById('pw-active-banner').style.display='none'; document.getElementById('pw-header-title').innerText='📋 POST WALK'; showPwScreen('pw-screen-type'); renderPwHistory(); }
+
+  function savePwToHistory(text,type){
+    const key=type==='1st'?PW1_HIST:PW2_HIST;
+    let h=JSON.parse(localStorage.getItem(key))||[];
+    const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    h.unshift({label:`${ds} — ${pwCustomer} — ${pwJobId}`,text,time:ts,customer:pwCustomer,jobId:pwJobId});
+    if(h.length>20)h.pop();
+    localStorage.setItem(key,JSON.stringify(h));
+    renderPwHistory();
+  }
+  function showPwHistory(type){
+    const key=type==='1st'?PW1_HIST:PW2_HIST;
+    const h=JSON.parse(localStorage.getItem(key))||[];
+    const el=document.getElementById('pw-history-list');
+    el.innerHTML=h.length?h.map((item,i)=>`<div class="pw-history-entry"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="loadPwHistory('${type}',${i})">LOAD</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="delPwHistory('${type}',${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;text-align:center;">No ${type==='1st'?'1st trim':'2nd trim'} post walks yet.</p>`;
+  }
+  function renderPwHistory(){ showPwHistory('1st'); }
+  function loadPwHistory(type,i){ const key=type==='1st'?PW1_HIST:PW2_HIST,h=JSON.parse(localStorage.getItem(key))||[],item=h[i]; if(!item)return; document.getElementById('pw-summary-text').value=item.text; pwCustomer=item.customer;pwJobId=item.jobId; document.getElementById('pw-active-banner').innerHTML=`📋 <span style="opacity:0.75;">ACTIVE JOB:</span> ${pwCustomer} — ${pwJobId}`; document.getElementById('pw-active-banner').style.display='flex'; showPwScreen('pw-screen-summary'); }
+  function delPwHistory(type,i){ const key=type==='1st'?PW1_HIST:PW2_HIST; let h=JSON.parse(localStorage.getItem(key))||[];h.splice(i,1);localStorage.setItem(key,JSON.stringify(h));showPwHistory(type); }
 
   // ── BUILD LAYOUT ───────────────────────────────────────────────
-  const appContainer = document.getElementById('app-content');
-  layout.forEach(sec => {
-    const title = document.createElement('div');
-    title.className = `section-title ${sec.color}`;
-    title.innerHTML = `<span>${sec.title}</span><span style="display:flex;align-items:center;gap:6px;"><span class="section-check" id="check-${sec.id}">✓</span><span class="chevron"></span></span>`;
-    title.onclick = () => toggleSection(sec.id, title);
-    const content = document.createElement('div');
-    content.id = `content-${sec.id}`;
-    content.className = 'section-content';
-    const grid = document.createElement('div');
-    grid.className = 'item-grid';
-    sec.items.forEach(item => {
-      let itemTypes = sec.types || [];
-      if (sec.id==="sp") { itemTypes=railLengths.includes(item)?["OPEN","WALL"]:item==="Shoes"?["FLAT","ANGLE"]:["QTY"]; }
-      const card = document.createElement('div');
-      card.className = 'item-card';
-      card.id = `card-${sec.id}-${item.replace(/[\/ ']/g,"-")}`;
-      card.innerHTML = `<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div><div class="note-badge">📝</div>`;
-      card.onclick = () => openModal(sec.id, item, itemTypes);
-      grid.appendChild(card);
-    });
+  const appContainer=document.getElementById('app-content');
+  layout.forEach(sec=>{
+    const title=document.createElement('div'); title.className=`section-title ${sec.color}`; title.innerHTML=`<span>${sec.title}</span><span style="display:flex;align-items:center;gap:6px;"><span class="section-check" id="check-${sec.id}">✓</span><span class="chevron"></span></span>`; title.onclick=()=>toggleSection2(sec.id,title);
+    const content=document.createElement('div'); content.id=`content-${sec.id}`; content.className='section-content';
+    const grid=document.createElement('div'); grid.className='item-grid';
+    sec.items.forEach(item=>{ let it=sec.types||[]; if(sec.id==='sp'){it=railLengths.includes(item)?['OPEN','WALL']:item==='Shoes'?['FLAT','ANGLE']:['QTY'];} const card=document.createElement('div');card.className='item-card';card.id=`card-${sec.id}-${item.replace(/[\/ ']/g,"-")}`;card.innerHTML=`<span>${item}</span><div class="badge badge-left"></div><div class="badge badge-center"></div><div class="badge badge-right"></div><div class="note-badge">📝</div>`;card.onclick=()=>openModal(sec.id,item,it);grid.appendChild(card); });
     content.appendChild(grid);
-    if (sec.id==="AS") {
-      const fireBtn = document.createElement('button');
-      fireBtn.id="fire-status"; fireBtn.className="item-card"; fireBtn.style.width="calc(100% - 16px)"; fireBtn.style.margin="8px"; fireBtn.innerText="FIRE RATED: NO"; fireBtn.onclick=toggleFire;
-      content.appendChild(fireBtn);
-    }
-    appContainer.appendChild(title);
-    appContainer.appendChild(content);
+    if(sec.id==='AS'){ const fb=document.createElement('button');fb.id='fire-status';fb.className='item-card';fb.style.width='calc(100% - 16px)';fb.style.margin='8px';fb.innerText='FIRE RATED: NO';fb.onclick=toggleFire;content.appendChild(fb); }
+    appContainer.appendChild(title); appContainer.appendChild(content);
   });
 
   // ── INIT ───────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
   requestAnimationFrame(updateStickyOffsets);
-  window.addEventListener('resize', updateStickyOffsets);
+  window.addEventListener('resize',updateStickyOffsets);
 </script>
 </body>
 </html>
