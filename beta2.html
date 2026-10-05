@@ -290,14 +290,14 @@
 
         <label style="font-size:12px;font-weight:900;color:var(--navy);">Result</label>
         <div class="pw-result-row">
-          <div class="pw-result-choice" id="pw1-complete-btn" onclick="setPw1Result('complete')">✅ Complete</div>
-          <div class="pw-result-choice" id="pw1-incomplete-btn" onclick="setPw1Result('incomplete')">❌ Incomplete</div>
+          <button class="pw-result-choice" id="pw1-complete-btn" onclick="setPw1Result('complete')">✅ Complete</button>
+          <button class="pw-result-choice" id="pw1-incomplete-btn" onclick="setPw1Result('incomplete')">❌ Incomplete</button>
         </div>
 
         <label style="font-size:12px;font-weight:900;color:var(--navy);margin-top:4px;">Doors</label>
         <div class="pw-door-row">
-          <div class="pw-door-choice" id="pw1-door-ok" onclick="setPw1DoorCheck('ok')">✅ All opening &amp; closing properly</div>
-          <div class="pw-door-choice" id="pw1-door-issues" onclick="setPw1DoorCheck('issues')">❌ Door issues noted</div>
+          <button class="pw-door-choice" id="pw1-door-ok" onclick="setPw1DoorCheck('ok')">✅ All opening &amp; closing properly</button>
+          <button class="pw-door-choice" id="pw1-door-issues" onclick="setPw1DoorCheck('issues')">❌ Door issues noted</button>
         </div>
 
         <div id="pw1-reasons-section" style="display:none;">
@@ -388,6 +388,8 @@
 
   // Quick note state — one array per area
   let quickNotes={main:[],pw1:[],pw2:[]};
+  // Global search results so onclick handlers can always access them
+  let _pwSearchResults=[];
 
   const PW1_REASONS=[
     {label:'Material Short / Missing',hint:'What is short or missing?'},
@@ -539,15 +541,20 @@
   function searchPwJobs(){
     const q=document.getElementById('pw-search-input').value.trim().toLowerCase();
     const results=[],seen=new Set();
-    const all=[...(JSON.parse(localStorage.getItem('bfs_history'))||[]),(JSON.parse(localStorage.getItem(TEST_HIST))||[])];
-    all.forEach(h=>{if(!h.fullData?.customer)return;const c=h.fullData.customer||'',j=h.fullData.jobId||h.fullData.lot||'',k=`${c}|${j}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||c.toLowerCase().includes(q)||j.toLowerCase().includes(q)||(h.label||'').toLowerCase().includes(q))results.push({customer:c,jobId:j,time:h.time});});
-    try{(JSON.parse(localStorage.getItem('bfs_takeoff_index'))||[]).forEach(e=>{const k=`${e.customer}|${e.jobId||''}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||e.customer.toLowerCase().includes(q)||(e.jobId||'').toLowerCase().includes(q))results.push({customer:e.customer,jobId:e.jobId||'',time:''});});}catch(e){}
+    // Spread both arrays correctly
+    const all=[
+      ...(JSON.parse(localStorage.getItem('bfs_history'))||[]),
+      ...(JSON.parse(localStorage.getItem(TEST_HIST))||[])
+    ];
+    all.forEach(h=>{if(!h.fullData?.customer)return;const c=h.fullData.customer||'',j=h.fullData.jobId||h.fullData.lot||'',k=`${c}|${j}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||c.toLowerCase().includes(q)||j.toLowerCase().includes(q)||(h.label||'').toLowerCase().includes(q))results.push({customer:c,jobId:j,time:h.time||''});});
+    try{(JSON.parse(localStorage.getItem('bfs_takeoff_index'))||[]).forEach(e=>{const k=`${e.customer}|${e.jobId||''}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||e.customer.toLowerCase().includes(q)||(e.jobId||'').toLowerCase().includes(q))results.push({customer:e.customer,jobId:e.jobId||'',time:''});});}catch(ex){}
+    // Store in global so onclick can access it reliably
+    _pwSearchResults = results;
     const el=document.getElementById('pw-search-results');
-    if(!results.length){el.innerHTML=`<p style="font-size:12px;color:#94a3b8;margin:8px 0;">No matches. Enter manually below.</p>`;return;}
-    el.innerHTML=results.slice(0,8).map((r,i)=>`<div class="pw-result-item" onclick="usePwResult(${i})"><div><div class="pw-result-label">${r.customer}</div><div class="pw-result-sub">${r.jobId}${r.time?' · '+r.time:''}</div></div><button class="pw-use-btn">Use →</button></div>`).join('');
-    el._results=results;
+    if(!results.length){el.innerHTML=`<p style="font-size:12px;color:#94a3b8;margin:8px 0;">No matches found. Enter manually below.</p>`;return;}
+    el.innerHTML=results.slice(0,8).map((r,i)=>`<div class="pw-result-item"><div><div class="pw-result-label">${r.customer}</div><div class="pw-result-sub">${r.jobId||'No Job ID'}${r.time?' · '+r.time:''}</div></div><button class="pw-use-btn" onclick="usePwResult(${i})">Use →</button></div>`).join('');
   }
-  function usePwResult(i){const r=document.getElementById('pw-search-results')._results[i];pwCustomer=r.customer;pwJobId=r.jobId;startPwForm();}
+  function usePwResult(i){const r=_pwSearchResults[i];if(!r)return;pwCustomer=r.customer;pwJobId=r.jobId;startPwForm();}
   function startPwFormManual(){pwCustomer=document.getElementById('pw-cust-manual').value.trim();pwJobId=document.getElementById('pw-jobid-manual').value.trim();if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}startPwForm();}
 
   function startPwForm(){
@@ -576,25 +583,67 @@
   function buildPw1Reasons(){
     document.getElementById('pw1-reasons-grid').innerHTML=PW1_REASONS.map(r=>{
       const id=r.label.replace(/[\s\/]/g,'-');
-      return`<div class="pw-reason" id="reason-${id}" onclick="toggleReason(${JSON.stringify(r.label)},event)">
-        <div class="pw-reason-header">
+      // Use button for the header so iPhone registers taps reliably
+      return`<div class="pw-reason" id="reason-${id}">
+        <button class="pw-reason-header" onclick="toggleReason(${JSON.stringify(r.label)})" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;text-align:left;">
           <div class="pw-reason-icon" id="icon-${id}">○</div>
-          <span class="pw-reason-lbl">${r.label}</span>
-        </div>
-        <div class="pw-reason-note-wrap" id="notewrap-${id}">
+          <span class="pw-reason-lbl" id="lbl-${id}">${r.label}</span>
+        </button>
+        <div class="pw-reason-note-wrap" id="notewrap-${id}" style="display:none;padding:0 14px 14px 14px;">
           <div class="pw-reason-hint">Details — tap mic to speak</div>
-          <textarea id="rnote-${id}" placeholder="${r.hint}" onclick="event.stopPropagation()"></textarea>
+          <textarea id="rnote-${id}" placeholder="${r.hint}" style="width:100%;height:55px;font-size:13px;padding:8px;border:1px solid #fca5a5;border-radius:6px;background:#fff;resize:none;margin:0;font-family:-apple-system,sans-serif;line-height:1.4;"></textarea>
         </div>
       </div>`;
     }).join('');
   }
-  function toggleReason(label,event){
-    if(event&&(event.target.tagName==='TEXTAREA'||event.target.tagName==='INPUT'))return;
-    const id=label.replace(/[\s\/]/g,'-'),el=document.getElementById(`reason-${id}`),icon=document.getElementById(`icon-${id}`),wrap=document.getElementById(`notewrap-${id}`);
-    if(pw1SelectedReasons.has(label)){pw1SelectedReasons.delete(label);el.classList.remove('selected');wrap.style.display='none';icon.innerText='○';}
-    else{pw1SelectedReasons.add(label);el.classList.add('selected');wrap.style.display='block';icon.innerText='❌';setTimeout(()=>document.getElementById(`rnote-${id}`)?.focus(),150);}
+  function toggleReason(label){
+    const id=label.replace(/[\s\/]/g,'-');
+    const el=document.getElementById(`reason-${id}`);
+    const icon=document.getElementById(`icon-${id}`);
+    const wrap=document.getElementById(`notewrap-${id}`);
+    const lbl=document.getElementById(`lbl-${id}`);
+    if(!el)return;
+    if(pw1SelectedReasons.has(label)){
+      pw1SelectedReasons.delete(label);
+      el.classList.remove('selected');
+      el.style.background='#f8fafc';
+      el.style.borderColor='#e2e8f0';
+      wrap.style.display='none';
+      icon.innerText='○';
+      icon.style.background='white';
+      icon.style.borderColor='#cbd5e1';
+      if(lbl)lbl.style.color='var(--navy)';
+    }else{
+      pw1SelectedReasons.add(label);
+      el.classList.add('selected');
+      el.style.background='#fef2f2';
+      el.style.borderColor='#dc2626';
+      wrap.style.display='block';
+      icon.innerText='❌';
+      icon.style.background='#dc2626';
+      icon.style.borderColor='#dc2626';
+      if(lbl)lbl.style.color='#dc2626';
+      setTimeout(()=>document.getElementById(`rnote-${id}`)?.focus(),200);
+    }
   }
-  function resetPw1Buttons(){pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();['pw1-complete-btn','pw1-incomplete-btn'].forEach(id=>document.getElementById(id).className='pw-result-choice');['pw1-door-ok','pw1-door-issues'].forEach(id=>document.getElementById(id).className='pw-door-choice');document.getElementById('pw1-reasons-section').style.display='none';}
+  function resetPw1Buttons(){
+    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();
+    ['pw1-complete-btn','pw1-incomplete-btn'].forEach(id=>document.getElementById(id).className='pw-result-choice');
+    ['pw1-door-ok','pw1-door-issues'].forEach(id=>document.getElementById(id).className='pw-door-choice');
+    document.getElementById('pw1-reasons-section').style.display='none';
+    // Reset any reason cards that were selected
+    PW1_REASONS.forEach(r=>{
+      const id=r.label.replace(/[\s\/]/g,'-');
+      const el=document.getElementById(`reason-${id}`);
+      const icon=document.getElementById(`icon-${id}`);
+      const wrap=document.getElementById(`notewrap-${id}`);
+      const lbl=document.getElementById(`lbl-${id}`);
+      if(el){el.classList.remove('selected');el.style.background='';el.style.borderColor='';}
+      if(icon){icon.innerText='○';icon.style.background='';icon.style.borderColor='';}
+      if(wrap)wrap.style.display='none';
+      if(lbl)lbl.style.color='';
+    });
+  }
   function setPw1Result(r){pw1Result=r;document.getElementById('pw1-complete-btn').className='pw-result-choice'+(r==='complete'?' sel-complete':'');document.getElementById('pw1-incomplete-btn').className='pw-result-choice'+(r==='incomplete'?' sel-incomplete':'');document.getElementById('pw1-reasons-section').style.display=r==='incomplete'?'block':'none';}
   function setPw1DoorCheck(r){pw1DoorCheck=r;document.getElementById('pw1-door-ok').className='pw-door-choice'+(r==='ok'?' sel-ok':'');document.getElementById('pw1-door-issues').className='pw-door-choice'+(r==='issues'?' sel-bad':'');}
 
