@@ -455,16 +455,39 @@
   function clearQNotes(area){quickNotes[area]=[];renderQNotes(area);}
 
   // ── DOOR TOTAL ─────────────────────────────────────────────────
-  function updateDoorTotal(){
+  function getDoorTotal(){
     let t=0;
     [{id:'68',items:doorSizes,types:['LH','RH','SLAB']},{id:'80',items:doorSizes,types:['LH','RH','SLAB']},{id:'atws',items:doorSizes,types:['LH','RH']},{id:'DBL68',items:dblSizes,types:['DBL','T-AST']},{id:'DBL80',items:dblSizes,types:['DBL','T-AST']}].forEach(s=>{s.items.forEach(sz=>s.types.forEach(tp=>{t+=state[`${s.id}_${sz.replace(/[\/ ']/g,"-")}_${tp}`]||0;}));});
-    document.getElementById('door-total-count').innerText=t;
-    t>0?document.getElementById('door-total-row').classList.add('visible'):document.getElementById('door-total-row').classList.remove('visible');
+    return t;
+  }
+  function updateDoorTotal(){
+    const t=getDoorTotal();
+    const countEl=document.getElementById('door-total-count');
+    if(countEl)countEl.innerText=t;
+    const rowEl=document.getElementById('door-total-row');
+    if(rowEl)t>0?rowEl.classList.add('visible'):rowEl.classList.remove('visible');
+    // Refresh banner so door count stays current as PM counts
+    updateJobBanner();
   }
 
   // ── CORE ───────────────────────────────────────────────────────
   function updateStickyOffsets(){const bv=document.body.classList.contains('banner-visible'),bh=bv?(document.getElementById('job-banner').offsetHeight||36):0;document.documentElement.style.setProperty('--section-top',(44+bh)+'px');}
-  function updateJobBanner(){const c=document.getElementById('customer').value.trim(),j=document.getElementById('job-id').value.trim(),b=document.getElementById('job-banner');if(c||j){b.innerHTML=`📋 <span>ACTIVE JOB:</span> ${[c,j].filter(Boolean).join(' — ')}`;b.classList.add('visible');document.body.classList.add('banner-visible');}else{b.classList.remove('visible');document.body.classList.remove('banner-visible');}updateStickyOffsets();}
+  function updateJobBanner(){
+    const c=document.getElementById('customer').value.trim();
+    const j=document.getElementById('job-id').value.trim();
+    const b=document.getElementById('job-banner');
+    if(c||j){
+      const total=getDoorTotal();
+      const doorPart=total>0?` <span style="opacity:0.8;margin-left:6px;font-weight:700;">· 🚪 ${total}</span>`:'';
+      b.innerHTML=`📋 <span>ACTIVE JOB:</span> ${[c,j].filter(Boolean).join(' — ')}${doorPart}`;
+      b.classList.add('visible');
+      document.body.classList.add('banner-visible');
+    }else{
+      b.classList.remove('visible');
+      document.body.classList.remove('banner-visible');
+    }
+    updateStickyOffsets();
+  }
   function saveState(){localStorage.setItem(TEST_KEY,JSON.stringify({customer:document.getElementById('customer').value,jobId:document.getElementById('job-id').value,notes:document.getElementById('notes').value,summaryText:document.getElementById('summary').value,state}));updateSummaryStyle();updateDoorTotal();}
   function loadActiveState(){const s=localStorage.getItem(TEST_KEY);if(s){const d=JSON.parse(s);document.getElementById('customer').value=d.customer||'';document.getElementById('job-id').value=d.jobId||'';document.getElementById('notes').value=d.notes||'';document.getElementById('summary').value=d.summaryText||'';state=d.state||{fireRated:false};refreshAllCards();updateSummaryStyle();updateJobBanner();updateDoorTotal();}}
   function getSyncKey(sId,label,type){if(sId==="sp"){sId=railLengths.includes(label)?'HR':label==='Shoes'?'STSH':'ST';}return`${sId}_${label.replace(/[\/ ']/g,"-")}_${type}`;}
@@ -581,49 +604,44 @@
 
   // ── 1ST TRIM ───────────────────────────────────────────────────
   function buildPw1Reasons(){
-    document.getElementById('pw1-reasons-grid').innerHTML=PW1_REASONS.map(r=>{
-      const id=r.label.replace(/[\s\/]/g,'-');
-      // Use button for the header so iPhone registers taps reliably
-      return`<div class="pw-reason" id="reason-${id}">
-        <button class="pw-reason-header" onclick="toggleReason(${JSON.stringify(r.label)})" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;text-align:left;">
-          <div class="pw-reason-icon" id="icon-${id}">○</div>
-          <span class="pw-reason-lbl" id="lbl-${id}">${r.label}</span>
+    // Use numeric index in onclick — avoids ALL quoting issues in HTML attributes
+    document.getElementById('pw1-reasons-grid').innerHTML=PW1_REASONS.map((r,idx)=>{
+      return`<div class="pw-reason" id="pr-${idx}">
+        <button type="button"
+          onclick="toggleReason(${idx})"
+          style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;text-align:left;">
+          <div id="pr-icon-${idx}" style="width:32px;height:32px;border-radius:8px;border:2px solid #cbd5e1;background:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">○</div>
+          <span id="pr-lbl-${idx}" style="font-size:14px;font-weight:800;color:var(--navy);flex:1;">${r.label}</span>
         </button>
-        <div class="pw-reason-note-wrap" id="notewrap-${id}" style="display:none;padding:0 14px 14px 14px;">
-          <div class="pw-reason-hint">Details — tap mic to speak</div>
-          <textarea id="rnote-${id}" placeholder="${r.hint}" style="width:100%;height:55px;font-size:13px;padding:8px;border:1px solid #fca5a5;border-radius:6px;background:#fff;resize:none;margin:0;font-family:-apple-system,sans-serif;line-height:1.4;"></textarea>
+        <div id="pr-note-${idx}" style="display:none;padding:0 14px 14px;">
+          <div style="font-size:10px;color:#dc2626;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:0.3px;">Details — tap mic on keyboard to speak</div>
+          <textarea id="pr-text-${idx}" placeholder="${r.hint}"
+            style="width:100%;height:55px;font-size:14px;padding:8px;border:1px solid #fca5a5;border-radius:6px;background:#fff;resize:none;margin:0;font-family:-apple-system,sans-serif;line-height:1.4;"></textarea>
         </div>
       </div>`;
     }).join('');
   }
-  function toggleReason(label){
-    const id=label.replace(/[\s\/]/g,'-');
-    const el=document.getElementById(`reason-${id}`);
-    const icon=document.getElementById(`icon-${id}`);
-    const wrap=document.getElementById(`notewrap-${id}`);
-    const lbl=document.getElementById(`lbl-${id}`);
-    if(!el)return;
+
+  function toggleReason(idx){
+    const r=PW1_REASONS[idx]; if(!r)return;
+    const label=r.label;
+    const card=document.getElementById(`pr-${idx}`);
+    const icon=document.getElementById(`pr-icon-${idx}`);
+    const noteWrap=document.getElementById(`pr-note-${idx}`);
+    const lbl=document.getElementById(`pr-lbl-${idx}`);
     if(pw1SelectedReasons.has(label)){
       pw1SelectedReasons.delete(label);
-      el.classList.remove('selected');
-      el.style.background='#f8fafc';
-      el.style.borderColor='#e2e8f0';
-      wrap.style.display='none';
-      icon.innerText='○';
-      icon.style.background='white';
-      icon.style.borderColor='#cbd5e1';
+      card.style.background='#f8fafc'; card.style.borderColor='#e2e8f0';
+      icon.textContent='○'; icon.style.background='white'; icon.style.borderColor='#cbd5e1';
       if(lbl)lbl.style.color='var(--navy)';
+      noteWrap.style.display='none';
     }else{
       pw1SelectedReasons.add(label);
-      el.classList.add('selected');
-      el.style.background='#fef2f2';
-      el.style.borderColor='#dc2626';
-      wrap.style.display='block';
-      icon.innerText='❌';
-      icon.style.background='#dc2626';
-      icon.style.borderColor='#dc2626';
+      card.style.background='#fef2f2'; card.style.borderColor='#dc2626';
+      icon.textContent='❌'; icon.style.background='#dc2626'; icon.style.borderColor='#dc2626';
       if(lbl)lbl.style.color='#dc2626';
-      setTimeout(()=>document.getElementById(`rnote-${id}`)?.focus(),200);
+      noteWrap.style.display='block';
+      setTimeout(()=>document.getElementById(`pr-text-${idx}`)?.focus(),200);
     }
   }
   function resetPw1Buttons(){
@@ -631,18 +649,7 @@
     ['pw1-complete-btn','pw1-incomplete-btn'].forEach(id=>document.getElementById(id).className='pw-result-choice');
     ['pw1-door-ok','pw1-door-issues'].forEach(id=>document.getElementById(id).className='pw-door-choice');
     document.getElementById('pw1-reasons-section').style.display='none';
-    // Reset any reason cards that were selected
-    PW1_REASONS.forEach(r=>{
-      const id=r.label.replace(/[\s\/]/g,'-');
-      const el=document.getElementById(`reason-${id}`);
-      const icon=document.getElementById(`icon-${id}`);
-      const wrap=document.getElementById(`notewrap-${id}`);
-      const lbl=document.getElementById(`lbl-${id}`);
-      if(el){el.classList.remove('selected');el.style.background='';el.style.borderColor='';}
-      if(icon){icon.innerText='○';icon.style.background='';icon.style.borderColor='';}
-      if(wrap)wrap.style.display='none';
-      if(lbl)lbl.style.color='';
-    });
+    buildPw1Reasons(); // Rebuild clean — simplest way to reset all state
   }
   function setPw1Result(r){pw1Result=r;document.getElementById('pw1-complete-btn').className='pw-result-choice'+(r==='complete'?' sel-complete':'');document.getElementById('pw1-incomplete-btn').className='pw-result-choice'+(r==='incomplete'?' sel-incomplete':'');document.getElementById('pw1-reasons-section').style.display=r==='incomplete'?'block':'none';}
   function setPw1DoorCheck(r){pw1DoorCheck=r;document.getElementById('pw1-door-ok').className='pw-door-choice'+(r==='ok'?' sel-ok':'');document.getElementById('pw1-door-issues').className='pw-door-choice'+(r==='issues'?' sel-bad':'');}
@@ -659,7 +666,13 @@
     report+=`Doors: ${doorLabel}\n`;
     if(pw1Result==='incomplete'&&pw1SelectedReasons.size>0){
       report+=`---\n`;
-      pw1SelectedReasons.forEach(label=>{const id=label.replace(/[\s\/]/g,'-'),note=(document.getElementById(`rnote-${id}`)?.value||'').trim();report+=`❌ ${label}\n`;if(note)report+=`   ${note}\n`;});
+      // Use index to find each selected reason and its note field
+      PW1_REASONS.forEach((r,idx)=>{
+        if(!pw1SelectedReasons.has(r.label))return;
+        const note=(document.getElementById(`pr-text-${idx}`)?.value||'').trim();
+        report+=`❌ ${r.label}\n`;
+        if(note)report+=`   ${note}\n`;
+      });
     }
     if(qnt){report+=`---\n${qnt}\n`;}
     if(matOnSite){report+=`---\nMaterial On Site: ${matOnSite}\n`;}
