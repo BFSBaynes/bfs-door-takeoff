@@ -323,6 +323,16 @@
         <textarea id="pw1-general-notes" placeholder="Anything else..." style="height:55px;"></textarea>
 
         <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-top:8px;" onclick="generatePw1()">⚡ Generate Post Walk</button>
+
+        <!-- Inline result — stays on same screen -->
+        <div id="pw1-result" style="display:none;margin-top:14px;padding-top:14px;border-top:2px solid #e2e8f0;">
+          <div style="font-size:10px;font-weight:900;color:var(--pw-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">✅ POST WALK GENERATED</div>
+          <textarea id="pw1-summary-text" readonly
+            style="height:280px;font-family:'Courier New',monospace;font-size:13px;border:2px solid var(--pw-green);width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#fff;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
+          <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-bottom:8px;" onclick="copyPwInline('pw1')">📋 Copy to AppWright</button>
+          <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
+        </div>
+
         <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);margin-top:8px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
       </div>
     </div>
@@ -358,6 +368,16 @@
         <textarea id="pw2-general-notes" placeholder="Anything else..." style="height:55px;"></textarea>
 
         <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-top:8px;" onclick="generatePw2()">⚡ Generate Post Walk</button>
+
+        <!-- Inline result — stays on same screen -->
+        <div id="pw2-result" style="display:none;margin-top:14px;padding-top:14px;border-top:2px solid #e2e8f0;">
+          <div style="font-size:10px;font-weight:900;color:var(--pw-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">✅ POST WALK GENERATED</div>
+          <textarea id="pw2-summary-text" readonly
+            style="height:280px;font-family:'Courier New',monospace;font-size:13px;border:2px solid var(--pw-green);width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#fff;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
+          <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-bottom:8px;" onclick="copyPwInline('pw2')">📋 Copy to AppWright</button>
+          <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
+        </div>
+
         <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);margin-top:8px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
       </div>
     </div>
@@ -590,6 +610,8 @@
       document.getElementById('pw1-material-onsite').value='';
       document.getElementById('pw1-general-notes').value='';
       clearQNotes('pw1');
+      // Hide previous result if any
+      const r1=document.getElementById('pw1-result');if(r1)r1.style.display='none';
       showPwScreen('pw-screen-1st');
     }else{
       document.getElementById('pw2-job-display').innerText=`${pwCustomer}${pwJobId?' — '+pwJobId:''}`;
@@ -597,6 +619,8 @@
       document.getElementById('pw2-material-pickup').value='';
       document.getElementById('pw2-general-notes').value='';
       clearQNotes('pw2');
+      // Hide previous result if any
+      const r2=document.getElementById('pw2-result');if(r2)r2.style.display='none';
       renderPw2Checklist();
       showPwScreen('pw-screen-2nd');
     }
@@ -666,19 +690,26 @@
     report+=`Doors: ${doorLabel}\n`;
     if(pw1Result==='incomplete'&&pw1SelectedReasons.size>0){
       report+=`---\n`;
-      // Use index to find each selected reason and its note field
       PW1_REASONS.forEach((r,idx)=>{
         if(!pw1SelectedReasons.has(r.label))return;
-        const note=(document.getElementById(`pr-text-${idx}`)?.value||'').trim();
+        const rawNote=(document.getElementById(`pr-text-${idx}`)?.value||'').trim();
         report+=`❌ ${r.label}\n`;
-        if(note)report+=`   ${note}\n`;
+        if(rawNote){
+          // Indent every line of a multi-line note, not just the first
+          rawNote.split('\n').forEach(line=>{if(line.trim())report+=`   ${line.trim()}\n`;});
+        }
       });
     }
     if(qnt){report+=`---\n${qnt}\n`;}
     if(matOnSite){report+=`---\nMaterial On Site: ${matOnSite}\n`;}
     if(genNotes){report+=`---\nNotes: ${genNotes}\n`;}
     report+=`---\n[Attach photos to AppWright reply if needed]`;
-    showPwSummary(report,'1st');
+    // Show inline — don't navigate away from the form
+    document.getElementById('pw1-summary-text').value=report;
+    const resultDiv=document.getElementById('pw1-result');
+    resultDiv.style.display='block';
+    resultDiv.scrollIntoView({behavior:'smooth'});
+    savePwToHistory(report,'1st');
   }
 
   // ── 2ND TRIM ───────────────────────────────────────────────────
@@ -698,13 +729,37 @@
     if(pickup){report+=`---\nExtra Material To Pick Up: ${pickup}\n`;}
     if(notes){report+=`---\nNotes: ${notes}\n`;}
     report+=`---\n[Attach photos to AppWright reply if needed]`;
-    showPwSummary(report,'2nd');
+    // Show inline — don't navigate away from the form
+    document.getElementById('pw2-summary-text').value=report;
+    const resultDiv2=document.getElementById('pw2-result');
+    resultDiv2.style.display='block';
+    resultDiv2.scrollIntoView({behavior:'smooth'});
+    savePwToHistory(report,'2nd');
   }
 
   // ── SUMMARY & HISTORY ──────────────────────────────────────────
-  function showPwSummary(text,type){document.getElementById('pw-summary-text').value=text;showPwScreen('pw-screen-summary');savePwToHistory(text,type);}
+  // Inline copy — used by buttons on the form itself
+  function copyPwInline(which){
+    const id=which==='pw1'?'pw1-summary-text':'pw2-summary-text';
+    const text=document.getElementById(id).value;
+    navigator.clipboard.writeText(text)
+      .then(()=>showToast('✓ COPIED — Paste into AppWright'))
+      .catch(()=>{document.getElementById(id).select();document.execCommand('copy');showToast('✓ COPIED');});
+  }
+  // Summary screen copy (used when loading from history)
   function copyPwSummary(){const t=document.getElementById('pw-summary-text').value;navigator.clipboard.writeText(t).then(()=>showToast('✓ COPIED — Paste into AppWright')).catch(()=>{document.getElementById('pw-summary-text').select();document.execCommand('copy');showToast('✓ COPIED');});}
-  function newPostWalk(){pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();pw2Checklist=[];clearQNotes('pw1');clearQNotes('pw2');document.getElementById('pw-active-banner').style.display='none';document.getElementById('pw-header-title').innerText='📋 POST WALK';showPwScreen('pw-screen-type');renderPwHistory();}
+  function showPwSummary(text,type){document.getElementById('pw-summary-text').value=text;showPwScreen('pw-screen-summary');}
+
+  function newPostWalk(){
+    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();pw2Checklist=[];
+    clearQNotes('pw1');clearQNotes('pw2');
+    // Hide inline results
+    ['pw1-result','pw2-result'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    document.getElementById('pw-active-banner').style.display='none';
+    document.getElementById('pw-header-title').innerText='📋 POST WALK';
+    showPwScreen('pw-screen-type');
+    renderPwHistory();
+  }
   function savePwToHistory(text,type){const key=type==='1st'?PW1_HIST:PW2_HIST;let h=JSON.parse(localStorage.getItem(key))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${pwCustomer} — ${pwJobId}`,text,time:ts,customer:pwCustomer,jobId:pwJobId});if(h.length>20)h.pop();localStorage.setItem(key,JSON.stringify(h));renderPwHistory();}
   function showPwHistory(type){const key=type==='1st'?PW1_HIST:PW2_HIST,h=JSON.parse(localStorage.getItem(key))||[],el=document.getElementById('pw-history-list');el.innerHTML=h.length?h.map((item,i)=>`<div class="pw-history-entry"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="loadPwHist('${type}',${i})">LOAD</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="delPwHist('${type}',${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;text-align:center;">No ${type==='1st'?'1st trim':'2nd trim'} post walks yet.</p>`;}
   function renderPwHistory(){showPwHistory('1st');}
