@@ -41,9 +41,9 @@
     .section-title { color:#fff; padding:15px 18px; font-weight:900; font-size:13px; margin:12px 0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:0.6px; border-radius:12px; position:sticky; top:var(--section-top,44px); z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.55),0 2px 6px rgba(0,0,0,0.35); }
     .section-check { display:none; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.4); border-radius:20px; padding:2px 9px; font-size:11px; font-weight:900; color:#fff; margin-right:8px; }
     .section-check.active { display:inline-block; background:var(--green); border-color:var(--green); }
-    /* Section pill colors — colored glow shadow lifts them off the dark background */
-    .bg-navy{ background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%); box-shadow:0 8px 28px rgba(26,82,150,0.55),0 3px 8px rgba(0,0,0,0.4); }
-    .bg-red{ background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%); box-shadow:0 8px 28px rgba(240,32,64,0.45),0 3px 8px rgba(0,0,0,0.35); }
+    /* Section pill colors — white top highlight simulates light source, strong drop shadow lifts off dark bg */
+    .bg-navy{ background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%); box-shadow:0 1px 0 rgba(255,255,255,0.22),0 10px 30px rgba(0,0,0,0.6),0 3px 8px rgba(0,0,0,0.4); }
+    .bg-red{ background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%); box-shadow:0 1px 0 rgba(255,255,255,0.18),0 10px 30px rgba(0,0,0,0.6),0 3px 8px rgba(0,0,0,0.4); }
     .section-content{display:none;padding:8px 0;} .section-content.active{display:block;}
 
     /* Item grid — deep 3D shadow effect */
@@ -173,9 +173,9 @@
     .lo-header{background:linear-gradient(135deg,#1d4ed8,#1e40af);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.5);}
     /* Lockout counter cards — same colors as trim section pills, colored glow shadows */
     .lo-counter-card{border-radius:14px;padding:14px 16px;margin-bottom:10px;border:none;}
-    .lo-counter-card.lo-navy{background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%);box-shadow:0 10px 32px rgba(26,82,150,0.55),0 4px 10px rgba(0,0,0,0.4);}
-    .lo-counter-card.lo-red{background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%);box-shadow:0 10px 32px rgba(240,32,64,0.45),0 4px 10px rgba(0,0,0,0.35);}
-    .lo-counter-card.has-count{background:linear-gradient(135deg,#14532d 0%,#166534 100%);box-shadow:0 10px 32px rgba(22,163,74,0.45),0 4px 10px rgba(22,163,74,0.2);}
+    .lo-counter-card.lo-navy{background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%);box-shadow:0 1px 0 rgba(255,255,255,0.22),0 12px 34px rgba(0,0,0,0.65),0 4px 10px rgba(0,0,0,0.45);}
+    .lo-counter-card.lo-red{background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%);box-shadow:0 1px 0 rgba(255,255,255,0.18),0 12px 34px rgba(0,0,0,0.65),0 4px 10px rgba(0,0,0,0.45);}
+    .lo-counter-card.has-count{background:linear-gradient(135deg,#14532d 0%,#166534 100%);box-shadow:0 1px 0 rgba(255,255,255,0.2),0 12px 34px rgba(0,0,0,0.65),0 4px 10px rgba(0,0,0,0.4);}
     .lo-item-label{font-size:15px;font-weight:900;color:rgba(255,255,255,0.75);margin-bottom:12px;letter-spacing:0.3px;}
     .lo-controls{display:flex;align-items:center;justify-content:space-between;}
     /* Frosted glass +/- buttons */
@@ -340,8 +340,18 @@
     </div>
     <div id="lo-counters"></div>
     <div class="header-card" style="margin-top:4px;">
+      <!-- Quick Notes for lockout walk -->
+      <div class="qnote-section">
+        <span class="qnote-label">📋 Quick Notes</span>
+        <div class="qnote-list" id="qnotes-lo"></div>
+        <div class="qnote-btns">
+          <button class="qnote-add-check" onclick="addQNote('lo','check')">✅ Add Check</button>
+          <button class="qnote-add-x" onclick="addQNote('lo','x')">❌ Add Issue</button>
+        </div>
+      </div>
+      <hr class="qnote-divider">
       <label>Notes</label>
-      <textarea id="lo-notes" placeholder="Post walk notes..." oninput="saveLoState()" style="height:65px;"></textarea>
+      <textarea id="lo-notes" placeholder="Post walk notes..." oninput="saveLoState()" style="height:80px;"></textarea>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
         <button class="actionBtn" style="background:linear-gradient(135deg,var(--bfs-red),#c0152f);color:white;box-shadow:0 3px 10px rgba(227,24,55,0.35);" onclick="openLoRecap()">⚡ Generate</button>
         <button class="actionBtn" style="background:#f1f5f9;color:var(--navy);border:1.5px solid #e2e8f0;" onclick="copyLoSummary()">📋 Copy</button>
@@ -549,7 +559,7 @@
   let pw1SelectedReasons=new Set();
 
   // Quick note state — one array per area
-  let quickNotes={main:[],pw1:[]};
+  let quickNotes={main:[],pw1:[],lo:[]};
   // Global search results so onclick handlers can always access them
   let _pwSearchResults=[];
 
@@ -737,7 +747,29 @@
   const LO_ITEMS=['Passage','Privacy','Dummy','Deadbolt','Hinge Bumps','Base Bumps'];
   let loState={};
 
-  function openLockoutWalk(){const saved=localStorage.getItem('bfs_lo_active_work');if(saved){const d=JSON.parse(saved);document.getElementById('lo-customer').value=d.customer||'';document.getElementById('lo-job-id').value=d.jobId||'';document.getElementById('lo-notes').value=d.notes||'';document.getElementById('lo-summary').value=d.summaryText||'';loState=d.loState||{};}else{document.getElementById('lo-customer').value='';document.getElementById('lo-job-id').value='';document.getElementById('lo-notes').value='';document.getElementById('lo-summary').value='';loState={};}buildLoCounters();renderLoHistory();updateLoSummaryStyle();updateLoJobBanner();const ol=document.getElementById('lo-overlay');ol.style.display='block';ol.scrollTop=0;checkLoTrimMatch();}
+  function openLockoutWalk(){
+    clearQNotes('lo');
+    const saved=localStorage.getItem('bfs_lo_active_work');
+    if(saved){
+      const d=JSON.parse(saved);
+      document.getElementById('lo-customer').value=d.customer||'';
+      document.getElementById('lo-job-id').value=d.jobId||'';
+      document.getElementById('lo-notes').value=d.notes||'';
+      document.getElementById('lo-summary').value=d.summaryText||'';
+      loState=d.loState||{};
+    }else{
+      // Auto-fill customer from main takeoff if available
+      const mainCust=(document.getElementById('customer')?.value||'').trim();
+      document.getElementById('lo-customer').value=mainCust;
+      document.getElementById('lo-job-id').value='';
+      document.getElementById('lo-notes').value='';
+      document.getElementById('lo-summary').value='';
+      loState={};
+    }
+    buildLoCounters();renderLoHistory();updateLoSummaryStyle();updateLoJobBanner();
+    const ol=document.getElementById('lo-overlay');ol.style.display='block';ol.scrollTop=0;
+    checkLoTrimMatch();
+  }
   function closeLockoutWalk(){document.getElementById('lo-overlay').style.display='none';}
 
   function buildLoCounters(){const c=document.getElementById('lo-counters');c.innerHTML=LO_ITEMS.map((item,idx)=>{const qty=loState[item]||0,base=idx%2===0?'lo-navy':'lo-red',cls=qty>0?'has-count':base;return`<div class="lo-counter-card ${cls}" id="lo-card-${item}"><div class="lo-item-label">${item}</div><div class="lo-controls"><button class="lo-btn" onclick="updateLoQty('${item}',-1)">−</button><span class="lo-qty${qty>0?' has-count':''}" id="lo-qty-${item}">${qty}</span><button class="lo-btn" id="lo-plus-${item}" onclick="updateLoQty('${item}',1)">+</button></div></div>`;}).join('');}
@@ -745,7 +777,7 @@
   function updateLoQty(item,delta){loState[item]=Math.max(0,(loState[item]||0)+delta);const qty=loState[item],qEl=document.getElementById(`lo-qty-${item}`),cEl=document.getElementById(`lo-card-${item}`),bEl=document.getElementById(`lo-plus-${item}`);qEl.innerText=qty;qEl.classList.toggle('has-count',qty>0);const idx=LO_ITEMS.indexOf(item),base=idx%2===0?'lo-navy':'lo-red';cEl.className=`lo-counter-card ${qty>0?'has-count':base}`;if(delta>0){playTapUp();[qEl,bEl].forEach(el=>{if(!el)return;el.classList.remove('tap-flash');void el.offsetWidth;el.classList.add('tap-flash');setTimeout(()=>el.classList.remove('tap-flash'),220);});}else playTapDown();saveLoState();}
 
   function saveLoState(){const data={customer:document.getElementById('lo-customer').value,jobId:document.getElementById('lo-job-id').value,notes:document.getElementById('lo-notes').value,summaryText:document.getElementById('lo-summary').value,loState};localStorage.setItem('bfs_lo_active_work',JSON.stringify(data));updateLoSummaryStyle();updateLoJobBanner();}
-  function updateLoJobBanner(){const cust=document.getElementById('lo-customer').value.trim(),jobId=document.getElementById('lo-job-id').value.trim(),banner=document.getElementById('lo-job-banner');if(!banner)return;if(cust||jobId){banner.innerHTML=`🔒 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${[cust,jobId].filter(Boolean).join(' — ')}`;banner.style.display='flex';}else banner.style.display='none';}
+  function updateLoJobBanner(){const cust=document.getElementById('lo-customer').value.trim(),jobId=document.getElementById('lo-job-id').value.trim(),banner=document.getElementById('lo-job-banner');if(!banner)return;if(cust||jobId){const total=LO_ITEMS.reduce((s,i)=>s+(loState[i]||0),0);const totalPart=total>0?` <span style="opacity:0.8;margin-left:6px;font-weight:700;">· 🔑 ${total}</span>`:'';banner.innerHTML=`🔒 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${[cust,jobId].filter(Boolean).join(' — ')}${totalPart}`;banner.style.display='flex';}else banner.style.display='none';}
   function updateLoSummaryStyle(){const s=document.getElementById('lo-summary'),empty=document.getElementById('lo-summary-empty');if(s&&empty){empty.style.display=s.value.length>0?'none':'flex';s.style.borderColor=s.value.length>0?'var(--bfs-red)':'#e2e8f0';}}
 
   function openLoRecap(){const cust=document.getElementById('lo-customer').value.trim(),jobId=document.getElementById('lo-job-id').value.trim();if(!cust||!jobId){showToast('⚠️ ENTER CUSTOMER & JOB ID');return;}if(!LO_ITEMS.some(i=>(loState[i]||0)>0)){showToast('⚠️ NO COUNTS ENTERED YET');return;}const match=lookupTrimTakeoff(cust,jobId);if(match){const expSingle=match.singles+match.tast,expDummies=(match.dbl*2)+(match.tast*2),gotSingle=(loState['Passage']||0)+(loState['Privacy']||0),gotDummies=loState['Dummy']||0;if(gotSingle!==expSingle||gotDummies!==expDummies){let detail='';if(gotSingle!==expSingle){const diff=gotSingle-expSingle,dir=diff>0?`<span style="color:#b45309;">+${diff} over</span>`:`<span style="color:#b91c1c;">${diff} under</span>`;detail+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #fcd34d;"><span style="font-size:12px;font-weight:700;color:#92400e;">Passage / Privacy</span><span style="font-size:13px;font-weight:900;">${dir} (got ${gotSingle}, expected ${expSingle})</span></div>`;}if(gotDummies!==expDummies){const diff=gotDummies-expDummies,dir=diff>0?`<span style="color:#b45309;">+${diff} over</span>`:`<span style="color:#b91c1c;">${diff} under</span>`;detail+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;"><span style="font-size:12px;font-weight:700;color:#92400e;">Dummy</span><span style="font-size:13px;font-weight:900;">${dir} (got ${gotDummies}, expected ${expDummies})</span></div>`;}document.getElementById('lo-mismatch-detail').innerHTML=detail;document.getElementById('loMismatchModal').style.display='flex';return;}}  _openLoRecapScreen();}
@@ -754,10 +786,10 @@
   function closeLoMismatch(){document.getElementById('loMismatchModal').style.display='none';}
   function confirmLoGenerate(){closeLoRecap();generateLoSummary();}
 
-  function generateLoSummary(){const cust=document.getElementById('lo-customer').value.trim()||'NA',jobId=document.getElementById('lo-job-id').value.trim()||'NA',notes=document.getElementById('lo-notes').value.trim();let report=`LOCKOUT WALK -- ${cust} -- ${jobId}\n----------------------------\n\n--- LOCKOUT ---\n`;LO_ITEMS.forEach(item=>{if((loState[item]||0)>0)report+=`- ${item}: ${loState[item]}\n`;});if(notes)report+=`\n----------------------------\nNOTES\n${notes}`;const s=document.getElementById('lo-summary');s.value=report;s.style.borderColor='var(--green)';setTimeout(()=>{s.style.borderColor='var(--bfs-red)';},600);updateLoSummaryStyle();saveLoToHistory(report,{customer:cust,jobId,notes,loState:JSON.parse(JSON.stringify(loState))});saveLoState();learnFromJob(cust);}
+  function generateLoSummary(){const cust=document.getElementById('lo-customer').value.trim()||'NA',jobId=document.getElementById('lo-job-id').value.trim()||'NA',notes=document.getElementById('lo-notes').value.trim(),loQnt=getQNotesText('lo');let report=`LOCKOUT WALK -- ${cust} -- ${jobId}\n----------------------------\n\n--- LOCKOUT ---\n`;LO_ITEMS.forEach(item=>{if((loState[item]||0)>0)report+=`- ${item}: ${loState[item]}\n`;});if(loQnt||notes){report+=`\n----------------------------\nNOTES\n`;if(loQnt)report+=loQnt+'\n';if(notes)report+=notes;}const s=document.getElementById('lo-summary');s.value=report;s.style.borderColor='var(--green)';setTimeout(()=>{s.style.borderColor='var(--bfs-red)';},600);updateLoSummaryStyle();saveLoToHistory(report,{customer:cust,jobId,notes,loState:JSON.parse(JSON.stringify(loState))});saveLoState();learnFromJob(cust);}
   function copyLoSummary(){const text=document.getElementById('lo-summary').value;if(!text.trim()){showToast('⚠️ GENERATE FIRST');return;}navigator.clipboard.writeText(text).then(()=>showToast('✓ COPIED TO CLIPBOARD')).catch(()=>{document.getElementById('lo-summary').select();document.execCommand('copy');showToast('✓ COPIED');});}
-  function loNewLot(){const c=document.getElementById('lo-customer').value;loState={};['lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-customer').value=c;buildLoCounters();saveLoState();document.getElementById('lo-job-id').focus();showToast('✓ READY FOR NEW LOT');}
-  function loReset(){if(!confirm('Reset all lockout walk fields?'))return;loState={};['lo-customer','lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-trim-match').style.display='none';window._loTrimMatch=null;localStorage.removeItem('bfs_lo_active_work');buildLoCounters();updateLoSummaryStyle();updateLoJobBanner();}
+  function loNewLot(){const c=document.getElementById('lo-customer').value;loState={};['lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-customer').value=c;clearQNotes('lo');buildLoCounters();saveLoState();document.getElementById('lo-job-id').focus();showToast('✓ READY FOR NEW LOT');}
+  function loReset(){if(!confirm('Reset all lockout walk fields?'))return;loState={};['lo-customer','lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-trim-match').style.display='none';window._loTrimMatch=null;localStorage.removeItem('bfs_lo_active_work');clearQNotes('lo');buildLoCounters();updateLoSummaryStyle();updateLoJobBanner();}
   function saveLoToHistory(text,fullData){let h=JSON.parse(localStorage.getItem('bfs_lo_history'))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),label=[fullData.customer,fullData.jobId].filter(Boolean).join(' — ');h.unshift({label:`${ds} — ${label}`,text,time:ts,fullData});if(h.length>20)h.pop();localStorage.setItem('bfs_lo_history',JSON.stringify(h));renderLoHistory();}
   function renderLoHistory(){const list=document.getElementById('lo-history-list'),h=JSON.parse(localStorage.getItem('bfs_lo_history'))||[];list.innerHTML=h.length?h.map((item,i)=>`<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div class="history-controls"><button class="load-btn" onclick="loadLoHistory(${i})">LOAD</button><button class="del-btn" onclick="delLoHistory(${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;padding:8px 0;">No lockout walks yet.</p>`;}
   function loadLoHistory(i){const h=JSON.parse(localStorage.getItem('bfs_lo_history'))[i];document.getElementById('lo-customer').value=h.fullData.customer||'';document.getElementById('lo-job-id').value=h.fullData.jobId||'';document.getElementById('lo-notes').value=h.fullData.notes||'';document.getElementById('lo-summary').value=h.text||'';loState=JSON.parse(JSON.stringify(h.fullData.loState||{}));buildLoCounters();saveLoState();updateLoSummaryStyle();checkLoTrimMatch();}
