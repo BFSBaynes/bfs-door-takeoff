@@ -5,77 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Elevate Trim - TEST</title>
   <style>
-    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#cbd5e1; --accent:#1e40af; --slate:#334155; --green:#16a34a; --pw-green:#16a34a; }
+    :root{ --navy:#0A2E4E; --bfs-red:#E31837; --bg:#f1f5f9; --accent:#1e40af; --slate:#334155; --green:#16a34a; }
     *{ box-sizing:border-box; font-family:-apple-system,sans-serif; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
     body{ margin:0; background:var(--bg); padding:8px; padding-top:44px; padding-bottom:30px; overflow-x:hidden; }
     body.banner-visible { padding-top:80px; }
     body.banner-visible .section-title { top:var(--section-top,44px); }
     :root { --section-top:44px; }
 
-    #top-bar { position:fixed; top:0; left:0; right:0; height:44px; z-index:650; background:var(--bfs-red); box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+    #top-bar { position:fixed; top:0; left:0; right:0; height:44px; z-index:650; background:var(--bfs-red); box-shadow:0 2px 8px rgba(0,0,0,0.3); }
     .mode-switch { position:fixed; top:6px; left:8px; z-index:700; background:rgba(255,255,255,0.15); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; text-decoration:none; border:1.5px solid rgba(255,255,255,0.5); white-space:nowrap; }
-    .pw-btn { position:fixed; top:6px; right:8px; z-index:700; background:var(--pw-green); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.6); white-space:nowrap; cursor:pointer; }
+    .pw-btn { position:fixed; top:6px; right:8px; z-index:700; background:var(--navy); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.6); white-space:nowrap; cursor:pointer; }
     .test-badge { position:fixed; top:6px; right:145px; z-index:700; background:#7c3aed; color:white; padding:5px 8px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.6); white-space:nowrap; }
 
     #job-banner { display:none; position:fixed; top:44px; left:0; right:0; z-index:660; background:var(--bfs-red); color:white; font-size:11px; font-weight:800; text-align:center; padding:8px 16px; letter-spacing:0.5px; box-shadow:0 2px 6px rgba(0,0,0,0.3); text-transform:uppercase; border-bottom:2px solid rgba(255,255,255,0.2); min-height:36px; align-items:center; justify-content:center; }
     #job-banner.visible { display:flex; }
     #job-banner span { opacity:0.75; font-weight:600; margin:0 4px; }
 
-    .header-card { background:#fff; border-radius:8px; padding:12px; margin-bottom:12px; box-shadow:0 4px 6px rgba(0,0,0,0.1); border:1px solid #94a3b8; text-align:center; }
-    .app-logo { width:120px; height:auto; margin:5px auto 8px; display:block; }
-    label { font-weight:700; font-size:10px; color:#475569; display:block; margin-bottom:3px; text-transform:uppercase; text-align:left; }
-    input,textarea { width:100%; padding:10px; border:1px solid #94a3b8; border-radius:6px; font-size:16px; margin-bottom:8px; outline:none; background:#fff; }
-    .input-row { display:flex; gap:8px; margin-bottom:4px; }
+    /* Cards — clean white, no border, real shadow */
+    .header-card { background:#fff; border-radius:14px; padding:16px; margin-bottom:12px; box-shadow:0 4px 20px rgba(0,0,0,0.09); border:none; text-align:center; }
+    label { font-weight:700; font-size:10px; color:#64748b; display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.4px; text-align:left; }
+    input,textarea { width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:16px; margin-bottom:10px; outline:none; background:#fff; transition:border-color 0.15s; }
+    input:focus,textarea:focus { border-color:var(--navy); }
+    .input-row { display:flex; gap:8px; margin-bottom:0; }
     .input-group { flex:1; }
 
-    /* Door total */
-    #door-total-row { display:none; background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:8px 12px; margin-top:4px; align-items:center; justify-content:center; gap:8px; }
+    /* Door total — bold navy stat footer on header card */
+    #door-total-row { display:none; background:var(--navy); padding:16px; align-items:center; justify-content:center; flex-direction:column; gap:2px; }
     #door-total-row.visible { display:flex; }
-    #door-total-count { font-size:22px; font-weight:900; color:var(--green); }
+    #door-total-label { font-size:9px; font-weight:700; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:1.2px; }
+    #door-total-count { font-size:46px; font-weight:900; color:white; line-height:1.05; }
 
-    .section-title { color:#fff; padding:14px; font-weight:800; font-size:14px; margin:8px -8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; border-bottom:3px solid rgba(0,0,0,0.2); position:sticky; top:var(--section-top,44px); z-index:100; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-    .section-check { display:none; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.6); border-radius:20px; padding:2px 9px; font-size:11px; font-weight:900; color:#fff; margin-right:8px; }
+    /* Section titles */
+    .section-title { color:#fff; padding:15px 18px; font-weight:900; font-size:13px; margin:12px 0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:0.5px; border-radius:12px; position:sticky; top:var(--section-top,44px); z-index:100; box-shadow:0 6px 18px rgba(0,0,0,0.25); }
+    .section-check { display:none; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.5); border-radius:20px; padding:2px 9px; font-size:11px; font-weight:900; color:#fff; margin-right:8px; }
     .section-check.active { display:inline-block; background:var(--green); border-color:var(--green); }
     .bg-navy{background:var(--navy);} .bg-red{background:var(--bfs-red);}
     .section-content{display:none;padding:8px 0;} .section-content.active{display:block;}
-    .item-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px;}
-    .item-card{background:#fff;border:2px solid #94a3b8;border-radius:8px;padding:15px 4px 22px 4px;text-align:center;font-weight:800;color:var(--navy);box-shadow:0 2px 4px rgba(0,0,0,0.1);font-size:13px;cursor:pointer;position:relative;min-height:65px;display:flex;align-items:center;justify-content:center;transition:transform 0.1s,background 0.15s;}
-    .badge{position:absolute;bottom:2px;font-size:9px;font-weight:900;background:rgba(226,232,240,0.9);padding:1px 3px;border-radius:3px;color:var(--navy);display:none;white-space:nowrap;}
+
+    /* Item grid — better shadow, more rounded */
+    .item-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:6px 4px;}
+    .item-card{background:#fff;border:1.5px solid #e8edf2;border-radius:10px;padding:16px 4px 24px 4px;text-align:center;font-weight:800;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,0.07);font-size:13px;cursor:pointer;position:relative;min-height:68px;display:flex;align-items:center;justify-content:center;transition:transform 0.1s,background 0.15s;}
+    .badge{position:absolute;bottom:3px;font-size:9px;font-weight:900;background:rgba(226,232,240,0.9);padding:1px 4px;border-radius:4px;color:var(--navy);display:none;white-space:nowrap;}
     .badge.active{display:block;color:var(--green);border:1px solid var(--green);}
     .badge-left{left:3px;} .badge-right{right:3px;} .badge-center{left:50%;transform:translateX(-50%);}
-    .item-card:active{transform:scale(0.95);background:#f1f5f9;} .item-card.has-data{border-color:var(--green);background:#f0fdf4;color:var(--green);}
+    .item-card:active{transform:scale(0.95);} .item-card.has-data{border-color:var(--green);background:#f0fdf4;color:var(--green);}
     .note-badge{position:absolute;top:3px;right:3px;font-size:9px;display:none;} .note-badge.active{display:block;}
+
+    /* Modal */
     .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;}
-    .modal-content{background:white;padding:20px;border-radius:12px;width:95%;max-width:420px;text-align:center;max-height:90vh;overflow-y:auto;}
-    .modal-type-block{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:12px;text-align:left;}
+    .modal-content{background:white;padding:20px;border-radius:16px;width:95%;max-width:420px;text-align:center;max-height:90vh;overflow-y:auto;}
+    .modal-type-block{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px;text-align:left;}
     .modal-counter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-    .btn{width:44px;height:44px;border-radius:6px;border:0;background:var(--navy);color:white;font-weight:bold;font-size:22px;}
+    .btn{width:46px;height:46px;border-radius:8px;border:0;background:var(--navy);color:white;font-weight:bold;font-size:22px;}
     .qty-display{font-size:22px;font-weight:800;min-width:35px;color:var(--navy);text-align:center;}
-    .qty-input{width:80px;text-align:center;font-size:20px;font-weight:800;color:var(--navy);border:2px solid var(--navy);}
+    .qty-input{width:80px;text-align:center;font-size:20px;font-weight:800;color:var(--navy);border:2px solid var(--navy);border-radius:6px;}
     .active-qty{color:var(--green)!important;border-color:var(--green)!important;}
-    .actionBtn{padding:14px;border:0;border-radius:6px;font-weight:700;font-size:14px;cursor:pointer;}
-    #summary{background:#fff;height:280px;margin-top:8px;font-family:sans-serif;font-size:14px;border:2px solid var(--navy);width:100%;border-radius:4px;padding:12px;white-space:pre-wrap;word-wrap:break-word;}
-    #summary.has-text{border-color:var(--bfs-red);}
+    .actionBtn{padding:14px;border:0;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;}
+
+    /* Summary output */
+    .summary-sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid #f1f5f9;}
+    .summary-sec-bar{width:4px;height:20px;background:var(--bfs-red);border-radius:2px;flex-shrink:0;}
+    .summary-sec-title{font-size:12px;font-weight:900;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;}
+    #summary{background:#f8fafc;height:280px;margin-top:8px;font-family:'Courier New',monospace;font-size:13px;border:1.5px solid #e2e8f0;width:100%;border-radius:8px;padding:12px;white-space:pre-wrap;word-wrap:break-word;line-height:1.5;color:#1e293b;}
+    #summary.has-text{border-color:var(--bfs-red);background:#fff;}
     #summary-empty-state{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;margin-top:8px;}
-    #summary-empty-state span{font-size:2rem;margin-bottom:8px;opacity:0.4;}
+    #summary-empty-state span{font-size:2rem;margin-bottom:8px;opacity:0.3;}
     #summary-empty-state p{font-size:13px;color:#94a3b8;text-align:center;margin:0;}
     #summary-empty-state.hidden{display:none;}
-    .history-section{background:#fff;border-radius:8px;padding:12px;margin-top:12px;border:1px solid #94a3b8;}
-    .history-item{display:flex;justify-content:space-between;align-items:center;padding:12px 5px;border-bottom:1px solid #e2e8f0;font-size:12px;}
+
+    /* History */
+    .history-section{background:#fff;border-radius:14px;padding:14px;margin-top:12px;box-shadow:0 4px 20px rgba(0,0,0,0.09);border:none;}
+    .history-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f1f5f9;font-size:12px;}
     .history-controls{display:flex;gap:8px;}
-    .del-btn{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;padding:8px 14px;border-radius:6px;font-weight:900;font-size:14px;cursor:pointer;}
-    .load-btn{padding:10px 15px;background:var(--navy);color:white;border:0;border-radius:4px;font-weight:800;font-size:13px;cursor:pointer;}
+    .del-btn{background:#fee2e2;color:#b91c1c;border:none;padding:8px 14px;border-radius:8px;font-weight:900;font-size:14px;cursor:pointer;}
+    .load-btn{padding:10px 15px;background:var(--navy);color:white;border:0;border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;}
+
+    /* Autocomplete */
     .ac-wrap{position:relative;}
-    .ac-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid var(--navy);border-top:none;border-radius:0 0 8px 8px;z-index:800;max-height:180px;overflow-y:auto;box-shadow:0 6px 16px rgba(0,0,0,0.15);}
+    .ac-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid var(--navy);border-top:none;border-radius:0 0 10px 10px;z-index:800;max-height:180px;overflow-y:auto;box-shadow:0 8px 20px rgba(0,0,0,0.15);}
     .ac-dropdown.open{display:block;}
-    .ac-item{padding:11px 14px;font-size:15px;font-weight:600;color:var(--navy);border-bottom:1px solid #e2e8f0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .ac-item{padding:12px 14px;font-size:15px;font-weight:600;color:var(--navy);border-bottom:1px solid #f1f5f9;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;}
     .ac-item:last-child{border-bottom:none;} .ac-item:active{background:#f0f9ff;}
-    .ac-item-label{flex:1;} .ac-delete{flex-shrink:0;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;border-radius:5px;font-size:11px;font-weight:900;padding:3px 8px;cursor:pointer;}
-    .version-tag{text-align:center;color:#475569;font-size:9px;margin:20px 0;font-weight:bold;}
+    .ac-item-label{flex:1;} .ac-delete{flex-shrink:0;background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;font-size:11px;font-weight:900;padding:4px 9px;cursor:pointer;}
+    .version-tag{text-align:center;color:#94a3b8;font-size:9px;margin:20px 0;font-weight:600;}
     .chevron::after{content:'▼';font-size:10px;} .active-header .chevron::after{content:'▲';}
-    #scroll-top{display:none;position:fixed;bottom:20px;right:16px;z-index:998;background:var(--navy);color:white;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.3);align-items:center;justify-content:center;}
+    #scroll-top{display:none;position:fixed;bottom:24px;right:16px;z-index:998;background:var(--navy);color:white;border:none;border-radius:50%;width:46px;height:46px;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.3);align-items:center;justify-content:center;}
     #scroll-top.visible{display:flex;}
-    #toast{visibility:hidden;min-width:200px;background-color:#1e293b;color:#fff;text-align:center;border-radius:30px;padding:12px 20px;position:fixed;z-index:3000;left:50%;bottom:30px;transform:translateX(-50%);font-weight:bold;font-size:13px;box-shadow:0 4px 15px rgba(0,0,0,0.4);}
+    #toast{visibility:hidden;min-width:200px;background-color:#0f172a;color:#fff;text-align:center;border-radius:30px;padding:12px 20px;position:fixed;z-index:3000;left:50%;bottom:30px;transform:translateX(-50%);font-weight:bold;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
     #toast.show{visibility:visible;animation:fadein 0.3s,fadeout 0.4s 1.4s forwards;}
     @keyframes fadein{from{opacity:0;bottom:20px}to{opacity:1;bottom:30px}} @keyframes fadeout{from{opacity:1}to{opacity:0}}
 
@@ -96,51 +112,53 @@
 
     /* ── POST WALK OVERLAY ── */
     #pw-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1500;background:var(--bg);overflow-y:auto;}
-    .pw-header{background:var(--pw-green);position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,0.3);}
+    /* Red header — matches main app top bar */
+    .pw-header{background:var(--bfs-red);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.35);}
     .pw-header-row{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;}
-    .pw-header-title{color:white;font-weight:800;font-size:11px;letter-spacing:0.3px;}
-    .pw-back-btn{background:rgba(0,0,0,0.2);color:white;border:1.5px solid rgba(255,255,255,0.6);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;}
-    #pw-active-banner{display:none;min-height:34px;padding:8px 16px;font-size:11px;font-weight:800;color:white;text-align:center;letter-spacing:0.5px;text-transform:uppercase;border-top:1px solid rgba(255,255,255,0.2);border-bottom:2px solid rgba(255,255,255,0.2);align-items:center;justify-content:center;}
-    .pw-body{padding:0 8px 8px 8px;}
-    .pw-card{background:white;border-radius:8px;padding:16px;margin-top:8px;border:1px solid #94a3b8;box-shadow:0 4px 6px rgba(0,0,0,0.1);}
-    .pw-type-btn{width:100%;padding:20px;border:0;border-radius:10px;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:10px;flex-direction:column;}
-    .pw-type-btn-1st{background:var(--navy);color:white;} .pw-type-btn-2nd{background:var(--pw-green);color:white;}
-    .pw-type-sub{font-size:11px;opacity:0.8;font-weight:600;}
-    .pw-result-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+    .pw-header-title{color:white;font-weight:900;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;}
+    .pw-back-btn{background:rgba(0,0,0,0.2);color:white;border:1.5px solid rgba(255,255,255,0.5);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;}
+    /* Active job sub-banner: dark navy strip under the red header */
+    #pw-active-banner{display:none;background:var(--navy);min-height:34px;padding:7px 16px;font-size:11px;font-weight:800;color:white;text-align:center;letter-spacing:0.5px;text-transform:uppercase;border-top:1px solid rgba(255,255,255,0.15);align-items:center;justify-content:center;}
+    .pw-body{padding:0 8px 24px 8px;}
+    .pw-card{background:white;border-radius:10px;padding:16px;margin-top:10px;border:1px solid #cbd5e1;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+    /* Type screen button */
+    .pw-type-btn{width:100%;padding:22px 16px;border:0;border-radius:10px;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;flex-direction:column;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+    .pw-type-btn-1st{background:var(--navy);color:white;}
+    .pw-type-sub{font-size:11px;opacity:0.75;font-weight:600;letter-spacing:0.2px;}
+    /* Search results */
+    .pw-result-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
     .pw-result-item:active{background:#eff6ff;border-color:var(--accent);}
     .pw-result-label{font-weight:800;font-size:14px;color:var(--navy);}
     .pw-result-sub{font-size:11px;color:#64748b;margin-top:2px;}
     .pw-use-btn{background:var(--navy);color:white;border:0;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0;}
-    .pw-result-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
-    .pw-result-choice{padding:16px;border:3px solid #e2e8f0;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;text-align:center;background:white;transition:all 0.15s;}
+    /* Section header strip inside form */
+    .pw-sec-hdr{background:var(--navy);color:white;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:1px;padding:6px 10px;border-radius:4px;margin:14px 0 8px 0;display:flex;align-items:center;gap:6px;}
+    /* Result / Door choice buttons */
+    .pw-result-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 4px 0;}
+    .pw-result-choice{padding:18px 8px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;font-weight:900;cursor:pointer;text-align:center;background:white;transition:all 0.15s;line-height:1.3;}
     .pw-result-choice.sel-complete{background:#f0fdf4;border-color:var(--green);color:var(--green);}
     .pw-result-choice.sel-incomplete{background:#fef2f2;border-color:#dc2626;color:#dc2626;}
-    .pw-door-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0;}
-    .pw-door-choice{padding:12px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;text-align:center;background:white;line-height:1.3;}
+    .pw-door-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 4px 0;}
+    .pw-door-choice{padding:14px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;text-align:center;background:white;line-height:1.4;}
     .pw-door-choice.sel-ok{background:#f0fdf4;border-color:var(--green);color:var(--green);}
     .pw-door-choice.sel-bad{background:#fef2f2;border-color:#dc2626;color:#dc2626;}
-    .pw-reason{background:#f8fafc;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:8px;overflow:hidden;cursor:pointer;transition:all 0.15s;}
-    .pw-reason.selected{background:#fef2f2;border-color:#dc2626;cursor:default;}
-    .pw-reason-header{display:flex;align-items:center;gap:12px;padding:14px;}
-    .pw-reason.selected .pw-reason-header{padding-bottom:8px;}
-    .pw-reason-icon{width:32px;height:32px;border-radius:8px;border:2px solid #cbd5e1;background:white;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all 0.15s;}
-    .pw-reason.selected .pw-reason-icon{background:#dc2626;border-color:#dc2626;font-size:18px;}
+    /* Reason cards */
+    .pw-reason{background:#f8fafc;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:8px;overflow:hidden;transition:all 0.15s;}
+    .pw-reason.selected{background:#fef2f2;border-color:#dc2626;}
     .pw-reason-lbl{font-size:14px;font-weight:800;color:var(--navy);flex:1;}
     .pw-reason.selected .pw-reason-lbl{color:#dc2626;}
     .pw-reason-note-wrap{display:none;padding:0 14px 14px 14px;}
     .pw-reason.selected .pw-reason-note-wrap{display:block;}
     .pw-reason-note-wrap textarea{width:100%;height:55px;font-size:13px;padding:8px;border:1px solid #fca5a5;border-radius:6px;background:#fff;resize:none;margin:0;font-family:-apple-system,sans-serif;line-height:1.4;}
     .pw-reason-note-wrap textarea:focus{border-color:#dc2626;outline:none;}
-    .pw-reason-hint{font-size:10px;color:#dc2626;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:0.3px;}
-    .pw-checklist-item{display:flex;align-items:center;gap:8px;padding:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:6px;}
-    .pw-check-text{flex:1;font-size:14px;font-weight:600;color:var(--navy);}
-    .pw-check-done{background:#e2e8f0;color:var(--slate);border:0;border-radius:6px;padding:7px 10px;font-size:13px;font-weight:800;cursor:pointer;}
-    .pw-check-notdone{background:#e2e8f0;color:var(--slate);border:0;border-radius:6px;padding:7px 10px;font-size:13px;font-weight:800;cursor:pointer;}
-    .pw-check-done.active{background:var(--green);color:white;} .pw-check-notdone.active{background:#dc2626;color:white;}
-    .pw-check-del{background:#e2e8f0;color:var(--slate);border:0;border-radius:6px;padding:7px 8px;font-size:13px;cursor:pointer;}
-    .pw-checklist-item.is-done{background:#f0fdf4;border-color:#86efac;} .pw-checklist-item.is-notdone{background:#fef2f2;border-color:#fca5a5;}
-    .pw-add-item{width:100%;background:#e2e8f0;color:var(--navy);border:2px dashed #94a3b8;border-radius:8px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;}
+    /* Generated output card */
+    #pw1-result{display:none;margin-top:16px;border-radius:10px;overflow:hidden;border:2px solid var(--navy);}
+    .pw-result-hdr{background:var(--navy);padding:10px 14px;display:flex;align-items:center;gap:8px;}
+    .pw-result-hdr-text{font-size:11px;font-weight:900;color:white;text-transform:uppercase;letter-spacing:0.8px;}
+    .pw-result-body{padding:12px;background:white;}
+    /* Summary screen (history fallback) */
     #pw-summary-text{height:320px;font-family:'Courier New',monospace;font-size:13px;border:2px solid var(--navy);width:100%;border-radius:4px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#fff;line-height:1.5;color:#000;}
+    /* History */
     .pw-history-entry{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:12px;}
     .pw-history-entry:last-child{border-bottom:none;}
   </style>
@@ -156,28 +174,42 @@
 <div id="job-banner"></div>
 
 <!-- MAIN HEADER -->
-<div id="main-header" class="header-card" style="margin-top:8px;">
-  <img src="icon-512.png" alt="Logo" class="app-logo">
-  <div class="input-row">
-    <div class="input-group ac-wrap">
-      <label>Customer</label>
-      <input id="customer" type="text" placeholder="Pulte" autocomplete="off"
-        oninput="saveState();updateJobBanner();showCustomerSuggestions()"
-        onfocus="showCustomerSuggestions()"
-        onblur="setTimeout(()=>closeDropdown('ac-customer'),200)">
-      <div id="ac-customer" class="ac-dropdown"></div>
+<div id="main-header" class="header-card" style="margin-top:8px;padding:0;overflow:hidden;text-align:left;">
+  <!-- Red accent stripe -->
+  <div style="height:4px;background:linear-gradient(90deg,var(--bfs-red),#ff4d6d);"></div>
+  <div style="padding:14px 14px 10px;">
+    <!-- Branding row -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid #f1f5f9;">
+      <img src="icon-512.png" alt="BFS Logo" style="width:42px;height:auto;border-radius:8px;">
+      <div>
+        <div style="font-size:14px;font-weight:900;color:var(--navy);letter-spacing:0.4px;text-transform:uppercase;">Elevate Trim</div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:1px;">Door &amp; Trim Takeoff</div>
+      </div>
+    </div>
+    <!-- Customer -->
+    <div class="input-row">
+      <div class="input-group ac-wrap">
+        <label>Customer</label>
+        <input id="customer" type="text" placeholder="e.g. Pulte" autocomplete="off"
+          oninput="saveState();updateJobBanner();showCustomerSuggestions()"
+          onfocus="showCustomerSuggestions()"
+          onblur="setTimeout(()=>closeDropdown('ac-customer'),200)">
+        <div id="ac-customer" class="ac-dropdown"></div>
+      </div>
+    </div>
+    <!-- Job ID -->
+    <div class="input-row">
+      <div class="input-group">
+        <label>Job ID</label>
+        <input id="job-id" type="text" placeholder="e.g. LOT 104A" autocomplete="off"
+          oninput="saveState();updateJobBanner()" style="margin-bottom:0;">
+      </div>
     </div>
   </div>
-  <div class="input-row">
-    <div class="input-group">
-      <label>Job ID</label>
-      <input id="job-id" type="text" placeholder="LOT 104A" autocomplete="off"
-        oninput="saveState();updateJobBanner()">
-    </div>
-  </div>
+  <!-- Door total — navy stat footer, hidden until doors are counted -->
   <div id="door-total-row">
-    <span style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">🚪 Total Doors Counted:</span>
-    <span id="door-total-count">0</span>
+    <div id="door-total-label">🚪 Total Doors Counted</div>
+    <div id="door-total-count">0</div>
   </div>
 </div>
 
@@ -193,7 +225,13 @@
 </div>
 
 <!-- SUMMARY -->
-<div class="header-card" style="margin-top:15px;" id="summary-section">
+<div class="header-card" style="margin-top:10px;" id="summary-section">
+
+  <!-- Section header -->
+  <div class="summary-sec-hdr">
+    <div class="summary-sec-bar"></div>
+    <span class="summary-sec-title">Generate Takeoff</span>
+  </div>
 
   <!-- Quick Note Builder for main takeoff -->
   <div class="qnote-section">
@@ -210,24 +248,27 @@
   <textarea id="notes" placeholder="Any additional notes..." oninput="saveState()" style="height:60px;"></textarea>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-    <button class="actionBtn" style="background:var(--bfs-red);color:white;font-size:14px;" onclick="generateSummary()">⚡ Generate</button>
-    <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="copySummary()">📋 Copy Text</button>
+    <button class="actionBtn" style="background:linear-gradient(135deg,var(--bfs-red),#c0152f);color:white;font-size:14px;font-weight:800;box-shadow:0 3px 10px rgba(227,24,55,0.35);" onclick="generateSummary()">⚡ Generate</button>
+    <button class="actionBtn" style="background:#f1f5f9;color:var(--navy);border:1.5px solid #e2e8f0;" onclick="copySummary()">📋 Copy Text</button>
   </div>
   <div style="position:relative;">
     <textarea id="summary" readonly></textarea>
-    <div id="summary-empty-state"><span>📋</span><p>Tap <strong>Generate Takeoff</strong><br>to build your report</p></div>
+    <div id="summary-empty-state"><span>📋</span><p>Tap <strong>Generate</strong><br>to build your report</p></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-    <button class="actionBtn" style="background:#dbeafe;color:#1e40af;" onclick="confirmNewLot()">🏠 New Job, Same Customer</button>
-    <button class="actionBtn" style="background:#fee2e2;color:#b91c1c;" onclick="confirmReset()">🗑 Reset All Fields</button>
+    <button class="actionBtn" style="background:#eff6ff;color:#1e40af;border:1.5px solid #bfdbfe;" onclick="confirmNewLot()">🏠 New Job, Same Customer</button>
+    <button class="actionBtn" style="background:#fff1f2;color:#b91c1c;border:1.5px solid #fecdd3;" onclick="confirmReset()">🗑 Reset All Fields</button>
   </div>
 </div>
 
 <!-- HISTORY -->
 <div class="history-section">
-  <div onclick="toggleHist()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0 8px 0;">
-    <label style="cursor:pointer;margin:0;font-size:11px;color:#475569;">RECENT TAKEOFFS</label>
-    <span id="history-chevron" style="font-size:11px;color:#475569;font-weight:800;">▼ SHOW</span>
+  <div onclick="toggleHist()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 10px 0;border-bottom:1.5px solid #f1f5f9;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:3px;height:16px;background:var(--navy);border-radius:2px;"></div>
+      <label style="cursor:pointer;margin:0;font-size:11px;color:var(--navy);font-weight:900;">RECENT TAKEOFFS</label>
+    </div>
+    <span id="history-chevron" style="font-size:11px;color:#64748b;font-weight:800;">▼ SHOW</span>
   </div>
   <div id="history-body" style="display:none;">
     <input type="text" id="history-search" placeholder="🔍  Search..." style="margin-bottom:8px;font-size:14px;padding:10px;border:1px solid #94a3b8;border-radius:6px;width:100%;" oninput="renderHistory()">
@@ -250,18 +291,20 @@
 
     <!-- TYPE SELECTION -->
     <div id="pw-screen-type">
-      <div class="pw-card" style="text-align:center;">
-        <img src="icon-512.png" alt="Logo" class="app-logo">
-        <p style="color:#64748b;font-size:13px;margin:0 0 16px 0;">Select the type of post walk you are completing.</p>
-        <button class="pw-type-btn pw-type-btn-1st" onclick="selectPwType('1st')">🏠 1st Trim Post Walk<span class="pw-type-sub">After first trim install</span></button>
-        <button class="pw-type-btn pw-type-btn-2nd" onclick="selectPwType('2nd')">✅ 2nd Trim Post Walk<span class="pw-type-sub">After shoe / quarter round</span></button>
+      <div class="pw-card" style="text-align:center;padding:20px 16px;">
+        <button class="pw-type-btn pw-type-btn-1st" style="margin-bottom:0;" onclick="selectPwType('1st')">
+          🏠 1st Trim Post Walk
+          <span class="pw-type-sub">Tap to select job and begin walk</span>
+        </button>
       </div>
       <div class="pw-card" style="margin-top:8px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-          <button onclick="showPwHistory('1st')" style="background:var(--navy);color:white;border:0;border-radius:6px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;">1st Trim History</button>
-          <button onclick="showPwHistory('2nd')" style="background:var(--pw-green);color:white;border:0;border-radius:6px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;">2nd Trim History</button>
+        <div onclick="togglePwHist()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0 8px 0;border-bottom:1px solid #e2e8f0;">
+          <label style="cursor:pointer;margin:0;font-size:11px;color:#475569;">RECENT POST WALKS</label>
+          <span id="pw-history-chevron" style="font-size:11px;color:#475569;font-weight:800;">▼ SHOW</span>
         </div>
-        <div id="pw-history-list"><p style="font-size:11px;color:#94a3b8;text-align:center;">No post walk history yet.</p></div>
+        <div id="pw-history-body" style="display:none;margin-top:8px;">
+          <div id="pw-history-list"><p style="font-size:11px;color:#94a3b8;text-align:center;">No post walks yet.</p></div>
+        </div>
       </div>
     </div>
 
@@ -282,113 +325,79 @@
 
     <!-- 1ST TRIM FORM -->
     <div id="pw-screen-1st" style="display:none;">
-      <div class="pw-card">
-        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:10px;margin-bottom:14px;">
-          <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">1st Trim Post Walk</div>
-          <div style="font-size:16px;font-weight:900;color:var(--navy);margin-top:3px;" id="pw1-job-display"></div>
+      <div class="pw-card" style="padding:0;overflow:hidden;">
+
+        <!-- Navy job banner -->
+        <div style="background:var(--navy);padding:14px 16px;">
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">1st Trim Post Walk</div>
+          <div style="font-size:17px;font-weight:900;color:white;" id="pw1-job-display">—</div>
         </div>
 
-        <label style="font-size:12px;font-weight:900;color:var(--navy);">Result</label>
-        <div class="pw-result-row">
-          <button class="pw-result-choice" id="pw1-complete-btn" onclick="setPw1Result('complete')">✅ Complete</button>
-          <button class="pw-result-choice" id="pw1-incomplete-btn" onclick="setPw1Result('incomplete')">❌ Incomplete</button>
-        </div>
+        <div style="padding:16px;">
 
-        <label style="font-size:12px;font-weight:900;color:var(--navy);margin-top:4px;">Doors</label>
-        <div class="pw-door-row">
-          <button class="pw-door-choice" id="pw1-door-ok" onclick="setPw1DoorCheck('ok')">✅ All opening &amp; closing properly</button>
-          <button class="pw-door-choice" id="pw1-door-issues" onclick="setPw1DoorCheck('issues')">❌ Door issues noted</button>
-        </div>
-
-        <div id="pw1-reasons-section" style="display:none;">
-          <label style="font-size:12px;font-weight:900;color:var(--navy);margin-top:12px;">What is the issue? (tap to select)</label>
-          <div id="pw1-reasons-grid" style="margin-top:8px;"></div>
-        </div>
-
-        <!-- Quick Note Builder for 1st trim -->
-        <hr class="qnote-divider" style="margin-top:14px;">
-        <div class="qnote-section">
-          <span class="qnote-label">📋 Additional Notes</span>
-          <div class="qnote-list" id="qnotes-pw1"></div>
-          <div class="qnote-btns">
-            <button class="qnote-add-check" onclick="addQNote('pw1','check')">✅ Add Check</button>
-            <button class="qnote-add-x" onclick="addQNote('pw1','x')">❌ Add Issue</button>
+          <!-- RESULT section -->
+          <div class="pw-sec-hdr">📋 Result</div>
+          <div class="pw-result-row">
+            <button class="pw-result-choice" id="pw1-complete-btn" onclick="setPw1Result('complete')">✅<br>Complete</button>
+            <button class="pw-result-choice" id="pw1-incomplete-btn" onclick="setPw1Result('incomplete')">❌<br>Incomplete</button>
           </div>
+
+          <!-- DOORS section -->
+          <div class="pw-sec-hdr">🚪 Doors</div>
+          <div class="pw-door-row">
+            <button class="pw-door-choice" id="pw1-door-ok" onclick="setPw1DoorCheck('ok')">✅ All opening &amp; closing properly</button>
+            <button class="pw-door-choice" id="pw1-door-issues" onclick="setPw1DoorCheck('issues')">❌ Door issues noted</button>
+          </div>
+
+          <!-- ISSUES section (conditional) -->
+          <div id="pw1-reasons-section" style="display:none;">
+            <div class="pw-sec-hdr">⚠️ What is the issue?</div>
+            <div id="pw1-reasons-grid"></div>
+          </div>
+
+          <!-- NOTES section -->
+          <div class="pw-sec-hdr" style="margin-top:18px;">📝 Notes</div>
+          <div class="qnote-section">
+            <span class="qnote-label" style="margin-bottom:6px;">Quick Notes</span>
+            <div class="qnote-list" id="qnotes-pw1"></div>
+            <div class="qnote-btns" style="margin-bottom:10px;">
+              <button class="qnote-add-check" onclick="addQNote('pw1','check')">✅ Add Check</button>
+              <button class="qnote-add-x" onclick="addQNote('pw1','x')">❌ Add Issue</button>
+            </div>
+          </div>
+          <label>Material On Site</label>
+          <textarea id="pw1-material-onsite" placeholder="e.g. Newel post, pickets on site..." style="height:50px;"></textarea>
+          <label>General Notes</label>
+          <textarea id="pw1-general-notes" placeholder="Anything else..." style="height:55px;"></textarea>
+
+          <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-top:4px;" onclick="generatePw1()">⚡ Generate Post Walk</button>
+
+          <!-- Output card — inline, stays on same screen -->
+          <div id="pw1-result">
+            <div class="pw-result-hdr">
+              <span style="font-size:16px;">📋</span>
+              <span class="pw-result-hdr-text">Ready to Copy</span>
+            </div>
+            <div class="pw-result-body">
+              <textarea id="pw1-summary-text" readonly
+                style="height:260px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
+              <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="copyPwInline()">📋 Copy to AppWright</button>
+              <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
+            </div>
+          </div>
+
+          <button class="actionBtn" style="width:100%;background:#f1f5f9;color:var(--slate);margin-top:10px;font-size:13px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
         </div>
-        <hr class="qnote-divider">
-
-        <label>Material On Site</label>
-        <textarea id="pw1-material-onsite" placeholder="e.g. Newel post, pickets on site..." style="height:50px;"></textarea>
-        <label>General Notes</label>
-        <textarea id="pw1-general-notes" placeholder="Anything else..." style="height:55px;"></textarea>
-
-        <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-top:8px;" onclick="generatePw1()">⚡ Generate Post Walk</button>
-
-        <!-- Inline result — stays on same screen -->
-        <div id="pw1-result" style="display:none;margin-top:14px;padding-top:14px;border-top:2px solid #e2e8f0;">
-          <div style="font-size:10px;font-weight:900;color:var(--pw-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">✅ POST WALK GENERATED</div>
-          <textarea id="pw1-summary-text" readonly
-            style="height:280px;font-family:'Courier New',monospace;font-size:13px;border:2px solid var(--pw-green);width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#fff;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
-          <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-bottom:8px;" onclick="copyPwInline('pw1')">📋 Copy to AppWright</button>
-          <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
-        </div>
-
-        <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);margin-top:8px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
       </div>
     </div>
 
-    <!-- 2ND TRIM FORM -->
-    <div id="pw-screen-2nd" style="display:none;">
-      <div class="pw-card">
-        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:10px;margin-bottom:14px;">
-          <div style="font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">2nd Trim Post Walk</div>
-          <div style="font-size:16px;font-weight:900;color:var(--navy);margin-top:3px;" id="pw2-job-display"></div>
-        </div>
-
-        <label style="font-size:12px;font-weight:900;color:var(--navy);">Walk Checklist</label>
-        <p style="font-size:11px;color:#64748b;margin:4px 0 8px 0;">Tap + Add Item, speak or type each item, then mark ✅ or ❌ as you walk.</p>
-        <div id="pw2-checklist"></div>
-        <button class="pw-add-item" onclick="addPwChecklistItem()">+ Add Item</button>
-
-        <!-- Quick Note Builder for 2nd trim -->
-        <hr class="qnote-divider" style="margin-top:14px;">
-        <div class="qnote-section">
-          <span class="qnote-label">📋 Additional Notes</span>
-          <div class="qnote-list" id="qnotes-pw2"></div>
-          <div class="qnote-btns">
-            <button class="qnote-add-check" onclick="addQNote('pw2','check')">✅ Add Check</button>
-            <button class="qnote-add-x" onclick="addQNote('pw2','x')">❌ Add Issue</button>
-          </div>
-        </div>
-        <hr class="qnote-divider">
-
-        <label>Extra Material To Pick Up</label>
-        <textarea id="pw2-material-pickup" placeholder="e.g. (3) leftover doors in garage..." style="height:55px;"></textarea>
-        <label>General Notes</label>
-        <textarea id="pw2-general-notes" placeholder="Anything else..." style="height:55px;"></textarea>
-
-        <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-top:8px;" onclick="generatePw2()">⚡ Generate Post Walk</button>
-
-        <!-- Inline result — stays on same screen -->
-        <div id="pw2-result" style="display:none;margin-top:14px;padding-top:14px;border-top:2px solid #e2e8f0;">
-          <div style="font-size:10px;font-weight:900;color:var(--pw-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">✅ POST WALK GENERATED</div>
-          <textarea id="pw2-summary-text" readonly
-            style="height:280px;font-family:'Courier New',monospace;font-size:13px;border:2px solid var(--pw-green);width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#fff;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
-          <button class="actionBtn" style="width:100%;background:var(--pw-green);color:white;margin-bottom:8px;" onclick="copyPwInline('pw2')">📋 Copy to AppWright</button>
-          <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
-        </div>
-
-        <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);margin-top:8px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
-      </div>
-    </div>
-
-    <!-- SUMMARY SCREEN -->
+    <!-- SUMMARY SCREEN (fallback for old history items without structured data) -->
     <div id="pw-screen-summary" style="display:none;">
       <div class="pw-card">
-        <div style="font-size:12px;font-weight:900;color:var(--pw-green);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">✅ Post Walk Generated</div>
+        <div style="font-size:12px;font-weight:900;color:var(--bfs-red);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">📋 Post Walk — Loaded from History</div>
         <textarea id="pw-summary-text" readonly></textarea>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-          <button class="actionBtn" style="background:var(--pw-green);color:white;" onclick="copyPwSummary()">📋 Copy to AppWright</button>
+          <button class="actionBtn" style="background:var(--navy);color:white;" onclick="copyPwSummary()">📋 Copy to AppWright</button>
           <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
         </div>
       </div>
@@ -398,16 +407,15 @@
 </div>
 
 <script>
-  const TEST_KEY='bfs_test_active',TEST_HIST='bfs_test_history',PW1_HIST='bfs_test_pw1_history',PW2_HIST='bfs_test_pw2_history';
+  const TEST_KEY='bfs_test_active',TEST_HIST='bfs_test_history',PW1_HIST='bfs_test_pw1_history';
   let state={fireRated:false};
   let activeSectionId='',activeItemLabel='',activeTypes=[];
-  let pwType='',pwCustomer='',pwJobId='';
+  let pwCustomer='',pwJobId='';
   let pw1Result='',pw1DoorCheck='';
   let pw1SelectedReasons=new Set();
-  let pw2Checklist=[];
 
   // Quick note state — one array per area
-  let quickNotes={main:[],pw1:[],pw2:[]};
+  let quickNotes={main:[],pw1:[]};
   // Global search results so onclick handlers can always access them
   let _pwSearchResults=[];
 
@@ -575,11 +583,11 @@
   // ════════════════════════════════════════════════════════════════
   // POST WALK
   // ════════════════════════════════════════════════════════════════
-  function openPostWalk(){pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();pw2Checklist=[];clearQNotes('pw1');clearQNotes('pw2');showPwScreen('pw-screen-type');renderPwHistory();document.getElementById('pw-overlay').style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
+  function openPostWalk(){pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();clearQNotes('pw1');showPwScreen('pw-screen-type');renderPwHistory();document.getElementById('pw-overlay').style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
   function closePostWalk(){document.getElementById('pw-overlay').style.display='none';}
-  function showPwScreen(id){['pw-screen-type','pw-screen-search','pw-screen-1st','pw-screen-2nd','pw-screen-summary'].forEach(s=>document.getElementById(s).style.display='none');document.getElementById(id).style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
+  function showPwScreen(id){['pw-screen-type','pw-screen-search','pw-screen-1st','pw-screen-summary'].forEach(s=>document.getElementById(s).style.display='none');document.getElementById(id).style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
 
-  function selectPwType(type){pwType=type;document.getElementById('pw-header-title').innerText=type==='1st'?'📋 1ST TRIM POST WALK':'📋 2ND TRIM POST WALK';document.getElementById('pw-search-input').value='';document.getElementById('pw-search-results').innerHTML='';document.getElementById('pw-cust-manual').value='';document.getElementById('pw-jobid-manual').value='';showPwScreen('pw-screen-search');}
+  function selectPwType(type){document.getElementById('pw-header-title').innerText='📋 1ST TRIM POST WALK';document.getElementById('pw-search-input').value='';document.getElementById('pw-search-results').innerHTML='';document.getElementById('pw-cust-manual').value='';document.getElementById('pw-jobid-manual').value='';showPwScreen('pw-screen-search');}
 
   function searchPwJobs(){
     const q=document.getElementById('pw-search-input').value.trim().toLowerCase();
@@ -601,29 +609,17 @@
   function startPwFormManual(){pwCustomer=document.getElementById('pw-cust-manual').value.trim();pwJobId=document.getElementById('pw-jobid-manual').value.trim();if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}startPwForm();}
 
   function startPwForm(){
+    document.getElementById('pw-header-title').innerText='📋 1ST TRIM POST WALK';
     const banner=document.getElementById('pw-active-banner');
     banner.innerHTML=`📋 <span style="opacity:0.75;font-weight:600;">ACTIVE JOB:</span> ${pwCustomer}${pwJobId?' — '+pwJobId:''}`;
     banner.style.display='flex';
-    if(pwType==='1st'){
-      document.getElementById('pw1-job-display').innerText=`${pwCustomer}${pwJobId?' — '+pwJobId:''}`;
-      buildPw1Reasons();resetPw1Buttons();
-      document.getElementById('pw1-material-onsite').value='';
-      document.getElementById('pw1-general-notes').value='';
-      clearQNotes('pw1');
-      // Hide previous result if any
-      const r1=document.getElementById('pw1-result');if(r1)r1.style.display='none';
-      showPwScreen('pw-screen-1st');
-    }else{
-      document.getElementById('pw2-job-display').innerText=`${pwCustomer}${pwJobId?' — '+pwJobId:''}`;
-      pw2Checklist=[];
-      document.getElementById('pw2-material-pickup').value='';
-      document.getElementById('pw2-general-notes').value='';
-      clearQNotes('pw2');
-      // Hide previous result if any
-      const r2=document.getElementById('pw2-result');if(r2)r2.style.display='none';
-      renderPw2Checklist();
-      showPwScreen('pw-screen-2nd');
-    }
+    document.getElementById('pw1-job-display').innerText=`${pwCustomer}${pwJobId?' — '+pwJobId:''}`;
+    buildPw1Reasons();resetPw1Buttons();
+    document.getElementById('pw1-material-onsite').value='';
+    document.getElementById('pw1-general-notes').value='';
+    clearQNotes('pw1');
+    const r1=document.getElementById('pw1-result');if(r1)r1.style.display='none';
+    showPwScreen('pw-screen-1st');
   }
 
   // ── 1ST TRIM ───────────────────────────────────────────────────
@@ -703,68 +699,82 @@
     if(qnt){report+=`---\n${qnt}\n`;}
     if(matOnSite){report+=`---\nMaterial On Site: ${matOnSite}\n`;}
     if(genNotes){report+=`---\nNotes: ${genNotes}\n`;}
-    report+=`---\n[Attach photos to AppWright reply if needed]`;
+    // Collect structured state so history items can be loaded back into the form
+    const structured={
+      result:pw1Result,
+      doorCheck:pw1DoorCheck,
+      reasons:PW1_REASONS.map((r,idx)=>{
+        if(!pw1SelectedReasons.has(r.label))return null;
+        const note=(document.getElementById(`pr-text-${idx}`)?.value||'').trim();
+        return{idx,label:r.label,note};
+      }).filter(Boolean),
+      matOnSite,genNotes
+    };
     // Show inline — don't navigate away from the form
     document.getElementById('pw1-summary-text').value=report;
     const resultDiv=document.getElementById('pw1-result');
     resultDiv.style.display='block';
     resultDiv.scrollIntoView({behavior:'smooth'});
-    savePwToHistory(report,'1st');
-  }
-
-  // ── 2ND TRIM ───────────────────────────────────────────────────
-  function addPwChecklistItem(){const text=prompt('What was completed or checked?');if(!text||!text.trim())return;pw2Checklist.push({text:text.trim(),status:null});renderPw2Checklist();}
-  function setPw2Status(i,status){pw2Checklist[i].status=pw2Checklist[i].status===status?null:status;renderPw2Checklist();}
-  function delPw2Item(i){pw2Checklist.splice(i,1);renderPw2Checklist();}
-  function renderPw2Checklist(){const el=document.getElementById('pw2-checklist');el.innerHTML=pw2Checklist.map((item,i)=>{const isDone=item.status==='done',isNot=item.status==='notdone';return`<div class="pw-checklist-item${isDone?' is-done':isNot?' is-notdone':''}"><span class="pw-check-text">${isDone?'✅ ':isNot?'❌ ':'○ '}${item.text}</span><button class="pw-check-done${isDone?' active':''}" onclick="setPw2Status(${i},'done')">✅</button><button class="pw-check-notdone${isNot?' active':''}" onclick="setPw2Status(${i},'notdone')">❌</button><button class="pw-check-del" onclick="delPw2Item(${i})">🗑</button></div>`;}).join('');}
-
-  function generatePw2(){
-    if(!pw2Checklist.length){showToast('⚠️ ADD AT LEAST ONE ITEM');return;}
-    const pickup=document.getElementById('pw2-material-pickup').value.trim();
-    const notes=document.getElementById('pw2-general-notes').value.trim();
-    const qnt=getQNotesText('pw2');
-    let report=`POST WALK — 2ND TRIM -- ${pwCustomer} -- ${pwJobId}\n----------------------------\n`;
-    pw2Checklist.forEach(item=>{report+=`${item.status==='done'?'✅':item.status==='notdone'?'❌':'○'} ${item.text}\n`;});
-    if(qnt){report+=`---\n${qnt}\n`;}
-    if(pickup){report+=`---\nExtra Material To Pick Up: ${pickup}\n`;}
-    if(notes){report+=`---\nNotes: ${notes}\n`;}
-    report+=`---\n[Attach photos to AppWright reply if needed]`;
-    // Show inline — don't navigate away from the form
-    document.getElementById('pw2-summary-text').value=report;
-    const resultDiv2=document.getElementById('pw2-result');
-    resultDiv2.style.display='block';
-    resultDiv2.scrollIntoView({behavior:'smooth'});
-    savePwToHistory(report,'2nd');
+    savePwToHistory(report,structured);
   }
 
   // ── SUMMARY & HISTORY ──────────────────────────────────────────
-  // Inline copy — used by buttons on the form itself
-  function copyPwInline(which){
-    const id=which==='pw1'?'pw1-summary-text':'pw2-summary-text';
-    const text=document.getElementById(id).value;
+  // Inline copy — used by the Copy button on the 1st trim form
+  function copyPwInline(){
+    const text=document.getElementById('pw1-summary-text').value;
     navigator.clipboard.writeText(text)
       .then(()=>showToast('✓ COPIED — Paste into AppWright'))
-      .catch(()=>{document.getElementById(id).select();document.execCommand('copy');showToast('✓ COPIED');});
+      .catch(()=>{const el=document.getElementById('pw1-summary-text');el.select();document.execCommand('copy');showToast('✓ COPIED');});
   }
   // Summary screen copy (used when loading from history)
   function copyPwSummary(){const t=document.getElementById('pw-summary-text').value;navigator.clipboard.writeText(t).then(()=>showToast('✓ COPIED — Paste into AppWright')).catch(()=>{document.getElementById('pw-summary-text').select();document.execCommand('copy');showToast('✓ COPIED');});}
-  function showPwSummary(text,type){document.getElementById('pw-summary-text').value=text;showPwScreen('pw-screen-summary');}
-
   function newPostWalk(){
-    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();pw2Checklist=[];
-    clearQNotes('pw1');clearQNotes('pw2');
-    // Hide inline results
-    ['pw1-result','pw2-result'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();
+    clearQNotes('pw1');
+    const r=document.getElementById('pw1-result');if(r)r.style.display='none';
     document.getElementById('pw-active-banner').style.display='none';
     document.getElementById('pw-header-title').innerText='📋 POST WALK';
     showPwScreen('pw-screen-type');
     renderPwHistory();
   }
-  function savePwToHistory(text,type){const key=type==='1st'?PW1_HIST:PW2_HIST;let h=JSON.parse(localStorage.getItem(key))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${pwCustomer} — ${pwJobId}`,text,time:ts,customer:pwCustomer,jobId:pwJobId});if(h.length>20)h.pop();localStorage.setItem(key,JSON.stringify(h));renderPwHistory();}
-  function showPwHistory(type){const key=type==='1st'?PW1_HIST:PW2_HIST,h=JSON.parse(localStorage.getItem(key))||[],el=document.getElementById('pw-history-list');el.innerHTML=h.length?h.map((item,i)=>`<div class="pw-history-entry"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="loadPwHist('${type}',${i})">LOAD</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="delPwHist('${type}',${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;text-align:center;">No ${type==='1st'?'1st trim':'2nd trim'} post walks yet.</p>`;}
-  function renderPwHistory(){showPwHistory('1st');}
-  function loadPwHist(type,i){const key=type==='1st'?PW1_HIST:PW2_HIST,h=JSON.parse(localStorage.getItem(key))||[],item=h[i];if(!item)return;document.getElementById('pw-summary-text').value=item.text;pwCustomer=item.customer;pwJobId=item.jobId;document.getElementById('pw-active-banner').innerHTML=`📋 <span style="opacity:0.75;">ACTIVE JOB:</span> ${pwCustomer} — ${pwJobId}`;document.getElementById('pw-active-banner').style.display='flex';showPwScreen('pw-screen-summary');}
-  function delPwHist(type,i){const key=type==='1st'?PW1_HIST:PW2_HIST;let h=JSON.parse(localStorage.getItem(key))||[];h.splice(i,1);localStorage.setItem(key,JSON.stringify(h));showPwHistory(type);}
+  function savePwToHistory(text,structured){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${pwCustomer} — ${pwJobId}`,text,time:ts,customer:pwCustomer,jobId:pwJobId,structured:structured||null});if(h.length>20)h.pop();localStorage.setItem(PW1_HIST,JSON.stringify(h));renderPwHistory();}
+  function showPwHistory(){const h=JSON.parse(localStorage.getItem(PW1_HIST))||[],el=document.getElementById('pw-history-list');el.innerHTML=h.length?h.map((item,i)=>`<div class="pw-history-entry"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="loadPwHist(${i})">✏️ EDIT</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="delPwHist(${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;text-align:center;">No post walks yet.</p>`;}
+  function renderPwHistory(){showPwHistory();}
+  function loadPwHist(i){
+    const h=JSON.parse(localStorage.getItem(PW1_HIST))||[],item=h[i];
+    if(!item)return;
+    pwCustomer=item.customer;pwJobId=item.jobId;
+    startPwForm(); // resets form, sets banner, shows pw-screen-1st
+    if(item.structured){
+      applyPwStructured(item.structured);
+      document.getElementById('pw1-summary-text').value=item.text;
+      document.getElementById('pw1-result').style.display='block';
+    }else{
+      // Fallback: old items without structured data go to read-only view
+      document.getElementById('pw-summary-text').value=item.text;
+      showPwScreen('pw-screen-summary');
+    }
+  }
+  function applyPwStructured(s){
+    if(!s)return;
+    if(s.result)setPw1Result(s.result);
+    if(s.doorCheck)setPw1DoorCheck(s.doorCheck);
+    if(s.reasons&&s.reasons.length){
+      s.reasons.forEach(r=>{
+        pw1SelectedReasons.add(r.label);
+        const card=document.getElementById(`pr-${r.idx}`),icon=document.getElementById(`pr-icon-${r.idx}`),noteWrap=document.getElementById(`pr-note-${r.idx}`),lbl=document.getElementById(`pr-lbl-${r.idx}`);
+        if(card){card.style.background='#fef2f2';card.style.borderColor='#dc2626';}
+        if(icon){icon.textContent='❌';icon.style.background='#dc2626';icon.style.borderColor='#dc2626';}
+        if(lbl)lbl.style.color='#dc2626';
+        if(noteWrap)noteWrap.style.display='block';
+        if(r.note){const ta=document.getElementById(`pr-text-${r.idx}`);if(ta)ta.value=r.note;}
+      });
+    }
+    if(s.matOnSite)document.getElementById('pw1-material-onsite').value=s.matOnSite;
+    if(s.genNotes)document.getElementById('pw1-general-notes').value=s.genNotes;
+  }
+  function delPwHist(i){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];h.splice(i,1);localStorage.setItem(PW1_HIST,JSON.stringify(h));showPwHistory();}
+  function togglePwHist(){const b=document.getElementById('pw-history-body'),c=document.getElementById('pw-history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
 
   // ── BUILD LAYOUT ───────────────────────────────────────────────
   const appCont=document.getElementById('app-content');
