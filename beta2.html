@@ -199,14 +199,11 @@
 
 <!-- MAIN HEADER -->
 <div id="main-header" class="header-card" style="margin-top:8px;padding:0;overflow:hidden;text-align:left;">
-  <!-- Red accent stripe -->
-  <div style="height:4px;background:linear-gradient(90deg,var(--bfs-red),#ff4d6d);"></div>
   <div style="padding:16px 14px 10px;">
     <!-- Centered branding -->
     <div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1.5px solid #f1f5f9;">
-      <img src="icon-512.png" alt="BFS Logo" style="width:60px;height:auto;border-radius:12px;margin:0 auto 10px;display:block;box-shadow:0 4px 14px rgba(0,0,0,0.18);">
-      <div style="font-size:15px;font-weight:900;color:var(--navy);letter-spacing:1.2px;text-transform:uppercase;">Elevate Trim</div>
-      <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:3px;">Door &amp; Trim Takeoff</div>
+      <img src="icon-512.png" alt="BFS Logo" style="width:90px;height:auto;border-radius:14px;margin:0 auto 10px;display:block;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+      <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Door &amp; Trim Takeoff</div>
     </div>
     <!-- Customer -->
     <div class="input-row">
@@ -310,9 +307,7 @@
     <div id="lo-job-banner" style="display:none;background:rgba(0,0,0,0.25);min-height:34px;padding:7px 16px;font-size:11px;font-weight:800;color:white;text-align:center;letter-spacing:0.5px;text-transform:uppercase;border-top:1px solid rgba(255,255,255,0.15);align-items:center;justify-content:center;"></div>
   </div>
   <div style="padding:0 8px 24px 8px;">
-    <div class="header-card" style="margin-top:10px;padding:0;overflow:hidden;text-align:left;">
-      <div style="height:4px;background:linear-gradient(90deg,#2563eb,#1d4ed8);"></div>
-      <div style="padding:14px 14px 12px;">
+    <div class="header-card" style="margin-top:10px;padding:14px 14px 12px;text-align:left;">
         <div class="input-row">
           <div class="input-group ac-wrap">
             <label>Customer</label>
@@ -330,7 +325,6 @@
               oninput="saveLoState();checkLoTrimMatch()" style="margin-bottom:0;">
           </div>
         </div>
-      </div>
     </div>
     <!-- Trim cross-reference — shows when lot matches a saved trim takeoff -->
     <div id="lo-trim-match" style="display:none;background:#eff6ff;border:2px solid #1d4ed8;border-radius:12px;padding:14px;margin:8px 0;box-shadow:0 8px 24px rgba(29,78,216,0.2);">
@@ -758,9 +752,7 @@
       document.getElementById('lo-summary').value=d.summaryText||'';
       loState=d.loState||{};
     }else{
-      // Auto-fill customer from main takeoff if available
-      const mainCust=(document.getElementById('customer')?.value||'').trim();
-      document.getElementById('lo-customer').value=mainCust;
+      document.getElementById('lo-customer').value='';
       document.getElementById('lo-job-id').value='';
       document.getElementById('lo-notes').value='';
       document.getElementById('lo-summary').value='';
