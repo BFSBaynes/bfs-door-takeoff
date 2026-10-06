@@ -25,12 +25,10 @@
     body.banner-visible .section-title { top: var(--section-top, 44px); }
     :root { --header-top: 44px; --section-top: 44px; }
 
-    /* ── SOLID RED TOP BAR ── */
     #top-bar {
       position: fixed; top: 0; left: 0; right: 0; height: 44px; z-index: 650;
       background: var(--bfs-red); box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
-
     .mode-switch {
       position: fixed; top: 6px; left: 8px; z-index: 700;
       background: rgba(255,255,255,0.15); color: white; padding: 5px 12px;
@@ -38,8 +36,12 @@
       text-decoration: none; border: 1.5px solid rgba(255,255,255,0.5);
       white-space: nowrap; letter-spacing: 0.3px;
     }
-
-    /* ── LOCKOUT WALK BUTTON ── */
+    .beta-btn {
+      position: fixed; top: 6px; left: 50%; transform: translateX(-50%); z-index: 700;
+      background: #7c3aed; color: white; padding: 5px 10px; border-radius: 20px;
+      font-size: 10px; font-weight: 800; text-decoration: none;
+      border: 1.5px solid rgba(255,255,255,0.5); white-space: nowrap; letter-spacing: 0.3px;
+    }
     .lo-walk-btn {
       position: fixed; top: 6px; right: 8px; z-index: 700;
       background: #d97706; color: white; padding: 5px 12px;
@@ -47,8 +49,6 @@
       border: 1.5px solid rgba(255,255,255,0.6);
       white-space: nowrap; letter-spacing: 0.3px; cursor: pointer;
     }
-
-    /* ── LOCKOUT WALK OVERLAY ── */
     #lo-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       z-index: 1500; background: var(--bg); overflow-y: auto;
@@ -78,7 +78,6 @@
     }
     .lo-qty.has-count { color: var(--green); }
     .lo-qty.tap-flash { transform: scale(1.25); color: var(--green); }
-
     #job-banner {
       display: none; position: fixed; top: 44px; left: 0; right: 0; z-index: 660;
       background: var(--bfs-red); color: white; font-size: 11px; font-weight: 800;
@@ -89,7 +88,6 @@
     }
     #job-banner.visible { display: flex; }
     #job-banner span { opacity: 0.75; font-weight: 600; margin: 0 4px; }
-
     .header-card {
       background:#fff; border-radius: 8px; padding: 12px; margin-bottom: 12px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #94a3b8; text-align: center;
@@ -99,7 +97,6 @@
     input, textarea { width:100%; padding: 10px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; margin-bottom: 8px; outline: none; background: #fff; }
     .input-row { display: flex; gap: 8px; margin-bottom: 4px; }
     .input-group { flex: 1; }
-
     .section-title {
       color: #fff; padding: 14px; font-weight: 800; font-size: 14px;
       margin: 8px -8px; cursor: pointer; display: flex;
@@ -118,7 +115,6 @@
     .bg-red { background: var(--bfs-red); }
     .section-content { display: none; padding: 8px 0; }
     .section-content.active { display: block; }
-
     .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px; }
     .item-card {
       background: #fff; border: 2px solid #94a3b8; border-radius: 8px;
@@ -141,7 +137,6 @@
     .item-card.has-data { border-color: var(--green); background: #f0fdf4; color: var(--green); }
     .note-badge { position: absolute; top: 3px; right: 3px; font-size: 9px; display: none; line-height: 1; }
     .note-badge.active { display: block; }
-
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.85); z-index: 2000;
@@ -161,7 +156,6 @@
     .qty-display { font-size: 22px; font-weight: 800; min-width: 35px; color: var(--navy); text-align: center; }
     .qty-input { width: 80px; text-align: center; font-size: 20px; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); }
     .active-qty { color: var(--green) !important; border-color: var(--green) !important; }
-
     .actionBtn { padding: 14px; border: 0; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
     #summary {
       background: #fff; height: 350px; margin-top: 8px; font-family: sans-serif;
@@ -175,7 +169,6 @@
       60%  { border-color: var(--green); box-shadow: 0 0 0 8px rgba(22,163,74,0.1); }
       100% { border-color: var(--bfs-red); box-shadow: 0 0 10px rgba(227,24,55,0.1); }
     }
-
     #summary-empty-state {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -184,13 +177,11 @@
     #summary-empty-state span { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
     #summary-empty-state p { font-size: 13px; color: #94a3b8; text-align: center; line-height: 1.6; margin: 0; }
     #summary-empty-state.hidden { display: none; }
-
     .history-section { background: #fff; border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid #94a3b8; }
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #e2e8f0; font-size: 12px; }
     .history-controls { display: flex; gap: 8px; align-items: center; }
     .del-btn { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 8px 14px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; }
     .load-btn { padding: 10px 15px; background: var(--navy); color: white; border: 0; border-radius: 4px; font-weight: 800; font-size: 13px; cursor: pointer; min-width: 70px; }
-
     .ac-wrap { position: relative; }
     .ac-dropdown {
       display: none; position: absolute; top: 100%; left: 0; right: 0;
@@ -213,11 +204,9 @@
       cursor: pointer; line-height: 1;
     }
     .ac-delete:active { background: #fecaca; }
-
     .version-tag { text-align:center; color:#475569; font-size:9px; margin: 20px 0; font-weight: bold; }
     .chevron::after { content: '▼'; font-size: 10px; }
     .active-header .chevron::after { content: '▲'; }
-
     #scroll-top {
       display: none; position: fixed; bottom: 20px; right: 16px; z-index: 998;
       background: var(--navy); color: white; border: none; border-radius: 50%;
@@ -241,6 +230,7 @@
 
 <div id="top-bar"></div>
 <a href="classic.html" class="mode-switch" onclick="localStorage.setItem('preferred_mode', 'classic')">SWITCH TO CLASSIC</a>
+<a href="beta2.html" class="beta-btn">🧪 TRY NEW VERSION</a>
 <button class="lo-walk-btn" onclick="openLockoutWalk()">🔒 LOCKOUT WALK</button>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
@@ -356,9 +346,6 @@
 
 <div class="version-tag">Version 3.3.3 — Lockout Walk</div>
 
-<!-- ══════════════════════════════════════════════════════════════
-     LOCKOUT WALK OVERLAY
-══════════════════════════════════════════════════════════════ -->
 <div id="lo-overlay">
   <div class="lo-header">
     <div style="height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 12px;">
@@ -370,7 +357,6 @@
     </div>
     <div id="lo-job-banner" style="display:none; min-height:34px; padding:8px 16px; font-size:11px; font-weight:800; color:white; text-align:center; letter-spacing:0.5px; text-transform:uppercase; border-top:1px solid rgba(255,255,255,0.2); border-bottom:2px solid rgba(255,255,255,0.2); align-items:center; justify-content:center;"></div>
   </div>
-
   <div style="padding:0 8px 8px 8px;">
     <div class="header-card" style="margin-top:8px;">
       <img src="icon-512.png" alt="Elevate Trim" class="app-logo">
@@ -392,16 +378,12 @@
         </div>
       </div>
     </div>
-
-    <!-- Trim takeoff cross-reference — auto-shows when lot matches a saved trim takeoff -->
     <div id="lo-trim-match" style="display:none; background:#eff6ff; border:2px solid #1e40af; border-radius:8px; padding:12px; margin-bottom:8px;">
       <div style="font-weight:900; font-size:11px; color:#1e40af; margin-bottom:8px; letter-spacing:0.5px;">📋 TRIM TAKEOFF FOUND FOR THIS LOT</div>
       <div id="lo-trim-totals"></div>
       <button onclick="showLoTrimDetail()" style="width:100%; margin-top:10px; background:#1e40af; color:white; border:none; border-radius:6px; padding:10px; font-weight:800; font-size:13px; cursor:pointer;">👁 View Full Trim Takeoff</button>
     </div>
-
     <div id="lo-counters"></div>
-
     <div class="header-card" style="margin-top:4px;">
       <label>Post Walk Notes</label>
       <textarea id="lo-notes" placeholder="Notes..." oninput="saveLoState()" style="height:70px;"></textarea>
@@ -423,7 +405,6 @@
         <button class="actionBtn" style="background:#fee2e2; color:#b91c1c; font-size:13px;" onclick="loReset()">🗑 Reset</button>
       </div>
     </div>
-
     <div class="history-section" style="margin-top:12px;">
       <div onclick="toggleLoHistory()" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:4px 0 8px 0;">
         <label style="cursor:pointer; margin:0; font-size:11px; color:#475569;">LOCKOUT WALK HISTORY (LAST 20)</label>
@@ -434,7 +415,6 @@
         <button onclick="clearLoHistory()" style="width:100%; background:none; border:none; color:#94a3b8; font-size:10px; text-decoration:underline; margin-top:12px; cursor:pointer; padding:10px;">Clear Lockout History</button>
       </div>
     </div>
-
     <div class="version-tag">Lockout Walk — separate from full takeoff history</div>
   </div>
 </div>
@@ -642,7 +622,6 @@
   document.getElementById('loMismatchModal').addEventListener('click', function(e) { if (e.target === this) closeLoMismatch(); });
   document.getElementById('loTrimDetailModal').addEventListener('click', function(e) { if (e.target === this) closeLoTrimDetail(); });
 
-  // ── TAP AUDIO FEEDBACK ───────────────────────────────────────────
   let _tapCtx = null;
   function _getCtx() {
     try {
@@ -988,7 +967,6 @@
     appContainer.appendChild(content);
   });
 
-  // ── AUTOCOMPLETE KNOWLEDGE BASE ──────────────────────────────────
   function getKnowledge() {
     try { return JSON.parse(localStorage.getItem('bfs_knowledge')) || {}; }
     catch(e) { return {}; }
@@ -1005,13 +983,6 @@
     saveKnowledge(kb);
   }
   function getCustomers() { return Object.keys(getKnowledge()).sort(); }
-  function getSubdivisionsFor(customer) {
-    const kb = getKnowledge();
-    if (customer && kb[customer]) return kb[customer].sort();
-    const all = new Set();
-    Object.values(kb).forEach(subs => subs.forEach(s => all.add(s)));
-    return Array.from(all).sort();
-  }
   function deleteCustomer(customer) {
     const kb = getKnowledge();
     delete kb[customer];
@@ -1019,12 +990,6 @@
     document.getElementById('customer').value = "";
     saveState(); updateJobBanner();
     showCustomerSuggestions();
-  }
-  function deleteSubdivision(customer, subdivision) {
-    const kb = getKnowledge();
-    if (kb[customer]) kb[customer] = kb[customer].filter(s => s !== subdivision);
-    saveKnowledge(kb);
-    
   }
   function showDropdown(dropdownId, items, onSelect, onDelete) {
     const dd = document.getElementById(dropdownId);
@@ -1054,10 +1019,6 @@
       (toDelete) => { deleteCustomer(toDelete); }
     );
   }
-  function showSubdivisionSuggestions() {
-    const customer = document.getElementById('customer').value.trim();
-    // Subdivision removed - no suggestions
-  }
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.ac-wrap')) {
       closeDropdown('ac-customer');
@@ -1065,17 +1026,12 @@
     }
   });
 
-  // ══════════════════════════════════════════════════════════════
-  // LOCKOUT WALK — same logic as classic, shared knowledge base
-  // ══════════════════════════════════════════════════════════════
   const LO_ITEMS = ['Passage', 'Privacy', 'Dummy', 'Deadbolt', 'Hinge Bumps', 'Base Bumps'];
   let loState = {};
-  // Lockout walk uses the shared playTapUp / playTapDown defined above
 
   function openLockoutWalk() {
     const loSaved = localStorage.getItem('bfs_lo_active_work');
     if (loSaved) {
-      // Restore in-progress lockout walk (customer, job-id, counters, notes)
       const d = JSON.parse(loSaved);
       document.getElementById('lo-customer').value = d.customer || '';
       document.getElementById('lo-job-id').value   = d.jobId || d.lot || d.subdivision || '';
@@ -1083,7 +1039,6 @@
       document.getElementById('lo-summary').value  = d.summaryText || '';
       loState = d.loState || {};
     } else {
-      // No previous lockout walk — start completely blank
       document.getElementById('lo-customer').value = '';
       document.getElementById('lo-job-id').value   = '';
       document.getElementById('lo-notes').value    = '';
@@ -1100,9 +1055,7 @@
     checkLoTrimMatch();
   }
 
-  function closeLockoutWalk() {
-    document.getElementById('lo-overlay').style.display = 'none';
-  }
+  function closeLockoutWalk() { document.getElementById('lo-overlay').style.display = 'none'; }
 
   function buildLoCounters() {
     const container = document.getElementById('lo-counters');
@@ -1138,9 +1091,7 @@
         el.classList.add('tap-flash');
         setTimeout(() => el.classList.remove('tap-flash'), 220);
       });
-    } else {
-      playTapDown();
-    }
+    } else { playTapDown(); }
     saveLoState();
   }
 
@@ -1163,14 +1114,9 @@
     const banner = document.getElementById('lo-job-banner');
     if (!banner) return;
     if (cust || jobId) {
-      const parts = [];
-      if (cust)  parts.push(cust);
-      if (jobId) parts.push(jobId);
-      banner.innerHTML = `📋 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${parts.join(' — ')}`;
+      banner.innerHTML = `📋 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${[cust,jobId].filter(Boolean).join(' — ')}`;
       banner.style.display = 'flex';
-    } else {
-      banner.style.display = 'none';
-    }
+    } else { banner.style.display = 'none'; }
   }
 
   function updateLoSummaryStyle() {
@@ -1188,8 +1134,6 @@
     if (!cust || !jobId) { showToast('⚠️ ENTER CUSTOMER & JOB ID'); return; }
     const hasAny = LO_ITEMS.some(i => (loState[i] || 0) > 0);
     if (!hasAny) { showToast('⚠️ NO COUNTS ENTERED YET'); return; }
-
-    // ── MISMATCH CHECK against trim takeoff index ──────────────────
     const match = lookupTrimTakeoff(cust, jobId);
     if (match) {
       const expSingle  = match.singles + match.tast;
@@ -1201,25 +1145,18 @@
         if (gotSingle !== expSingle) {
           const diff = gotSingle - expSingle;
           const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
-          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #fcd34d;">
-            <span style="font-size:12px;font-weight:700;color:#92400e;">Passage / Privacy</span>
-            <span style="font-size:13px;font-weight:900;">${dir} (got ${gotSingle}, expected ${expSingle})</span>
-          </div>`;
+          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #fcd34d;"><span style="font-size:12px;font-weight:700;color:#92400e;">Passage / Privacy</span><span style="font-size:13px;font-weight:900;">${dir} (got ${gotSingle}, expected ${expSingle})</span></div>`;
         }
         if (gotDummies !== expDummies) {
           const diff = gotDummies - expDummies;
           const dir  = diff > 0 ? `<span style="color:#b45309;">+${diff} over</span>` : `<span style="color:#b91c1c;">${diff} under</span>`;
-          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;">
-            <span style="font-size:12px;font-weight:700;color:#92400e;">Dummy</span>
-            <span style="font-size:13px;font-weight:900;">${dir} (got ${gotDummies}, expected ${expDummies})</span>
-          </div>`;
+          detail += `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;"><span style="font-size:12px;font-weight:700;color:#92400e;">Dummy</span><span style="font-size:13px;font-weight:900;">${dir} (got ${gotDummies}, expected ${expDummies})</span></div>`;
         }
         document.getElementById('lo-mismatch-detail').innerHTML = detail;
         document.getElementById('loMismatchModal').style.display = 'flex';
         return;
       }
     }
-
     _openLoRecapScreen();
   }
 
@@ -1238,20 +1175,14 @@
 
   function closeLoRecap() { document.getElementById('loRecapModal').style.display = 'none'; }
   function closeLoMismatch() { document.getElementById('loMismatchModal').style.display = 'none'; }
-
-  function confirmLoGenerate() {
-    closeLoRecap();
-    generateLoSummary();
-  }
+  function confirmLoGenerate() { closeLoRecap(); generateLoSummary(); }
 
   function generateLoSummary() {
     const cust  = document.getElementById('lo-customer').value.trim() || 'NA';
     const jobId = document.getElementById('lo-job-id').value.trim() || 'NA';
     const notes = document.getElementById('lo-notes').value.trim();
     let report = `LOCKOUT WALK -- ${cust} -- ${jobId}\n----------------------------\n\n--- LOCKOUT ---\n`;
-    LO_ITEMS.forEach(item => {
-      if ((loState[item] || 0) > 0) report += `- ${item}: ${loState[item]}\n`;
-    });
+    LO_ITEMS.forEach(item => { if ((loState[item] || 0) > 0) report += `- ${item}: ${loState[item]}\n`; });
     if (notes) report += `\n----------------------------\nNOTES\n${notes}`;
     const summaryEl = document.getElementById('lo-summary');
     summaryEl.value = report;
@@ -1266,9 +1197,7 @@
   function copyLoSummary() {
     const text = document.getElementById('lo-summary').value;
     if (!text.trim()) { showToast('⚠️ GENERATE FIRST'); return; }
-    navigator.clipboard.writeText(text)
-      .then(() => showToast('✓ COPIED TO CLIPBOARD'))
-      .catch(() => { document.getElementById('lo-summary').select(); document.execCommand('copy'); showToast('✓ COPIED'); });
+    navigator.clipboard.writeText(text).then(() => showToast('✓ COPIED TO CLIPBOARD')).catch(() => { document.getElementById('lo-summary').select(); document.execCommand('copy'); showToast('✓ COPIED'); });
   }
 
   function loNewLot() {
@@ -1278,8 +1207,7 @@
     document.getElementById('lo-notes').value       = '';
     document.getElementById('lo-summary').value     = '';
     document.getElementById('lo-customer').value = cust;
-    buildLoCounters();
-    saveLoState();
+    buildLoCounters(); saveLoState();
     document.getElementById('lo-job-id').focus();
     showToast('✓ READY FOR NEW LOT');
   }
@@ -1292,9 +1220,7 @@
     document.getElementById('lo-trim-match').style.display = 'none';
     window._loTrimMatch = null;
     localStorage.removeItem('bfs_lo_active_work');
-    buildLoCounters();
-    updateLoSummaryStyle();
-    updateLoJobBanner();
+    buildLoCounters(); updateLoSummaryStyle(); updateLoJobBanner();
   }
 
   function saveLoToHistory(text, fullData) {
@@ -1314,14 +1240,7 @@
     const history = JSON.parse(localStorage.getItem('bfs_lo_history')) || [];
     list.innerHTML = history.length ? '' : `<p style="font-size:11px; color:#94a3b8; padding:8px 0;">No lockout walks yet.</p>`;
     history.forEach((item, index) => {
-      list.innerHTML += `
-        <div class="history-item">
-          <span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ''}</small></span>
-          <div class="history-controls">
-            <button class="load-btn" onclick="loadLoHistory(${index})">LOAD</button>
-            <button class="del-btn"  onclick="deleteLoHistory(${index})">✕</button>
-          </div>
-        </div>`;
+      list.innerHTML += `<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time || ''}</small></span><div class="history-controls"><button class="load-btn" onclick="loadLoHistory(${index})">LOAD</button><button class="del-btn" onclick="deleteLoHistory(${index})">✕</button></div></div>`;
     });
   }
 
@@ -1332,10 +1251,7 @@
     document.getElementById('lo-notes').value        = h.fullData.notes || '';
     document.getElementById('lo-summary').value      = h.text || '';
     loState = JSON.parse(JSON.stringify(h.fullData.loState || {}));
-    buildLoCounters();
-    saveLoState();
-    updateLoSummaryStyle();
-    checkLoTrimMatch();
+    buildLoCounters(); saveLoState(); updateLoSummaryStyle(); checkLoTrimMatch();
   }
 
   function deleteLoHistory(index) {
@@ -1346,10 +1262,7 @@
   }
 
   function clearLoHistory() {
-    if (confirm('Clear all lockout walk history?')) {
-      localStorage.removeItem('bfs_lo_history');
-      renderLoHistory();
-    }
+    if (confirm('Clear all lockout walk history?')) { localStorage.removeItem('bfs_lo_history'); renderLoHistory(); }
   }
 
   function toggleLoHistory() {
@@ -1363,20 +1276,11 @@
   function showLoCustomerSuggestions() {
     const val = document.getElementById('lo-customer').value.trim().toLowerCase();
     const filtered = val ? getCustomers().filter(c => c.toLowerCase().includes(val)) : getCustomers();
-    showDropdown('lo-ac-customer', filtered,
-      (s) => { document.getElementById('lo-customer').value = s; saveLoState(); },
-      null
-    );
+    showDropdown('lo-ac-customer', filtered, (s) => { document.getElementById('lo-customer').value = s; saveLoState(); }, null);
   }
 
-  function showLoSubdivisionSuggestions() {
-    const customer = document.getElementById('lo-customer').value.trim();
-    // Job ID field has no autocomplete - subdivision removed
-  }
-
-  // ── TAKEOFF INDEX — persistent lot cross-reference ────────────────
   const TAKEOFF_INDEX_KEY = 'bfs_takeoff_index';
-  const EXPIRY_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+  const EXPIRY_MS = 90 * 24 * 60 * 60 * 1000;
 
   function getTakeoffIndex() {
     try { return JSON.parse(localStorage.getItem(TAKEOFF_INDEX_KEY)) || []; }
@@ -1386,16 +1290,13 @@
   function migrateOldIndexKeys() {
     const index = getTakeoffIndex();
     if (!index.length) return;
-    const newEntries = [];
-    const removeKeys = [];
+    const newEntries = [], removeKeys = [];
     index.forEach(entry => {
       const parts = (entry.key || '').split('|');
       if (parts.length === 3) {
         const newKey = `${parts[0]}|${parts[2]}`;
         const alreadyExists = index.some(e => e.key === newKey) || newEntries.some(e => e.key === newKey);
-        if (!alreadyExists) {
-          newEntries.push({ ...entry, key: newKey, jobId: entry.lot || entry.subdivision || parts[2] });
-        }
+        if (!alreadyExists) newEntries.push({ ...entry, key: newKey, jobId: entry.lot || entry.subdivision || parts[2] });
         removeKeys.push(entry.key);
       }
     });
@@ -1406,11 +1307,9 @@
   }
 
   function expireTakeoffIndex() {
-    const now   = Date.now();
-    const index = getTakeoffIndex();
+    const now   = Date.now(), index = getTakeoffIndex();
     const fresh = index.filter(e => (now - (e.timestamp || 0)) < EXPIRY_MS);
-    if (fresh.length !== index.length)
-      localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(fresh));
+    if (fresh.length !== index.length) localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(fresh));
   }
 
   function computeTrimTotals(st) {
@@ -1418,10 +1317,8 @@
     Object.keys(st).forEach(key => {
       const val = st[key];
       if (typeof val !== 'number' || val <= 0) return;
-      if ((key.startsWith('68_') || key.startsWith('80_') || key.startsWith('atws_')) &&
-          (key.endsWith('_LH') || key.endsWith('_RH')))
-        singles += val;
-      if (key.endsWith('_DBL'))   dbl  += val;
+      if ((key.startsWith('68_') || key.startsWith('80_') || key.startsWith('atws_')) && (key.endsWith('_LH') || key.endsWith('_RH'))) singles += val;
+      if (key.endsWith('_DBL')) dbl += val;
       if (key.endsWith('_T-AST')) tast += val;
     });
     return { singles, dbl, tast };
@@ -1429,14 +1326,11 @@
 
   function saveTrimToIndex(st, customer, jobId, summaryText) {
     if (!customer || !jobId) return;
-    const totals    = computeTrimTotals(st);
-    const index     = getTakeoffIndex();
+    const totals = computeTrimTotals(st), index = getTakeoffIndex();
     const lookupKey = `${customer.toLowerCase()}|${(jobId||'').toLowerCase()}`;
-    const existing  = index.findIndex(e => e.key === lookupKey);
-    const entry     = { key: lookupKey, customer, jobId,
-                        timestamp: Date.now(), summaryText, ...totals };
-    if (existing >= 0) index[existing] = entry;
-    else index.push(entry);
+    const existing = index.findIndex(e => e.key === lookupKey);
+    const entry = { key: lookupKey, customer, jobId, timestamp: Date.now(), summaryText, ...totals };
+    if (existing >= 0) index[existing] = entry; else index.push(entry);
     localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
   }
 
@@ -1453,57 +1347,29 @@
     if (!cust || !jobId) { panel.style.display = 'none'; return; }
     const match = lookupTrimTakeoff(cust, jobId);
     if (!match) { panel.style.display = 'none'; return; }
-
     document.getElementById('lo-trim-totals').innerHTML = _buildTrimMatchHTML(match);
     window._loTrimMatch = match;
     panel.style.display = 'block';
   }
 
   function _buildTrimMatchHTML(match) {
-    const expSingleLocks = match.singles + match.tast;
-    const expDummies     = (match.dbl * 2) + (match.tast * 2);
+    const expSingleLocks = match.singles + match.tast, expDummies = (match.dbl * 2) + (match.tast * 2);
     let rows = `<div style="font-size:12px;font-weight:900;color:var(--navy);margin-bottom:8px;">${match.customer} — ${match.jobId || match.lot || match.subdivision || ''}</div>`;
-    if (match.singles > 0) rows += `
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
-        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Single Doors</span>
-        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.singles}</span>
-      </div>`;
-    if (match.dbl > 0) rows += `
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
-        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — DBL</span>
-        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.dbl}</span>
-      </div>`;
-    if (match.tast > 0) rows += `
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;">
-        <span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — T-AST</span>
-        <span style="font-size:14px;font-weight:900;color:#1e40af;">${match.tast}</span>
-      </div>`;
+    if (match.singles > 0) rows += `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;"><span style="font-size:12px;font-weight:700;color:#1e3a8a;">Single Doors</span><span style="font-size:14px;font-weight:900;color:#1e40af;">${match.singles}</span></div>`;
+    if (match.dbl > 0) rows += `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;"><span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — DBL</span><span style="font-size:14px;font-weight:900;color:#1e40af;">${match.dbl}</span></div>`;
+    if (match.tast > 0) rows += `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;"><span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — T-AST</span><span style="font-size:14px;font-weight:900;color:#1e40af;">${match.tast}</span></div>`;
     let expRows = '';
-    if (expSingleLocks > 0) expRows += `
-      <div style="display:flex;justify-content:space-between;padding:3px 0;">
-        <span style="font-size:12px;color:#1e3a8a;">Passage / Privacy</span>
-        <span style="font-size:15px;font-weight:900;color:var(--green);">${expSingleLocks}</span>
-      </div>`;
-    if (expDummies > 0) expRows += `
-      <div style="display:flex;justify-content:space-between;padding:3px 0;">
-        <span style="font-size:12px;color:#1e3a8a;">Dummy Knobs</span>
-        <span style="font-size:15px;font-weight:900;color:var(--green);">${expDummies}</span>
-      </div>`;
-    return rows + `<div style="margin-top:8px;padding:8px;background:#dbeafe;border-radius:6px;">
-      <div style="font-size:10px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:0.5px;">EXPECTED LOCKS FROM TRIM TAKEOFF</div>
-      ${expRows}
-    </div>`;
+    if (expSingleLocks > 0) expRows += `<div style="display:flex;justify-content:space-between;padding:3px 0;"><span style="font-size:12px;color:#1e3a8a;">Passage / Privacy</span><span style="font-size:15px;font-weight:900;color:var(--green);">${expSingleLocks}</span></div>`;
+    if (expDummies > 0) expRows += `<div style="display:flex;justify-content:space-between;padding:3px 0;"><span style="font-size:12px;color:#1e3a8a;">Dummy Knobs</span><span style="font-size:15px;font-weight:900;color:var(--green);">${expDummies}</span></div>`;
+    return rows + `<div style="margin-top:8px;padding:8px;background:#dbeafe;border-radius:6px;"><div style="font-size:10px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:0.5px;">EXPECTED LOCKS FROM TRIM TAKEOFF</div>${expRows}</div>`;
   }
 
   function showLoTrimDetail() {
     if (!window._loTrimMatch) return;
-    document.getElementById('lo-trim-detail-text').value =
-      window._loTrimMatch.summaryText || 'No trim takeoff text saved for this lot.';
+    document.getElementById('lo-trim-detail-text').value = window._loTrimMatch.summaryText || 'No trim takeoff text saved for this lot.';
     document.getElementById('loTrimDetailModal').style.display = 'flex';
   }
-  function closeLoTrimDetail() {
-    document.getElementById('loTrimDetailModal').style.display = 'none';
-  }
+  function closeLoTrimDetail() { document.getElementById('loTrimDetailModal').style.display = 'none'; }
 
   function backfillTakeoffIndex() {
     const history = JSON.parse(localStorage.getItem('bfs_history')) || [];
@@ -1516,14 +1382,12 @@
       const key = `${h.fullData.customer.toLowerCase()}|${bfJobId}`;
       if (index.find(e => e.key === key)) return;
       const totals = computeTrimTotals(h.fullData.state);
-      index.push({ key, customer: h.fullData.customer, jobId: h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '',
-                   timestamp: Date.now(), summaryText: h.text || '', ...totals });
+      index.push({ key, customer: h.fullData.customer, jobId: h.fullData.jobId || h.fullData.lot || h.fullData.subdivision || '', timestamp: Date.now(), summaryText: h.text || '', ...totals });
       changed = true;
     });
     if (changed) localStorage.setItem(TAKEOFF_INDEX_KEY, JSON.stringify(index));
   }
 
-  // ── INIT ──────────────────────────────────────────────────────────
   renderHistory();
   loadActiveState();
   expireTakeoffIndex();
