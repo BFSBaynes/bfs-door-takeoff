@@ -15,8 +15,9 @@
     /* Fixed top bar */
     #top-bar { position:fixed; top:0; left:0; right:0; height:44px; z-index:650; background:var(--bfs-red); box-shadow:0 2px 12px rgba(0,0,0,0.5); }
     .mode-switch { position:fixed; top:6px; left:8px; z-index:700; background:rgba(255,255,255,0.15); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; text-decoration:none; border:1.5px solid rgba(255,255,255,0.4); white-space:nowrap; }
-    .pw-btn { position:fixed; top:6px; right:8px; z-index:700; background:rgba(255,255,255,0.15); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.4); white-space:nowrap; cursor:pointer; }
-    .test-badge { position:fixed; top:6px; right:145px; z-index:700; background:#7c3aed; color:white; padding:5px 8px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.4); white-space:nowrap; }
+    .pw-btn { position:fixed; top:6px; right:110px; z-index:700; background:rgba(255,255,255,0.15); color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.4); white-space:nowrap; cursor:pointer; }
+    .lo-walk-btn { position:fixed; top:6px; right:8px; z-index:700; background:#2563eb; color:white; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.4); white-space:nowrap; cursor:pointer; }
+    .test-badge { position:fixed; top:6px; left:85px; z-index:700; background:#7c3aed; color:white; padding:5px 8px; border-radius:20px; font-size:10px; font-weight:800; border:1.5px solid rgba(255,255,255,0.4); white-space:nowrap; }
 
     #job-banner { display:none; position:fixed; top:44px; left:0; right:0; z-index:660; background:linear-gradient(90deg,#c0122d,var(--bfs-red)); color:white; font-size:11px; font-weight:800; text-align:center; padding:8px 16px; letter-spacing:0.5px; box-shadow:0 4px 16px rgba(0,0,0,0.5); text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.15); min-height:36px; align-items:center; justify-content:center; }
     #job-banner.visible { display:flex; }
@@ -40,9 +41,9 @@
     .section-title { color:#fff; padding:15px 18px; font-weight:900; font-size:13px; margin:12px 0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:0.6px; border-radius:12px; position:sticky; top:var(--section-top,44px); z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.55),0 2px 6px rgba(0,0,0,0.35); }
     .section-check { display:none; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.4); border-radius:20px; padding:2px 9px; font-size:11px; font-weight:900; color:#fff; margin-right:8px; }
     .section-check.active { display:inline-block; background:var(--green); border-color:var(--green); }
-    /* Richer gradient colors for section pills */
-    .bg-navy{ background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%); }
-    .bg-red{ background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%); }
+    /* Section pill colors — colored glow shadow lifts them off the dark background */
+    .bg-navy{ background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%); box-shadow:0 8px 28px rgba(26,82,150,0.55),0 3px 8px rgba(0,0,0,0.4); }
+    .bg-red{ background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%); box-shadow:0 8px 28px rgba(240,32,64,0.45),0 3px 8px rgba(0,0,0,0.35); }
     .section-content{display:none;padding:8px 0;} .section-content.active{display:block;}
 
     /* Item grid — deep 3D shadow effect */
@@ -166,6 +167,23 @@
     /* History */
     .pw-history-entry{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:12px;}
     .pw-history-entry:last-child{border-bottom:none;}
+
+    /* ── LOCKOUT WALK ── */
+    #lo-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1500;background:linear-gradient(160deg,#071a2e 0%,#0d3158 55%,#071a2e 100%);overflow-y:auto;}
+    .lo-header{background:linear-gradient(135deg,#1d4ed8,#1e40af);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.5);}
+    /* Lockout counter cards — same colors as trim section pills, colored glow shadows */
+    .lo-counter-card{border-radius:14px;padding:14px 16px;margin-bottom:10px;border:none;}
+    .lo-counter-card.lo-navy{background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%);box-shadow:0 10px 32px rgba(26,82,150,0.55),0 4px 10px rgba(0,0,0,0.4);}
+    .lo-counter-card.lo-red{background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%);box-shadow:0 10px 32px rgba(240,32,64,0.45),0 4px 10px rgba(0,0,0,0.35);}
+    .lo-counter-card.has-count{background:linear-gradient(135deg,#14532d 0%,#166534 100%);box-shadow:0 10px 32px rgba(22,163,74,0.45),0 4px 10px rgba(22,163,74,0.2);}
+    .lo-item-label{font-size:15px;font-weight:900;color:rgba(255,255,255,0.75);margin-bottom:12px;letter-spacing:0.3px;}
+    .lo-controls{display:flex;align-items:center;justify-content:space-between;}
+    /* Frosted glass +/- buttons */
+    .lo-btn{width:56px;height:56px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.12);color:white;font-weight:bold;font-size:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.08s,background 0.15s;}
+    .lo-btn.tap-flash{background:rgba(255,255,255,0.35);transform:scale(1.12);}
+    .lo-qty{font-size:46px;font-weight:900;color:white;min-width:68px;text-align:center;transition:transform 0.15s,color 0.15s;text-shadow:0 2px 8px rgba(0,0,0,0.3);}
+    .lo-qty.has-count{color:#86efac;}
+    .lo-qty.tap-flash{transform:scale(1.22);color:#86efac;}
   </style>
 </head>
 <body>
@@ -174,6 +192,7 @@
 <a href="index.html" class="mode-switch">← LIVE APP</a>
 <span class="test-badge">🧪 TEST</span>
 <button class="pw-btn" onclick="openPostWalk()">📋 POST WALK</button>
+<button class="lo-walk-btn" onclick="openLockoutWalk()">🔒 LOCKOUT</button>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
 <div id="job-banner"></div>
@@ -182,14 +201,12 @@
 <div id="main-header" class="header-card" style="margin-top:8px;padding:0;overflow:hidden;text-align:left;">
   <!-- Red accent stripe -->
   <div style="height:4px;background:linear-gradient(90deg,var(--bfs-red),#ff4d6d);"></div>
-  <div style="padding:14px 14px 10px;">
-    <!-- Branding row -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid #f1f5f9;">
-      <img src="icon-512.png" alt="BFS Logo" style="width:42px;height:auto;border-radius:8px;">
-      <div>
-        <div style="font-size:14px;font-weight:900;color:var(--navy);letter-spacing:0.4px;text-transform:uppercase;">Elevate Trim</div>
-        <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-top:1px;">Door &amp; Trim Takeoff</div>
-      </div>
+  <div style="padding:16px 14px 10px;">
+    <!-- Centered branding -->
+    <div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1.5px solid #f1f5f9;">
+      <img src="icon-512.png" alt="BFS Logo" style="width:60px;height:auto;border-radius:12px;margin:0 auto 10px;display:block;box-shadow:0 4px 14px rgba(0,0,0,0.18);">
+      <div style="font-size:15px;font-weight:900;color:var(--navy);letter-spacing:1.2px;text-transform:uppercase;">Elevate Trim</div>
+      <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:3px;">Door &amp; Trim Takeoff</div>
     </div>
     <!-- Customer -->
     <div class="input-row">
@@ -281,7 +298,119 @@
   </div>
 </div>
 
-<div class="version-tag">TEST — Post Walk + Door Counter + Quick Notes</div>
+<div class="version-tag">TEST BUILD — Lockout Walk · Post Walk · Door Counter · Quick Notes</div>
+
+<!-- LOCKOUT WALK OVERLAY -->
+<div id="lo-overlay">
+  <div class="lo-header">
+    <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;">
+      <span style="color:white;font-weight:900;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;">🔒 Lockout Walk</span>
+      <button onclick="closeLockoutWalk()" style="background:rgba(0,0,0,0.2);color:white;border:1.5px solid rgba(255,255,255,0.5);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;">✕ BACK TO TAKEOFF</button>
+    </div>
+    <div id="lo-job-banner" style="display:none;background:rgba(0,0,0,0.25);min-height:34px;padding:7px 16px;font-size:11px;font-weight:800;color:white;text-align:center;letter-spacing:0.5px;text-transform:uppercase;border-top:1px solid rgba(255,255,255,0.15);align-items:center;justify-content:center;"></div>
+  </div>
+  <div style="padding:0 8px 24px 8px;">
+    <div class="header-card" style="margin-top:10px;padding:0;overflow:hidden;text-align:left;">
+      <div style="height:4px;background:linear-gradient(90deg,#2563eb,#1d4ed8);"></div>
+      <div style="padding:14px 14px 12px;">
+        <div class="input-row">
+          <div class="input-group ac-wrap">
+            <label>Customer</label>
+            <input id="lo-customer" type="text" placeholder="e.g. Pulte" autocomplete="off"
+              oninput="saveLoState();showLoCustomerSuggestions();checkLoTrimMatch()"
+              onfocus="showLoCustomerSuggestions()"
+              onblur="setTimeout(()=>closeDropdown('lo-ac-customer'),200)">
+            <div id="lo-ac-customer" class="ac-dropdown"></div>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label>Job ID</label>
+            <input id="lo-job-id" type="text" placeholder="e.g. LOT 104A" autocomplete="off"
+              oninput="saveLoState();checkLoTrimMatch()" style="margin-bottom:0;">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Trim cross-reference — shows when lot matches a saved trim takeoff -->
+    <div id="lo-trim-match" style="display:none;background:#eff6ff;border:2px solid #1d4ed8;border-radius:12px;padding:14px;margin:8px 0;box-shadow:0 8px 24px rgba(29,78,216,0.2);">
+      <div style="font-weight:900;font-size:11px;color:#1d4ed8;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase;">📋 Trim Takeoff Found For This Lot</div>
+      <div id="lo-trim-totals"></div>
+      <button onclick="showLoTrimDetail()" style="width:100%;margin-top:10px;background:#1d4ed8;color:white;border:none;border-radius:8px;padding:11px;font-weight:800;font-size:13px;cursor:pointer;">👁 View Full Trim Takeoff</button>
+    </div>
+    <div id="lo-counters"></div>
+    <div class="header-card" style="margin-top:4px;">
+      <label>Notes</label>
+      <textarea id="lo-notes" placeholder="Post walk notes..." oninput="saveLoState()" style="height:65px;"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+        <button class="actionBtn" style="background:linear-gradient(135deg,var(--bfs-red),#c0152f);color:white;box-shadow:0 3px 10px rgba(227,24,55,0.35);" onclick="openLoRecap()">⚡ Generate</button>
+        <button class="actionBtn" style="background:#f1f5f9;color:var(--navy);border:1.5px solid #e2e8f0;" onclick="copyLoSummary()">📋 Copy</button>
+      </div>
+      <div style="position:relative;margin-top:10px;">
+        <textarea id="lo-summary" readonly style="height:200px;font-family:'Courier New',monospace;font-size:13px;border:1.5px solid #e2e8f0;width:100%;border-radius:8px;padding:10px;white-space:pre;background:#f8fafc;line-height:1.4;color:#000;"></textarea>
+        <div id="lo-summary-empty" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+          <span style="font-size:2rem;opacity:0.3;">🔑</span>
+          <p style="font-size:12px;color:#94a3b8;text-align:center;margin:8px 0 0 0;">Tap Generate to build your lockout report</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+        <button class="actionBtn" style="background:#eff6ff;color:#1d4ed8;border:1.5px solid #bfdbfe;font-size:13px;" onclick="loNewLot()">🏠 New Job, Same Customer</button>
+        <button class="actionBtn" style="background:#fff1f2;color:#b91c1c;border:1.5px solid #fecdd3;font-size:13px;" onclick="loReset()">🗑 Reset</button>
+      </div>
+    </div>
+    <div class="history-section" style="margin-top:10px;">
+      <div onclick="toggleLoHistory()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 10px 0;border-bottom:1.5px solid #f1f5f9;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:3px;height:16px;background:#1d4ed8;border-radius:2px;"></div>
+          <label style="cursor:pointer;margin:0;font-size:11px;color:var(--navy);font-weight:900;">LOCKOUT WALK HISTORY</label>
+        </div>
+        <span id="lo-history-chevron" style="font-size:11px;color:#64748b;font-weight:800;">▼ SHOW</span>
+      </div>
+      <div id="lo-history-body" style="display:none;margin-top:8px;">
+        <div id="lo-history-list"></div>
+        <button onclick="clearLoHistory()" style="width:100%;background:none;border:none;color:#94a3b8;font-size:10px;text-decoration:underline;margin-top:8px;cursor:pointer;padding:8px;">Clear Lockout History</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOCKOUT RECAP MODAL -->
+<div id="loRecapModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem;margin-bottom:6px;">🔒</div>
+    <h2 style="margin:0 0 4px 0;color:var(--navy);font-size:1.2rem;">Lockout Recap</h2>
+    <p style="color:#64748b;font-size:12px;margin:0 0 12px 0;">Does this match what you counted on the walk?</p>
+    <div id="lo-recap-content" style="margin-bottom:16px;text-align:left;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="closeLoRecap()">Go Back &amp; Fix</button>
+      <button class="actionBtn" style="background:var(--bfs-red);color:white;" onclick="confirmLoGenerate()">✓ Looks Right</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCKOUT MISMATCH MODAL -->
+<div id="loMismatchModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:320px;">
+    <div style="font-size:2rem;margin-bottom:6px;">⚠️</div>
+    <h2 style="margin:0 0 6px 0;color:var(--navy);font-size:1.2rem;">Counts Don't Match</h2>
+    <p style="color:#64748b;font-size:13px;margin:0 0 12px 0;">Has there been a change from the original door takeoff?</p>
+    <div id="lo-mismatch-detail" style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="closeLoMismatch()">Go Back &amp; Fix</button>
+      <button class="actionBtn" style="background:var(--bfs-red);color:white;" onclick="closeLoMismatch();_openLoRecapScreen();">Yes, Proceed</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRIM DETAIL MODAL -->
+<div id="loTrimDetailModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:480px;">
+    <h2 style="margin:0 0 6px 0;color:var(--navy);font-size:1.1rem;">📋 Trim Takeoff — Reference</h2>
+    <p style="color:#64748b;font-size:11px;margin:0 0 8px 0;">Original trim takeoff for this lot. Cross-reference your lockout walk counts.</p>
+    <textarea id="lo-trim-detail-text" readonly style="height:320px;font-family:'Courier New',monospace;font-size:12px;border:1px solid #e2e8f0;width:100%;border-radius:6px;padding:10px;white-space:pre;background:#f8fafc;color:#000;line-height:1.4;"></textarea>
+    <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);margin-top:10px;" onclick="closeLoTrimDetail()">Close</button>
+  </div>
+</div>
 
 <!-- POST WALK OVERLAY -->
 <div id="pw-overlay">
@@ -564,6 +693,8 @@
     const sEl=document.getElementById('summary');sEl.classList.remove('flash');void sEl.offsetWidth;sEl.classList.add('flash');
     document.getElementById('summary-section').scrollIntoView({behavior:'smooth'});
     saveToHistory(r,`${cV} — ${jV}`,{customer:cV,jobId:jV,notes:gN,state:JSON.parse(JSON.stringify(state))});
+    saveTrimToIndex(state,cV,jV,r);
+    learnFromJob(cV);
   }
 
   function updateSummaryStyle(){const s=document.getElementById('summary'),e=document.getElementById('summary-empty-state'),h=s.value.length>0;h?s.classList.add('has-text'):s.classList.remove('has-text');h?e.classList.add('hidden'):e.classList.remove('hidden');}
@@ -577,13 +708,67 @@
   function loadHistory(i){const h=JSON.parse(localStorage.getItem(TEST_HIST))[i];if(!h)return;document.getElementById('summary').value=h.text;document.getElementById('customer').value=h.fullData.customer||'';document.getElementById('job-id').value=h.fullData.jobId||'';document.getElementById('notes').value=h.fullData.notes||'';state=JSON.parse(JSON.stringify(h.fullData.state));refreshAllCards();saveState();updateJobBanner();updateSummaryStyle();updateDoorTotal();document.getElementById('summary-section').scrollIntoView({behavior:'smooth'});}
   function delHistory(i){let h=JSON.parse(localStorage.getItem(TEST_HIST));h.splice(i,1);localStorage.setItem(TEST_HIST,JSON.stringify(h));renderHistory();}
   function getKnowledge(){try{return JSON.parse(localStorage.getItem('bfs_knowledge'))||{};}catch(e){return{};}}
+  function saveKnowledge(kb){const plain={};Object.keys(kb).forEach(k=>{plain[k]=Array.isArray(kb[k])?kb[k]:Array.from(kb[k]);});localStorage.setItem('bfs_knowledge',JSON.stringify(plain));}
+  function learnFromJob(customer){if(!customer)return;const kb=getKnowledge();if(!kb[customer])kb[customer]=[];saveKnowledge(kb);}
   function getCustomers(){return Object.keys(getKnowledge()).sort();}
-  function deleteCustomer(c){const kb=getKnowledge();delete kb[c];localStorage.setItem('bfs_knowledge',JSON.stringify(kb));document.getElementById('customer').value='';saveState();updateJobBanner();showCustomerSuggestions();}
+  function deleteCustomer(c){const kb=getKnowledge();delete kb[c];saveKnowledge(kb);document.getElementById('customer').value='';saveState();updateJobBanner();showCustomerSuggestions();}
   function showDropdown(id,items,onSel,onDel){const dd=document.getElementById(id);if(!items.length){dd.classList.remove('open');return;}dd.innerHTML=items.map(item=>{const s=item.replace(/'/g,"\\'"),del=onDel?`<button class="ac-delete" onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();(${onDel.toString()})('${s}')">✕</button>`:'';return`<div class="ac-item" onmousedown="event.preventDefault()" onclick="(${onSel.toString()})('${s}');closeDropdown('${id}')"><span class="ac-item-label">${item}</span>${del}</div>`;}).join('');dd.classList.add('open');}
   function closeDropdown(id){const dd=document.getElementById(id);if(dd)dd.classList.remove('open');}
   function showCustomerSuggestions(){const v=document.getElementById('customer').value.trim().toLowerCase(),f=v?getCustomers().filter(c=>c.toLowerCase().includes(v)):getCustomers();showDropdown('ac-customer',f,s=>{document.getElementById('customer').value=s;saveState();updateJobBanner();},s=>deleteCustomer(s));}
-  document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap'))closeDropdown('ac-customer');});
+  document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap')){closeDropdown('ac-customer');closeDropdown('lo-ac-customer');}});
   window.addEventListener('scroll',()=>{const b=document.getElementById('scroll-top');window.scrollY>300?b.classList.add('visible'):b.classList.remove('visible');});
+
+  // ════════════════════════════════════════════════════════════════
+  // TAKEOFF INDEX — persistent 90-day cross-reference
+  // ════════════════════════════════════════════════════════════════
+  const TAKEOFF_INDEX_KEY='bfs_takeoff_index';
+  const EXPIRY_MS=90*24*60*60*1000;
+  function getTakeoffIndex(){try{return JSON.parse(localStorage.getItem(TAKEOFF_INDEX_KEY))||[];}catch(e){return[];}}
+  function migrateOldIndexKeys(){const index=getTakeoffIndex();if(!index.length)return;const newEntries=[],removeKeys=[];index.forEach(entry=>{const parts=(entry.key||'').split('|');if(parts.length===3){const newKey=`${parts[0]}|${parts[2]}`;const alreadyExists=index.some(e=>e.key===newKey)||newEntries.some(e=>e.key===newKey);if(!alreadyExists)newEntries.push({...entry,key:newKey,jobId:entry.lot||entry.subdivision||parts[2]});removeKeys.push(entry.key);}});if(newEntries.length||removeKeys.length){const migrated=[...index.filter(e=>!removeKeys.includes(e.key)),...newEntries];localStorage.setItem(TAKEOFF_INDEX_KEY,JSON.stringify(migrated));}}
+  function expireTakeoffIndex(){const now=Date.now(),index=getTakeoffIndex(),fresh=index.filter(e=>(now-(e.timestamp||0))<EXPIRY_MS);if(fresh.length!==index.length)localStorage.setItem(TAKEOFF_INDEX_KEY,JSON.stringify(fresh));}
+  function computeTrimTotals(st){let singles=0,dbl=0,tast=0;Object.keys(st).forEach(key=>{const val=st[key];if(typeof val!=='number'||val<=0)return;if((key.startsWith('68_')||key.startsWith('80_')||key.startsWith('atws_'))&&(key.endsWith('_LH')||key.endsWith('_RH')))singles+=val;if(key.endsWith('_DBL'))dbl+=val;if(key.endsWith('_T-AST'))tast+=val;});return{singles,dbl,tast};}
+  function saveTrimToIndex(st,customer,jobId,summaryText){if(!customer||!jobId)return;const totals=computeTrimTotals(st),index=getTakeoffIndex(),lookupKey=`${customer.toLowerCase()}|${(jobId||'').toLowerCase()}`,existing=index.findIndex(e=>e.key===lookupKey),entry={key:lookupKey,customer,jobId,timestamp:Date.now(),summaryText,...totals};if(existing>=0)index[existing]=entry;else index.push(entry);localStorage.setItem(TAKEOFF_INDEX_KEY,JSON.stringify(index));}
+  function lookupTrimTakeoff(customer,jobId){if(!customer||!jobId)return null;const key=`${customer.toLowerCase()}|${jobId.toLowerCase()}`;return getTakeoffIndex().find(e=>e.key===key)||null;}
+  function backfillTakeoffIndex(){const history=[...(JSON.parse(localStorage.getItem('bfs_history'))||[]),...(JSON.parse(localStorage.getItem(TEST_HIST))||[])];if(!history.length)return;const index=getTakeoffIndex();let changed=false;history.forEach(h=>{if(!h.fullData?.state||!h.fullData.customer||(!h.fullData.jobId&&!h.fullData.lot&&!h.fullData.subdivision))return;const bfJobId=(h.fullData.jobId||h.fullData.lot||h.fullData.subdivision||'').toLowerCase();const key=`${h.fullData.customer.toLowerCase()}|${bfJobId}`;if(index.find(e=>e.key===key))return;const totals=computeTrimTotals(h.fullData.state);index.push({key,customer:h.fullData.customer,jobId:h.fullData.jobId||h.fullData.lot||h.fullData.subdivision||'',timestamp:Date.now(),summaryText:h.text||'',...totals});changed=true;});if(changed)localStorage.setItem(TAKEOFF_INDEX_KEY,JSON.stringify(index));}
+
+  // ════════════════════════════════════════════════════════════════
+  // LOCKOUT WALK
+  // ════════════════════════════════════════════════════════════════
+  const LO_ITEMS=['Passage','Privacy','Dummy','Deadbolt','Hinge Bumps','Base Bumps'];
+  let loState={};
+
+  function openLockoutWalk(){const saved=localStorage.getItem('bfs_lo_active_work');if(saved){const d=JSON.parse(saved);document.getElementById('lo-customer').value=d.customer||'';document.getElementById('lo-job-id').value=d.jobId||'';document.getElementById('lo-notes').value=d.notes||'';document.getElementById('lo-summary').value=d.summaryText||'';loState=d.loState||{};}else{document.getElementById('lo-customer').value='';document.getElementById('lo-job-id').value='';document.getElementById('lo-notes').value='';document.getElementById('lo-summary').value='';loState={};}buildLoCounters();renderLoHistory();updateLoSummaryStyle();updateLoJobBanner();const ol=document.getElementById('lo-overlay');ol.style.display='block';ol.scrollTop=0;checkLoTrimMatch();}
+  function closeLockoutWalk(){document.getElementById('lo-overlay').style.display='none';}
+
+  function buildLoCounters(){const c=document.getElementById('lo-counters');c.innerHTML=LO_ITEMS.map((item,idx)=>{const qty=loState[item]||0,base=idx%2===0?'lo-navy':'lo-red',cls=qty>0?'has-count':base;return`<div class="lo-counter-card ${cls}" id="lo-card-${item}"><div class="lo-item-label">${item}</div><div class="lo-controls"><button class="lo-btn" onclick="updateLoQty('${item}',-1)">−</button><span class="lo-qty${qty>0?' has-count':''}" id="lo-qty-${item}">${qty}</span><button class="lo-btn" id="lo-plus-${item}" onclick="updateLoQty('${item}',1)">+</button></div></div>`;}).join('');}
+
+  function updateLoQty(item,delta){loState[item]=Math.max(0,(loState[item]||0)+delta);const qty=loState[item],qEl=document.getElementById(`lo-qty-${item}`),cEl=document.getElementById(`lo-card-${item}`),bEl=document.getElementById(`lo-plus-${item}`);qEl.innerText=qty;qEl.classList.toggle('has-count',qty>0);const idx=LO_ITEMS.indexOf(item),base=idx%2===0?'lo-navy':'lo-red';cEl.className=`lo-counter-card ${qty>0?'has-count':base}`;if(delta>0){playTapUp();[qEl,bEl].forEach(el=>{if(!el)return;el.classList.remove('tap-flash');void el.offsetWidth;el.classList.add('tap-flash');setTimeout(()=>el.classList.remove('tap-flash'),220);});}else playTapDown();saveLoState();}
+
+  function saveLoState(){const data={customer:document.getElementById('lo-customer').value,jobId:document.getElementById('lo-job-id').value,notes:document.getElementById('lo-notes').value,summaryText:document.getElementById('lo-summary').value,loState};localStorage.setItem('bfs_lo_active_work',JSON.stringify(data));updateLoSummaryStyle();updateLoJobBanner();}
+  function updateLoJobBanner(){const cust=document.getElementById('lo-customer').value.trim(),jobId=document.getElementById('lo-job-id').value.trim(),banner=document.getElementById('lo-job-banner');if(!banner)return;if(cust||jobId){banner.innerHTML=`🔒 <span style="opacity:0.75;font-weight:600;margin:0 4px;">ACTIVE JOB:</span> ${[cust,jobId].filter(Boolean).join(' — ')}`;banner.style.display='flex';}else banner.style.display='none';}
+  function updateLoSummaryStyle(){const s=document.getElementById('lo-summary'),empty=document.getElementById('lo-summary-empty');if(s&&empty){empty.style.display=s.value.length>0?'none':'flex';s.style.borderColor=s.value.length>0?'var(--bfs-red)':'#e2e8f0';}}
+
+  function openLoRecap(){const cust=document.getElementById('lo-customer').value.trim(),jobId=document.getElementById('lo-job-id').value.trim();if(!cust||!jobId){showToast('⚠️ ENTER CUSTOMER & JOB ID');return;}if(!LO_ITEMS.some(i=>(loState[i]||0)>0)){showToast('⚠️ NO COUNTS ENTERED YET');return;}const match=lookupTrimTakeoff(cust,jobId);if(match){const expSingle=match.singles+match.tast,expDummies=(match.dbl*2)+(match.tast*2),gotSingle=(loState['Passage']||0)+(loState['Privacy']||0),gotDummies=loState['Dummy']||0;if(gotSingle!==expSingle||gotDummies!==expDummies){let detail='';if(gotSingle!==expSingle){const diff=gotSingle-expSingle,dir=diff>0?`<span style="color:#b45309;">+${diff} over</span>`:`<span style="color:#b91c1c;">${diff} under</span>`;detail+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #fcd34d;"><span style="font-size:12px;font-weight:700;color:#92400e;">Passage / Privacy</span><span style="font-size:13px;font-weight:900;">${dir} (got ${gotSingle}, expected ${expSingle})</span></div>`;}if(gotDummies!==expDummies){const diff=gotDummies-expDummies,dir=diff>0?`<span style="color:#b45309;">+${diff} over</span>`:`<span style="color:#b91c1c;">${diff} under</span>`;detail+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;"><span style="font-size:12px;font-weight:700;color:#92400e;">Dummy</span><span style="font-size:13px;font-weight:900;">${dir} (got ${gotDummies}, expected ${expDummies})</span></div>`;}document.getElementById('lo-mismatch-detail').innerHTML=detail;document.getElementById('loMismatchModal').style.display='flex';return;}}  _openLoRecapScreen();}
+  function _openLoRecapScreen(){const content=document.getElementById('lo-recap-content');content.innerHTML=LO_ITEMS.map(item=>{const qty=loState[item]||0;if(!qty)return'';return`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e2e8f0;"><span style="font-weight:900;font-size:18px;color:var(--navy);">${item}</span><span style="font-size:36px;font-weight:900;color:var(--green);">${qty}</span></div>`;}).filter(Boolean).join('');document.getElementById('loRecapModal').style.display='flex';}
+  function closeLoRecap(){document.getElementById('loRecapModal').style.display='none';}
+  function closeLoMismatch(){document.getElementById('loMismatchModal').style.display='none';}
+  function confirmLoGenerate(){closeLoRecap();generateLoSummary();}
+
+  function generateLoSummary(){const cust=document.getElementById('lo-customer').value.trim()||'NA',jobId=document.getElementById('lo-job-id').value.trim()||'NA',notes=document.getElementById('lo-notes').value.trim();let report=`LOCKOUT WALK -- ${cust} -- ${jobId}\n----------------------------\n\n--- LOCKOUT ---\n`;LO_ITEMS.forEach(item=>{if((loState[item]||0)>0)report+=`- ${item}: ${loState[item]}\n`;});if(notes)report+=`\n----------------------------\nNOTES\n${notes}`;const s=document.getElementById('lo-summary');s.value=report;s.style.borderColor='var(--green)';setTimeout(()=>{s.style.borderColor='var(--bfs-red)';},600);updateLoSummaryStyle();saveLoToHistory(report,{customer:cust,jobId,notes,loState:JSON.parse(JSON.stringify(loState))});saveLoState();learnFromJob(cust);}
+  function copyLoSummary(){const text=document.getElementById('lo-summary').value;if(!text.trim()){showToast('⚠️ GENERATE FIRST');return;}navigator.clipboard.writeText(text).then(()=>showToast('✓ COPIED TO CLIPBOARD')).catch(()=>{document.getElementById('lo-summary').select();document.execCommand('copy');showToast('✓ COPIED');});}
+  function loNewLot(){const c=document.getElementById('lo-customer').value;loState={};['lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-customer').value=c;buildLoCounters();saveLoState();document.getElementById('lo-job-id').focus();showToast('✓ READY FOR NEW LOT');}
+  function loReset(){if(!confirm('Reset all lockout walk fields?'))return;loState={};['lo-customer','lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-trim-match').style.display='none';window._loTrimMatch=null;localStorage.removeItem('bfs_lo_active_work');buildLoCounters();updateLoSummaryStyle();updateLoJobBanner();}
+  function saveLoToHistory(text,fullData){let h=JSON.parse(localStorage.getItem('bfs_lo_history'))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),label=[fullData.customer,fullData.jobId].filter(Boolean).join(' — ');h.unshift({label:`${ds} — ${label}`,text,time:ts,fullData});if(h.length>20)h.pop();localStorage.setItem('bfs_lo_history',JSON.stringify(h));renderLoHistory();}
+  function renderLoHistory(){const list=document.getElementById('lo-history-list'),h=JSON.parse(localStorage.getItem('bfs_lo_history'))||[];list.innerHTML=h.length?h.map((item,i)=>`<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div class="history-controls"><button class="load-btn" onclick="loadLoHistory(${i})">LOAD</button><button class="del-btn" onclick="delLoHistory(${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;padding:8px 0;">No lockout walks yet.</p>`;}
+  function loadLoHistory(i){const h=JSON.parse(localStorage.getItem('bfs_lo_history'))[i];document.getElementById('lo-customer').value=h.fullData.customer||'';document.getElementById('lo-job-id').value=h.fullData.jobId||'';document.getElementById('lo-notes').value=h.fullData.notes||'';document.getElementById('lo-summary').value=h.text||'';loState=JSON.parse(JSON.stringify(h.fullData.loState||{}));buildLoCounters();saveLoState();updateLoSummaryStyle();checkLoTrimMatch();}
+  function delLoHistory(i){let h=JSON.parse(localStorage.getItem('bfs_lo_history'));h.splice(i,1);localStorage.setItem('bfs_lo_history',JSON.stringify(h));renderLoHistory();}
+  function clearLoHistory(){if(confirm('Clear all lockout walk history?')){localStorage.removeItem('bfs_lo_history');renderLoHistory();}}
+  function toggleLoHistory(){const b=document.getElementById('lo-history-body'),c=document.getElementById('lo-history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
+  function showLoCustomerSuggestions(){const val=document.getElementById('lo-customer').value.trim().toLowerCase(),filtered=val?getCustomers().filter(c=>c.toLowerCase().includes(val)):getCustomers();showDropdown('lo-ac-customer',filtered,s=>{document.getElementById('lo-customer').value=s;saveLoState();},null);}
+  function checkLoTrimMatch(){const cust=document.getElementById('lo-customer').value.trim(),jobId=document.getElementById('lo-job-id').value.trim(),panel=document.getElementById('lo-trim-match');if(!cust||!jobId){panel.style.display='none';return;}const match=lookupTrimTakeoff(cust,jobId);if(!match){panel.style.display='none';return;}document.getElementById('lo-trim-totals').innerHTML=_buildTrimMatchHTML(match);window._loTrimMatch=match;panel.style.display='block';}
+  function _buildTrimMatchHTML(match){const expSingleLocks=match.singles+match.tast,expDummies=(match.dbl*2)+(match.tast*2);let rows=`<div style="font-size:12px;font-weight:900;color:var(--navy);margin-bottom:8px;">${match.customer} — ${match.jobId||''}</div>`;if(match.singles>0)rows+=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;"><span style="font-size:12px;font-weight:700;color:#1e3a8a;">Single Doors</span><span style="font-size:14px;font-weight:900;color:#1d4ed8;">${match.singles}</span></div>`;if(match.dbl>0)rows+=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;"><span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — DBL</span><span style="font-size:14px;font-weight:900;color:#1d4ed8;">${match.dbl}</span></div>`;if(match.tast>0)rows+=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #bfdbfe;"><span style="font-size:12px;font-weight:700;color:#1e3a8a;">Double — T-AST</span><span style="font-size:14px;font-weight:900;color:#1d4ed8;">${match.tast}</span></div>`;let expRows='';if(expSingleLocks>0)expRows+=`<div style="display:flex;justify-content:space-between;padding:3px 0;"><span style="font-size:12px;color:#1e3a8a;">Passage / Privacy</span><span style="font-size:15px;font-weight:900;color:var(--green);">${expSingleLocks}</span></div>`;if(expDummies>0)expRows+=`<div style="display:flex;justify-content:space-between;padding:3px 0;"><span style="font-size:12px;color:#1e3a8a;">Dummy Knobs</span><span style="font-size:15px;font-weight:900;color:var(--green);">${expDummies}</span></div>`;return rows+`<div style="margin-top:8px;padding:8px;background:#dbeafe;border-radius:6px;"><div style="font-size:10px;font-weight:900;color:#1e3a8a;margin-bottom:6px;letter-spacing:0.5px;">EXPECTED LOCKS FROM TRIM TAKEOFF</div>${expRows}</div>`;}
+  function showLoTrimDetail(){if(!window._loTrimMatch)return;document.getElementById('lo-trim-detail-text').value=window._loTrimMatch.summaryText||'No trim takeoff text saved for this lot.';document.getElementById('loTrimDetailModal').style.display='flex';}
+  function closeLoTrimDetail(){document.getElementById('loTrimDetailModal').style.display='none';}
 
   // ════════════════════════════════════════════════════════════════
   // POST WALK
@@ -794,6 +979,7 @@
   });
 
   renderHistory();loadActiveState();
+  expireTakeoffIndex();migrateOldIndexKeys();backfillTakeoffIndex();
   requestAnimationFrame(updateStickyOffsets);
   window.addEventListener('resize',updateStickyOffsets);
 </script>
