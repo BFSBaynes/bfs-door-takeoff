@@ -184,19 +184,117 @@
     .lo-qty{font-size:46px;font-weight:900;color:white;min-width:68px;text-align:center;transition:transform 0.15s,color 0.15s;text-shadow:0 2px 8px rgba(0,0,0,0.3);}
     .lo-qty.has-count{color:#86efac;}
     .lo-qty.tap-flash{transform:scale(1.22);color:#86efac;}
+
+    /* ── MAIN PAGE (home) + NAV ── */
+    .nav-home{position:fixed;top:6px;left:8px;z-index:700;background:rgba(0,0,0,0.22);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;border:1.5px solid rgba(255,255,255,0.6);white-space:nowrap;cursor:pointer;font-family:inherit;letter-spacing:.3px;}
+    body.view-home .nav-home{display:none;}
+    body:not(.view-home) #nav-live{display:none;}
+    body:not(.view-home) .test-badge{left:auto;right:8px;}
+    body.view-home #job-banner{display:none!important;}
+    body.view-home{padding-top:44px!important;}
+    .wk-group{font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#64748b;margin:0 0 8px 2px;}
+    .wk-group.mt{margin-top:18px;}
+    .wk-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:-2px 0 6px;font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#94a3b8;text-align:center;}
+    .wk-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .wk-tile{border:0;border-radius:12px;padding:14px 8px;text-align:center;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:14px;font-weight:900;line-height:1.2;min-height:104px;font-family:inherit;}
+    .wk-tile .wk-ico{font-size:26px;line-height:1;}
+    .wk-tile small{font-size:10px;font-weight:600;opacity:.85;letter-spacing:.2px;line-height:1.3;}
+    .wk-tile:active:not(:disabled){transform:scale(.97);}
+    .wk-tile-navy{background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%);box-shadow:0 1px 0 rgba(255,255,255,0.2),0 8px 24px rgba(0,0,0,0.45);}
+    .wk-tile-red{background:linear-gradient(135deg,#f02040 0%,#b80e2a 100%);box-shadow:0 1px 0 rgba(255,255,255,0.18),0 8px 24px rgba(0,0,0,0.45);}
+    .wk-tile-soft{background:#f8fafc;color:#94a3b8;border:1.5px dashed #cbd5e1;cursor:default;box-shadow:none;}
+    .wk-tag{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.6px;padding:2px 7px;border-radius:10px;color:#fff;margin-bottom:3px;}
+    .wk-tag.pre{background:#1a5296;} .wk-tag.lock{background:#b80e2a;} .wk-tag.post{background:#475569;}
+
+    /* ── PRE-WALK ENGINE ── */
+    .wk-how-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1.5px solid #bfdbfe;border-radius:10px;background:#eff6ff;color:#1e3a8a;font-size:13px;font-weight:900;cursor:pointer;margin-bottom:8px;font-family:inherit;}
+    .wk-help{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.5;color:#1e3a8a;margin-bottom:8px;}
+    .wk-count{margin-left:auto;background:rgba(255,255,255,0.18);border-radius:10px;padding:2px 9px;font-size:10px;letter-spacing:.3px;}
+    .wk-row{background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:10px;transition:border-color .15s,background .15s;}
+    .wk-row.st-in{background:#f0fdf4;border-color:#86efac;}
+    .wk-row.st-out{background:#fef2f2;border-color:#fca5a5;}
+    .wk-row-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;}
+    .wk-row-label{font-size:15px;font-weight:900;color:var(--navy);line-height:1.25;}
+    .wk-help-btn{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:1.5px solid #94a3b8;background:#fff;color:#475569;font-weight:900;font-size:14px;cursor:pointer;line-height:1;padding:0;font-family:inherit;}
+    .wk-tri{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .wk-tri-btn{padding:14px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#fff;font-size:14px;font-weight:800;color:#475569;cursor:pointer;font-family:inherit;}
+    .wk-tri-btn.sel-in{background:#16a34a;border-color:#16a34a;color:#fff;}
+    .wk-tri-btn.sel-out{background:#dc2626;border-color:#dc2626;color:#fff;}
+    .wk-out{margin-top:10px;padding-top:10px;border-top:1px dashed #fca5a5;}
+    .wk-out-lbl{font-size:10px;font-weight:900;color:#b91c1c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+    .wk-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+    .wk-chip{padding:9px 12px;border:1.5px solid #cbd5e1;border-radius:20px;background:#fff;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer;font-family:inherit;}
+    .wk-chip.sel{background:var(--navy);border-color:var(--navy);color:#fff;}
+    .wk-chip.add{border-style:dashed;}
+    .wk-in{width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:16px;margin:0;background:#fff;font-family:-apple-system,sans-serif;}
+    .wk-muted{font-size:11px;color:#64748b;font-weight:600;margin:2px 2px 4px;}
+    .wk-ready{display:flex;flex-direction:column;gap:8px;}
+    .wk-ready-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border:2px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;width:100%;}
+    .wk-ready-btn .ico{font-size:24px;flex-shrink:0;}
+    .wk-ready-btn b{display:block;font-size:14px;color:var(--navy);}
+    .wk-ready-btn small{display:block;font-size:11px;color:#64748b;font-weight:600;margin-top:2px;line-height:1.35;}
+    .wk-ready-btn.sel-yes{background:#f0fdf4;border-color:#16a34a;}
+    .wk-ready-btn.sel-pending{background:#fffbeb;border-color:#f59e0b;}
+    .wk-ready-btn.sel-no{background:#fef2f2;border-color:#dc2626;}
+    .wk-hint{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.45;color:#92400e;margin-top:8px;}
+    .wk-result{display:none;margin-top:16px;border-radius:10px;overflow:hidden;border:2px solid var(--navy);}
+    .wk-edit-btn{margin-left:auto;background:rgba(255,255,255,0.16);border:1.5px solid rgba(255,255,255,0.55);color:#fff;border-radius:16px;padding:6px 13px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
+    .wk-edit-btn.on{background:#16a34a;border-color:#16a34a;}
+    .wk-edit-hint{display:none;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.4;color:#92400e;margin-bottom:8px;}
   </style>
 </head>
-<body>
+<body class="view-home">
 
 <div id="top-bar"></div>
-<a href="index.html" class="mode-switch">← LIVE APP</a>
+<a href="index.html" class="mode-switch" id="nav-live">← LIVE APP</a>
+<button class="nav-home" id="nav-home" onclick="goHome()">🏠 MAIN PAGE</button>
 <span class="test-badge">🧪 TEST</span>
-<button class="pw-btn" onclick="openPostWalk()">📋 POST WALK</button>
-<button class="lo-walk-btn" onclick="openLockoutWalk()">🔒 LOCKOUT</button>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div id="toast"></div>
 <div id="job-banner"></div>
 
+<!-- ═══════ MAIN PAGE ═══════ -->
+<div id="home-view">
+  <div class="header-card" style="margin-top:8px;padding:20px 16px 18px;text-align:center;">
+    <img src="icon-512.png" alt="Elevate Trim" style="width:96px;height:auto;border-radius:16px;margin:0 auto 10px;display:block;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+    <div style="font-size:21px;font-weight:900;color:var(--navy);letter-spacing:.3px;">Elevate Trim</div>
+    <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-top:4px;">What are you working on?</div>
+  </div>
+
+  <div class="header-card" style="padding:14px;">
+    <div class="wk-group">Takeoffs</div>
+    <div class="wk-tiles">
+      <button class="wk-tile wk-tile-navy" onclick="openTrim()"><span class="wk-ico">📐</span>Trim<br>Takeoff<small id="home-trim-sub">Count doors, trim &amp; stair parts</small></button>
+      <button class="wk-tile wk-tile-red" onclick="openLockoutWalk()"><span class="wk-ico">🔒</span>Lockout<br>Takeoff<small>Count locks &amp; check the takeoff</small></button>
+    </div>
+
+    <div class="wk-group mt">Walks</div>
+    <div class="wk-cols"><span>Pre-walk</span><span>Post walk</span></div>
+    <div class="wk-tiles">
+      <button class="wk-tile wk-tile-navy" onclick="openWalk('trim1')"><span class="wk-ico">🔍</span>1st Trim<br>Pre-Walk<small>Framing, drywall &amp; power</small></button>
+      <button class="wk-tile wk-tile-navy" onclick="openWalk('post1')"><span class="wk-ico">✅</span>1st Trim<br>Post Walk<small>Complete / incomplete &amp; why</small></button>
+      <button class="wk-tile wk-tile-navy" onclick="openWalk('trim2')"><span class="wk-ico">🔍</span>2nd Trim<br>Pre-Walk<small>Floors &amp; surfaces ready?</small></button>
+      <button class="wk-tile wk-tile-soft" disabled><span class="wk-ico">✅</span>2nd Trim<br>Post Walk<small>Coming soon</small></button>
+      <button class="wk-tile wk-tile-red" onclick="openWalk('lockout')"><span class="wk-ico">🔍</span>Lockout<br>Pre-Walk<small>Doors installed &amp; painted?</small></button>
+      <button class="wk-tile wk-tile-soft" disabled><span class="wk-ico">✅</span>Lockout<br>Post Walk<small>Coming soon</small></button>
+    </div>
+  </div>
+
+  <div class="history-section">
+    <div onclick="togglePwHist()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 10px 0;border-bottom:1.5px solid #f1f5f9;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:3px;height:16px;background:var(--navy);border-radius:2px;"></div>
+        <label style="cursor:pointer;margin:0;font-size:11px;color:var(--navy);font-weight:900;">RECENT WALKS</label>
+      </div>
+      <span id="pw-history-chevron" style="font-size:11px;color:#64748b;font-weight:800;">▼ SHOW</span>
+    </div>
+    <div id="pw-history-body" style="display:none;margin-top:8px;">
+      <div id="pw-history-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="trim-view" style="display:none;">
 <!-- MAIN HEADER -->
 <div id="main-header" class="header-card" style="margin-top:8px;padding:0;overflow:hidden;text-align:left;">
   <div style="padding:16px 14px 10px;">
@@ -295,14 +393,15 @@
   </div>
 </div>
 
-<div class="version-tag">TEST BUILD — Lockout Walk · Post Walk · Door Counter · Quick Notes</div>
+<div class="version-tag">TEST BUILD — Main Page · Pre-Walks · Post Walk · Lockout · Door Counter · Quick Notes</div>
+</div><!-- /trim-view -->
 
 <!-- LOCKOUT WALK OVERLAY -->
 <div id="lo-overlay">
   <div class="lo-header">
     <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;">
-      <span style="color:white;font-weight:900;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;">🔒 Lockout Walk</span>
-      <button onclick="closeLockoutWalk()" style="background:rgba(0,0,0,0.2);color:white;border:1.5px solid rgba(255,255,255,0.5);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;">✕ BACK TO TAKEOFF</button>
+      <span style="color:white;font-weight:900;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;">🔒 Lockout Takeoff</span>
+      <button onclick="goHome()" style="background:rgba(0,0,0,0.2);color:white;border:1.5px solid rgba(255,255,255,0.5);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;cursor:pointer;">🏠 MAIN PAGE</button>
     </div>
     <div id="lo-job-banner" style="display:none;background:rgba(0,0,0,0.25);min-height:34px;padding:7px 16px;font-size:11px;font-weight:800;color:white;text-align:center;letter-spacing:0.5px;text-transform:uppercase;border-top:1px solid rgba(255,255,255,0.15);align-items:center;justify-content:center;"></div>
   </div>
@@ -420,31 +519,12 @@
 <div id="pw-overlay">
   <div class="pw-header">
     <div class="pw-header-row">
-      <span class="pw-header-title" id="pw-header-title">📋 POST WALK</span>
-      <button class="pw-back-btn" onclick="closePostWalk()">✕ BACK TO TAKEOFF</button>
+      <span class="pw-header-title" id="pw-header-title">📋 WALKS</span>
+      <button class="pw-back-btn" onclick="goHome()">🏠 MAIN PAGE</button>
     </div>
     <div id="pw-active-banner"></div>
   </div>
   <div class="pw-body">
-
-    <!-- TYPE SELECTION -->
-    <div id="pw-screen-type">
-      <div class="pw-card" style="text-align:center;padding:20px 16px;">
-        <button class="pw-type-btn pw-type-btn-1st" style="margin-bottom:0;" onclick="selectPwType('1st')">
-          🏠 1st Trim Post Walk
-          <span class="pw-type-sub">Tap to select job and begin walk</span>
-        </button>
-      </div>
-      <div class="pw-card" style="margin-top:8px;">
-        <div onclick="togglePwHist()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0 8px 0;border-bottom:1px solid #e2e8f0;">
-          <label style="cursor:pointer;margin:0;font-size:11px;color:#475569;">RECENT POST WALKS</label>
-          <span id="pw-history-chevron" style="font-size:11px;color:#475569;font-weight:800;">▼ SHOW</span>
-        </div>
-        <div id="pw-history-body" style="display:none;margin-top:8px;">
-          <div id="pw-history-list"><p style="font-size:11px;color:#94a3b8;text-align:center;">No post walks yet.</p></div>
-        </div>
-      </div>
-    </div>
 
     <!-- SEARCH -->
     <div id="pw-screen-search" style="display:none;">
@@ -457,6 +537,7 @@
           <input id="pw-cust-manual" type="text" placeholder="Customer" style="margin-bottom:8px;">
           <input id="pw-jobid-manual" type="text" placeholder="Job ID">
           <button class="actionBtn" style="width:100%;background:linear-gradient(135deg,#1a5296,#0d3a6e);color:white;box-shadow:0 1px 0 rgba(255,255,255,0.15),0 4px 12px rgba(0,0,0,0.25);" onclick="startPwFormManual()">Continue →</button>
+          <button class="actionBtn" style="width:100%;background:#f1f5f9;color:var(--slate);margin-top:10px;font-size:13px;" onclick="goHome()">← Main Page</button>
         </div>
       </div>
     </div>
@@ -520,7 +601,65 @@
               <textarea id="pw1-summary-text" readonly
                 style="height:260px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
               <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="copyPwInline()">📋 Copy to AppWright</button>
-              <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
+              <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">🏠 Main Page</button>
+            </div>
+          </div>
+
+          <button class="actionBtn" style="width:100%;background:#f1f5f9;color:var(--slate);margin-top:10px;font-size:13px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
+        </div>
+      </div>
+    </div>
+
+        <!-- PRE-WALK FORM (1st Trim, 2nd Trim, Lockout) — filled in by the walk engine -->
+    <div id="pw-screen-pre" style="display:none;">
+      <div class="pw-card" style="padding:0;overflow:hidden;">
+        <div style="background:var(--navy);padding:14px 16px;">
+          <div id="wk-kicker" style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Pre-Walk</div>
+          <div style="font-size:17px;font-weight:900;color:white;" id="wk-job-display">—</div>
+        </div>
+        <div style="padding:16px;">
+
+          <button class="wk-how-btn" onclick="wkToggleHow()"><span>📖 How this walk works</span><span id="wk-how-chev">▼</span></button>
+          <div id="wk-how" class="wk-help" style="display:none;"></div>
+
+          <div id="wk-expected" style="display:none;"></div>
+
+          <div class="pw-sec-hdr" id="wk-status-hdr">Checklist</div>
+          <div id="wk-status"></div>
+          <div id="wk-unchecked" class="wk-muted"></div>
+          <button class="actionBtn" id="wk-allok" onclick="wkAllInstalled()" style="width:100%;background:#f0fdf4;color:var(--green);border:2px solid #86efac;font-size:13px;">✅ Mark everything installed</button>
+
+          <div class="pw-sec-hdr">🚦 Ready?</div>
+          <div id="wk-ready" class="wk-ready"></div>
+          <div id="wk-ready-hint"></div>
+
+          <div class="pw-sec-hdr" id="wk-issues-hdr">⚠️ Issues found</div>
+          <div class="wk-chips" id="wk-issue-chips"></div>
+          <div id="wk-issues"></div>
+
+          <div id="wk-deliver-sec">
+            <div class="pw-sec-hdr">📦 Please deliver</div>
+            <div class="wk-chips" id="wk-deliver-chips"></div>
+            <div id="wk-deliver"></div>
+          </div>
+
+          <div class="pw-sec-hdr">📝 Notes</div>
+          <textarea id="wk-notes" placeholder="Anything else the office needs to know..." style="height:60px;" oninput="wkNotesInput(this.value)"></textarea>
+
+          <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-top:4px;" onclick="wkGenerate()">⚡ Generate Pre-Walk</button>
+
+          <div id="wk-result" class="wk-result">
+            <div class="pw-result-hdr">
+              <span style="font-size:16px;">📋</span>
+              <span class="pw-result-hdr-text">Ready to Copy</span>
+              <button class="wk-edit-btn" id="wk-edit-btn" onclick="wkToggleEdit()">✏️ Edit</button>
+            </div>
+            <div class="pw-result-body">
+              <div class="wk-edit-hint" id="wk-edit-hint">✏️ Editing — change anything you like, then tap ✓ Done.</div>
+              <textarea id="wk-out-text" readonly oninput="wkDirty=true" style="height:280px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
+              <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="wkCopy()">📋 Copy to AppWright</button>
+              <button class="actionBtn" id="wk-another" style="width:100%;background:#dbeafe;color:#1e40af;margin-bottom:8px;" onclick="wkAnother()">+ Another walk</button>
+              <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="goHome()">🏠 Main Page</button>
             </div>
           </div>
 
@@ -536,7 +675,7 @@
         <textarea id="pw-summary-text" readonly></textarea>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
           <button class="actionBtn" style="background:var(--navy);color:white;" onclick="copyPwSummary()">📋 Copy to AppWright</button>
-          <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">+ New Post Walk</button>
+          <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">🏠 Main Page</button>
         </div>
       </div>
     </div>
@@ -797,11 +936,11 @@
   // ════════════════════════════════════════════════════════════════
   // POST WALK
   // ════════════════════════════════════════════════════════════════
-  function openPostWalk(){pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();clearQNotes('pw1');showPwScreen('pw-screen-type');renderPwHistory();document.getElementById('pw-overlay').style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
+  function openPostWalk(){openWalk('post1');}
   function closePostWalk(){document.getElementById('pw-overlay').style.display='none';}
-  function showPwScreen(id){['pw-screen-type','pw-screen-search','pw-screen-1st','pw-screen-summary'].forEach(s=>document.getElementById(s).style.display='none');document.getElementById(id).style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
+  function showPwScreen(id){['pw-screen-search','pw-screen-1st','pw-screen-pre','pw-screen-summary'].forEach(s=>document.getElementById(s).style.display='none');document.getElementById(id).style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
 
-  function selectPwType(type){document.getElementById('pw-header-title').innerText='📋 1ST TRIM POST WALK';document.getElementById('pw-search-input').value='';document.getElementById('pw-search-results').innerHTML='';document.getElementById('pw-cust-manual').value='';document.getElementById('pw-jobid-manual').value='';showPwScreen('pw-screen-search');}
+  function selectPwType(type){pwMode='post1';document.getElementById('pw-header-title').innerText='📋 1ST TRIM POST WALK';document.getElementById('pw-search-input').value='';document.getElementById('pw-search-results').innerHTML='';document.getElementById('pw-cust-manual').value='';document.getElementById('pw-jobid-manual').value='';showPwScreen('pw-screen-search');}
 
   function searchPwJobs(){
     const q=document.getElementById('pw-search-input').value.trim().toLowerCase();
@@ -819,8 +958,8 @@
     if(!results.length){el.innerHTML=`<p style="font-size:12px;color:#94a3b8;margin:8px 0;">No matches found. Enter manually below.</p>`;return;}
     el.innerHTML=results.slice(0,8).map((r,i)=>`<div class="pw-result-item"><div><div class="pw-result-label">${r.customer}</div><div class="pw-result-sub">${r.jobId||'No Job ID'}${r.time?' · '+r.time:''}</div></div><button class="pw-use-btn" onclick="usePwResult(${i})">Use →</button></div>`).join('');
   }
-  function usePwResult(i){const r=_pwSearchResults[i];if(!r)return;pwCustomer=r.customer;pwJobId=r.jobId;startPwForm();}
-  function startPwFormManual(){pwCustomer=document.getElementById('pw-cust-manual').value.trim();pwJobId=document.getElementById('pw-jobid-manual').value.trim();if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}startPwForm();}
+  function usePwResult(i){const r=_pwSearchResults[i];if(!r)return;pwCustomer=r.customer;pwJobId=r.jobId;routeWalk();}
+  function startPwFormManual(){pwCustomer=document.getElementById('pw-cust-manual').value.trim();pwJobId=document.getElementById('pw-jobid-manual').value.trim();if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}routeWalk();}
 
   function startPwForm(){
     document.getElementById('pw-header-title').innerText='📋 1ST TRIM POST WALK';
@@ -942,19 +1081,10 @@
   }
   // Summary screen copy (used when loading from history)
   function copyPwSummary(){const t=document.getElementById('pw-summary-text').value;navigator.clipboard.writeText(t).then(()=>showToast('✓ COPIED — Paste into AppWright')).catch(()=>{document.getElementById('pw-summary-text').select();document.execCommand('copy');showToast('✓ COPIED');});}
-  function newPostWalk(){
-    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();
-    clearQNotes('pw1');
-    const r=document.getElementById('pw1-result');if(r)r.style.display='none';
-    document.getElementById('pw-active-banner').style.display='none';
-    document.getElementById('pw-header-title').innerText='📋 POST WALK';
-    showPwScreen('pw-screen-type');
-    renderPwHistory();
-  }
-  function savePwToHistory(text,structured){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${pwCustomer} — ${pwJobId}`,text,time:ts,customer:pwCustomer,jobId:pwJobId,structured:structured||null});if(h.length>20)h.pop();localStorage.setItem(PW1_HIST,JSON.stringify(h));renderPwHistory();}
-  function showPwHistory(){const h=JSON.parse(localStorage.getItem(PW1_HIST))||[],el=document.getElementById('pw-history-list');el.innerHTML=h.length?h.map((item,i)=>`<div class="pw-history-entry"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="loadPwHist(${i})">✏️ EDIT</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="delPwHist(${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;text-align:center;">No post walks yet.</p>`;}
+  function newPostWalk(){goHome();}
+  function savePwToHistory(text,structured){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${pwCustomer} — ${pwJobId}`,text,time:ts,ts:Date.now(),customer:pwCustomer,jobId:pwJobId,structured:structured||null});if(h.length>20)h.pop();localStorage.setItem(PW1_HIST,JSON.stringify(h));renderPwHistory();}
   function renderPwHistory(){showPwHistory();}
-  function loadPwHist(i){
+  function loadPwHist(i){wkEnsureOverlay();
     const h=JSON.parse(localStorage.getItem(PW1_HIST))||[],item=h[i];
     if(!item)return;
     pwCustomer=item.customer;pwJobId=item.jobId;
@@ -990,6 +1120,546 @@
   function delPwHist(i){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];h.splice(i,1);localStorage.setItem(PW1_HIST,JSON.stringify(h));showPwHistory();}
   function togglePwHist(){const b=document.getElementById('pw-history-body'),c=document.getElementById('pw-history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
 
+  // ════════════════════════════════════════════════════════════════
+  //  WALK CONTENT — EDIT HERE
+  //  Everything the pre-walks show lives in this one block: the checklist
+  //  items, the "?" help text, and the quick-tap buttons. To change it, edit
+  //  the words between the quotes, add a line, or delete a line. Nothing else
+  //  in the file needs to change.  (Keep the quote marks and commas.)
+  //
+  //  status items:
+  //    id        one short word, no spaces
+  //    label     what the PM sees on the checklist
+  //    yes / no  the two button words            (default: "✅ Installed" / "❌ Not in")
+  //    ok / bad  how it reads in the AppWright text when it is fine / not fine
+  //    holds     false = if this is not in, it does NOT hold up the job
+  //    ask       "note" = only ask which ones / what's left (no "per super" date)
+  //    lines     true = the PM adds one line per opening/door instead of one long note
+  //  walk settings:  deliver:false hides "Please deliver";  issuesTitle = heading for the issues list
+  //    extra     adds a second question when it is not fine (used for the generator)
+  //  PMs can skip any item that doesn't apply to the house — there is no N/A.
+  // ════════════════════════════════════════════════════════════════
+  const WK_WHEN = ["Today","Tomorrow","This week","Next week","Date unknown"];
+
+  const WALKS = {
+
+    // ───────────── 1ST TRIM PRE-WALK ─────────────
+    trim1: {
+      title: "1st Trim Pre-Walk",
+      headerTitle: "📋 1ST TRIM PRE-WALK",
+      reportTitle: "PRE-WALK — 1ST TRIM",
+      statusTitle: "🏠 Ready for trim?",
+      outPlaceholder: "What's left / what did the super say?",
+      allOk: "✅ Mark everything good",
+      okPrefix: "",
+      deliver: false,                              // no "Please deliver" section on this walk
+      issuesTitle: "⚠️ Anything else wrong?",
+      how: [
+        "Walk the whole house.",
+        "Tap what you find on each item. Skip anything that doesn't apply to this house.",
+        "If something isn't done, get with the superintendent for a date and tap what the super tells you.",
+        "Countertops don't hold up the job — the house can still be Ready if they aren't in.",
+        "No power? Mark it and say whether a generator is needed.",
+        "Upload your photos of any problems to AppWright."
+      ],
+      tips: [
+        "Door and cased openings framed correctly",
+        "Drywall hung, mudded and sanded",
+        "Electricity on, or a generator needed",
+        "Countertops in (nice to have — not required to start trim)"
+      ],
+      status: [
+        {id:"openings", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
+         ok:"Openings framed correctly", bad:"Openings NOT framed correctly", ask:"note",
+         lines:true, linesLabel:"Which openings? One line for each opening", linePh:"Which opening? (e.g. Master bath — too narrow)", addLabel:"+ Add another opening",
+         help:"Walk every door and cased opening. If one is framed wrong, mark Problem and say which openings."},
+        {id:"drywall", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
+         ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", notePh:"What's left — not hung, not mudded, not sanded?",
+         help:"Drywall should be hung, mudded and sanded. If anything is left, mark Not done and say what's left."},
+        {id:"counters", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
+         ok:"Countertops in", bad:"Countertops NOT in",
+         help:"Countertops do not hold up the job. If they aren't in you can still mark the house Ready — just get a date from the super."},
+        {id:"power", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
+         ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?",
+         extra:{label:"Generator?", yes:"Generator needed", no:"No generator needed"},
+         help:"Check that the electricity is on. If there is no power, mark it and say whether a generator is needed."}
+      ],
+      ready: [
+        {v:"yes",     icon:"✅", t:"Ready",                  s:"Ready to start trim"},
+        {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be done before we start trim"},
+        {v:"no",      icon:"❌", t:"Not ready",              s:"Can't start trim yet"}
+      ],
+      issueChips: [
+        {label:"Add an issue", text:""}
+      ]
+    },
+
+    // ───────────── 2ND TRIM / SHOE PRE-WALK ─────────────
+    trim2: {
+      title: "2nd Trim Pre-Walk",
+      headerTitle: "📋 2ND TRIM PRE-WALK",
+      reportTitle: "PRE-WALK — 2ND TRIM",
+      statusTitle: "🧱 Floors & surfaces",
+      outPlaceholder: "Which rooms / what did the super say?",
+      allOk: "✅ Mark everything installed",
+      okPrefix: "Installed: ",
+      how: [
+        "Walk the whole house — every room, closet and bath.",
+        "Tap Installed or Not in on each item. Skip anything this house doesn't have (no wood flooring? just leave it).",
+        "If something is not in, get with the superintendent for a date and tap what the super tells you.",
+        "The house is still Ready if the missing items will be in before we install the quarter round and shoe.",
+        "List any material, other than 1/4 round or shoe mold, that has to be delivered to finish the install.",
+        "Upload your photos of any problems to AppWright."
+      ],
+      tips: [
+        "Door slabs off their frames (note which doors, and if the slab is out in the garage)",
+        "Baseboard that needs fixing",
+        "Missing closet rods",
+        "Items requested on first trim that still need delivering (1x8, grab rail, pull-down sticks with hooks...)",
+        "Any other material needed to finish besides 1/4 round and shoe mold"
+      ],
+      status: [
+        {id:"counters", label:"Countertops",             help:"Check every kitchen, bath and laundry. Not in? Get a date from the super and tap what they tell you."},
+        {id:"lvp",      label:"LVP",                     help:"Walk every room and closet that gets LVP. If only some rooms are done, mark Not in and say which rooms."},
+        {id:"wood",     label:"Wood flooring",           help:"Check every area that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
+        {id:"carpet",   label:"Carpet",                  help:"Check all areas — bedrooms, closets, stairs, hall. If part of the house is missing, say which rooms."},
+        {id:"tile",     label:"Tile",                    help:"Check baths, laundry and any other tile areas."},
+        {id:"cabinets", label:"Cabinets & vanities set", help:"Base cabinets and vanities should be set so the shoe can go against them."}
+      ],
+      ready: [
+        {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in"},
+        {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the quarter round and shoe"},
+        {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the install yet"}
+      ],
+      issueChips: [
+        {label:"Door slab off frame", text:"Door slab is off its frame — "},
+        {label:"Baseboard fix",       text:"Baseboard needs fixing — "},
+        {label:"Closet rod missing",  text:"Closet rod missing — "},
+        {label:"Trim damaged",        text:"Trim damaged — "},
+        {label:"Other",               text:""}
+      ],
+      deliverChips: ["1x8","grab rail","pull-down sticks with hooks","closet rod","closet shelving","baseboard","casing","door slab"]
+    },
+
+    // ───────────── LOCKOUT PRE-WALK ─────────────
+    lockout: {
+      title: "Lockout Pre-Walk",
+      headerTitle: "🔒 LOCKOUT PRE-WALK",
+      reportTitle: "PRE-WALK — LOCKOUT",
+      statusTitle: "🚪 Doors",
+      outPlaceholder: "Which doors / what did the super say?",
+      allOk: "✅ Mark everything done",
+      okPrefix: "",
+      how: [
+        "Walk the whole house, including the garage entry and the exterior doors.",
+        "Tap what you find on each item. Skip anything that doesn't apply. Locks go on after the doors are hung and painted.",
+        "If something is not ready, get with the superintendent for a date and tap what the super tells you.",
+        "Check the locks needed (shown below when a trim takeoff is saved for this job) against what is on site, and list anything that has to be delivered.",
+        "Upload your photos of any problems to AppWright."
+      ],
+      tips: [
+        "Doors not hung, or slabs off their frames",
+        "Doors not painted yet",
+        "Doors that bind or will not latch",
+        "Exterior and garage entry doors ready for locks",
+        "Missing hardware"
+      ],
+      status: [
+        {id:"intdoors", label:"Interior doors installed", yes:"✅ Installed", no:"❌ Not in",
+         ok:"Interior doors installed", bad:"Interior doors NOT installed", notePh:"Which doors?",
+         help:"Every interior door hung on its frame. A slab leaning in the garage or sitting off its frame counts as Not in — note which doors."},
+        {id:"painted",  label:"Doors painted", yes:"✅ Painted", no:"❌ Not painted",
+         ok:"Doors painted", bad:"Doors NOT painted", notePh:"Which doors / areas?",
+         help:"Doors painted before locks go on. If only some are done, mark Not painted and say which areas."},
+        {id:"extdoors", label:"Exterior & garage entry doors installed", yes:"✅ Installed", no:"❌ Not in",
+         ok:"Exterior & garage entry doors installed", bad:"Exterior / garage entry doors NOT installed", notePh:"Which doors?",
+         help:"Front, rear/patio and garage entry doors installed and ready for locks."},
+        {id:"base",     label:"Baseboard installed (for base bumps)", yes:"✅ Installed", no:"❌ Not in",
+         ok:"Baseboard installed", bad:"Baseboard NOT installed", notePh:"Which rooms?",
+         help:"Baseboard needs to be in where base bumps go. Skip this one if the house has no base bumps."}
+      ],
+      ready: [
+        {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in"},
+        {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the locks"},
+        {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the lockout yet"}
+      ],
+      issueChips: [
+        {label:"Door not installed",  text:"Door not installed — "},
+        {label:"Door not painted",    text:"Door not painted — "},
+        {label:"Door slab off frame", text:"Door slab is off its frame — "},
+        {label:"Door binds / won't latch", text:"Door binds or won't latch — "},
+        {label:"Door damaged",        text:"Door damaged — "},
+        {label:"Hardware missing",    text:"Hardware missing — "},
+        {label:"Other",               text:""}
+      ],
+      deliverChips: ["passage knobs","privacy knobs","dummy knobs","deadbolts","keyed entry","hinge bumps","base bumps","strike plates","door slab"]
+    }
+  };
+
+  // ════════════════════════════════════════════════════════════════
+  // MAIN PAGE + WALK ENGINE — builds every pre-walk from the WALKS block above
+  // ════════════════════════════════════════════════════════════════
+  const WK_HIST='bfs_test_prewalk_history', WK_DRAFTS='bfs_test_walk_drafts';
+  let pwMode='post1';   // which walk the job-search screen is feeding: post1 | trim1 | trim2 | lockout
+  let wk=null;          // the pre-walk currently being filled in
+  let wkDirty=false;    // true once the PM has typed in the generated text
+
+  // ── navigation: Main Page ⇄ Trim Takeoff / Lockout Takeoff / Walks ──
+  function showView(v){
+    document.getElementById('home-view').style.display=(v==='home')?'block':'none';
+    document.getElementById('trim-view').style.display=(v==='trim')?'block':'none';
+    document.body.classList.toggle('view-home',v==='home');
+    requestAnimationFrame(updateStickyOffsets);
+  }
+  function homeInfo(){
+    const c=(document.getElementById('customer').value||'').trim(),j=(document.getElementById('job-id').value||'').trim(),t=getDoorTotal();
+    document.getElementById('home-trim-sub').textContent=(c||j)?('In progress: '+[c,j].filter(Boolean).join(' — ')+(t?' · 🚪 '+t:'')):'Count doors, trim & stair parts';
+  }
+  function goHome(){
+    ['pw-overlay','lo-overlay'].forEach(id=>{document.getElementById(id).style.display='none';});
+    wk=null;pwMode='post1';
+    document.getElementById('pw-active-banner').style.display='none';
+    showView('home');homeInfo();renderPwHistory();window.scrollTo(0,0);
+  }
+  function openTrim(){showView('trim');window.scrollTo(0,0);}
+  function wkEnsureOverlay(){const ov=document.getElementById('pw-overlay');ov.style.display='block';ov.scrollTop=0;}
+  function openWalk(kind){
+    wkEnsureOverlay();
+    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();clearQNotes('pw1');
+    document.getElementById('pw-active-banner').style.display='none';
+    if(kind==='post1')selectPwType('1st');else startWalkFlow(kind);
+  }
+
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function wkCap(s){s=String(s||'');return s.charAt(0).toUpperCase()+s.slice(1);}
+  function wkCfg(){return WALKS[wk.mode];}
+  function wkKeyFor(mode,c,j){return mode+'|'+String(c||'').trim().toLowerCase()+'|'+String(j||'').trim().toLowerCase();}
+  function wkBlank(mode,c,j){
+    const st={};WALKS[mode].status.forEach(s=>{st[s.id]={v:'',when:'',note:'',extra:'',lines:[]};});
+    return {mode:mode,customer:c,jobId:j,status:st,ready:'',issues:[],deliver:[],notes:'',hid:Date.now(),done:false};
+  }
+  // Keeps saved drafts/history working even after the content block above is edited
+  function wkNormalize(){
+    const cfg=wkCfg(),st={};
+    cfg.status.forEach(s=>{
+      const o=(wk.status||{})[s.id]||{};
+      const ln=Array.isArray(o.lines)?o.lines.map(x=>String(x)):[];
+      if(s.lines&&!ln.length&&o.note)ln.push(String(o.note));   // an older save kept one long note — it becomes the first line
+      st[s.id]={v:(o.v==='in'||o.v==='out')?o.v:'',when:o.when||'',note:o.note||'',extra:(o.extra==='yes'||o.extra==='no')?o.extra:'',lines:ln};
+    });
+    wk.status=st;
+    wk.issues=(wk.issues||[]).map(i=>({text:String(i.text||'')}));
+    wk.deliver=(wk.deliver||[]).map(d=>String(d));
+    wk.notes=wk.notes||'';wk.ready=wk.ready||'';
+  }
+
+  // ── drafts: a walk in progress survives a phone lock, a call, or leaving the screen ──
+  function wkDrafts(){try{return JSON.parse(localStorage.getItem(WK_DRAFTS))||{};}catch(e){return {};}}
+  function wkSave(){
+    if(!wk||wk.done)return;
+    const d=wkDrafts();d[wkKeyFor(wk.mode,wk.customer,wk.jobId)]={ts:Date.now(),data:wk};
+    const ks=Object.keys(d);
+    if(ks.length>20)ks.sort((a,b)=>d[a].ts-d[b].ts).slice(0,ks.length-20).forEach(k=>{delete d[k];});
+    try{localStorage.setItem(WK_DRAFTS,JSON.stringify(d));}catch(e){}
+  }
+  function wkDropDraft(){const d=wkDrafts();delete d[wkKeyFor(wk.mode,wk.customer,wk.jobId)];try{localStorage.setItem(WK_DRAFTS,JSON.stringify(d));}catch(e){}}
+
+  // ── entering a walk ──
+  function startWalkFlow(mode){
+    pwMode=mode;
+    document.getElementById('pw-header-title').innerText=WALKS[mode].headerTitle;
+    document.getElementById('pw-search-input').value='';
+    document.getElementById('pw-search-results').innerHTML='';
+    document.getElementById('pw-cust-manual').value='';
+    document.getElementById('pw-jobid-manual').value='';
+    showPwScreen('pw-screen-search');
+  }
+  function routeWalk(){if(pwMode==='post1')startPwForm();else startPreForm();}
+  function startPreForm(){
+    const dr=wkDrafts()[wkKeyFor(pwMode,pwCustomer,pwJobId)];
+    wk=dr?JSON.parse(JSON.stringify(dr.data)):wkBlank(pwMode,pwCustomer,pwJobId);
+    wk.mode=pwMode;wk.customer=pwCustomer;wk.jobId=pwJobId;wk.done=false;
+    wkNormalize();
+    wkOpenForm();
+    if(dr)showToast('↩ Draft restored');
+  }
+  function wkOpenForm(){
+    const cfg=wkCfg(),jobTxt=wk.customer+(wk.jobId?' — '+wk.jobId:'');
+    document.getElementById('pw-header-title').innerText=cfg.headerTitle;
+    const b=document.getElementById('pw-active-banner');
+    b.innerHTML='📋 <span style="opacity:0.75;font-weight:600;">ACTIVE JOB:</span> '+esc(jobTxt);b.style.display='flex';
+    document.getElementById('wk-kicker').textContent=cfg.title;
+    document.getElementById('wk-job-display').textContent=jobTxt;
+    document.getElementById('wk-allok').textContent=cfg.allOk;
+    document.getElementById('wk-another').textContent='+ Another '+cfg.title;
+    document.getElementById('wk-how').innerHTML=
+      '<div style="font-weight:900;margin-bottom:6px;">How this walk works</div><ol style="margin:0 0 10px 18px;padding:0;">'+
+      cfg.how.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('')+'</ol>'+
+      '<div style="font-weight:900;margin-bottom:6px;">Things to look for</div><ul style="margin:0 0 0 18px;padding:0;">'+
+      cfg.tips.map(x=>'<li style="margin-bottom:3px;">'+esc(x)+'</li>').join('')+'</ul>';
+    document.getElementById('wk-how').style.display='none';
+    document.getElementById('wk-how-chev').textContent='▼';
+    document.getElementById('wk-notes').value=wk.notes;
+    document.getElementById('wk-deliver-sec').style.display=(cfg.deliver===false)?'none':'block';
+    document.getElementById('wk-issues-hdr').textContent=cfg.issuesTitle||'⚠️ Issues found';
+    document.getElementById('wk-result').style.display='none';
+    wkSetEdit(false);wkDirty=false;
+    wkRenderExpected();wkRenderStatus();wkRenderReady();wkRenderChips();wkRenderIssues();wkRenderDeliver();
+    showPwScreen('pw-screen-pre');
+  }
+  function wkAnother(){startWalkFlow(wk?wk.mode:pwMode);}
+  function wkToggleHow(){
+    const el=document.getElementById('wk-how'),open=el.style.display!=='none';
+    el.style.display=open?'none':'block';
+    document.getElementById('wk-how-chev').textContent=open?'▼':'▲';
+  }
+
+  // ── lockout only: locks needed, pulled from the trim takeoff for this job ──
+  function wkRenderExpected(){
+    const el=document.getElementById('wk-expected');el.style.display='none';el.innerHTML='';
+    if(wk.mode!=='lockout')return;
+    const m=lookupTrimTakeoff(wk.customer,wk.jobId);
+    window._loTrimMatch=m||null;
+    el.style.display='block';
+    if(m){
+      el.innerHTML='<div style="background:#eff6ff;border:2px solid #1d4ed8;border-radius:12px;padding:14px;margin-bottom:12px;"><div style="font-weight:900;font-size:11px;color:#1d4ed8;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase;">📋 Locks needed — from the trim takeoff</div>'+_buildTrimMatchHTML(m)+'<button onclick="showLoTrimDetail()" style="width:100%;margin-top:10px;background:#1d4ed8;color:white;border:none;border-radius:8px;padding:11px;font-weight:800;font-size:13px;cursor:pointer;">👁 View Full Trim Takeoff</button></div>';
+    }else{
+      el.innerHTML='<div class="wk-hint" style="margin:0 0 12px;">No trim takeoff is saved for this job, so the locks needed can\'t be shown. Check that the Job ID matches the takeoff.</div>';
+    }
+  }
+
+  // ── checklist (tap what applies; skip what doesn't) ──
+  function wkRenderStatus(){
+    const cfg=wkCfg();let n=0;
+    document.getElementById('wk-status').innerHTML=cfg.status.map(s=>{
+      const o=wk.status[s.id];if(o.v)n++;
+      let out='';
+      if(o.v==='out'){
+        out='<div class="wk-out">';
+        if(s.extra){
+          out+='<div class="wk-out-lbl">'+esc(s.extra.label)+'</div><div class="wk-chips">'+
+            ['yes','no'].map(k=>'<button class="wk-chip'+(o.extra===k?' sel':'')+'" onclick="wkExtra(\''+s.id+'\',\''+k+'\')">'+esc(s.extra[k])+'</button>').join('')+'</div>';
+        }
+        if(s.ask!=='note'){
+          out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips">'+
+            WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\''+s.id+'\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
+        }
+        if(s.lines){
+          out+='<div class="wk-out-lbl">'+esc(s.linesLabel||'Which ones? One line for each')+'</div>'+
+            o.lines.map((ln,i)=>'<div class="qnote-item"><span class="qnote-emoji">❌</span><input type="text" class="qnote-input is-x" style="font-size:16px;" value="'+esc(ln)+'" placeholder="'+esc(s.linePh||'')+'" oninput="wkLine(\''+s.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkDelLine(\''+s.id+'\','+i+')">✕</button></div>').join('')+
+            '<button class="wk-chip add" onclick="wkAddLine(\''+s.id+'\')">'+esc(s.addLabel||'+ Add another')+'</button></div>';
+        }else{
+          out+='<input class="wk-in" type="text" placeholder="'+esc(s.notePh||cfg.outPlaceholder)+'" value="'+esc(o.note)+'" oninput="wkNote(\''+s.id+'\',this.value)"></div>';
+        }
+      }
+      return '<div class="wk-row'+(o.v?' st-'+o.v:'')+'" id="wk-row-'+s.id+'">'+
+        '<div class="wk-row-top"><span class="wk-row-label">'+esc(s.label)+'</span><button class="wk-help-btn" onclick="wkHelp(\''+s.id+'\')">?</button></div>'+
+        '<div class="wk-help" id="wk-help-'+s.id+'" style="display:none;">'+esc(s.help||'')+'</div>'+
+        '<div class="wk-tri">'+
+          '<button class="wk-tri-btn'+(o.v==='in'?' sel-in':'')+'" onclick="wkSetStatus(\''+s.id+'\',\'in\')">'+esc(s.yes||'✅ Installed')+'</button>'+
+          '<button class="wk-tri-btn'+(o.v==='out'?' sel-out':'')+'" onclick="wkSetStatus(\''+s.id+'\',\'out\')">'+esc(s.no||'❌ Not in')+'</button>'+
+        '</div>'+out+'</div>';
+    }).join('');
+    document.getElementById('wk-status-hdr').innerHTML=esc(cfg.statusTitle)+'<span class="wk-count">'+n+' / '+cfg.status.length+'</span>';
+    const left=cfg.status.length-n;
+    document.getElementById('wk-unchecked').textContent=left?(left+' not tapped — left out of the report'):'';
+  }
+  function wkHelp(id){const el=document.getElementById('wk-help-'+id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+  function wkSetStatus(id,v){
+    const s=wkCfg().status.find(x=>x.id===id),o=wk.status[id];
+    o.v=(o.v===v)?'':v;
+    const opened=(o.v==='out'&&s&&s.lines&&!o.lines.length);
+    if(opened)o.lines=[''];
+    wkRenderStatus();wkReadyHint();wkSave();
+    if(opened)wkFocusLine(id,false);        // keyboard opens on the first line
+  }
+  function wkFocusLine(id,last){
+    const ins=document.querySelectorAll('#wk-row-'+id+' .qnote-input');if(!ins.length)return;
+    const el=last?ins[ins.length-1]:ins[0];el.focus();
+    try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
+  }
+  function wkLine(id,i,v){if(wk.status[id].lines[i]!==undefined)wk.status[id].lines[i]=v;wkSave();}
+  function wkAddLine(id){wk.status[id].lines.push('');wkRenderStatus();wkFocusLine(id,true);wkSave();}
+  function wkDelLine(id,i){wk.status[id].lines.splice(i,1);wkRenderStatus();wkSave();}
+  function wkWhen(id,wi){const o=wk.status[id],w=WK_WHEN[wi];o.when=(o.when===w)?'':w;wkRenderStatus();wkSave();}
+  function wkExtra(id,k){const o=wk.status[id];o.extra=(o.extra===k)?'':k;wkRenderStatus();wkSave();}
+  function wkNote(id,val){wk.status[id].note=val;wkSave();}
+  function wkAllInstalled(){
+    let c=0;wkCfg().status.forEach(s=>{if(!wk.status[s.id].v){wk.status[s.id].v='in';c++;}});
+    if(!c){showToast('Nothing left to mark');return;}
+    wkRenderStatus();wkReadyHint();wkSave();showToast('✅ '+c+' marked');
+  }
+
+  // ── ready? ──
+  function wkRenderReady(){
+    document.getElementById('wk-ready').innerHTML=wkCfg().ready.map(r=>
+      '<button class="wk-ready-btn'+(wk.ready===r.v?' sel-'+r.v:'')+'" onclick="wkSetReady(\''+r.v+'\')"><span class="ico">'+r.icon+'</span><span><b>'+esc(r.t)+'</b><small>'+esc(r.s)+'</small></span></button>'
+    ).join('');
+    wkReadyHint();
+  }
+  function wkSetReady(v){wk.ready=(wk.ready===v)?'':v;wkRenderReady();wkSave();}
+  function wkReadyHint(){
+    const el=document.getElementById('wk-ready-hint');if(!el)return;
+    // items marked holds:false (e.g. countertops on the 1st trim walk) never count against "Ready"
+    const holding=wkCfg().status.filter(s=>wk.status[s.id].v==='out'&&s.holds!==false).length;
+    let h='';
+    if(wk.ready==='yes'&&holding)h='⚠️ '+holding+' item'+(holding>1?'s that hold':' that holds')+' up the job '+(holding>1?'are':'is')+' marked Not in. If they will be done before we start, choose “Ready once items are in.”';
+    else if(wk.ready==='pending'&&!holding)h='Nothing that holds up the job is marked Not in. Choose “Ready” unless something is still missing.';
+    el.innerHTML=h?'<div class="wk-hint">'+h+'</div>':'';
+  }
+
+  // ── issues & deliveries ──
+  function wkRenderChips(){
+    const cfg=wkCfg();
+    document.getElementById('wk-issue-chips').innerHTML=cfg.issueChips.map((c,i)=>'<button class="wk-chip add" onclick="wkAddIssue('+i+')">+ '+esc(c.label)+'</button>').join('');
+    document.getElementById('wk-deliver-chips').innerHTML=(cfg.deliverChips||[]).map((c,i)=>'<button class="wk-chip add" onclick="wkAddDeliver('+i+')">+ '+esc(wkCap(c))+'</button>').join('')+'<button class="wk-chip add" onclick="wkAddDeliverBlank()">+ Other</button>';
+  }
+  function wkFocusLast(sel){
+    const ins=document.querySelectorAll(sel);if(!ins.length)return;
+    const el=ins[ins.length-1];el.focus();
+    try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
+  }
+  function wkRenderIssues(){
+    document.getElementById('wk-issues').innerHTML=wk.issues.map((it,i)=>
+      '<div class="qnote-item"><span class="qnote-emoji">❌</span><input type="text" class="qnote-input is-x" style="font-size:16px;" value="'+esc(it.text)+'" placeholder="Describe the issue..." oninput="wkIssueText('+i+',this.value)"><button class="qnote-del" onclick="wkDelIssue('+i+')">✕</button></div>'
+    ).join('');
+  }
+  function wkAddIssue(ci){wk.warnedBare=false;wk.issues.push({text:wkCfg().issueChips[ci].text||''});wkRenderIssues();wkFocusLast('#wk-issues .qnote-input');wkSave();}
+  function wkIssueText(i,v){wk.warnedBare=false;if(wk.issues[i])wk.issues[i].text=v;wkSave();}
+  function wkDelIssue(i){wk.issues.splice(i,1);wkRenderIssues();wkSave();}
+
+  function wkRenderDeliver(){
+    document.getElementById('wk-deliver').innerHTML=wk.deliver.map((d,i)=>
+      '<div class="qnote-item"><span class="qnote-emoji">📦</span><input type="text" class="qnote-input" style="font-size:16px;" value="'+esc(d)+'" placeholder="What needs to be delivered?" oninput="wkDeliverText('+i+',this.value)"><button class="qnote-del" onclick="wkDelDeliver('+i+')">✕</button></div>'
+    ).join('');
+  }
+  function wkAddDeliver(ci){
+    const t=wkCfg().deliverChips[ci];
+    if(wk.deliver.some(d=>d.trim().toLowerCase()===t.toLowerCase())){showToast('Already on the list');return;}
+    wk.deliver.push(t);wkRenderDeliver();wkSave();
+  }
+  function wkAddDeliverBlank(){wk.deliver.push('');wkRenderDeliver();wkFocusLast('#wk-deliver .qnote-input');wkSave();}
+  function wkDeliverText(i,v){if(wk.deliver[i]!==undefined)wk.deliver[i]=v;wkSave();}
+  function wkDelDeliver(i){wk.deliver.splice(i,1);wkRenderDeliver();wkSave();}
+  function wkNotesInput(v){wk.notes=v;wkSave();}
+
+  // ── the AppWright text ──
+  const WK_READY_LINE={yes:'✅ YES',pending:'🟡 READY ONCE ITEMS ARE IN',no:'❌ NOT READY'};
+  function wkList(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];}
+  function wkClean(t){return String(t||'').replace(/[\s\-–—]+$/,'').trim();}
+  function wkBuildReport(){
+    const cfg=wkCfg(),L=[];
+    L.push([cfg.reportTitle,wk.customer,wk.jobId].filter(Boolean).join(' -- '));
+    L.push('----------------------------');
+    L.push('Ready: '+WK_READY_LINE[wk.ready]);
+    const oks=cfg.status.filter(s=>wk.status[s.id].v==='in').map(s=>s.ok||s.label);
+    if(oks.length)L.push('✅ '+(cfg.okPrefix||'')+oks.join(', '));
+    cfg.status.filter(s=>wk.status[s.id].v==='out').forEach(s=>{
+      const o=wk.status[s.id],note=(o.note||'').trim();
+      let line='❌ '+(s.bad||('NOT IN: '+s.label))+((!s.lines&&note)?' ('+note+')':'');
+      if(s.extra&&o.extra)line+=' — '+String(s.extra[o.extra]).toLowerCase();
+      if(s.ask!=='note')line+=o.when?' — per super: '+o.when.toLowerCase():' — no date from super yet';
+      if(s.holds===false)line+=' — not holding up the job';
+      L.push(line);
+      if(s.lines)o.lines.map(x=>x.trim()).filter(Boolean).forEach(x=>L.push('   - '+x));
+    });
+    const iss=wk.issues.map(i=>wkClean(i.text)).filter(Boolean);
+    if(iss.length){L.push('---');iss.forEach(t=>L.push('❌ '+t));}
+    const del=(cfg.deliver===false)?[]:wk.deliver.map(d=>d.trim()).filter(Boolean);
+    if(del.length){L.push('---');L.push('Please deliver the '+wkList(del)+'.');}
+    const n=(wk.notes||'').trim();
+    if(n){L.push('---');L.push('Notes: '+n);}
+    return L.join('\n');
+  }
+  function wkGenerate(){
+    const cfg=wkCfg();
+    // Only "Ready?" is required — checklist items the house doesn't have can simply be skipped.
+    if(!wk.ready){
+      showToast('⚠️ CHOOSE READY OR NOT READY');
+      const el=document.getElementById('wk-ready');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+    // An issue button tapped but never filled in (e.g. just "Door slab is off its frame") gives the office no location.
+    // Pause once so the PM can add the room; tapping Generate again sends it as is.
+    const presets=cfg.issueChips.map(c=>wkClean(c.text)).filter(Boolean);
+    const bare=wk.issues.map((i,ix)=>({ix:ix,t:wkClean(i.text)})).filter(o=>o.t&&presets.indexOf(o.t)>-1);
+    if(bare.length&&!wk.warnedBare){
+      wk.warnedBare=true;
+      showToast('⚠️ ADD A ROOM TO THE ISSUE — or tap Generate again');
+      const ins=document.querySelectorAll('#wk-issues .qnote-input'),el=ins[bare[0].ix];
+      if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.focus();}
+      return;
+    }
+    if(wkDirty&&!confirm('Generating again will replace the changes you made to the text. Continue?'))return;
+    const text=wkBuildReport();
+    document.getElementById('wk-out-text').value=text;wkDirty=false;wkSetEdit(false);
+    const r=document.getElementById('wk-result');r.style.display='block';r.scrollIntoView({behavior:'smooth'});
+    wk.done=true;wkSaveHistory(text);wkDropDraft();
+  }
+  function wkCopy(){
+    const ta=document.getElementById('wk-out-text');
+    wkOutEdited();
+    navigator.clipboard.writeText(ta.value)
+      .then(()=>showToast('✓ COPIED — Paste into AppWright'))
+      .catch(()=>{const was=ta.readOnly;ta.readOnly=false;ta.select();document.execCommand('copy');ta.readOnly=was;showToast('✓ COPIED');});
+  }
+  // The generated text is locked until the PM taps ✏️ Edit, so a stray tap or scroll can't change it.
+  function wkSetEdit(on){
+    const ta=document.getElementById('wk-out-text'),btn=document.getElementById('wk-edit-btn'),hint=document.getElementById('wk-edit-hint');
+    ta.readOnly=!on;
+    ta.style.borderColor=on?'#f59e0b':'#cbd5e1';ta.style.background=on?'#fffbeb':'#f8fafc';
+    btn.textContent=on?'✓ Done':'✏️ Edit';btn.classList.toggle('on',on);
+    hint.style.display=on?'block':'none';
+    if(on){ta.focus();try{ta.setSelectionRange(ta.value.length,ta.value.length);}catch(e){}}
+    else if(wk)wkOutEdited();
+  }
+  function wkToggleEdit(){wkSetEdit(document.getElementById('wk-out-text').readOnly);}
+
+  // ── history (EDIT brings the whole walk back into the form) ──
+  function wkSaveHistory(text){
+    let h=[];try{h=JSON.parse(localStorage.getItem(WK_HIST))||[];}catch(e){}
+    const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),tm=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    h=h.filter(x=>x.hid!==wk.hid);
+    h.unshift({label:ds+' — '+wk.customer+(wk.jobId?' — '+wk.jobId:''),text:text,time:tm,ts:Date.now(),mode:wk.mode,customer:wk.customer,jobId:wk.jobId,hid:wk.hid,structured:JSON.parse(JSON.stringify(wk))});
+    if(h.length>20)h.pop();
+    localStorage.setItem(WK_HIST,JSON.stringify(h));
+    renderPwHistory();
+  }
+  function wkOutEdited(){
+    let h=[];try{h=JSON.parse(localStorage.getItem(WK_HIST))||[];}catch(e){}
+    const it=h.find(x=>wk&&x.hid===wk.hid);
+    if(it){it.text=document.getElementById('wk-out-text').value;localStorage.setItem(WK_HIST,JSON.stringify(h));}
+  }
+  function loadPreHist(i){
+    const h=JSON.parse(localStorage.getItem(WK_HIST)||'[]'),it=h[i];
+    if(!it||!it.structured||!WALKS[it.mode])return;
+    wkEnsureOverlay();
+    pwMode=it.mode;pwCustomer=it.customer;pwJobId=it.jobId;
+    wk=JSON.parse(JSON.stringify(it.structured));wk.mode=it.mode;wk.hid=it.hid;wk.done=true;
+    wkNormalize();wkOpenForm();
+    document.getElementById('wk-out-text').value=it.text;wkDirty=false;wkSetEdit(false);
+    document.getElementById('wk-result').style.display='block';
+  }
+  function delPreHist(i){
+    const h=JSON.parse(localStorage.getItem(WK_HIST)||'[]');h.splice(i,1);
+    localStorage.setItem(WK_HIST,JSON.stringify(h));renderPwHistory();
+  }
+  // One list on the Main Page for every kind of walk, newest first
+  const WK_TAGS={trim1:'PRE · 1ST TRIM',trim2:'PRE · 2ND TRIM',lockout:'PRE · LOCKOUT'};
+  function showPwHistory(){
+    const el=document.getElementById('pw-history-list');if(!el)return;
+    let post=[],pre=[];
+    try{post=(JSON.parse(localStorage.getItem(PW1_HIST))||[]).map((h,i)=>({k:'post',i:i,h:h}));}catch(e){}
+    try{pre=(JSON.parse(localStorage.getItem(WK_HIST))||[]).map((h,i)=>({k:'pre',i:i,h:h}));}catch(e){}
+    const all=pre.concat(post).sort((a,b)=>(b.h.ts||0)-(a.h.ts||0));
+    el.innerHTML=all.length?all.map(x=>{
+      const isPost=x.k==='post';
+      const tag=isPost?'POST · 1ST TRIM':(WK_TAGS[x.h.mode]||'PRE-WALK'),cls=isPost?'post':(x.h.mode==='lockout'?'lock':'pre');
+      return '<div class="pw-history-entry"><span><span class="wk-tag '+cls+'">'+tag+'</span><br><b>'+esc(x.h.label)+'</b><br><small style="color:#64748b">'+esc(x.h.time||'')+'</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="'+(isPost?'loadPwHist(':'loadPreHist(')+x.i+')">✏️ EDIT</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="'+(isPost?'delPwHist(':'delPreHist(')+x.i+')">✕</button></div></div>';
+    }).join(''):'<p style="font-size:11px;color:#94a3b8;text-align:center;">No walks yet.</p>';
+  }
+  renderPwHistory();
+
   // ── BUILD LAYOUT ───────────────────────────────────────────────
   const appCont=document.getElementById('app-content');
   layout.forEach(sec=>{
@@ -1002,7 +1672,7 @@
     appCont.appendChild(title);appCont.appendChild(content);
   });
 
-  renderHistory();loadActiveState();
+  renderHistory();loadActiveState();homeInfo();
   expireTakeoffIndex();migrateOldIndexKeys();backfillTakeoffIndex();
   requestAnimationFrame(updateStickyOffsets);
   window.addEventListener('resize',updateStickyOffsets);
