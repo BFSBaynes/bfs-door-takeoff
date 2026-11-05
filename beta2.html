@@ -1505,13 +1505,13 @@
         if(s.extra)out+='<div class="wk-out-lbl">'+esc(s.extra.label)+'</div><div class="wk-chips">'+
           ['yes','no'].map(k=>'<button class="wk-chip'+(o.extra===k?' sel':'')+'" onclick="wkExtra(\''+s.id+'\',\''+k+'\')">'+esc(s.extra[k])+'</button>').join('')+'</div>';
         if(ask==='when'){
-          out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips">'+
+          out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips wk-when-chips">'+
             WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\''+s.id+'\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
           if(o.when==='This week'||o.when==='Next week'){
             const days=wkWeekDays(o.when);
-            out+='<div class="wk-out-lbl">Which day? (if the super gave one)</div><div class="wk-chips">'+(days.length
+            out+='<div class="wk-day-block"><div class="wk-out-lbl">Which day? (if the super gave one)</div><div class="wk-chips">'+(days.length
               ?days.map(d=>{const iso=wkIso(d);return '<button class="wk-chip'+(o.date===iso?' sel':'')+'" onclick="wkDay(\''+s.id+'\',\''+iso+'\')">'+esc(wkNice(d))+'</button>';}).join('')
-              :'<span class="wk-muted">No days left this week — pick a date below.</span>')+'</div>';
+              :'<span class="wk-muted">No days left this week — pick a date below.</span>')+'</div></div>';
           }
           if(o.when!=='Today'&&o.when!=='Tomorrow'&&o.when!=='Date unknown')
             out+='<div class="wk-out-lbl">Or pick an exact date</div><input class="wk-in" type="date" min="'+wkIso(wkToday())+'" value="'+esc(o.date)+'" onchange="wkDate(\''+s.id+'\',this.value)" style="margin-bottom:8px;">';
@@ -1557,7 +1557,17 @@
     wkRefresh(id);wkSave();
   }
   function wkDay(id,iso){const o=wk.status[id];o.date=(o.date===iso)?'':iso;wkRefresh(id);wkSave();}
-  function wkDate(id,v){const o=wk.status[id];o.date=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';o.when='';wkRefresh(id);wkSave();}
+  function wkDate(id,v){
+    // Only update what's saved and tidy the buttons around the box. The date box itself is never redrawn here —
+    // iPhones report a "change" the moment the picker opens and again as the wheel moves, and redrawing closes it.
+    const o=wk.status[id];o.date=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';o.when='';
+    const row=document.getElementById('wk-row-'+id);
+    if(row){
+      row.querySelectorAll('.wk-when-chips .wk-chip.sel').forEach(c=>c.classList.remove('sel'));
+      const db=row.querySelector('.wk-day-block');if(db)db.remove();
+    }
+    wkSave();
+  }
   function wkExtra(id,k){const o=wk.status[id];o.extra=(o.extra===k)?'':k;wkRefresh(id);wkSave();}
   function wkNote(id,val){wk.status[id].note=val;wkSave();}
   function wkFocusLine(id,last){      // a line with a quantity starts on the quantity box
