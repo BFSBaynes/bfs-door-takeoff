@@ -280,21 +280,11 @@
     .td-tag{display:inline-block;font-size:8px;font-weight:900;letter-spacing:.5px;padding:2px 6px;border-radius:8px;color:#fff;vertical-align:middle;margin-left:4px;}
     .td-tag.on{background:#1a5296;} .td-tag.gen{background:#16a34a;}
 
-    /* ── JOBS (Main Page card + Job view) ── */
-    #job-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1500;background:linear-gradient(160deg,#071a2e 0%,#0d3158 55%,#071a2e 100%);overflow-y:auto;}
-    .jb-row{width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:13px 12px;margin-bottom:8px;border:2px solid #e2e8f0;border-radius:12px;background:#f8fafc;cursor:pointer;font-family:inherit;}
-    .jb-name{flex:1;min-width:0;font-size:14px;font-weight:900;color:var(--navy);}
-    .jb-meta{font-size:11px;font-weight:700;color:#64748b;flex-shrink:0;}
-    .jb-go{font-size:18px;color:#94a3b8;font-weight:900;flex-shrink:0;}
-    .jb-more{background:none;border:0;color:#1d4ed8;font-weight:800;font-size:12px;text-decoration:underline;cursor:pointer;padding:2px 4px 10px;font-family:inherit;}
-    .jb-title{font-size:19px;font-weight:900;color:var(--navy);margin-bottom:2px;}
-    .jb-group{font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#64748b;margin:14px 2px 8px;}
-    .jb-step{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 14px;margin-bottom:8px;border:2px solid #e2e8f0;border-left:6px solid #1a5296;border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;}
-    .jb-step.red{border-left-color:#b80e2a;}
-    .jb-step .ico{font-size:22px;flex-shrink:0;}
-    .jb-step b{display:block;font-size:14px;color:var(--navy);}
-    .jb-step small{display:block;font-size:11px;font-weight:700;margin-top:2px;color:#64748b;}
-    .jb-step small.ok{color:#15803d;} .jb-step small.warn{color:#b45309;} .jb-step small.bad{color:#b91c1c;} .jb-step small.prog{color:#1d4ed8;}
+    /* ── job picker rows (compact) ── */
+    .wk-rj{width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:10px 12px;margin-bottom:6px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-family:inherit;}
+    .wk-rj-name{flex:1;min-width:0;font-size:14px;font-weight:800;color:var(--navy);}
+    .wk-rj-meta{font-size:11px;font-weight:700;color:#64748b;flex-shrink:0;}
+    .wk-rj-go{font-size:16px;color:#94a3b8;font-weight:900;flex-shrink:0;}
 
     /* ── PRE-WALK FOLLOW-UP (on post walks) ── */
     .wk-pre{background:#fffbeb;border:2px solid #fcd34d;border-radius:12px;padding:12px;margin-bottom:12px;}
@@ -357,21 +347,6 @@
       <button class="wk-tile wk-tile-navy" onclick="openWalk('post2')"><span class="wk-ico">✅</span>2nd Trim<br>Post Walk<small>Shoe complete &amp; extra material</small></button>
       <button class="wk-tile wk-tile-red" onclick="openWalk('lockout')"><span class="wk-ico">🔍</span>Lockout<br>Pre-Walk<small>Doors installed &amp; painted?</small></button>
       <button class="wk-tile wk-tile-red" onclick="openWalk('postlo')"><span class="wk-ico">✅</span>Lockout<br>Post Walk<small>Hardware working &amp; missing items</small></button>
-    </div>
-  </div>
-
-  <div class="header-card" style="padding:14px;text-align:left;">
-    <div class="wk-group">📂 Jobs</div>
-    <div id="jobs-list"></div>
-    <button class="jb-more" id="jobs-more" onclick="jobsToggleAll()" style="display:none;">Show all</button>
-    <button class="wk-chip add" onclick="jobsToggleAdd()">＋ Add a job</button>
-    <div id="jobs-add" style="display:none;margin-top:10px;">
-      <div class="ac-wrap">
-        <input id="nj-customer" type="text" placeholder="Customer" autocomplete="off" oninput="njSuggest()" onfocus="njSuggest()" onblur="setTimeout(()=>closeDropdown('ac-nj'),200)" style="margin-bottom:8px;">
-        <div id="ac-nj" class="ac-dropdown"></div>
-      </div>
-      <input id="nj-job" type="text" placeholder="Job ID" autocomplete="off" style="margin-bottom:8px;">
-      <button class="actionBtn" style="width:100%;background:linear-gradient(135deg,#1a5296,#0d3a6e);color:white;" onclick="jobAddOpen()">Open job →</button>
     </div>
   </div>
 
@@ -703,23 +678,6 @@
   </div>
 </div>
 
-<!-- JOB VIEW — pick a job once, every step opens already filled in -->
-<div id="job-overlay">
-  <div class="pw-header">
-    <div class="pw-header-row">
-      <span class="pw-header-title">📂 JOB</span>
-      <button class="pw-back-btn" onclick="goHome()">🏠 MAIN PAGE</button>
-    </div>
-  </div>
-  <div class="pw-body">
-    <div class="pw-card" style="padding:16px;">
-      <div id="jb-title" class="jb-title">—</div>
-      <div class="wk-muted" style="margin:2px 2px 12px;">Tap a step — it opens already filled in for this job.</div>
-      <div id="jb-steps"></div>
-    </div>
-  </div>
-</div>
-
 <!-- REPORT A PROBLEM -->
 <div id="rp-modal" style="display:none;">
   <div class="rp-box">
@@ -1012,7 +970,7 @@
   // ════════════════════════════════════════════════════════════════
   // ── ROLLOUT SETTINGS ──
   // The version shows on the Main Page and is sent with every problem report — change it each time you upload a new file.
-  const APP_VERSION = "Beta 1.2";
+  const APP_VERSION = "Beta 1.3";
   // Where "Report a problem" emails go. Leave it empty ("") and the button copies the report so it can be pasted into an email.
   const REPORT_EMAIL = "miller.baynes@bldr.com";
 
@@ -1396,10 +1354,10 @@
     if(el)el.textContent=lc?('In progress: '+lc+(ln>1?' · +'+(ln-1)+' more':'')):(ln?(ln+' in progress'):'Count locks & check the takeoff');
   }
   function goHome(){
-    ['pw-overlay','lo-overlay','job-overlay'].forEach(id=>{document.getElementById(id).style.display='none';});
+    ['pw-overlay','lo-overlay'].forEach(id=>{document.getElementById(id).style.display='none';});
     rpClose();wk=null;pwMode='';
     document.getElementById('pw-active-banner').style.display='none';
-    showView('home');homeInfo();renderPwHistory();renderJobs();window.scrollTo(0,0);
+    showView('home');homeInfo();renderPwHistory();window.scrollTo(0,0);
   }
   function openTrim(){showView('trim');window.scrollTo(0,0);}
   function wkEnsureOverlay(){const ov=document.getElementById('pw-overlay');ov.style.display='block';ov.scrollTop=0;}
@@ -1523,14 +1481,18 @@
   function wkAnother(){const m=wk?wk.mode:pwMode;wk=null;wkShowPage(m,true);}
 
   // ── picking the job ──
+  // Pre-walks: type to find a job (the last takeoff may be a month old, so no list up front).
+  // Post walks: the 3 most recent jobs show right away (they usually follow a pre-walk by a couple of days).
   function searchPwJobs(){
     const q=document.getElementById('pw-search-input').value.trim().toLowerCase();
+    const post=!!(WALKS[pwMode]&&WALKS[pwMode].kind==='post');
+    const el=document.getElementById('pw-search-results');
+    if(!q&&!post){_pwSearchResults=[];el.innerHTML='';return;}
     let list=jobsAll();
     if(q)list=list.filter(r=>r.customer.toLowerCase().includes(q)||r.jobId.toLowerCase().includes(q));
-    _pwSearchResults=list.slice(0,8);
-    const el=document.getElementById('pw-search-results');
-    if(!_pwSearchResults.length){el.innerHTML='<p style="font-size:12px;color:#94a3b8;margin:8px 0;">'+(q?'No matches found. Enter it below.':'No jobs yet. Enter one below.')+'</p>';return;}
-    el.innerHTML=(q?'':'<div class="wk-muted" style="margin:8px 2px 4px;">Recent jobs — tap one</div>')+_pwSearchResults.map((r,i)=>'<div class="pw-result-item"><div><div class="pw-result-label">'+esc(r.customer)+'</div><div class="pw-result-sub">'+esc(r.jobId)+(r.ts>1e9?' · '+esc(jbDate(r.ts)):'')+'</div></div><button class="pw-use-btn" onclick="usePwResult('+i+')">Use →</button></div>').join('');
+    _pwSearchResults=list.slice(0,q?6:3);
+    if(!_pwSearchResults.length){el.innerHTML='<p style="font-size:12px;color:#94a3b8;margin:8px 0;">'+(q?'No matches found. Enter it below.':'No recent jobs yet. Enter one below.')+'</p>';return;}
+    el.innerHTML=(q?'':'<div class="wk-muted" style="margin:8px 2px 4px;">Recent jobs — tap one</div>')+_pwSearchResults.map((r,i)=>'<button class="wk-rj" onclick="usePwResult('+i+')"><span class="wk-rj-name">'+esc(r.customer+' — '+r.jobId)+'</span><span class="wk-rj-meta">'+esc(r.ts>1e9?jbDate(r.ts):'')+'</span><span class="wk-rj-go">›</span></button>').join('');
   }
   function usePwResult(i){const r=_pwSearchResults[i];if(!r)return;pwCustomer=r.customer;pwJobId=r.jobId;startWalk();}
   function startPwFormManual(){
@@ -1981,7 +1943,7 @@
   renderPwHistory();
 
   // ════════════════════════════════════════════════════════════════
-  // IN-PROGRESS TAKEOFFS · JOBS · PRE-WALK FOLLOW-UP · REPORT A PROBLEM
+  // IN-PROGRESS TAKEOFFS · RECENT JOBS · PRE-WALK FOLLOW-UP · REPORT A PROBLEM
   // These were added AROUND the existing takeoff code. The original takeoff and
   // lockout functions are untouched; they are only "listened to" so work is saved.
   // ════════════════════════════════════════════════════════════════
@@ -2136,7 +2098,7 @@
     TK.trim.renderBar();TK.lock.renderBar();
   }
 
-  // ── every job the app knows about, newest first ──
+  // ── every job the app knows about, newest first (feeds the job picker on the walks) ──
   function jobsAll(){
     const map={};
     const add=(c,j,ts)=>{c=String(c||'').trim();j=String(j||'').trim();if(!c||!j)return;const k=jobKey(c,j),e=map[k];if(!e)map[k]={customer:c,jobId:j,ts:ts||0};else if((ts||0)>e.ts){e.ts=ts;e.customer=c;e.jobId=j;}};
@@ -2153,89 +2115,7 @@
     return Object.keys(map).map(k=>map[k]).sort((a,b)=>b.ts-a.ts);
   }
 
-  // ── Main Page: the Jobs card ──
-  let JOBS=[],jobsShowAll=false;
-  function renderJobs(){
-    const el=wkEl('jobs-list');if(!el)return;
-    JOBS=jobsAll();
-    const shownJobs=jobsShowAll?JOBS:JOBS.slice(0,3);
-    el.innerHTML=shownJobs.length?shownJobs.map((j,i)=>'<button class="jb-row" onclick="jobOpen('+i+')"><span class="jb-name">'+esc(j.customer+' — '+j.jobId)+'</span><span class="jb-meta">'+esc(j.ts>1e9?jbDate(j.ts):'')+'</span><span class="jb-go">›</span></button>').join(''):'<p class="wk-muted" style="margin:0 0 8px;">No jobs yet — add one below, or start any takeoff or walk.</p>';
-    const more=wkEl('jobs-more');more.style.display=JOBS.length>3?'block':'none';more.textContent=jobsShowAll?'Show fewer':'Show all ('+JOBS.length+')';
-  }
-  function jobsToggleAll(){jobsShowAll=!jobsShowAll;renderJobs();}
-  function jobsToggleAdd(){const el=wkEl('jobs-add');el.style.display=el.style.display==='none'?'block':'none';}
-  function njSuggest(){
-    const v=wkEl('nj-customer').value.trim().toLowerCase(),f=v?getCustomers().filter(c=>c.toLowerCase().includes(v)):getCustomers();
-    showDropdown('ac-nj',f,s=>{document.getElementById('nj-customer').value=s;},null);
-  }
-  function jobAddOpen(){
-    const c=wkVal('nj-customer'),j=wkVal('nj-job');
-    if(!c||!j){showToast('⚠️ ENTER CUSTOMER AND JOB ID');return;}
-    wkEl('nj-customer').value='';wkEl('nj-job').value='';wkEl('jobs-add').style.display='none';
-    jobShow(c,j);
-  }
-  function jobOpen(i){const j=JOBS[i];if(j)jobShow(j.customer,j.jobId);}
-
-  // ── Job view: one job, every step, each already filled in ──
-  let jobCur=null;
-  const JB_STAGES=[
-    {title:'1st Trim',cls:'',steps:[{k:'tk',t:'Trim Takeoff',i:'📐'},{k:'trim1',t:'Pre-Walk',i:'🔍'},{k:'post1',t:'Post Walk',i:'✅'}]},
-    {title:'2nd Trim',cls:'',steps:[{k:'trim2',t:'Pre-Walk',i:'🔍'},{k:'post2',t:'Post Walk',i:'✅'}]},
-    {title:'Lockout',cls:'red',steps:[{k:'lockout',t:'Pre-Walk',i:'🔍'},{k:'lk',t:'Lockout Takeoff',i:'🔒'},{k:'postlo',t:'Post Walk',i:'✅'}]}
-  ];
   function wkLatest(mode,c,j){const k=jobKey(c,j);return wkArr(WK_HIST).find(x=>x.mode===mode&&jobKey(x.customer,x.jobId)===k);}
-  function jbHistDate(h){const m=/^(\d+\/\d+)/.exec((h&&h.label)||'');return m?m[1]:'';}
-  function jbStatus(k){
-    const c=jobCur.customer,j=jobCur.jobId,key=jobKey(c,j);
-    if(WALKS[k]){
-      if(wkDrafts()[wkKeyFor(k,c,j)])return {t:'✏️ In progress',c:'prog'};
-      const h=wkLatest(k,c,j);
-      if(h){
-        const rd=WALKS[k].sections.find(s=>s.type==='ready'),o=rd&&rd.options.find(x=>x.v===(h.structured&&h.structured.ready));
-        return {t:(o?o.icon+' '+o.t:'✓ Done')+(h.ts?' · '+jbDate(h.ts):''),c:o?((o.v==='yes'||o.v==='complete')?'ok':(o.v==='pending'?'warn':'bad')):'ok'};
-      }
-      return {t:'Not started',c:''};
-    }
-    const T=(k==='tk')?TK.trim:TK.lock,d=T.find(c,j);
-    if(d)return d.generated?{t:'✅ Generated · '+T.o.unit+' '+d.count+' · '+jbDate(d.ts),c:'ok'}:{t:'✏️ In progress · '+T.o.unit+' '+d.count,c:'prog'};
-    const hist=(k==='tk')?wkArr(TEST_HIST).concat(wkArr(TAKEOFF_INDEX_KEY).map(e=>({fullData:{customer:e.customer,jobId:e.jobId}}))):wkArr('bfs_lo_history');
-    return hist.some(h=>h.fullData&&jobKey(h.fullData.customer,h.fullData.jobId)===key)?{t:'✅ Generated',c:'ok'}:{t:'Not started',c:''};
-  }
-  function jobShow(c,j){
-    jobCur={customer:c,jobId:j};
-    ['pw-overlay','lo-overlay'].forEach(id=>{wkEl(id).style.display='none';});
-    const ov=wkEl('job-overlay');ov.style.display='block';ov.scrollTop=0;
-    jobRender();
-  }
-  function jobRender(){
-    wkEl('jb-title').textContent=jobCur.customer+' — '+jobCur.jobId;
-    wkEl('jb-steps').innerHTML=JB_STAGES.map(g=>'<div class="jb-group">'+esc(g.title)+'</div>'+g.steps.map(s=>{
-      const st=jbStatus(s.k);
-      return '<button class="jb-step'+(g.cls?' '+g.cls:'')+'" onclick="jobGo(\''+s.k+'\')"><span class="ico">'+s.i+'</span><span><b>'+esc(s.t)+'</b><small class="'+st.c+'">'+esc(st.t)+'</small></span></button>';
-    }).join('')).join('');
-  }
-  function jobGo(k){
-    const c=jobCur.customer,j=jobCur.jobId;
-    wkEl('job-overlay').style.display='none';
-    if(WALKS[k]){wkEnsureOverlay();wk=null;pwCustomer=c;pwJobId=j;wkShowPage(k,true);startWalk();return;}
-    if(k==='tk'){
-      showView('trim');window.scrollTo(0,0);
-      const d=TK.trim.find(c,j);
-      if(d)TK.trim.open(d.id);
-      else{
-        const hi=wkArr(TEST_HIST).findIndex(h=>h.fullData&&jobKey(h.fullData.customer,h.fullData.jobId)===jobKey(c,j));
-        if(hi>-1)loadHistory(hi);else TK.trim.fresh(c,j);
-      }
-      return;
-    }
-    openLockoutWalk();
-    const d=TK.lock.find(c,j);
-    if(d)TK.lock.open(d.id);
-    else{
-      const hi=wkArr('bfs_lo_history').findIndex(h=>h.fullData&&jobKey(h.fullData.customer,h.fullData.jobId)===jobKey(c,j));
-      if(hi>-1)loadLoHistory(hi);else TK.lock.fresh(c,j);
-    }
-  }
 
   // ── post walks: what the pre-walk flagged, and was it done? ──
   const WK_PAIR={post1:'trim1',post2:'trim2',postlo:'lockout'};
@@ -2280,7 +2160,6 @@
   function rpNavigate(url){window.location.href=url;}
   function rpScreen(){
     const on=id=>{const e=wkEl(id);return !!e&&e.style.display==='block';};
-    if(on('job-overlay'))return 'Job view';
     if(on('lo-overlay'))return 'Lockout Takeoff';
     if(on('pw-overlay'))return (WALKS[(wk&&wk.mode)||pwMode]||{title:'Walks'}).title;
     if(wkEl('trim-view').style.display!=='none')return 'Trim Takeoff';
@@ -2288,7 +2167,6 @@
   }
   function rpJob(){
     const on=id=>{const e=wkEl(id);return !!e&&e.style.display==='block';};
-    if(on('job-overlay')&&jobCur)return jobCur.customer+' — '+jobCur.jobId;
     if(on('pw-overlay')&&wk)return [wk.customer,wk.jobId].filter(Boolean).join(' — ');
     if(on('lo-overlay'))return [wkVal('lo-customer'),wkVal('lo-job-id')].filter(Boolean).join(' — ');
     if(wkEl('trim-view').style.display!=='none')return [wkVal('customer'),wkVal('job-id')].filter(Boolean).join(' — ');
@@ -2329,7 +2207,7 @@
     appCont.appendChild(title);appCont.appendChild(content);
   });
 
-  renderHistory();loadActiveState();tkInit();homeInfo();renderJobs();
+  renderHistory();loadActiveState();tkInit();homeInfo();
   expireTakeoffIndex();migrateOldIndexKeys();backfillTakeoffIndex();
   requestAnimationFrame(updateStickyOffsets);
   window.addEventListener('resize',updateStickyOffsets);
