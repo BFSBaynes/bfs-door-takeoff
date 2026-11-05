@@ -186,10 +186,12 @@
     .lo-qty.tap-flash{transform:scale(1.22);color:#86efac;}
 
     /* ── MAIN PAGE (home) + NAV ── */
-    .nav-home{position:fixed;top:6px;left:8px;z-index:700;background:rgba(0,0,0,0.22);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;border:1.5px solid rgba(255,255,255,0.6);white-space:nowrap;cursor:pointer;font-family:inherit;letter-spacing:.3px;}
+    .nav-home{position:fixed;top:6px;right:12px;z-index:700;background:rgba(0,0,0,0.2);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;border:1.5px solid rgba(255,255,255,0.5);white-space:nowrap;cursor:pointer;font-family:inherit;}
+    .nav-title{display:none;position:fixed;top:0;left:12px;height:44px;line-height:44px;z-index:700;color:#fff;font-weight:900;font-size:12px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+    body:not(.view-home) .nav-title{display:block;}
     body.view-home .nav-home{display:none;}
     body:not(.view-home) #nav-live{display:none;}
-    body:not(.view-home) .test-badge{left:auto;right:8px;}
+    body:not(.view-home) .test-badge{display:none;}
     body.view-home #job-banner{display:none!important;}
     body.view-home{padding-top:44px!important;}
     .wk-group{font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#64748b;margin:0 0 8px 2px;}
@@ -268,6 +270,7 @@
 
 <div id="top-bar"></div>
 <a href="index.html" class="mode-switch" id="nav-live">← LIVE APP</a>
+<span class="nav-title" id="nav-title">📐 TRIM TAKEOFF</span>
 <button class="nav-home" id="nav-home" onclick="goHome()">🏠 MAIN PAGE</button>
 <span class="test-badge">🧪 TEST</span>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -318,10 +321,9 @@
 <!-- MAIN HEADER -->
 <div id="main-header" class="header-card" style="margin-top:8px;padding:0;overflow:hidden;text-align:left;">
   <div style="padding:16px 14px 10px;">
-    <!-- Centered branding -->
-    <div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1.5px solid #f1f5f9;">
-      <img src="icon-512.png" alt="BFS Logo" style="width:90px;height:auto;border-radius:14px;margin:0 auto 10px;display:block;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-      <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Door &amp; Trim Takeoff</div>
+    <!-- Centered branding — the same flat logo as the Main Page and index/classic -->
+    <div style="text-align:center;margin-bottom:10px;">
+      <img src="icon-512.png" alt="Elevate Trim" style="width:160px;height:auto;margin:5px auto;display:block;">
     </div>
     <!-- Customer -->
     <div class="input-row">
@@ -552,6 +554,9 @@
       </div>
       <div style="padding:16px;">
 
+        <button class="wk-how-btn" onclick="wkToggleLook()"><span>🔍 Things to look for</span><span id="wk-look-chev">▲</span></button>
+        <div id="wk-look" class="wk-help"></div>
+
         <button class="wk-how-btn" onclick="wkToggleHow()"><span>📖 How this walk works</span><span id="wk-how-chev">▲</span></button>
         <div id="wk-how" class="wk-help"></div>
 
@@ -587,7 +592,7 @@
               <div class="pw-result-body">
                 <div class="wk-edit-hint" id="wk-edit-hint">✏️ Editing — change anything you like, then tap ✓ Done.</div>
                 <textarea id="wk-out-text" readonly oninput="wkDirty=true" style="height:300px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
-                <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="wkCopy()">📋 Copy to AppWright</button>
+                <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="wkCopy()">📋 Copy</button>
                 <button class="actionBtn" id="wk-another" style="width:100%;background:#dbeafe;color:#1e40af;margin-bottom:8px;" onclick="wkAnother()">+ Another walk</button>
                 <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="goHome()">🏠 Main Page</button>
               </div>
@@ -598,7 +603,7 @@
           <div id="wk-legacy" style="display:none;">
             <div class="wk-hint" style="margin:0 0 10px;">Saved with the first beta — view only.</div>
             <textarea id="wk-legacy-text" readonly style="height:300px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;"></textarea>
-            <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-top:8px;" onclick="wkCopyLegacy()">📋 Copy to AppWright</button>
+            <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-top:8px;" onclick="wkCopyLegacy()">📋 Copy</button>
           </div>
 
         </div>
@@ -865,7 +870,9 @@
   //  words between the quotes, add a line, or delete a line. Keep the quote
   //  marks and commas. Nothing else in the file needs to change.
   //
-  //  Each walk has "sections", shown top to bottom in this order:
+  //  Each walk has  look  = the "Things to look for" list (shown first — the SOP for
+  //  new hires) and  how  = the "How this walk works" steps, then "sections", shown
+  //  top to bottom in this order:
   //    checks   two-button items (PMs skip anything that doesn't apply — no N/A)
   //    ready    the big Ready? / Complete? choice (always printed first in the text)
   //    choice   one two-button question
@@ -878,7 +885,8 @@
   //  Item settings (checks):  id (one short word) · label · yes/no (button words)
   //    ok/bad (how it reads in the text) · holds:false (doesn't hold up the job)
   //    ask: "when" (default, asks "per super — when?") | "note" | "none"
-  //    lines:true (one line per door/opening, with "add another")
+  //    lines:true (one line per door/opening, with "add another");  add qty:true for a
+  //      quantity box + a "what and where" box on each line
   //    extra:{...} (a second question, used for the generator)
   // ════════════════════════════════════════════════════════════════
   const WK_WHEN = ["Today","Tomorrow","This week","Next week","Date unknown"];
@@ -892,20 +900,20 @@
       headerTitle: "📋 1ST TRIM PRE-WALK",
       reportTitle: "PRE-WALK — 1ST TRIM",
       outPlaceholder: "What's left / what did the super say?",
+      look: [
+        "Door and cased openings framed correctly",
+        "Drywall hung, mudded and sanded",
+        "Cabinets and countertops installed — they don't hold up the job, the base gets tied into them at 2nd trim",
+        "Electricity on, or a generator needed"
+      ],
       how: [
         "Walk the whole house.",
         "Tap what you find on each item. Skip anything that doesn't apply to this house.",
         "If something isn't done, get with the superintendent for a date and tap what the super tells you.",
-        "Countertops don't hold up the job — the house can still be Ready if they aren't in.",
+        "Cabinets and countertops don't hold up the job — the house can still be Ready if they aren't in.",
         "No power? Mark it and say whether a generator is needed.",
-        "Upload your photos of any problems to AppWright."
-      ],
-      tips: [
-        "Door and cased openings framed correctly",
-        "Drywall hung, mudded and sanded",
-        "Cabinets installed",
-        "Electricity on, or a generator needed",
-        "Countertops in (nice to have — not required to start trim)"
+        "Add a line for anything else that's wrong, and upload your photos of problems to AppWright.",
+        "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
         {type:"checks", title:"🏠 Ready for trim?", allOk:"✅ Mark everything good", items:[
@@ -916,12 +924,12 @@
           {id:"drywall", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
            ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", notePh:"What's left — not hung, not mudded, not sanded?",
            help:"Drywall should be hung, mudded and sanded. If anything is left, mark Not done and say what's left."},
-          {id:"cabinets", label:"Cabinets installed", yes:"✅ Installed", no:"❌ Not in",
+          {id:"cabinets", label:"Cabinets installed", yes:"✅ Installed", no:"❌ Not in", holds:false,
            ok:"Cabinets installed", bad:"Cabinets NOT installed",
-           help:"Check that the kitchen and bath cabinets and vanities are installed. Not in? Get a date from the super and tap what they tell you."},
+           help:"Cabinets do not hold up the job — we tie the base into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
           {id:"counters", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
            ok:"Countertops in", bad:"Countertops NOT in",
-           help:"Countertops do not hold up the job. If they aren't in you can still mark the house Ready — just get a date from the super."},
+           help:"Countertops do not hold up the job — we tie the base into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
           {id:"power", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
            ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?",
            extra:{label:"Generator?", yes:"Generator needed", no:"No generator needed"},
@@ -945,20 +953,24 @@
       headerTitle: "📋 2ND TRIM PRE-WALK",
       reportTitle: "PRE-WALK — 2ND TRIM",
       outPlaceholder: "Which rooms / what did the super say?",
+      look: [
+        "Countertops and cabinets/vanities set, so the shoe can go against them",
+        "Floors installed everywhere — LVP, wood, carpet and tile (every room and closet)",
+        "Door slabs off their frames (note which doors, and if the slab is out in the garage)",
+        "Baseboard that needs fixing",
+        "Missing closet rods",
+        "Items requested on first trim that still need delivering (1x8, grab rail, pull-down sticks with hooks...)",
+        "Enough material on site for the trim tie-ins",
+        "Any other material needed to finish besides 1/4 round and shoe mold"
+      ],
       how: [
         "Walk the whole house — every room, closet and bath.",
         "Tap Installed or Not in on each item. Skip anything this house doesn't have (no wood flooring? just leave it).",
         "If something is not in, get with the superintendent for a date and tap what the super tells you.",
         "The house is still Ready if the missing items will be in before we install the quarter round and shoe.",
-        "Add a line for each problem you find, say whether there is enough material on site for the trim tie-ins, and list anything that has to be delivered (quantity, then what it is).",
-        "Upload your photos of any problems to AppWright."
-      ],
-      tips: [
-        "Door slabs off their frames (note which doors, and if the slab is out in the garage)",
-        "Baseboard that needs fixing",
-        "Missing closet rods",
-        "Items requested on first trim that still need delivering (1x8, grab rail, pull-down sticks with hooks...)",
-        "Any other material needed to finish besides 1/4 round and shoe mold"
+        "Add a line for each problem, say whether there is enough material for the trim tie-ins, and list anything that has to be delivered (quantity, then what it is).",
+        "Upload your photos of any problems to AppWright.",
+        "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
         {type:"checks", title:"🧱 Floors & surfaces", allOk:"✅ Mark everything installed", okPrefix:"Installed: ", items:[
@@ -993,20 +1005,21 @@
       headerTitle: "🔒 LOCKOUT PRE-WALK",
       reportTitle: "PRE-WALK — LOCKOUT",
       outPlaceholder: "Which doors / what did the super say?",
+      look: [
+        "Doors not hung, or slabs off their frames",
+        "Doors not painted yet",
+        "Doors that bind or will not latch",
+        "Exterior and garage entry doors ready for locks",
+        "Missing hardware"
+      ],
       how: [
         "Walk the whole house, including the garage entry and the exterior doors.",
         "Tap what you find on each item. Skip anything that doesn't apply. Locks go on after the doors are hung and painted.",
         "If something is not ready, get with the superintendent for a date and tap what the super tells you.",
         "Check the locks needed (shown in the form when a trim takeoff is saved for this job) against what is on site.",
         "Add a line for each problem, and list anything that has to be delivered (quantity, then what it is).",
-        "Upload your photos of any problems to AppWright."
-      ],
-      tips: [
-        "Doors not hung, or slabs off their frames",
-        "Doors not painted yet",
-        "Doors that bind or will not latch",
-        "Exterior and garage entry doors ready for locks",
-        "Missing hardware"
+        "Upload your photos of any problems to AppWright.",
+        "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
         {type:"checks", title:"🚪 Doors", allOk:"✅ Mark everything done", items:[
@@ -1044,17 +1057,22 @@
       headerTitle: "📋 1ST TRIM POST WALK",
       reportTitle: "POST WALK — 1ST TRIM",
       outPlaceholder: "What's wrong?",
-      how: [
-        "Check all doors to make sure they are operating.",
-        "Check that the attic stair is installed properly.",
-        "Check that the trim and baseboard are squared.",
-        "Check the reveals on the doors.",
-        "Make sure there is no damaged material.",
-        "Check for extra base that needs to be picked up, and take a photo of the extra base.",
-        "Take pictures of your walk — especially any issues — and upload them into AppWright.",
-        "Then fill out the form: tap Complete or Incomplete, tap anything that's wrong and add a line for each, and list the material left on site (quantity, then what it is)."
+      look: [
+        "All doors are operating",
+        "The attic stair is installed properly",
+        "Trim and baseboard are squared",
+        "Reveals on the doors are good",
+        "No damaged material",
+        "Any extra trim/doors that need to be picked up — take a photo of them",
+        "Take pictures of your walk, especially any issues, and upload them into AppWright"
       ],
-      tips: [],
+      how: [
+        "Tap Complete or Incomplete.",
+        "Tap Mark everything good, or tap what's wrong on any check and add a line for each.",
+        "If it's incomplete, tap each reason and add a line for each item.",
+        "List any extra trim/doors left on site (quantity, then what it is) — or tap No extra material.",
+        "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
+      ],
       sections: [
         {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
           {v:"complete",   icon:"✅", t:"Complete",   s:"Everything is done",           line:"✅ COMPLETE"},
@@ -1101,24 +1119,27 @@
       headerTitle: "📋 2ND TRIM POST WALK",
       reportTitle: "POST WALK — 2ND TRIM",
       outPlaceholder: "What's wrong?",
-      how: [
-        "Walk the whole house.",
-        "Make sure all the shoe and quarter round is installed.",
-        "Check that the doors work.",
-        "Check any stair parts — baluster shoes tight and secure, caps on knee walls.",
-        "If you couldn't finish something, tap Incomplete, tap what stopped you, and say whether the installer will need a trip charge to come back.",
-        "List any extra material left on site (quantity, then what it is) — or tap No material left on site.",
-        "Take pictures of your walk — especially any issues — and upload them into AppWright."
+      look: [
+        "All the shoe and quarter round is installed",
+        "Doors are working properly",
+        "Pull-down rod installed (if the house has one)",
+        "Stair parts — baluster shoes tight and secure, caps on knee walls",
+        "Cabinets have their toe kicks, so the shoe can go against them",
+        "Door rough openings are the right size to set the doors",
+        "Any extra material left on site — take a photo of it",
+        "Take pictures of your walk, especially any issues, and upload them into AppWright"
       ],
-      tips: [],
+      how: [
+        "Tap Complete or Incomplete.",
+        "Tap Mark everything good, or tap what's wrong on any check and add a line for each.",
+        "If it's incomplete, tap each problem under 2nd Trim Issues and add a line for each. Tap Trip charge needed if the installer will have to come back.",
+        "List any extra material left on site (quantity, then what it is) — or tap No material left on site.",
+        "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
+      ],
       sections: [
         {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
           {v:"complete",   icon:"✅", t:"Complete",   s:"All the trim is done",    line:"✅ COMPLETE"},
           {v:"incomplete", icon:"❌", t:"Incomplete", s:"Something is left to do", line:"❌ INCOMPLETE"}
-        ]},
-        {type:"flags", title:"If it's incomplete", showWhen:{ready:"incomplete"}, items:[
-          {id:"rest", label:"Rest of trim is complete",                   line:"✅ Rest of trim is complete"},
-          {id:"trip", label:"Trip charge needed for installer when ready", line:"💲 Trip charge needed for installer when ready"}
         ]},
         {type:"checks", title:"🔎 Walk checks", allOk:"✅ Mark everything good", items:[
           {id:"shoe", label:"All shoe installed", yes:"✅ All in", no:"❌ Not all", ask:"note",
@@ -1133,12 +1154,15 @@
            ok:"Pull-down rod installed", bad:"Pull-down rod NOT installed",
            help:"Skip this one if the house has no pull-down rod."}
         ]},
-        {type:"reasons", title:"⚠️ What stopped you? (tap all that apply)", showWhen:{ready:"incomplete"}, items:[
+        {type:"reasons", title:"⚠️ 2nd Trim Issues", showWhen:{ready:"incomplete"}, items:[
           {id:"toekicks", label:"Cabinets missing toe kicks — can't install shoe", ph:"Which cabinets?",                         add:"+ Add a cabinet", more:"+ Add another cabinet"},
           {id:"ro",       label:"Door rough opening wrong — can't set door",       ph:"Which door — size needed / current size?", add:"+ Add a door",    more:"+ Add another door"},
           {id:"stairs",   label:"Stair parts need work",                           ph:"What needs to be done?",                  add:"+ Add an item",   more:"+ Add another item"},
           {id:"short"   , label:"Material short / missing",                        ph:"What is short or missing?",               add:"+ Add an item",   more:"+ Add another item"},
           {id:"other",    label:"Other",                                           ph:"Describe the issue...",                   add:"+ Add an issue",  more:"+ Add another issue"}
+        ]},
+        {type:"flags", showWhen:{ready:"incomplete"}, items:[
+          {id:"trip", label:"Trip charge needed for installer when ready", line:"💲 Trip charge needed for installer when ready"}
         ]},
         {type:"list", id:"material", title:"📦 Extra materials", kind:"qty", header:"Extra materials:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"13", txtPh:"shoe",
@@ -1156,24 +1180,33 @@
       headerTitle: "🔒 LOCKOUT POST WALK",
       reportTitle: "POST WALK — LOCKOUT",
       outPlaceholder: "What's wrong?",
-      how: [
-        "Check that all the hardware is installed.",
-        "Test every deadbolt and every door — they should close, latch and lock smoothly with proper gapping.",
-        "Check the front and garage door catch plates, and that the house numbers are installed.",
-        "If you adjusted any doors or catch plates, list how many. If the installer needs coaching, note what you showed them.",
-        "List any missing hardware and any extra locks or hardware left on site (quantity, then what it is).",
-        "Take pictures of your walk — especially any issues — and upload them into AppWright."
+      look: [
+        "All hardware is installed",
+        "Every deadbolt locks smoothly",
+        "Every door closes, latches and locks with proper gapping",
+        "The front and garage door catch plates — garage mortises are often slightly off and need adjusting",
+        "House numbers are installed",
+        "Weather stripping is installed on the garage door",
+        "Any extra locks or hardware left on site",
+        "Take pictures of your walk, especially any issues, and upload them into AppWright"
       ],
-      tips: [],
+      how: [
+        "Tap Complete or Incomplete.",
+        "Tap Mark everything good, or tap what's wrong. If hardware is missing, add a line for what and where.",
+        "If you adjusted any doors or catch plates, list how many.",
+        "Add a line for any other issue, and list any extra locks or hardware left on site (quantity, then what it is) — or tap None left on site.",
+        "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
+      ],
       sections: [
         {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
           {v:"complete",   icon:"✅", t:"Complete",   s:"Lockout is complete",     line:"✅ COMPLETE"},
           {v:"incomplete", icon:"❌", t:"Incomplete", s:"Something is left to do", line:"❌ INCOMPLETE"}
         ]},
         {type:"checks", title:"🔒 Walk checks", allOk:"✅ Mark everything good", items:[
-          {id:"hardware",  label:"All hardware installed", yes:"✅ All in", no:"❌ Missing some", ask:"none",
+          {id:"hardware",  label:"All hardware installed", yes:"✅ All in", no:"❌ Missing some", ask:"note",
            ok:"All hardware installed", bad:"Hardware NOT all installed",
-           help:"Check every door has its hardware. If something is missing, list it under Missing hardware below."},
+           lines:true, qty:true, linesLabel:"What's missing, and where? One line for each", qtyLabel:"Qty", txtLabel:"What's missing & where", qtyPh:"4", linePh:"Hinge stops — garage door", addLabel:"+ Add more missing hardware",
+           help:"Check every door has its hardware. If something is missing, tap Missing some and add a line for what and where."},
           {id:"deadbolts", label:"Deadbolts lock smoothly", yes:"✅ All good", no:"❌ Problem", ask:"note",
            ok:"Deadbolts lock smoothly", bad:"Deadbolt problems",
            lines:true, linesLabel:"Which deadbolts? One line for each", linePh:"Which door — what's wrong?", addLabel:"+ Add another deadbolt",
@@ -1182,28 +1215,19 @@
            ok:"All doors close, latch & lock properly", bad:"Door problems",
            lines:true, linesLabel:"Which doors? One line for each door", linePh:"Which door — what's wrong?", addLabel:"+ Add another door",
            help:"Close, latch and lock every door. Look for proper gapping. If any door has a problem, add a line for each one."},
-          {id:"numbers", label:"House numbers installed", yes:"✅ Installed", no:"❌ Not in", ask:"none",
-           ok:"House numbers installed", bad:"House numbers NOT installed",
-           help:"Skip this one if the house doesn't get numbers."}
-        ]},
-        {type:"flags", title:"Need the office?", items:[
-          {id:"service", label:"Service call needed", line:"🔧 Service call needed"},
-          {id:"advise",  label:"Please advise",       line:"📞 Please advise"}
+          {id:"numbers", label:"House numbers installed", yes:"✅ Installed", no:"❌ Not in", ask:"note",
+           ok:"House numbers installed", bad:"House numbers missing or NOT installed properly", notePh:"What's missing, or what isn't installed properly?",
+           help:"Check the house numbers are installed and installed properly. Skip this one if the house doesn't get numbers."}
         ]},
         {type:"list", id:"adjusted", title:"🔧 Adjustments I made", kind:"qty", header:"Adjusted:",
          qtyLabel:"#", txtLabel:"What I adjusted", qtyPh:"2", txtPh:"doors",
          add:"+ Add an adjustment", more:"+ Add another adjustment"},
         {type:"list", id:"issues", counts:true, title:"⚠️ Issues found", kind:"text", icon:"❌", prefix:"❌ ",
          add:"+ Add an issue", more:"+ Add another issue", ph:"Describe the issue..."},
-        {type:"list", id:"missing", title:"📦 Missing hardware", kind:"qty", header:"Missing:",
-         qtyLabel:"Qty", txtLabel:"What's missing", qtyPh:"4", txtPh:"hinge stops",
-         add:"+ Add missing hardware", more:"+ Add more missing hardware"},
         {type:"list", id:"extra", title:"🔑 Extra locks & hardware on site", kind:"qty", header:"Extra locks / hardware on site:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"2", txtPh:"passage knobs",
          add:"+ Add extra", more:"+ Add more extra",
          none:{label:"None left on site", line:"No extra locks or hardware left on site"}},
-        {type:"list", id:"coached", title:"👷 What I showed the installer", kind:"text", prefix:"- ", header:"Told the installer:",
-         add:"+ Add what you showed them", more:"+ Add another", ph:"e.g. Catch plates need adjusting, not just set in the mortise"},
         {type:"notes", title:"📝 Notes", ph:"Anything else..."}
       ]
     }
@@ -1266,8 +1290,8 @@
     cfg.sections.forEach(sec=>{
       if(sec.type==='checks')sec.items.forEach(it=>{
         const o=(wk.status||{})[it.id]||{};
-        const ln=Array.isArray(o.lines)?o.lines.map(x=>String(x)):[];
-        if(it.lines&&!ln.length&&o.note)ln.push(String(o.note));   // an older save kept one long note — it becomes the first line
+        const ln=(Array.isArray(o.lines)?o.lines:[]).map(x=>it.qty?{q:String((x&&x.q)||''),t:String((x&&typeof x==='object')?(x.t||''):(x||''))}:String((x&&typeof x==='object')?(x.t||''):(x||'')));
+        if(it.lines&&!ln.length&&o.note)ln.push(it.qty?{q:'',t:String(o.note)}:String(o.note));   // an older save kept one long note — it becomes the first line
         S[it.id]={v:(o.v==='in'||o.v==='out')?o.v:'',when:o.when||'',note:o.note||'',extra:(o.extra==='yes'||o.extra==='no')?o.extra:'',lines:ln};
       });
       else if(sec.type==='choice'){const v=(wk.choice||{})[sec.id];C[sec.id]=(v==='yes'||v==='no')?v:'';}
@@ -1309,11 +1333,16 @@
     document.getElementById('wk-form-body').style.display=open?'block':'none';
     document.getElementById('wk-form-chev').textContent=open?'▲':'▼';
   }
+  function wkSetLook(open){
+    document.getElementById('wk-look').style.display=open?'block':'none';
+    document.getElementById('wk-look-chev').textContent=open?'▲':'▼';
+  }
+  function wkToggleLook(){wkSetLook(document.getElementById('wk-look').style.display==='none');}
   function wkToggleHow(){wkSetHow(document.getElementById('wk-how').style.display==='none');}
   function wkToggleForm(){
     const opening=document.getElementById('wk-form-body').style.display==='none';
     wkSetForm(opening);
-    if(opening)wkSetHow(false);     // making room: the steps fold away when the form opens (tap to bring them back)
+    if(opening){wkSetLook(false);wkSetHow(false);}     // making room: both fold away when the form opens (tap to bring them back)
   }
   function wkShowPage(kind,formOpen){
     pwMode=kind;const cfg=WALKS[kind];
@@ -1322,10 +1351,8 @@
     document.getElementById('wk-kicker').textContent=cfg.kind==='pre'?'Pre-walk':'Post walk';
     document.getElementById('wk-title').textContent=cfg.title;
     document.getElementById('wk-form-title').textContent=cfg.kind==='pre'?'📋 Pre-walk form':'📋 Post-walk form';
-    document.getElementById('wk-how').innerHTML=
-      '<div style="font-weight:900;margin-bottom:6px;">How this walk works</div><ol style="margin:0'+(cfg.tips.length?' 0 10px':'')+' 18px;padding:0;">'+
-      cfg.how.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('')+'</ol>'+
-      (cfg.tips.length?'<div style="font-weight:900;margin-bottom:6px;">Things to look for</div><ul style="margin:0 0 0 18px;padding:0;">'+cfg.tips.map(x=>'<li style="margin-bottom:3px;">'+esc(x)+'</li>').join('')+'</ul>':'');
+    document.getElementById('wk-look').innerHTML='<ul style="margin:0 0 0 18px;padding:0;">'+cfg.look.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('')+'</ul>';
+    document.getElementById('wk-how').innerHTML='<ol style="margin:0 0 0 18px;padding:0;">'+cfg.how.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('')+'</ol>';
     document.getElementById('wk-gen-btn').textContent=cfg.kind==='pre'?'⚡ Generate Pre-Walk':'⚡ Generate Post Walk';
     document.getElementById('wk-another').textContent='+ Another '+cfg.title;
     // job picker is the first thing inside the form
@@ -1336,7 +1363,7 @@
     document.getElementById('wk-picker').style.display='block';
     document.getElementById('wk-formwrap').style.display='none';
     document.getElementById('wk-legacy').style.display='none';
-    wkSetForm(formOpen);wkSetHow(!formOpen);
+    wkSetForm(formOpen);wkSetLook(!formOpen);wkSetHow(!formOpen);
     document.getElementById('pw-overlay').scrollTop=0;
   }
   function wkChangeJob(){
@@ -1386,7 +1413,7 @@
     document.getElementById('wk-result').style.display='none';
     wkSetEdit(false);wkDirty=false;
     wkRenderExpected();wkRenderForm();
-    wkSetForm(true);wkSetHow(false);
+    wkSetForm(true);wkSetLook(false);wkSetHow(false);
     document.getElementById('pw-overlay').scrollTop=0;
   }
 
@@ -1444,8 +1471,11 @@
         if(ask==='when')out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips">'+
           WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\''+s.id+'\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
         if(s.lines){
-          out+='<div class="wk-out-lbl">'+esc(s.linesLabel||'Which ones? One line for each')+'</div>'+
-            o.lines.map((ln,i)=>'<div class="qnote-item"><span class="qnote-emoji">❌</span><input type="text" class="qnote-input is-x" style="font-size:16px;" value="'+esc(ln)+'" placeholder="'+esc(s.linePh||'')+'" oninput="wkLine(\''+s.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkDelLine(\''+s.id+'\','+i+')">✕</button></div>').join('')+
+          out+='<div class="wk-out-lbl">'+esc(s.linesLabel||'Which ones? One line for each')+'</div>';
+          if(s.qty&&o.lines.length)out+='<div class="wk-qhead"><span>'+esc(s.qtyLabel||'Qty')+'</span><span>'+esc(s.txtLabel||'What')+'</span></div>';
+          out+=o.lines.map((ln,i)=>s.qty
+            ?'<div class="wk-qrow"><input type="text" class="qnote-input wk-qty is-x" style="font-size:16px;" value="'+esc(ln.q)+'" placeholder="'+esc(s.qtyPh||'')+'" oninput="wkLineQ(\''+s.id+'\','+i+',this.value)"><input type="text" class="qnote-input wk-mat is-x" style="font-size:16px;" value="'+esc(ln.t)+'" placeholder="'+esc(s.linePh||'')+'" oninput="wkLine(\''+s.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkDelLine(\''+s.id+'\','+i+')">✕</button></div>'
+            :'<div class="qnote-item"><span class="qnote-emoji">❌</span><input type="text" class="qnote-input is-x" style="font-size:16px;" value="'+esc(ln)+'" placeholder="'+esc(s.linePh||'')+'" oninput="wkLine(\''+s.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkDelLine(\''+s.id+'\','+i+')">✕</button></div>').join('')+
             '<button class="wk-chip add" onclick="wkAddLine(\''+s.id+'\')">'+esc(s.addLabel||'+ Add another')+'</button>';
         }else if(ask!=='none'){
           out+='<input class="wk-in" type="text" placeholder="'+esc(s.notePh||wkCfg().outPlaceholder)+'" value="'+esc(o.note)+'" oninput="wkNote(\''+s.id+'\',this.value)">';
@@ -1470,15 +1500,21 @@
     const s=wkReg[id].item,o=wk.status[id];
     o.v=(o.v===v)?'':v;
     const opened=(o.v==='out'&&s.lines&&!o.lines.length);
-    if(opened)o.lines=[''];
+    if(opened)o.lines=[s.qty?{q:'',t:''}:''];
     wkRefresh(id);wkReadyHint();wkSave();
-    if(opened)wkFocusIn('wk-row-'+id,false);        // keyboard opens on the first line
+    if(opened)wkFocusLine(id,false);        // keyboard opens on the first line
   }
   function wkWhen(id,wi){const o=wk.status[id],w=WK_WHEN[wi];o.when=(o.when===w)?'':w;wkRefresh(id);wkSave();}
   function wkExtra(id,k){const o=wk.status[id];o.extra=(o.extra===k)?'':k;wkRefresh(id);wkSave();}
   function wkNote(id,val){wk.status[id].note=val;wkSave();}
-  function wkLine(id,i,v){if(wk.status[id].lines[i]!==undefined)wk.status[id].lines[i]=v;wkSave();}
-  function wkAddLine(id){wk.status[id].lines.push('');wkRefresh(id);wkFocusIn('wk-row-'+id,true);wkSave();}
+  function wkFocusLine(id,last){      // a line with a quantity starts on the quantity box
+    const c=document.getElementById('wk-row-'+id),ins=c?c.querySelectorAll('.qnote-input'):[];if(!ins.length)return;
+    const q=wkReg[id].item.qty,k=q?(last?ins.length-2:0):(last?ins.length-1:0),el=ins[Math.max(0,k)];
+    el.focus();try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
+  }
+  function wkLine(id,i,v){const L=wk.status[id].lines;if(L[i]===undefined)return;if(wkReg[id].item.qty)L[i].t=v;else L[i]=v;wkSave();}
+  function wkLineQ(id,i,v){const L=wk.status[id].lines;if(L[i])L[i].q=v;wkSave();}
+  function wkAddLine(id){wk.status[id].lines.push(wkReg[id].item.qty?{q:'',t:''}:'');wkRefresh(id);wkFocusLine(id,true);wkSave();}
   function wkDelLine(id,i){wk.status[id].lines.splice(i,1);wkRefresh(id);wkSave();}
   function wkAllOk(si){
     const sec=wkCfg().sections[si];let c=0;
@@ -1514,7 +1550,7 @@
       else if(wk.ready==='pending'&&!holding)h='Nothing that holds up the job is marked Not in. Choose “Ready” unless something is still missing.';
     }else if(rd.hints==='post'){
       if(wk.ready==='complete'&&flagged)h='⚠️ Something is marked as a problem. If it kept you from finishing, choose Incomplete.';
-      else if(wk.ready==='incomplete'&&!flagged)h='Tell the office what is left — tap what stopped you, or add it in Notes.';
+      else if(wk.ready==='incomplete'&&!flagged)h='Tell the office what is left — tap an issue below, or add it in Notes.';
     }
     el.innerHTML=h?'<div class="wk-hint">'+h+'</div>':'';
   }
@@ -1607,7 +1643,7 @@
           if(ask==='when')line+=o.when?' — per super: '+o.when.toLowerCase():' — no date from super yet';
           if(it.holds===false)line+=' — not holding up the job';
           L.push(line);
-          if(it.lines)o.lines.map(x=>x.trim()).filter(Boolean).forEach(x=>L.push('   - '+x));
+          if(it.lines)o.lines.map(x=>it.qty?((wkQty(x.q)?'('+wkQty(x.q)+') ':'')+String(x.t||'').trim()):String(x).trim()).filter(x=>x&&!/^\(\S*\)$/.test(x)).forEach(x=>L.push('   - '+x));
         });
       }else if(s.type==='choice'){
         const v=wk.choice[s.id];if(v==='yes'&&s.yesLine)L.push(s.yesLine);if(v==='no'&&s.noLine)L.push(s.noLine);
@@ -1652,7 +1688,7 @@
     const ta=document.getElementById('wk-out-text');
     wkOutEdited();
     navigator.clipboard.writeText(ta.value)
-      .then(()=>showToast('✓ COPIED — Paste into AppWright'))
+      .then(()=>showToast('✓ COPIED — now paste it into AppWright'))
       .catch(()=>{const was=ta.readOnly;ta.readOnly=false;ta.select();document.execCommand('copy');ta.readOnly=was;showToast('✓ COPIED');});
   }
   // The generated text is locked until the PM taps ✏️ Edit, so a stray tap or scroll can't change it.
@@ -1708,7 +1744,7 @@
   }
   function wkCopyLegacy(){
     const ta=document.getElementById('wk-legacy-text');
-    navigator.clipboard.writeText(ta.value).then(()=>showToast('✓ COPIED — Paste into AppWright')).catch(()=>{ta.select();document.execCommand('copy');showToast('✓ COPIED');});
+    navigator.clipboard.writeText(ta.value).then(()=>showToast('✓ COPIED — now paste it into AppWright')).catch(()=>{ta.select();document.execCommand('copy');showToast('✓ COPIED');});
   }
   function delPwHist(i){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];h.splice(i,1);localStorage.setItem(PW1_HIST,JSON.stringify(h));renderPwHistory();}
   function togglePwHist(){const b=document.getElementById('pw-history-body'),c=document.getElementById('pw-history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
