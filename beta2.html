@@ -885,11 +885,15 @@
   //  Item settings (checks):  id (one short word) · label · yes/no (button words)
   //    ok/bad (how it reads in the text) · holds:false (doesn't hold up the job)
   //    ask: "when" (default, asks "per super — when?") | "note" | "none"
+  //    whenLine: how the date reads in the text, e.g. "this will be painted {when}"  (default: "this will be installed {when}")
   //    lines:true (one line per door/opening, with "add another");  add qty:true for a
   //      quantity box + a "what and where" box on each line
   //    extra:{...} (a second question, used for the generator)
   // ════════════════════════════════════════════════════════════════
   const WK_WHEN = ["Today","Tomorrow","This week","Next week","Date unknown"];
+  // true  = every item in the AppWright text sits on its own line with a blank line between items
+  // false = every item on its own line, no blank lines in between
+  const WK_BLANK_BETWEEN_ITEMS = true;
 
   const WALKS = {
 
@@ -901,9 +905,10 @@
       reportTitle: "PRE-WALK — 1ST TRIM",
       outPlaceholder: "What's left / what did the super say?",
       look: [
-        "Door and cased openings framed correctly",
+        "Check all doors, attic stair, cased openings, etc. and make sure the rough opening is correct and the framing is plumb/square",
         "Drywall hung, mudded and sanded",
-        "Cabinets and countertops installed — they don't hold up the job, the base gets tied into them at 2nd trim",
+        "Cabinets installed — they don't hold up the job; the base and casing/trim will get tied into them at 2nd trim",
+        "Countertops installed — they don't hold up the job; we tie the casing/trim into them at 2nd trim",
         "Electricity on, or a generator needed"
       ],
       how: [
@@ -920,18 +925,18 @@
           {id:"openings", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
            ok:"Openings framed correctly", bad:"Openings NOT framed correctly", ask:"note",
            lines:true, linesLabel:"Which openings? One line for each opening", linePh:"Which opening? (e.g. Master bath — too narrow)", addLabel:"+ Add another opening",
-           help:"Walk every door and cased opening. If one is framed wrong, mark Problem and add a line for each opening."},
+           help:"Check all doors, attic stair, cased openings, etc. Make sure the rough opening is correct and the framing is plumb/square. If one is wrong, mark Problem and add a line for each opening."},
           {id:"drywall", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
-           ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", notePh:"What's left — not hung, not mudded, not sanded?",
+           ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", whenLine:"this will be finished {when}", notePh:"What's left — not hung, not mudded, not sanded?",
            help:"Drywall should be hung, mudded and sanded. If anything is left, mark Not done and say what's left."},
           {id:"cabinets", label:"Cabinets installed", yes:"✅ Installed", no:"❌ Not in", holds:false,
            ok:"Cabinets installed", bad:"Cabinets NOT installed",
-           help:"Cabinets do not hold up the job — we tie the base into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
+           help:"Cabinets do not hold up the job — the base and casing/trim will get tied into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
           {id:"counters", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
            ok:"Countertops in", bad:"Countertops NOT in",
-           help:"Countertops do not hold up the job — we tie the base into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
+           help:"Countertops do not hold up the job — we tie the casing/trim into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
           {id:"power", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
-           ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?",
+           ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?", whenLine:"power will be on {when}",
            extra:{label:"Generator?", yes:"Generator needed", no:"No generator needed"},
            help:"Check that the electricity is on. If there is no power, mark it and say whether a generator is needed."}
         ]},
@@ -954,10 +959,12 @@
       reportTitle: "PRE-WALK — 2ND TRIM",
       outPlaceholder: "Which rooms / what did the super say?",
       look: [
-        "Countertops and cabinets/vanities set, so the shoe can go against them",
-        "Floors installed everywhere — LVP, wood, carpet and tile (every room and closet)",
-        "Door slabs off their frames (note which doors, and if the slab is out in the garage)",
-        "Baseboard that needs fixing",
+        "Countertops and cabinets/vanities set, so the shoe/trim can be installed to them",
+        "Make sure floors are installed - LVP, Wood, Tile (in areas that shoe will be installed)",
+        "Cabinets have toe kicks so shoe can be installed against them",
+        "Make sure all doors are installed",
+        "Make sure doors are installed properly for the type of flooring — and note any that aren't",
+        "Check all baseboard, make sure it is installed, and if it needs to be floated",
         "Missing closet rods",
         "Items requested on first trim that still need delivering (1x8, grab rail, pull-down sticks with hooks...)",
         "Enough material on site for the trim tie-ins",
@@ -973,13 +980,12 @@
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
-        {type:"checks", title:"🧱 Floors & surfaces", allOk:"✅ Mark everything installed", okPrefix:"Installed: ", items:[
-          {id:"counters", label:"Countertops",             help:"Check every kitchen, bath and laundry. Not in? Get a date from the super and tap what they tell you."},
-          {id:"cabinets", label:"Cabinets & vanities set", help:"Base cabinets and vanities should be set so the shoe can go against them."},
-          {id:"lvp",      label:"LVP",                     help:"Walk every room and closet that gets LVP. If only some rooms are done, mark Not in and say which rooms."},
-          {id:"wood",     label:"Wood flooring",           help:"Check every area that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
-          {id:"carpet",   label:"Carpet",                  help:"Check all areas — bedrooms, closets, stairs, hall. If part of the house is missing, say which rooms."},
-          {id:"tile",     label:"Tile",                    help:"Check baths, laundry and any other tile areas."}
+        {type:"checks", title:"🧱 Floors & surfaces", allOk:"✅ Mark everything installed", items:[
+          {id:"counters", label:"Countertops",             ok:"Countertops installed",   help:"Check every kitchen, bath and laundry. Not in? Get a date from the super and tap what they tell you."},
+          {id:"cabinets", label:"Cabinets & vanities set", ok:"Cabinets & vanities set", help:"Base cabinets and vanities should be set so the shoe/trim can be installed to them."},
+          {id:"lvp",      label:"LVP",                     ok:"LVP installed",           help:"Check every area where shoe will be installed that gets LVP. If only some rooms are done, mark Not in and say which rooms."},
+          {id:"wood",     label:"Wood flooring",           ok:"Wood flooring installed", help:"Check every area where shoe will be installed that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
+          {id:"tile",     label:"Tile",                    ok:"Tile installed",          help:"Check baths, laundry and any other tile areas where shoe will be installed."}
         ]},
         {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
           {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in",                                              line:"✅ YES"},
@@ -1027,7 +1033,7 @@
            ok:"Interior doors installed", bad:"Interior doors NOT installed", notePh:"Which doors?",
            help:"Every interior door hung on its frame. A slab leaning in the garage or sitting off its frame counts as Not in — note which doors."},
           {id:"painted",  label:"Doors painted", yes:"✅ Painted", no:"❌ Not painted",
-           ok:"Doors painted", bad:"Doors NOT painted", notePh:"Which doors / areas?",
+           ok:"Doors painted", bad:"Doors NOT painted", notePh:"Which doors / areas?", whenLine:"this will be painted {when}",
            help:"Doors painted before locks go on. If only some are done, mark Not painted and say which areas."},
           {id:"extdoors", label:"Exterior & garage entry doors installed", yes:"✅ Installed", no:"❌ Not in",
            ok:"Exterior & garage entry doors installed", bad:"Exterior / garage entry doors NOT installed", notePh:"Which doors?",
@@ -1058,11 +1064,15 @@
       reportTitle: "POST WALK — 1ST TRIM",
       outPlaceholder: "What's wrong?",
       look: [
-        "All doors are operating",
-        "The attic stair is installed properly",
+        "Make sure all doors are operating/closing/latching properly",
+        "The attic stair is installed/nailed/operating properly and is sealed well",
         "Trim and baseboard are squared",
         "Reveals on the doors are good",
+        "Check for any areas that are missing doors/trim/etc. and note those",
+        "Make sure all stair parts are installed properly, epoxied/nailed",
+        "Make sure closet rods are installed, and take photos of them in case the painters take them off later",
         "No damaged material",
+        "If material is missing — can this wait until 2nd trim, or do we need to set up a service for these items or a return trip?",
         "Any extra trim/doors that need to be picked up — take a photo of them",
         "Take pictures of your walk, especially any issues, and upload them into AppWright"
       ],
@@ -1070,7 +1080,7 @@
         "Tap Complete or Incomplete.",
         "Tap Mark everything good, or tap what's wrong on any check and add a line for each.",
         "If it's incomplete, tap each reason and add a line for each item.",
-        "List any extra trim/doors left on site (quantity, then what it is) — or tap No extra material.",
+        "List any extra material left on site to pick up (quantity, then what it is) — or tap No extra material.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
@@ -1082,10 +1092,10 @@
           {id:"doors", label:"Doors operating properly", yes:"✅ All good", no:"❌ Issues", ask:"note",
            ok:"Doors operating properly", bad:"Door issues",
            lines:true, linesLabel:"Which doors? One line for each door", linePh:"Which door — what's wrong?", addLabel:"+ Add another door",
-           help:"Open and close every door. If any door isn't operating right, add a line for each one."},
+           help:"Make sure every door is operating/closing/latching properly. If any door isn't, add a line for each one."},
           {id:"attic", label:"Attic stair installed properly", yes:"✅ Good", no:"❌ Problem", ask:"note",
            ok:"Attic stair installed properly", bad:"Attic stair NOT installed properly", notePh:"What's wrong with the attic stair?",
-           help:"Check the attic stair is installed properly. Skip this if the house has none."},
+           help:"Check the attic stair is installed/nailed/operating properly and is sealed well. Skip this if the house has none."},
           {id:"squared", label:"Trim & baseboard squared", yes:"✅ Good", no:"❌ Problem", ask:"note",
            ok:"Trim & baseboard squared", bad:"Trim / baseboard NOT squared",
            lines:true, linesLabel:"Where? One line for each spot", linePh:"Where — what's wrong?", addLabel:"+ Add another spot",
@@ -1093,7 +1103,11 @@
           {id:"reveals", label:"Reveals on doors good", yes:"✅ Good", no:"❌ Problem", ask:"note",
            ok:"Door reveals good", bad:"Door reveals need work",
            lines:true, linesLabel:"Which doors? One line for each door", linePh:"Which door?", addLabel:"+ Add another door",
-           help:"Check the reveals on the doors. If any need work, add a line for each door."}
+           help:"Check the reveals on the doors. If any need work, add a line for each door."},
+          {id:"stairparts", label:"Stair parts / railing installed properly", yes:"✅ Good", no:"❌ Problem", ask:"note",
+           ok:"Stair parts / railing installed properly", bad:"Stair parts / railing NOT installed properly",
+           lines:true, linesLabel:"Where? One line for each spot", linePh:"Where — what's wrong? (e.g. loose pickets upstairs)", addLabel:"+ Add another spot",
+           help:"Make sure all stair parts and the railing are installed properly — epoxied/nailed. If not, add a line for each spot."}
         ]},
         {type:"reasons", title:"⚠️ Why incomplete? (tap all that apply)", showWhen:{ready:"incomplete"}, items:[
           {id:"short",     label:"Material Short / Missing",   ph:"What is short or missing?",                add:"+ Add an item",    more:"+ Add another item"},
@@ -1101,12 +1115,11 @@
           {id:"installer", label:"Installer Error",            ph:"What did the installer do wrong?",         add:"+ Add an error",   more:"+ Add another error"},
           {id:"framing",   label:"Framing / RO Issue",         ph:"Which opening and what is the issue?",     add:"+ Add an opening", more:"+ Add another opening"},
           {id:"damaged",   label:"Damaged Material",           ph:"What is damaged?",                         add:"+ Add an item",    more:"+ Add another item"},
-          {id:"doorfix",   label:"Door Adjustment Needed",     ph:"Which door and what needs adjusting?",     add:"+ Add a door",     more:"+ Add another door"},
           {id:"other",     label:"Other",                      ph:"Describe the issue...",                    add:"+ Add an issue",   more:"+ Add another issue"}
         ]},
-        {type:"list", id:"material", title:"📦 Material on site", kind:"qty", header:"Material on site:",
+        {type:"list", id:"material", title:"📦 Extra Material on Site to Pick Up", kind:"qty", header:"Extra material on site to pick up:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"48 LF", txtPh:"Baseboard",
-         add:"+ Add material", more:"+ Add more material",
+         add:"+ Add extra material", more:"+ Add more extra material",
          none:{label:"No extra material", line:"No extra material on site"}},
         {type:"notes", title:"📝 Notes", ph:"Anything else..."}
       ]
@@ -1125,15 +1138,14 @@
         "Pull-down rod installed (if the house has one)",
         "Stair parts — baluster shoes tight and secure, caps on knee walls",
         "Cabinets have their toe kicks, so the shoe can go against them",
-        "Door rough openings are the right size to set the doors",
-        "Any extra material left on site — take a photo of it",
+        "Any extra material left on site — take a photo of it and send it in through AppWright",
         "Take pictures of your walk, especially any issues, and upload them into AppWright"
       ],
       how: [
         "Tap Complete or Incomplete.",
         "Tap Mark everything good, or tap what's wrong on any check and add a line for each.",
         "If it's incomplete, tap each problem under 2nd Trim Issues and add a line for each. Tap Trip charge needed if the installer will have to come back.",
-        "List any extra material left on site (quantity, then what it is) — or tap No material left on site.",
+        "List any extra material left on site to pick up (quantity, then what it is) — or tap No extra material.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
@@ -1156,7 +1168,6 @@
         ]},
         {type:"reasons", title:"⚠️ 2nd Trim Issues", showWhen:{ready:"incomplete"}, items:[
           {id:"toekicks", label:"Cabinets missing toe kicks — can't install shoe", ph:"Which cabinets?",                         add:"+ Add a cabinet", more:"+ Add another cabinet"},
-          {id:"ro",       label:"Door rough opening wrong — can't set door",       ph:"Which door — size needed / current size?", add:"+ Add a door",    more:"+ Add another door"},
           {id:"stairs",   label:"Stair parts need work",                           ph:"What needs to be done?",                  add:"+ Add an item",   more:"+ Add another item"},
           {id:"short"   , label:"Material short / missing",                        ph:"What is short or missing?",               add:"+ Add an item",   more:"+ Add another item"},
           {id:"other",    label:"Other",                                           ph:"Describe the issue...",                   add:"+ Add an issue",  more:"+ Add another issue"}
@@ -1164,10 +1175,10 @@
         {type:"flags", showWhen:{ready:"incomplete"}, items:[
           {id:"trip", label:"Trip charge needed for installer when ready", line:"💲 Trip charge needed for installer when ready"}
         ]},
-        {type:"list", id:"material", title:"📦 Extra materials", kind:"qty", header:"Extra materials:",
+        {type:"list", id:"material", title:"📦 Extra Material on Site to Pick Up", kind:"qty", header:"Extra material on site to pick up:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"13", txtPh:"shoe",
-         add:"+ Add material", more:"+ Add more material",
-         none:{label:"No material left on site", line:"No material left on site"}},
+         add:"+ Add extra material", more:"+ Add more extra material",
+         none:{label:"No extra material", line:"No extra material on site"}},
         {type:"notes", title:"📝 Notes", ph:"Anything else..."}
       ]
     },
@@ -1186,7 +1197,7 @@
         "Every door closes, latches and locks with proper gapping",
         "The front and garage door catch plates — garage mortises are often slightly off and need adjusting",
         "House numbers are installed",
-        "Weather stripping is installed on the garage door",
+        "Weather stripping is installed on all exterior doors",
         "Any extra locks or hardware left on site",
         "Take pictures of your walk, especially any issues, and upload them into AppWright"
       ],
@@ -1292,7 +1303,7 @@
         const o=(wk.status||{})[it.id]||{};
         const ln=(Array.isArray(o.lines)?o.lines:[]).map(x=>it.qty?{q:String((x&&x.q)||''),t:String((x&&typeof x==='object')?(x.t||''):(x||''))}:String((x&&typeof x==='object')?(x.t||''):(x||'')));
         if(it.lines&&!ln.length&&o.note)ln.push(it.qty?{q:'',t:String(o.note)}:String(o.note));   // an older save kept one long note — it becomes the first line
-        S[it.id]={v:(o.v==='in'||o.v==='out')?o.v:'',when:o.when||'',note:o.note||'',extra:(o.extra==='yes'||o.extra==='no')?o.extra:'',lines:ln};
+        S[it.id]={v:(o.v==='in'||o.v==='out')?o.v:'',when:o.when||'',date:/^\d{4}-\d{2}-\d{2}$/.test(o.date||'')?o.date:'',note:o.note||'',extra:(o.extra==='yes'||o.extra==='no')?o.extra:'',lines:ln};
       });
       else if(sec.type==='choice'){const v=(wk.choice||{})[sec.id];C[sec.id]=(v==='yes'||v==='no')?v:'';}
       else if(sec.type==='flags')sec.items.forEach(it=>{F[it.id]=!!((wk.flags||{})[it.id]);});
@@ -1458,6 +1469,31 @@
     try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
   }
 
+  // ── dates: Today / Tomorrow pin the real date; This week / Next week ask which day ──
+  const WK_DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function wkToday(){const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate());}
+  function wkAddDays(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);}
+  function wkIso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function wkFromIso(iso){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
+  function wkNice(d){return WK_DAYS[d.getDay()]+' '+(d.getMonth()+1)+'/'+d.getDate();}
+  function wkWeekDays(which){      // the days still available, Mon–Sat
+    const t=wkToday(),mon=wkAddDays(t,-((t.getDay()+6)%7)),out=[];
+    if(which==='This week'){for(let i=0;i<6;i++){const d=wkAddDays(mon,i);if(d>=t)out.push(d);}}
+    else{const nm=wkAddDays(mon,7);for(let i=0;i<6;i++)out.push(wkAddDays(nm,i));}
+    return out;
+  }
+  // how the super's date reads in the text (today/tomorrow always carry the real date, so it still makes sense when read later)
+  function wkWhenText(o){
+    const d=wkFromIso(o.date);
+    if(d){
+      if(o.when==='Today'&&o.date===wkIso(wkToday()))return 'today ('+wkNice(d)+')';
+      if(o.when==='Tomorrow'&&o.date===wkIso(wkAddDays(wkToday(),1)))return 'tomorrow ('+wkNice(d)+')';
+      return wkNice(d);
+    }
+    if(o.when==='This week'||o.when==='Next week')return o.when.toLowerCase()+' (no day given)';
+    return '';
+  }
+
   // checks: two buttons per item, skip what doesn't apply
   function wkHtmlChecks(sec,si){
     let n=0;
@@ -1468,8 +1504,18 @@
       if(o.v==='out'){
         if(s.extra)out+='<div class="wk-out-lbl">'+esc(s.extra.label)+'</div><div class="wk-chips">'+
           ['yes','no'].map(k=>'<button class="wk-chip'+(o.extra===k?' sel':'')+'" onclick="wkExtra(\''+s.id+'\',\''+k+'\')">'+esc(s.extra[k])+'</button>').join('')+'</div>';
-        if(ask==='when')out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips">'+
-          WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\''+s.id+'\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
+        if(ask==='when'){
+          out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips">'+
+            WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\''+s.id+'\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
+          if(o.when==='This week'||o.when==='Next week'){
+            const days=wkWeekDays(o.when);
+            out+='<div class="wk-out-lbl">Which day? (if the super gave one)</div><div class="wk-chips">'+(days.length
+              ?days.map(d=>{const iso=wkIso(d);return '<button class="wk-chip'+(o.date===iso?' sel':'')+'" onclick="wkDay(\''+s.id+'\',\''+iso+'\')">'+esc(wkNice(d))+'</button>';}).join('')
+              :'<span class="wk-muted">No days left this week — pick a date below.</span>')+'</div>';
+          }
+          if(o.when!=='Today'&&o.when!=='Tomorrow'&&o.when!=='Date unknown')
+            out+='<div class="wk-out-lbl">Or pick an exact date</div><input class="wk-in" type="date" min="'+wkIso(wkToday())+'" value="'+esc(o.date)+'" onchange="wkDate(\''+s.id+'\',this.value)" style="margin-bottom:8px;">';
+        }
         if(s.lines){
           out+='<div class="wk-out-lbl">'+esc(s.linesLabel||'Which ones? One line for each')+'</div>';
           if(s.qty&&o.lines.length)out+='<div class="wk-qhead"><span>'+esc(s.qtyLabel||'Qty')+'</span><span>'+esc(s.txtLabel||'What')+'</span></div>';
@@ -1504,7 +1550,14 @@
     wkRefresh(id);wkReadyHint();wkSave();
     if(opened)wkFocusLine(id,false);        // keyboard opens on the first line
   }
-  function wkWhen(id,wi){const o=wk.status[id],w=WK_WHEN[wi];o.when=(o.when===w)?'':w;wkRefresh(id);wkSave();}
+  function wkWhen(id,wi){
+    const o=wk.status[id],w=WK_WHEN[wi];
+    if(o.when===w){o.when='';o.date='';}
+    else{o.when=w;o.date=(w==='Today')?wkIso(wkToday()):(w==='Tomorrow')?wkIso(wkAddDays(wkToday(),1)):'';}
+    wkRefresh(id);wkSave();
+  }
+  function wkDay(id,iso){const o=wk.status[id];o.date=(o.date===iso)?'':iso;wkRefresh(id);wkSave();}
+  function wkDate(id,v){const o=wk.status[id];o.date=/^\d{4}-\d{2}-\d{2}$/.test(v)?v:'';o.when='';wkRefresh(id);wkSave();}
   function wkExtra(id,k){const o=wk.status[id];o.extra=(o.extra===k)?'':k;wkRefresh(id);wkSave();}
   function wkNote(id,val){wk.status[id].note=val;wkSave();}
   function wkFocusLine(id,last){      // a line with a quantity starts on the quantity box
@@ -1626,31 +1679,34 @@
   function wkQty(q){return String(q||'').trim().replace(/^\(+/,'').replace(/\)+$/,'').trim();}
   function wkBuildReport(){
     const cfg=wkCfg(),L=[];
+    const gap=()=>{if(WK_BLANK_BETWEEN_ITEMS)L.push('');};     // blank line between items (set in the content block)
     L.push([cfg.reportTitle,wk.customer,wk.jobId].filter(Boolean).join(' -- '));
     L.push('----------------------------');
     // the headline answer first
     cfg.sections.forEach(s=>{if(s.type==='ready'){const o=s.options.find(x=>x.v===wk.ready);if(o)L.push((s.label||'Ready')+': '+o.line);}});
-    // findings: checks, questions, flags, reasons — in the order they appear on the form
+    // findings: checks, questions, flags, reasons — in the order they appear on the form, each on its own line
     cfg.sections.forEach(s=>{
       if(!wkVisible(s))return;
       if(s.type==='checks'){
-        const oks=s.items.filter(it=>wk.status[it.id].v==='in').map(it=>it.ok||it.label);
-        if(oks.length)L.push('✅ '+(s.okPrefix||'')+oks.join(', '));
+        s.items.filter(it=>wk.status[it.id].v==='in').forEach(it=>{gap();L.push('✅ '+(s.okPrefix||'')+(it.ok||it.label));});
         s.items.filter(it=>wk.status[it.id].v==='out').forEach(it=>{
           const o=wk.status[it.id],note=(o.note||'').trim(),ask=it.ask||'when';
           let line='❌ '+(it.bad||('NOT IN: '+it.label))+((!it.lines&&ask!=='none'&&note)?' ('+note+')':'');
           if(it.extra&&o.extra)line+=' — '+String(it.extra[o.extra]).toLowerCase();
-          if(ask==='when')line+=o.when?' — per super: '+o.when.toLowerCase():' — no date from super yet';
+          if(ask==='when'){
+            const wt=wkWhenText(o);
+            line+=' — per super: '+((o.when==='Date unknown'&&!o.date)?'date unknown':(wt?(it.whenLine||'this will be installed {when}').replace('{when}',wt):'no date from super yet'));
+          }
           if(it.holds===false)line+=' — not holding up the job';
-          L.push(line);
+          gap();L.push(line);
           if(it.lines)o.lines.map(x=>it.qty?((wkQty(x.q)?'('+wkQty(x.q)+') ':'')+String(x.t||'').trim()):String(x).trim()).filter(x=>x&&!/^\(\S*\)$/.test(x)).forEach(x=>L.push('   - '+x));
         });
       }else if(s.type==='choice'){
-        const v=wk.choice[s.id];if(v==='yes'&&s.yesLine)L.push(s.yesLine);if(v==='no'&&s.noLine)L.push(s.noLine);
+        const v=wk.choice[s.id];if(v==='yes'&&s.yesLine){gap();L.push(s.yesLine);}if(v==='no'&&s.noLine){gap();L.push(s.noLine);}
       }else if(s.type==='flags'){
-        s.items.forEach(it=>{if(wk.flags[it.id])L.push(it.line);});
+        s.items.forEach(it=>{if(wk.flags[it.id]){gap();L.push(it.line);}});
       }else if(s.type==='reasons'){
-        s.items.forEach(it=>{const o=wk.reasons[it.id];if(!o.on)return;L.push('❌ '+it.label);o.lines.map(x=>x.trim()).filter(Boolean).forEach(x=>L.push('   - '+x));});
+        s.items.forEach(it=>{const o=wk.reasons[it.id];if(!o.on)return;gap();L.push('❌ '+it.label);o.lines.map(x=>x.trim()).filter(Boolean).forEach(x=>L.push('   - '+x));});
       }
     });
     // lists and notes, each under a divider
@@ -1658,14 +1714,14 @@
       if(!wkVisible(s))return;
       if(s.type==='list'){
         const o=wk.lists[s.id];
-        if(o.none&&s.none){L.push('---');L.push(s.none.line);return;}
+        if(o.none&&s.none){gap();L.push('---');L.push(s.none.line);return;}
         const items=o.lines.map(l=>({q:wkQty(l.q),t:l.t.trim()})).filter(l=>l.t);
         if(!items.length)return;
-        L.push('---');
+        gap();L.push('---');
         if(s.header)L.push(s.header);
         items.forEach(l=>L.push((s.prefix||'')+(s.kind==='qty'&&l.q?'('+l.q+') ':'')+l.t));
       }else if(s.type==='notes'){
-        const n=(wk.notes||'').trim();if(n){L.push('---');L.push('Notes: '+n);}
+        const n=(wk.notes||'').trim();if(n){gap();L.push('---');L.push('Notes: '+n);}
       }
     });
     return L.join('\n');
