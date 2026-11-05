@@ -241,6 +241,27 @@
     .wk-edit-btn{margin-left:auto;background:rgba(255,255,255,0.16);border:1.5px solid rgba(255,255,255,0.55);color:#fff;border-radius:16px;padding:6px 13px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
     .wk-edit-btn.on{background:#16a34a;border-color:#16a34a;}
     .wk-edit-hint{display:none;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.4;color:#92400e;margin-bottom:8px;}
+    .wk-form-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,#1a5296 0%,#0d3a6e 100%);color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin:2px 0 12px;font-family:inherit;box-shadow:0 1px 0 rgba(255,255,255,0.2),0 6px 18px rgba(0,0,0,0.3);}
+    .wk-jobline{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#f1f5f9;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-weight:900;font-size:14px;color:var(--navy);}
+    .wk-link{flex-shrink:0;background:none;border:0;color:#1d4ed8;font-weight:800;font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;}
+    .wk-allok{width:100%;background:#f0fdf4;color:var(--green);border:2px solid #86efac;font-size:13px;}
+    .wk-ready-btn.sel-complete{background:#f0fdf4;border-color:#16a34a;}
+    .wk-ready-btn.sel-incomplete{background:#fef2f2;border-color:#dc2626;}
+    .wk-qhead{display:flex;gap:6px;font-size:9px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:#94a3b8;margin:2px 2px 4px;}
+    .wk-qhead span:first-child{flex:0 0 78px;text-align:center;}
+    .wk-qrow{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+    .wk-qrow .wk-qty{flex:0 0 78px;width:78px;text-align:center;}
+    .wk-qrow .wk-mat{flex:1;min-width:0;}
+    .wk-none{background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:10px 12px;font-size:13px;font-weight:800;color:#15803d;margin-bottom:6px;}
+    .wk-reason{background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;margin-bottom:8px;overflow:hidden;transition:background .15s,border-color .15s;}
+    .wk-reason.on{background:#fef2f2;border-color:#dc2626;}
+    .wk-reason-top{width:100%;display:flex;align-items:center;gap:12px;padding:13px 14px;background:none;border:0;cursor:pointer;text-align:left;font-family:inherit;}
+    .wk-reason-ico{width:30px;height:30px;border-radius:8px;border:2px solid #cbd5e1;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;color:#94a3b8;}
+    .wk-reason.on .wk-reason-ico{background:#dc2626;border-color:#dc2626;}
+    .wk-reason-lbl{font-size:14px;font-weight:800;color:var(--navy);flex:1;}
+    .wk-reason.on .wk-reason-lbl{color:#dc2626;}
+    .wk-reason-body{padding:0 14px 14px;}
+
   </style>
 </head>
 <body class="view-home">
@@ -255,9 +276,8 @@
 
 <!-- ═══════ MAIN PAGE ═══════ -->
 <div id="home-view">
-  <div class="header-card" style="margin-top:8px;padding:20px 16px 18px;text-align:center;">
-    <img src="icon-512.png" alt="Elevate Trim" style="width:96px;height:auto;border-radius:16px;margin:0 auto 10px;display:block;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-    <div style="font-size:21px;font-weight:900;color:var(--navy);letter-spacing:.3px;">Elevate Trim</div>
+  <div class="header-card" style="margin-top:8px;padding:12px 16px 14px;text-align:center;">
+    <img src="icon-512.png" alt="Elevate Trim" style="width:160px;height:auto;margin:5px auto;display:block;">
     <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-top:4px;">What are you working on?</div>
   </div>
 
@@ -274,9 +294,9 @@
       <button class="wk-tile wk-tile-navy" onclick="openWalk('trim1')"><span class="wk-ico">🔍</span>1st Trim<br>Pre-Walk<small>Framing, drywall &amp; power</small></button>
       <button class="wk-tile wk-tile-navy" onclick="openWalk('post1')"><span class="wk-ico">✅</span>1st Trim<br>Post Walk<small>Complete / incomplete &amp; why</small></button>
       <button class="wk-tile wk-tile-navy" onclick="openWalk('trim2')"><span class="wk-ico">🔍</span>2nd Trim<br>Pre-Walk<small>Floors &amp; surfaces ready?</small></button>
-      <button class="wk-tile wk-tile-soft" disabled><span class="wk-ico">✅</span>2nd Trim<br>Post Walk<small>Coming soon</small></button>
+      <button class="wk-tile wk-tile-navy" onclick="openWalk('post2')"><span class="wk-ico">✅</span>2nd Trim<br>Post Walk<small>Shoe complete &amp; extra material</small></button>
       <button class="wk-tile wk-tile-red" onclick="openWalk('lockout')"><span class="wk-ico">🔍</span>Lockout<br>Pre-Walk<small>Doors installed &amp; painted?</small></button>
-      <button class="wk-tile wk-tile-soft" disabled><span class="wk-ico">✅</span>Lockout<br>Post Walk<small>Coming soon</small></button>
+      <button class="wk-tile wk-tile-red" onclick="openWalk('postlo')"><span class="wk-ico">✅</span>Lockout<br>Post Walk<small>Hardware working &amp; missing items</small></button>
     </div>
   </div>
 
@@ -393,7 +413,7 @@
   </div>
 </div>
 
-<div class="version-tag">TEST BUILD — Main Page · Pre-Walks · Post Walk · Lockout · Door Counter · Quick Notes</div>
+<div class="version-tag">TEST BUILD — Main Page · Pre-Walks · Post Walks · Lockout · Door Counter · Quick Notes</div>
 </div><!-- /trim-view -->
 
 <!-- LOCKOUT WALK OVERLAY -->
@@ -515,7 +535,7 @@
   </div>
 </div>
 
-<!-- POST WALK OVERLAY -->
+<!-- WALKS OVERLAY — every pre-walk and post walk uses this one page -->
 <div id="pw-overlay">
   <div class="pw-header">
     <div class="pw-header-row">
@@ -525,161 +545,65 @@
     <div id="pw-active-banner"></div>
   </div>
   <div class="pw-body">
+    <div class="pw-card" style="padding:0;overflow:hidden;">
+      <div style="background:var(--navy);padding:14px 16px;">
+        <div id="wk-kicker" style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Pre-walk</div>
+        <div style="font-size:17px;font-weight:900;color:white;" id="wk-title">—</div>
+      </div>
+      <div style="padding:16px;">
 
-    <!-- SEARCH -->
-    <div id="pw-screen-search" style="display:none;">
-      <div class="pw-card">
-        <label style="font-size:13px;font-weight:900;color:var(--navy);">Find the trim takeoff for this job</label>
-        <input id="pw-search-input" type="text" placeholder="Type customer or job ID..." oninput="searchPwJobs()" style="margin-top:8px;">
-        <div id="pw-search-results"></div>
-        <div style="margin-top:8px;padding-top:12px;border-top:1px solid #e2e8f0;">
-          <p style="font-size:11px;color:#94a3b8;margin:0 0 8px 0;">Or enter manually if not in history:</p>
-          <input id="pw-cust-manual" type="text" placeholder="Customer" style="margin-bottom:8px;">
-          <input id="pw-jobid-manual" type="text" placeholder="Job ID">
-          <button class="actionBtn" style="width:100%;background:linear-gradient(135deg,#1a5296,#0d3a6e);color:white;box-shadow:0 1px 0 rgba(255,255,255,0.15),0 4px 12px rgba(0,0,0,0.25);" onclick="startPwFormManual()">Continue →</button>
-          <button class="actionBtn" style="width:100%;background:#f1f5f9;color:var(--slate);margin-top:10px;font-size:13px;" onclick="goHome()">← Main Page</button>
+        <button class="wk-how-btn" onclick="wkToggleHow()"><span>📖 How this walk works</span><span id="wk-how-chev">▲</span></button>
+        <div id="wk-how" class="wk-help"></div>
+
+        <button class="wk-form-btn" onclick="wkToggleForm()"><span id="wk-form-title">📋 Pre-walk form</span><span id="wk-form-chev">▼</span></button>
+        <div id="wk-form-body" style="display:none;">
+
+          <!-- 1) pick the job -->
+          <div id="wk-picker">
+            <label style="font-size:13px;font-weight:900;color:var(--navy);">Find the job (from your saved takeoffs)</label>
+            <input id="pw-search-input" type="text" placeholder="Type customer or job ID..." oninput="searchPwJobs()" style="margin-top:8px;">
+            <div id="pw-search-results"></div>
+            <div style="margin-top:8px;padding-top:12px;border-top:1px solid #e2e8f0;">
+              <p style="font-size:11px;color:#94a3b8;margin:0 0 8px 0;">Or enter it yourself:</p>
+              <input id="pw-cust-manual" type="text" placeholder="Customer" style="margin-bottom:8px;">
+              <input id="pw-jobid-manual" type="text" placeholder="Job ID">
+              <button class="actionBtn" style="width:100%;background:linear-gradient(135deg,#1a5296,#0d3a6e);color:white;box-shadow:0 1px 0 rgba(255,255,255,0.15),0 4px 12px rgba(0,0,0,0.25);" onclick="startPwFormManual()">Continue →</button>
+            </div>
+          </div>
+
+          <!-- 2) the walk itself — filled in by the walk engine -->
+          <div id="wk-formwrap" style="display:none;">
+            <div class="wk-jobline"><span id="wk-job-display">—</span><button class="wk-link" onclick="wkChangeJob()">Change job</button></div>
+            <div id="wk-expected" style="display:none;"></div>
+            <div id="wk-form"></div>
+            <button class="actionBtn" id="wk-gen-btn" style="width:100%;background:var(--bfs-red);color:white;margin-top:4px;" onclick="wkGenerate()">⚡ Generate</button>
+
+            <div id="wk-result" class="wk-result">
+              <div class="pw-result-hdr">
+                <span style="font-size:16px;">📋</span>
+                <span class="pw-result-hdr-text">Ready to Copy</span>
+                <button class="wk-edit-btn" id="wk-edit-btn" onclick="wkToggleEdit()">✏️ Edit</button>
+              </div>
+              <div class="pw-result-body">
+                <div class="wk-edit-hint" id="wk-edit-hint">✏️ Editing — change anything you like, then tap ✓ Done.</div>
+                <textarea id="wk-out-text" readonly oninput="wkDirty=true" style="height:300px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
+                <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="wkCopy()">📋 Copy to AppWright</button>
+                <button class="actionBtn" id="wk-another" style="width:100%;background:#dbeafe;color:#1e40af;margin-bottom:8px;" onclick="wkAnother()">+ Another walk</button>
+                <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="goHome()">🏠 Main Page</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- walks saved by the first beta (view only) -->
+          <div id="wk-legacy" style="display:none;">
+            <div class="wk-hint" style="margin:0 0 10px;">Saved with the first beta — view only.</div>
+            <textarea id="wk-legacy-text" readonly style="height:300px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;"></textarea>
+            <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-top:8px;" onclick="wkCopyLegacy()">📋 Copy to AppWright</button>
+          </div>
+
         </div>
       </div>
     </div>
-
-    <!-- 1ST TRIM FORM -->
-    <div id="pw-screen-1st" style="display:none;">
-      <div class="pw-card" style="padding:0;overflow:hidden;">
-
-        <!-- Navy job banner -->
-        <div style="background:var(--navy);padding:14px 16px;">
-          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">1st Trim Post Walk</div>
-          <div style="font-size:17px;font-weight:900;color:white;" id="pw1-job-display">—</div>
-        </div>
-
-        <div style="padding:16px;">
-
-          <!-- RESULT section -->
-          <div class="pw-sec-hdr">📋 Result</div>
-          <div class="pw-result-row">
-            <button class="pw-result-choice" id="pw1-complete-btn" onclick="setPw1Result('complete')">✅<br>Complete</button>
-            <button class="pw-result-choice" id="pw1-incomplete-btn" onclick="setPw1Result('incomplete')">❌<br>Incomplete</button>
-          </div>
-
-          <!-- DOORS section -->
-          <div class="pw-sec-hdr">🚪 Doors</div>
-          <div class="pw-door-row">
-            <button class="pw-door-choice" id="pw1-door-ok" onclick="setPw1DoorCheck('ok')">✅ All opening &amp; closing properly</button>
-            <button class="pw-door-choice" id="pw1-door-issues" onclick="setPw1DoorCheck('issues')">❌ Door issues noted</button>
-          </div>
-
-          <!-- ISSUES section (conditional) -->
-          <div id="pw1-reasons-section" style="display:none;">
-            <div class="pw-sec-hdr">⚠️ What is the issue?</div>
-            <div id="pw1-reasons-grid"></div>
-          </div>
-
-          <!-- NOTES section -->
-          <div class="pw-sec-hdr" style="margin-top:18px;">📝 Notes</div>
-          <div class="qnote-section">
-            <span class="qnote-label" style="margin-bottom:6px;">Quick Notes</span>
-            <div class="qnote-list" id="qnotes-pw1"></div>
-            <div class="qnote-btns" style="margin-bottom:10px;">
-              <button class="qnote-add-check" onclick="addQNote('pw1','check')">✅ Add Check</button>
-              <button class="qnote-add-x" onclick="addQNote('pw1','x')">❌ Add Issue</button>
-            </div>
-          </div>
-          <label>Material On Site</label>
-          <textarea id="pw1-material-onsite" placeholder="e.g. Newel post, pickets on site..." style="height:50px;"></textarea>
-          <label>General Notes</label>
-          <textarea id="pw1-general-notes" placeholder="Anything else..." style="height:55px;"></textarea>
-
-          <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-top:4px;" onclick="generatePw1()">⚡ Generate Post Walk</button>
-
-          <!-- Output card — inline, stays on same screen -->
-          <div id="pw1-result">
-            <div class="pw-result-hdr">
-              <span style="font-size:16px;">📋</span>
-              <span class="pw-result-hdr-text">Ready to Copy</span>
-            </div>
-            <div class="pw-result-body">
-              <textarea id="pw1-summary-text" readonly
-                style="height:260px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
-              <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="copyPwInline()">📋 Copy to AppWright</button>
-              <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">🏠 Main Page</button>
-            </div>
-          </div>
-
-          <button class="actionBtn" style="width:100%;background:#f1f5f9;color:var(--slate);margin-top:10px;font-size:13px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
-        </div>
-      </div>
-    </div>
-
-        <!-- PRE-WALK FORM (1st Trim, 2nd Trim, Lockout) — filled in by the walk engine -->
-    <div id="pw-screen-pre" style="display:none;">
-      <div class="pw-card" style="padding:0;overflow:hidden;">
-        <div style="background:var(--navy);padding:14px 16px;">
-          <div id="wk-kicker" style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Pre-Walk</div>
-          <div style="font-size:17px;font-weight:900;color:white;" id="wk-job-display">—</div>
-        </div>
-        <div style="padding:16px;">
-
-          <button class="wk-how-btn" onclick="wkToggleHow()"><span>📖 How this walk works</span><span id="wk-how-chev">▼</span></button>
-          <div id="wk-how" class="wk-help" style="display:none;"></div>
-
-          <div id="wk-expected" style="display:none;"></div>
-
-          <div class="pw-sec-hdr" id="wk-status-hdr">Checklist</div>
-          <div id="wk-status"></div>
-          <div id="wk-unchecked" class="wk-muted"></div>
-          <button class="actionBtn" id="wk-allok" onclick="wkAllInstalled()" style="width:100%;background:#f0fdf4;color:var(--green);border:2px solid #86efac;font-size:13px;">✅ Mark everything installed</button>
-
-          <div class="pw-sec-hdr">🚦 Ready?</div>
-          <div id="wk-ready" class="wk-ready"></div>
-          <div id="wk-ready-hint"></div>
-
-          <div class="pw-sec-hdr" id="wk-issues-hdr">⚠️ Issues found</div>
-          <div class="wk-chips" id="wk-issue-chips"></div>
-          <div id="wk-issues"></div>
-
-          <div id="wk-deliver-sec">
-            <div class="pw-sec-hdr">📦 Please deliver</div>
-            <div class="wk-chips" id="wk-deliver-chips"></div>
-            <div id="wk-deliver"></div>
-          </div>
-
-          <div class="pw-sec-hdr">📝 Notes</div>
-          <textarea id="wk-notes" placeholder="Anything else the office needs to know..." style="height:60px;" oninput="wkNotesInput(this.value)"></textarea>
-
-          <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-top:4px;" onclick="wkGenerate()">⚡ Generate Pre-Walk</button>
-
-          <div id="wk-result" class="wk-result">
-            <div class="pw-result-hdr">
-              <span style="font-size:16px;">📋</span>
-              <span class="pw-result-hdr-text">Ready to Copy</span>
-              <button class="wk-edit-btn" id="wk-edit-btn" onclick="wkToggleEdit()">✏️ Edit</button>
-            </div>
-            <div class="pw-result-body">
-              <div class="wk-edit-hint" id="wk-edit-hint">✏️ Editing — change anything you like, then tap ✓ Done.</div>
-              <textarea id="wk-out-text" readonly oninput="wkDirty=true" style="height:280px;font-family:'Courier New',monospace;font-size:13px;border:1px solid #cbd5e1;width:100%;border-radius:6px;padding:10px;white-space:pre-wrap;word-wrap:break-word;background:#f8fafc;line-height:1.5;color:#000;margin-bottom:8px;"></textarea>
-              <button class="actionBtn" style="width:100%;background:var(--bfs-red);color:white;margin-bottom:8px;font-size:15px;" onclick="wkCopy()">📋 Copy to AppWright</button>
-              <button class="actionBtn" id="wk-another" style="width:100%;background:#dbeafe;color:#1e40af;margin-bottom:8px;" onclick="wkAnother()">+ Another walk</button>
-              <button class="actionBtn" style="width:100%;background:#e2e8f0;color:var(--navy);" onclick="goHome()">🏠 Main Page</button>
-            </div>
-          </div>
-
-          <button class="actionBtn" style="width:100%;background:#f1f5f9;color:var(--slate);margin-top:10px;font-size:13px;" onclick="showPwScreen('pw-screen-search')">← Change Job</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SUMMARY SCREEN (fallback for old history items without structured data) -->
-    <div id="pw-screen-summary" style="display:none;">
-      <div class="pw-card">
-        <div style="font-size:12px;font-weight:900;color:var(--bfs-red);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">📋 Post Walk — Loaded from History</div>
-        <textarea id="pw-summary-text" readonly></textarea>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
-          <button class="actionBtn" style="background:var(--navy);color:white;" onclick="copyPwSummary()">📋 Copy to AppWright</button>
-          <button class="actionBtn" style="background:#e2e8f0;color:var(--navy);" onclick="newPostWalk()">🏠 Main Page</button>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -934,226 +858,40 @@
   function closeLoTrimDetail(){document.getElementById('loTrimDetailModal').style.display='none';}
 
   // ════════════════════════════════════════════════════════════════
-  // POST WALK
-  // ════════════════════════════════════════════════════════════════
-  function openPostWalk(){openWalk('post1');}
-  function closePostWalk(){document.getElementById('pw-overlay').style.display='none';}
-  function showPwScreen(id){['pw-screen-search','pw-screen-1st','pw-screen-pre','pw-screen-summary'].forEach(s=>document.getElementById(s).style.display='none');document.getElementById(id).style.display='block';document.getElementById('pw-overlay').scrollTop=0;}
-
-  function selectPwType(type){pwMode='post1';document.getElementById('pw-header-title').innerText='📋 1ST TRIM POST WALK';document.getElementById('pw-search-input').value='';document.getElementById('pw-search-results').innerHTML='';document.getElementById('pw-cust-manual').value='';document.getElementById('pw-jobid-manual').value='';showPwScreen('pw-screen-search');}
-
-  function searchPwJobs(){
-    const q=document.getElementById('pw-search-input').value.trim().toLowerCase();
-    const results=[],seen=new Set();
-    // Spread both arrays correctly
-    const all=[
-      ...(JSON.parse(localStorage.getItem('bfs_history'))||[]),
-      ...(JSON.parse(localStorage.getItem(TEST_HIST))||[])
-    ];
-    all.forEach(h=>{if(!h.fullData?.customer)return;const c=h.fullData.customer||'',j=h.fullData.jobId||h.fullData.lot||'',k=`${c}|${j}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||c.toLowerCase().includes(q)||j.toLowerCase().includes(q)||(h.label||'').toLowerCase().includes(q))results.push({customer:c,jobId:j,time:h.time||''});});
-    try{(JSON.parse(localStorage.getItem('bfs_takeoff_index'))||[]).forEach(e=>{const k=`${e.customer}|${e.jobId||''}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||e.customer.toLowerCase().includes(q)||(e.jobId||'').toLowerCase().includes(q))results.push({customer:e.customer,jobId:e.jobId||'',time:''});});}catch(ex){}
-    // Store in global so onclick can access it reliably
-    _pwSearchResults = results;
-    const el=document.getElementById('pw-search-results');
-    if(!results.length){el.innerHTML=`<p style="font-size:12px;color:#94a3b8;margin:8px 0;">No matches found. Enter manually below.</p>`;return;}
-    el.innerHTML=results.slice(0,8).map((r,i)=>`<div class="pw-result-item"><div><div class="pw-result-label">${r.customer}</div><div class="pw-result-sub">${r.jobId||'No Job ID'}${r.time?' · '+r.time:''}</div></div><button class="pw-use-btn" onclick="usePwResult(${i})">Use →</button></div>`).join('');
-  }
-  function usePwResult(i){const r=_pwSearchResults[i];if(!r)return;pwCustomer=r.customer;pwJobId=r.jobId;routeWalk();}
-  function startPwFormManual(){pwCustomer=document.getElementById('pw-cust-manual').value.trim();pwJobId=document.getElementById('pw-jobid-manual').value.trim();if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}routeWalk();}
-
-  function startPwForm(){
-    document.getElementById('pw-header-title').innerText='📋 1ST TRIM POST WALK';
-    const banner=document.getElementById('pw-active-banner');
-    banner.innerHTML=`📋 <span style="opacity:0.75;font-weight:600;">ACTIVE JOB:</span> ${pwCustomer}${pwJobId?' — '+pwJobId:''}`;
-    banner.style.display='flex';
-    document.getElementById('pw1-job-display').innerText=`${pwCustomer}${pwJobId?' — '+pwJobId:''}`;
-    buildPw1Reasons();resetPw1Buttons();
-    document.getElementById('pw1-material-onsite').value='';
-    document.getElementById('pw1-general-notes').value='';
-    clearQNotes('pw1');
-    const r1=document.getElementById('pw1-result');if(r1)r1.style.display='none';
-    showPwScreen('pw-screen-1st');
-  }
-
-  // ── 1ST TRIM ───────────────────────────────────────────────────
-  function buildPw1Reasons(){
-    // Use numeric index in onclick — avoids ALL quoting issues in HTML attributes
-    document.getElementById('pw1-reasons-grid').innerHTML=PW1_REASONS.map((r,idx)=>{
-      return`<div class="pw-reason" id="pr-${idx}">
-        <button type="button"
-          onclick="toggleReason(${idx})"
-          style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;text-align:left;">
-          <div id="pr-icon-${idx}" style="width:32px;height:32px;border-radius:8px;border:2px solid #cbd5e1;background:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">○</div>
-          <span id="pr-lbl-${idx}" style="font-size:14px;font-weight:800;color:var(--navy);flex:1;">${r.label}</span>
-        </button>
-        <div id="pr-note-${idx}" style="display:none;padding:0 14px 14px;">
-          <div style="font-size:10px;color:#dc2626;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:0.3px;">Details — tap mic on keyboard to speak</div>
-          <textarea id="pr-text-${idx}" placeholder="${r.hint}"
-            style="width:100%;height:55px;font-size:14px;padding:8px;border:1px solid #fca5a5;border-radius:6px;background:#fff;resize:none;margin:0;font-family:-apple-system,sans-serif;line-height:1.4;"></textarea>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function toggleReason(idx){
-    const r=PW1_REASONS[idx]; if(!r)return;
-    const label=r.label;
-    const card=document.getElementById(`pr-${idx}`);
-    const icon=document.getElementById(`pr-icon-${idx}`);
-    const noteWrap=document.getElementById(`pr-note-${idx}`);
-    const lbl=document.getElementById(`pr-lbl-${idx}`);
-    if(pw1SelectedReasons.has(label)){
-      pw1SelectedReasons.delete(label);
-      card.style.background='#f8fafc'; card.style.borderColor='#e2e8f0';
-      icon.textContent='○'; icon.style.background='white'; icon.style.borderColor='#cbd5e1';
-      if(lbl)lbl.style.color='var(--navy)';
-      noteWrap.style.display='none';
-    }else{
-      pw1SelectedReasons.add(label);
-      card.style.background='#fef2f2'; card.style.borderColor='#dc2626';
-      icon.textContent='❌'; icon.style.background='#dc2626'; icon.style.borderColor='#dc2626';
-      if(lbl)lbl.style.color='#dc2626';
-      noteWrap.style.display='block';
-      setTimeout(()=>document.getElementById(`pr-text-${idx}`)?.focus(),200);
-    }
-  }
-  function resetPw1Buttons(){
-    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();
-    ['pw1-complete-btn','pw1-incomplete-btn'].forEach(id=>document.getElementById(id).className='pw-result-choice');
-    ['pw1-door-ok','pw1-door-issues'].forEach(id=>document.getElementById(id).className='pw-door-choice');
-    document.getElementById('pw1-reasons-section').style.display='none';
-    buildPw1Reasons(); // Rebuild clean — simplest way to reset all state
-  }
-  function setPw1Result(r){pw1Result=r;document.getElementById('pw1-complete-btn').className='pw-result-choice'+(r==='complete'?' sel-complete':'');document.getElementById('pw1-incomplete-btn').className='pw-result-choice'+(r==='incomplete'?' sel-incomplete':'');document.getElementById('pw1-reasons-section').style.display=r==='incomplete'?'block':'none';}
-  function setPw1DoorCheck(r){pw1DoorCheck=r;document.getElementById('pw1-door-ok').className='pw-door-choice'+(r==='ok'?' sel-ok':'');document.getElementById('pw1-door-issues').className='pw-door-choice'+(r==='issues'?' sel-bad':'');}
-
-  function generatePw1(){
-    if(!pw1Result){showToast('⚠️ SELECT COMPLETE OR INCOMPLETE');return;}
-    if(!pw1DoorCheck){showToast('⚠️ SELECT DOOR STATUS');return;}
-    const matOnSite=document.getElementById('pw1-material-onsite').value.trim();
-    const genNotes=document.getElementById('pw1-general-notes').value.trim();
-    const qnt=getQNotesText('pw1');
-    const doorLabel=pw1DoorCheck==='ok'?'✅ All opening and closing properly':'❌ Issues noted below';
-    let report=`POST WALK — 1ST TRIM -- ${pwCustomer} -- ${pwJobId}\n----------------------------\n`;
-    report+=`Result: ${pw1Result==='complete'?'✅ COMPLETE':'❌ INCOMPLETE'}\n`;
-    report+=`Doors: ${doorLabel}\n`;
-    if(pw1Result==='incomplete'&&pw1SelectedReasons.size>0){
-      report+=`---\n`;
-      PW1_REASONS.forEach((r,idx)=>{
-        if(!pw1SelectedReasons.has(r.label))return;
-        const rawNote=(document.getElementById(`pr-text-${idx}`)?.value||'').trim();
-        report+=`❌ ${r.label}\n`;
-        if(rawNote){
-          // Indent every line of a multi-line note, not just the first
-          rawNote.split('\n').forEach(line=>{if(line.trim())report+=`   ${line.trim()}\n`;});
-        }
-      });
-    }
-    if(qnt){report+=`---\n${qnt}\n`;}
-    if(matOnSite){report+=`---\nMaterial On Site: ${matOnSite}\n`;}
-    if(genNotes){report+=`---\nNotes: ${genNotes}\n`;}
-    // Collect structured state so history items can be loaded back into the form
-    const structured={
-      result:pw1Result,
-      doorCheck:pw1DoorCheck,
-      reasons:PW1_REASONS.map((r,idx)=>{
-        if(!pw1SelectedReasons.has(r.label))return null;
-        const note=(document.getElementById(`pr-text-${idx}`)?.value||'').trim();
-        return{idx,label:r.label,note};
-      }).filter(Boolean),
-      matOnSite,genNotes
-    };
-    // Show inline — don't navigate away from the form
-    document.getElementById('pw1-summary-text').value=report;
-    const resultDiv=document.getElementById('pw1-result');
-    resultDiv.style.display='block';
-    resultDiv.scrollIntoView({behavior:'smooth'});
-    savePwToHistory(report,structured);
-  }
-
-  // ── SUMMARY & HISTORY ──────────────────────────────────────────
-  // Inline copy — used by the Copy button on the 1st trim form
-  function copyPwInline(){
-    const text=document.getElementById('pw1-summary-text').value;
-    navigator.clipboard.writeText(text)
-      .then(()=>showToast('✓ COPIED — Paste into AppWright'))
-      .catch(()=>{const el=document.getElementById('pw1-summary-text');el.select();document.execCommand('copy');showToast('✓ COPIED');});
-  }
-  // Summary screen copy (used when loading from history)
-  function copyPwSummary(){const t=document.getElementById('pw-summary-text').value;navigator.clipboard.writeText(t).then(()=>showToast('✓ COPIED — Paste into AppWright')).catch(()=>{document.getElementById('pw-summary-text').select();document.execCommand('copy');showToast('✓ COPIED');});}
-  function newPostWalk(){goHome();}
-  function savePwToHistory(text,structured){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${pwCustomer} — ${pwJobId}`,text,time:ts,ts:Date.now(),customer:pwCustomer,jobId:pwJobId,structured:structured||null});if(h.length>20)h.pop();localStorage.setItem(PW1_HIST,JSON.stringify(h));renderPwHistory();}
-  function renderPwHistory(){showPwHistory();}
-  function loadPwHist(i){wkEnsureOverlay();
-    const h=JSON.parse(localStorage.getItem(PW1_HIST))||[],item=h[i];
-    if(!item)return;
-    pwCustomer=item.customer;pwJobId=item.jobId;
-    startPwForm(); // resets form, sets banner, shows pw-screen-1st
-    if(item.structured){
-      applyPwStructured(item.structured);
-      document.getElementById('pw1-summary-text').value=item.text;
-      document.getElementById('pw1-result').style.display='block';
-    }else{
-      // Fallback: old items without structured data go to read-only view
-      document.getElementById('pw-summary-text').value=item.text;
-      showPwScreen('pw-screen-summary');
-    }
-  }
-  function applyPwStructured(s){
-    if(!s)return;
-    if(s.result)setPw1Result(s.result);
-    if(s.doorCheck)setPw1DoorCheck(s.doorCheck);
-    if(s.reasons&&s.reasons.length){
-      s.reasons.forEach(r=>{
-        pw1SelectedReasons.add(r.label);
-        const card=document.getElementById(`pr-${r.idx}`),icon=document.getElementById(`pr-icon-${r.idx}`),noteWrap=document.getElementById(`pr-note-${r.idx}`),lbl=document.getElementById(`pr-lbl-${r.idx}`);
-        if(card){card.style.background='#fef2f2';card.style.borderColor='#dc2626';}
-        if(icon){icon.textContent='❌';icon.style.background='#dc2626';icon.style.borderColor='#dc2626';}
-        if(lbl)lbl.style.color='#dc2626';
-        if(noteWrap)noteWrap.style.display='block';
-        if(r.note){const ta=document.getElementById(`pr-text-${r.idx}`);if(ta)ta.value=r.note;}
-      });
-    }
-    if(s.matOnSite)document.getElementById('pw1-material-onsite').value=s.matOnSite;
-    if(s.genNotes)document.getElementById('pw1-general-notes').value=s.genNotes;
-  }
-  function delPwHist(i){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];h.splice(i,1);localStorage.setItem(PW1_HIST,JSON.stringify(h));showPwHistory();}
-  function togglePwHist(){const b=document.getElementById('pw-history-body'),c=document.getElementById('pw-history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
-
-  // ════════════════════════════════════════════════════════════════
   //  WALK CONTENT — EDIT HERE
-  //  Everything the pre-walks show lives in this one block: the checklist
-  //  items, the "?" help text, and the quick-tap buttons. To change it, edit
-  //  the words between the quotes, add a line, or delete a line. Nothing else
-  //  in the file needs to change.  (Keep the quote marks and commas.)
+  //  Every walk (3 pre-walks, 3 post walks) is described in this one block:
+  //  the "How this walk works" steps, the checklist, the buttons, and the
+  //  wording that goes into the AppWright text. To change something, edit the
+  //  words between the quotes, add a line, or delete a line. Keep the quote
+  //  marks and commas. Nothing else in the file needs to change.
   //
-  //  status items:
-  //    id        one short word, no spaces
-  //    label     what the PM sees on the checklist
-  //    yes / no  the two button words            (default: "✅ Installed" / "❌ Not in")
-  //    ok / bad  how it reads in the AppWright text when it is fine / not fine
-  //    holds     false = if this is not in, it does NOT hold up the job
-  //    ask       "note" = only ask which ones / what's left (no "per super" date)
-  //    lines     true = the PM adds one line per opening/door instead of one long note
-  //  walk settings:  deliver:false hides "Please deliver";  issuesTitle = heading for the issues list
-  //    extra     adds a second question when it is not fine (used for the generator)
-  //  PMs can skip any item that doesn't apply to the house — there is no N/A.
+  //  Each walk has "sections", shown top to bottom in this order:
+  //    checks   two-button items (PMs skip anything that doesn't apply — no N/A)
+  //    ready    the big Ready? / Complete? choice (always printed first in the text)
+  //    choice   one two-button question
+  //    flags    tap-to-switch-on lines (e.g. "Trip charge needed")
+  //    reasons  "why incomplete" cards, each with add-another lines
+  //    list     add-another lines.  kind:"qty" = a quantity box + a material box
+  //    notes    a free-text box
+  //  showWhen:{ready:"incomplete"} shows a section only for that answer.
+  //
+  //  Item settings (checks):  id (one short word) · label · yes/no (button words)
+  //    ok/bad (how it reads in the text) · holds:false (doesn't hold up the job)
+  //    ask: "when" (default, asks "per super — when?") | "note" | "none"
+  //    lines:true (one line per door/opening, with "add another")
+  //    extra:{...} (a second question, used for the generator)
   // ════════════════════════════════════════════════════════════════
   const WK_WHEN = ["Today","Tomorrow","This week","Next week","Date unknown"];
 
   const WALKS = {
 
-    // ───────────── 1ST TRIM PRE-WALK ─────────────
+    // ═════════════ 1ST TRIM PRE-WALK ═════════════
     trim1: {
+      kind: "pre",
       title: "1st Trim Pre-Walk",
       headerTitle: "📋 1ST TRIM PRE-WALK",
       reportTitle: "PRE-WALK — 1ST TRIM",
-      statusTitle: "🏠 Ready for trim?",
       outPlaceholder: "What's left / what did the super say?",
-      allOk: "✅ Mark everything good",
-      okPrefix: "",
-      deliver: false,                              // no "Please deliver" section on this walk
-      issuesTitle: "⚠️ Anything else wrong?",
       how: [
         "Walk the whole house.",
         "Tap what you find on each item. Skip anything that doesn't apply to this house.",
@@ -1165,50 +903,54 @@
       tips: [
         "Door and cased openings framed correctly",
         "Drywall hung, mudded and sanded",
+        "Cabinets installed",
         "Electricity on, or a generator needed",
         "Countertops in (nice to have — not required to start trim)"
       ],
-      status: [
-        {id:"openings", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
-         ok:"Openings framed correctly", bad:"Openings NOT framed correctly", ask:"note",
-         lines:true, linesLabel:"Which openings? One line for each opening", linePh:"Which opening? (e.g. Master bath — too narrow)", addLabel:"+ Add another opening",
-         help:"Walk every door and cased opening. If one is framed wrong, mark Problem and say which openings."},
-        {id:"drywall", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
-         ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", notePh:"What's left — not hung, not mudded, not sanded?",
-         help:"Drywall should be hung, mudded and sanded. If anything is left, mark Not done and say what's left."},
-        {id:"counters", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
-         ok:"Countertops in", bad:"Countertops NOT in",
-         help:"Countertops do not hold up the job. If they aren't in you can still mark the house Ready — just get a date from the super."},
-        {id:"power", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
-         ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?",
-         extra:{label:"Generator?", yes:"Generator needed", no:"No generator needed"},
-         help:"Check that the electricity is on. If there is no power, mark it and say whether a generator is needed."}
-      ],
-      ready: [
-        {v:"yes",     icon:"✅", t:"Ready",                  s:"Ready to start trim"},
-        {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be done before we start trim"},
-        {v:"no",      icon:"❌", t:"Not ready",              s:"Can't start trim yet"}
-      ],
-      issueChips: [
-        {label:"Add an issue", text:""}
+      sections: [
+        {type:"checks", title:"🏠 Ready for trim?", allOk:"✅ Mark everything good", items:[
+          {id:"openings", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
+           ok:"Openings framed correctly", bad:"Openings NOT framed correctly", ask:"note",
+           lines:true, linesLabel:"Which openings? One line for each opening", linePh:"Which opening? (e.g. Master bath — too narrow)", addLabel:"+ Add another opening",
+           help:"Walk every door and cased opening. If one is framed wrong, mark Problem and add a line for each opening."},
+          {id:"drywall", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
+           ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", notePh:"What's left — not hung, not mudded, not sanded?",
+           help:"Drywall should be hung, mudded and sanded. If anything is left, mark Not done and say what's left."},
+          {id:"cabinets", label:"Cabinets installed", yes:"✅ Installed", no:"❌ Not in",
+           ok:"Cabinets installed", bad:"Cabinets NOT installed",
+           help:"Check that the kitchen and bath cabinets and vanities are installed. Not in? Get a date from the super and tap what they tell you."},
+          {id:"counters", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
+           ok:"Countertops in", bad:"Countertops NOT in",
+           help:"Countertops do not hold up the job. If they aren't in you can still mark the house Ready — just get a date from the super."},
+          {id:"power", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
+           ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?",
+           extra:{label:"Generator?", yes:"Generator needed", no:"No generator needed"},
+           help:"Check that the electricity is on. If there is no power, mark it and say whether a generator is needed."}
+        ]},
+        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
+          {v:"yes",     icon:"✅", t:"Ready",                  s:"Ready to start trim",                              line:"✅ YES"},
+          {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be done before we start trim",  line:"🟡 READY ONCE ITEMS ARE IN"},
+          {v:"no",      icon:"❌", t:"Not ready",              s:"Can't start trim yet",                             line:"❌ NOT READY"}
+        ]},
+        {type:"list", id:"issues", counts:true, title:"⚠️ Anything else wrong?", kind:"text", icon:"❌", prefix:"❌ ",
+         add:"+ Add an issue", more:"+ Add another issue", ph:"Describe the issue..."},
+        {type:"notes", title:"📝 Notes", ph:"Anything else the office needs to know..."}
       ]
     },
 
-    // ───────────── 2ND TRIM / SHOE PRE-WALK ─────────────
+    // ═════════════ 2ND TRIM / SHOE PRE-WALK ═════════════
     trim2: {
+      kind: "pre",
       title: "2nd Trim Pre-Walk",
       headerTitle: "📋 2ND TRIM PRE-WALK",
       reportTitle: "PRE-WALK — 2ND TRIM",
-      statusTitle: "🧱 Floors & surfaces",
       outPlaceholder: "Which rooms / what did the super say?",
-      allOk: "✅ Mark everything installed",
-      okPrefix: "Installed: ",
       how: [
         "Walk the whole house — every room, closet and bath.",
         "Tap Installed or Not in on each item. Skip anything this house doesn't have (no wood flooring? just leave it).",
         "If something is not in, get with the superintendent for a date and tap what the super tells you.",
         "The house is still Ready if the missing items will be in before we install the quarter round and shoe.",
-        "List any material, other than 1/4 round or shoe mold, that has to be delivered to finish the install.",
+        "Add a line for each problem you find, say whether there is enough material on site for the trim tie-ins, and list anything that has to be delivered (quantity, then what it is).",
         "Upload your photos of any problems to AppWright."
       ],
       tips: [
@@ -1218,43 +960,45 @@
         "Items requested on first trim that still need delivering (1x8, grab rail, pull-down sticks with hooks...)",
         "Any other material needed to finish besides 1/4 round and shoe mold"
       ],
-      status: [
-        {id:"counters", label:"Countertops",             help:"Check every kitchen, bath and laundry. Not in? Get a date from the super and tap what they tell you."},
-        {id:"lvp",      label:"LVP",                     help:"Walk every room and closet that gets LVP. If only some rooms are done, mark Not in and say which rooms."},
-        {id:"wood",     label:"Wood flooring",           help:"Check every area that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
-        {id:"carpet",   label:"Carpet",                  help:"Check all areas — bedrooms, closets, stairs, hall. If part of the house is missing, say which rooms."},
-        {id:"tile",     label:"Tile",                    help:"Check baths, laundry and any other tile areas."},
-        {id:"cabinets", label:"Cabinets & vanities set", help:"Base cabinets and vanities should be set so the shoe can go against them."}
-      ],
-      ready: [
-        {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in"},
-        {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the quarter round and shoe"},
-        {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the install yet"}
-      ],
-      issueChips: [
-        {label:"Door slab off frame", text:"Door slab is off its frame — "},
-        {label:"Baseboard fix",       text:"Baseboard needs fixing — "},
-        {label:"Closet rod missing",  text:"Closet rod missing — "},
-        {label:"Trim damaged",        text:"Trim damaged — "},
-        {label:"Other",               text:""}
-      ],
-      deliverChips: ["1x8","grab rail","pull-down sticks with hooks","closet rod","closet shelving","baseboard","casing","door slab"]
+      sections: [
+        {type:"checks", title:"🧱 Floors & surfaces", allOk:"✅ Mark everything installed", okPrefix:"Installed: ", items:[
+          {id:"counters", label:"Countertops",             help:"Check every kitchen, bath and laundry. Not in? Get a date from the super and tap what they tell you."},
+          {id:"cabinets", label:"Cabinets & vanities set", help:"Base cabinets and vanities should be set so the shoe can go against them."},
+          {id:"lvp",      label:"LVP",                     help:"Walk every room and closet that gets LVP. If only some rooms are done, mark Not in and say which rooms."},
+          {id:"wood",     label:"Wood flooring",           help:"Check every area that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
+          {id:"carpet",   label:"Carpet",                  help:"Check all areas — bedrooms, closets, stairs, hall. If part of the house is missing, say which rooms."},
+          {id:"tile",     label:"Tile",                    help:"Check baths, laundry and any other tile areas."}
+        ]},
+        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
+          {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in",                                              line:"✅ YES"},
+          {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the quarter round and shoe", line:"🟡 READY ONCE ITEMS ARE IN"},
+          {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the install yet",                                       line:"❌ NOT READY"}
+        ]},
+        {type:"list", id:"issues", counts:true, title:"⚠️ Issues found", kind:"text", icon:"❌", prefix:"❌ ",
+         add:"+ Add an issue", more:"+ Add another issue", ph:"Describe the issue..."},
+        {type:"choice", id:"tieins", title:"🧰 Enough material on site for trim tie-ins?", yes:"✅ Enough on site", no:"❌ Not enough",
+         yesLine:"✅ Enough material on site for trim tie-ins", noLine:"❌ NOT enough material on site for trim tie-ins"},
+        {type:"list", id:"deliver", title:"📦 Please deliver", kind:"qty", header:"Please deliver:",
+         qtyLabel:"Qty", txtLabel:"Material", qtyPh:"12", txtPh:"1x8",
+         add:"+ Add material", more:"+ Add more material"},
+        {type:"notes", title:"📝 Notes", ph:"Anything else the office needs to know..."}
+      ]
     },
 
-    // ───────────── LOCKOUT PRE-WALK ─────────────
+    // ═════════════ LOCKOUT PRE-WALK ═════════════
     lockout: {
+      kind: "pre",
+      expected: true,
       title: "Lockout Pre-Walk",
       headerTitle: "🔒 LOCKOUT PRE-WALK",
       reportTitle: "PRE-WALK — LOCKOUT",
-      statusTitle: "🚪 Doors",
       outPlaceholder: "Which doors / what did the super say?",
-      allOk: "✅ Mark everything done",
-      okPrefix: "",
       how: [
         "Walk the whole house, including the garage entry and the exterior doors.",
         "Tap what you find on each item. Skip anything that doesn't apply. Locks go on after the doors are hung and painted.",
         "If something is not ready, get with the superintendent for a date and tap what the super tells you.",
-        "Check the locks needed (shown below when a trim takeoff is saved for this job) against what is on site, and list anything that has to be delivered.",
+        "Check the locks needed (shown in the form when a trim takeoff is saved for this job) against what is on site.",
+        "Add a line for each problem, and list anything that has to be delivered (quantity, then what it is).",
         "Upload your photos of any problems to AppWright."
       ],
       tips: [
@@ -1264,45 +1008,215 @@
         "Exterior and garage entry doors ready for locks",
         "Missing hardware"
       ],
-      status: [
-        {id:"intdoors", label:"Interior doors installed", yes:"✅ Installed", no:"❌ Not in",
-         ok:"Interior doors installed", bad:"Interior doors NOT installed", notePh:"Which doors?",
-         help:"Every interior door hung on its frame. A slab leaning in the garage or sitting off its frame counts as Not in — note which doors."},
-        {id:"painted",  label:"Doors painted", yes:"✅ Painted", no:"❌ Not painted",
-         ok:"Doors painted", bad:"Doors NOT painted", notePh:"Which doors / areas?",
-         help:"Doors painted before locks go on. If only some are done, mark Not painted and say which areas."},
-        {id:"extdoors", label:"Exterior & garage entry doors installed", yes:"✅ Installed", no:"❌ Not in",
-         ok:"Exterior & garage entry doors installed", bad:"Exterior / garage entry doors NOT installed", notePh:"Which doors?",
-         help:"Front, rear/patio and garage entry doors installed and ready for locks."},
-        {id:"base",     label:"Baseboard installed (for base bumps)", yes:"✅ Installed", no:"❌ Not in",
-         ok:"Baseboard installed", bad:"Baseboard NOT installed", notePh:"Which rooms?",
-         help:"Baseboard needs to be in where base bumps go. Skip this one if the house has no base bumps."}
+      sections: [
+        {type:"checks", title:"🚪 Doors", allOk:"✅ Mark everything done", items:[
+          {id:"intdoors", label:"Interior doors installed", yes:"✅ Installed", no:"❌ Not in",
+           ok:"Interior doors installed", bad:"Interior doors NOT installed", notePh:"Which doors?",
+           help:"Every interior door hung on its frame. A slab leaning in the garage or sitting off its frame counts as Not in — note which doors."},
+          {id:"painted",  label:"Doors painted", yes:"✅ Painted", no:"❌ Not painted",
+           ok:"Doors painted", bad:"Doors NOT painted", notePh:"Which doors / areas?",
+           help:"Doors painted before locks go on. If only some are done, mark Not painted and say which areas."},
+          {id:"extdoors", label:"Exterior & garage entry doors installed", yes:"✅ Installed", no:"❌ Not in",
+           ok:"Exterior & garage entry doors installed", bad:"Exterior / garage entry doors NOT installed", notePh:"Which doors?",
+           help:"Front, rear/patio and garage entry doors installed and ready for locks."},
+          {id:"base",     label:"Baseboard installed (for base bumps)", yes:"✅ Installed", no:"❌ Not in",
+           ok:"Baseboard installed", bad:"Baseboard NOT installed", notePh:"Which rooms?",
+           help:"Baseboard needs to be in where base bumps go. Skip this one if the house has no base bumps."}
+        ]},
+        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
+          {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in",                              line:"✅ YES"},
+          {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the locks", line:"🟡 READY ONCE ITEMS ARE IN"},
+          {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the lockout yet",                       line:"❌ NOT READY"}
+        ]},
+        {type:"list", id:"issues", counts:true, title:"⚠️ Issues found", kind:"text", icon:"❌", prefix:"❌ ",
+         add:"+ Add an issue", more:"+ Add another issue", ph:"Describe the issue..."},
+        {type:"list", id:"deliver", title:"📦 Please deliver", kind:"qty", header:"Please deliver:",
+         qtyLabel:"Qty", txtLabel:"Material", qtyPh:"4", txtPh:"hinge stops",
+         add:"+ Add material", more:"+ Add more material"},
+        {type:"notes", title:"📝 Notes", ph:"Anything else the office needs to know..."}
+      ]
+    },
+
+    // ═════════════ 1ST TRIM POST WALK ═════════════
+    post1: {
+      kind: "post",
+      title: "1st Trim Post Walk",
+      headerTitle: "📋 1ST TRIM POST WALK",
+      reportTitle: "POST WALK — 1ST TRIM",
+      outPlaceholder: "What's wrong?",
+      how: [
+        "Check all doors to make sure they are operating.",
+        "Check that the attic stair is installed properly.",
+        "Check that the trim and baseboard are squared.",
+        "Check the reveals on the doors.",
+        "Make sure there is no damaged material.",
+        "Check for extra base that needs to be picked up, and take a photo of the extra base.",
+        "Take pictures of your walk — especially any issues — and upload them into AppWright.",
+        "Then fill out the form: tap Complete or Incomplete, tap anything that's wrong and add a line for each, and list the material left on site (quantity, then what it is)."
       ],
-      ready: [
-        {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in"},
-        {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the locks"},
-        {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the lockout yet"}
+      tips: [],
+      sections: [
+        {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
+          {v:"complete",   icon:"✅", t:"Complete",   s:"Everything is done",           line:"✅ COMPLETE"},
+          {v:"incomplete", icon:"❌", t:"Incomplete", s:"Something is left to do",      line:"❌ INCOMPLETE"}
+        ]},
+        {type:"checks", title:"🔎 Walk checks", allOk:"✅ Mark everything good", items:[
+          {id:"doors", label:"Doors operating properly", yes:"✅ All good", no:"❌ Issues", ask:"note",
+           ok:"Doors operating properly", bad:"Door issues",
+           lines:true, linesLabel:"Which doors? One line for each door", linePh:"Which door — what's wrong?", addLabel:"+ Add another door",
+           help:"Open and close every door. If any door isn't operating right, add a line for each one."},
+          {id:"attic", label:"Attic stair installed properly", yes:"✅ Good", no:"❌ Problem", ask:"note",
+           ok:"Attic stair installed properly", bad:"Attic stair NOT installed properly", notePh:"What's wrong with the attic stair?",
+           help:"Check the attic stair is installed properly. Skip this if the house has none."},
+          {id:"squared", label:"Trim & baseboard squared", yes:"✅ Good", no:"❌ Problem", ask:"note",
+           ok:"Trim & baseboard squared", bad:"Trim / baseboard NOT squared",
+           lines:true, linesLabel:"Where? One line for each spot", linePh:"Where — what's wrong?", addLabel:"+ Add another spot",
+           help:"Check the trim and baseboard are squared. If not, add a line for each spot."},
+          {id:"reveals", label:"Reveals on doors good", yes:"✅ Good", no:"❌ Problem", ask:"note",
+           ok:"Door reveals good", bad:"Door reveals need work",
+           lines:true, linesLabel:"Which doors? One line for each door", linePh:"Which door?", addLabel:"+ Add another door",
+           help:"Check the reveals on the doors. If any need work, add a line for each door."}
+        ]},
+        {type:"reasons", title:"⚠️ Why incomplete? (tap all that apply)", showWhen:{ready:"incomplete"}, items:[
+          {id:"short",     label:"Material Short / Missing",   ph:"What is short or missing?",                add:"+ Add an item",    more:"+ Add another item"},
+          {id:"wrong",     label:"Wrong Product Delivered",    ph:"What was wrong?",                          add:"+ Add a product",  more:"+ Add another product"},
+          {id:"installer", label:"Installer Error",            ph:"What did the installer do wrong?",         add:"+ Add an error",   more:"+ Add another error"},
+          {id:"framing",   label:"Framing / RO Issue",         ph:"Which opening and what is the issue?",     add:"+ Add an opening", more:"+ Add another opening"},
+          {id:"damaged",   label:"Damaged Material",           ph:"What is damaged?",                         add:"+ Add an item",    more:"+ Add another item"},
+          {id:"doorfix",   label:"Door Adjustment Needed",     ph:"Which door and what needs adjusting?",     add:"+ Add a door",     more:"+ Add another door"},
+          {id:"other",     label:"Other",                      ph:"Describe the issue...",                    add:"+ Add an issue",   more:"+ Add another issue"}
+        ]},
+        {type:"list", id:"material", title:"📦 Material on site", kind:"qty", header:"Material on site:",
+         qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"48 LF", txtPh:"Baseboard",
+         add:"+ Add material", more:"+ Add more material",
+         none:{label:"No extra material", line:"No extra material on site"}},
+        {type:"notes", title:"📝 Notes", ph:"Anything else..."}
+      ]
+    },
+
+    // ═════════════ 2ND TRIM / SHOE POST WALK ═════════════
+    post2: {
+      kind: "post",
+      title: "2nd Trim Post Walk",
+      headerTitle: "📋 2ND TRIM POST WALK",
+      reportTitle: "POST WALK — 2ND TRIM",
+      outPlaceholder: "What's wrong?",
+      how: [
+        "Walk the whole house.",
+        "Make sure all the shoe and quarter round is installed.",
+        "Check that the doors work.",
+        "Check any stair parts — baluster shoes tight and secure, caps on knee walls.",
+        "If you couldn't finish something, tap Incomplete, tap what stopped you, and say whether the installer will need a trip charge to come back.",
+        "List any extra material left on site (quantity, then what it is) — or tap No material left on site.",
+        "Take pictures of your walk — especially any issues — and upload them into AppWright."
       ],
-      issueChips: [
-        {label:"Door not installed",  text:"Door not installed — "},
-        {label:"Door not painted",    text:"Door not painted — "},
-        {label:"Door slab off frame", text:"Door slab is off its frame — "},
-        {label:"Door binds / won't latch", text:"Door binds or won't latch — "},
-        {label:"Door damaged",        text:"Door damaged — "},
-        {label:"Hardware missing",    text:"Hardware missing — "},
-        {label:"Other",               text:""}
+      tips: [],
+      sections: [
+        {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
+          {v:"complete",   icon:"✅", t:"Complete",   s:"All the trim is done",    line:"✅ COMPLETE"},
+          {v:"incomplete", icon:"❌", t:"Incomplete", s:"Something is left to do", line:"❌ INCOMPLETE"}
+        ]},
+        {type:"flags", title:"If it's incomplete", showWhen:{ready:"incomplete"}, items:[
+          {id:"rest", label:"Rest of trim is complete",                   line:"✅ Rest of trim is complete"},
+          {id:"trip", label:"Trip charge needed for installer when ready", line:"💲 Trip charge needed for installer when ready"}
+        ]},
+        {type:"checks", title:"🔎 Walk checks", allOk:"✅ Mark everything good", items:[
+          {id:"shoe", label:"All shoe installed", yes:"✅ All in", no:"❌ Not all", ask:"note",
+           ok:"All shoe installed", bad:"Shoe NOT all installed",
+           lines:true, linesLabel:"Where? One line for each spot", linePh:"Where — what's missing?", addLabel:"+ Add another spot",
+           help:"Check that all the shoe and quarter round is installed. If some isn't, add a line for each spot."},
+          {id:"doors", label:"Doors working properly", yes:"✅ All good", no:"❌ Issues", ask:"note",
+           ok:"Doors working properly", bad:"Door issues",
+           lines:true, linesLabel:"Which doors? One line for each door", linePh:"Which door — what's wrong?", addLabel:"+ Add another door",
+           help:"Open and close every door. If any door isn't working right, add a line for each one."},
+          {id:"rod", label:"Pull-down rod installed", yes:"✅ Installed", no:"❌ Not in", ask:"none",
+           ok:"Pull-down rod installed", bad:"Pull-down rod NOT installed",
+           help:"Skip this one if the house has no pull-down rod."}
+        ]},
+        {type:"reasons", title:"⚠️ What stopped you? (tap all that apply)", showWhen:{ready:"incomplete"}, items:[
+          {id:"toekicks", label:"Cabinets missing toe kicks — can't install shoe", ph:"Which cabinets?",                         add:"+ Add a cabinet", more:"+ Add another cabinet"},
+          {id:"ro",       label:"Door rough opening wrong — can't set door",       ph:"Which door — size needed / current size?", add:"+ Add a door",    more:"+ Add another door"},
+          {id:"stairs",   label:"Stair parts need work",                           ph:"What needs to be done?",                  add:"+ Add an item",   more:"+ Add another item"},
+          {id:"short"   , label:"Material short / missing",                        ph:"What is short or missing?",               add:"+ Add an item",   more:"+ Add another item"},
+          {id:"other",    label:"Other",                                           ph:"Describe the issue...",                   add:"+ Add an issue",  more:"+ Add another issue"}
+        ]},
+        {type:"list", id:"material", title:"📦 Extra materials", kind:"qty", header:"Extra materials:",
+         qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"13", txtPh:"shoe",
+         add:"+ Add material", more:"+ Add more material",
+         none:{label:"No material left on site", line:"No material left on site"}},
+        {type:"notes", title:"📝 Notes", ph:"Anything else..."}
+      ]
+    },
+
+    // ═════════════ LOCKOUT POST WALK ═════════════
+    postlo: {
+      kind: "post",
+      expected: true,
+      title: "Lockout Post Walk",
+      headerTitle: "🔒 LOCKOUT POST WALK",
+      reportTitle: "POST WALK — LOCKOUT",
+      outPlaceholder: "What's wrong?",
+      how: [
+        "Check that all the hardware is installed.",
+        "Test every deadbolt and every door — they should close, latch and lock smoothly with proper gapping.",
+        "Check the front and garage door catch plates, and that the house numbers are installed.",
+        "If you adjusted any doors or catch plates, list how many. If the installer needs coaching, note what you showed them.",
+        "List any missing hardware and any extra locks or hardware left on site (quantity, then what it is).",
+        "Take pictures of your walk — especially any issues — and upload them into AppWright."
       ],
-      deliverChips: ["passage knobs","privacy knobs","dummy knobs","deadbolts","keyed entry","hinge bumps","base bumps","strike plates","door slab"]
+      tips: [],
+      sections: [
+        {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
+          {v:"complete",   icon:"✅", t:"Complete",   s:"Lockout is complete",     line:"✅ COMPLETE"},
+          {v:"incomplete", icon:"❌", t:"Incomplete", s:"Something is left to do", line:"❌ INCOMPLETE"}
+        ]},
+        {type:"checks", title:"🔒 Walk checks", allOk:"✅ Mark everything good", items:[
+          {id:"hardware",  label:"All hardware installed", yes:"✅ All in", no:"❌ Missing some", ask:"none",
+           ok:"All hardware installed", bad:"Hardware NOT all installed",
+           help:"Check every door has its hardware. If something is missing, list it under Missing hardware below."},
+          {id:"deadbolts", label:"Deadbolts lock smoothly", yes:"✅ All good", no:"❌ Problem", ask:"note",
+           ok:"Deadbolts lock smoothly", bad:"Deadbolt problems",
+           lines:true, linesLabel:"Which deadbolts? One line for each", linePh:"Which door — what's wrong?", addLabel:"+ Add another deadbolt",
+           help:"Lock and unlock every deadbolt. If any don't work smoothly, add a line for each one."},
+          {id:"doors", label:"All doors close, latch & lock properly", yes:"✅ All good", no:"❌ Problem", ask:"note",
+           ok:"All doors close, latch & lock properly", bad:"Door problems",
+           lines:true, linesLabel:"Which doors? One line for each door", linePh:"Which door — what's wrong?", addLabel:"+ Add another door",
+           help:"Close, latch and lock every door. Look for proper gapping. If any door has a problem, add a line for each one."},
+          {id:"numbers", label:"House numbers installed", yes:"✅ Installed", no:"❌ Not in", ask:"none",
+           ok:"House numbers installed", bad:"House numbers NOT installed",
+           help:"Skip this one if the house doesn't get numbers."}
+        ]},
+        {type:"flags", title:"Need the office?", items:[
+          {id:"service", label:"Service call needed", line:"🔧 Service call needed"},
+          {id:"advise",  label:"Please advise",       line:"📞 Please advise"}
+        ]},
+        {type:"list", id:"adjusted", title:"🔧 Adjustments I made", kind:"qty", header:"Adjusted:",
+         qtyLabel:"#", txtLabel:"What I adjusted", qtyPh:"2", txtPh:"doors",
+         add:"+ Add an adjustment", more:"+ Add another adjustment"},
+        {type:"list", id:"issues", counts:true, title:"⚠️ Issues found", kind:"text", icon:"❌", prefix:"❌ ",
+         add:"+ Add an issue", more:"+ Add another issue", ph:"Describe the issue..."},
+        {type:"list", id:"missing", title:"📦 Missing hardware", kind:"qty", header:"Missing:",
+         qtyLabel:"Qty", txtLabel:"What's missing", qtyPh:"4", txtPh:"hinge stops",
+         add:"+ Add missing hardware", more:"+ Add more missing hardware"},
+        {type:"list", id:"extra", title:"🔑 Extra locks & hardware on site", kind:"qty", header:"Extra locks / hardware on site:",
+         qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"2", txtPh:"passage knobs",
+         add:"+ Add extra", more:"+ Add more extra",
+         none:{label:"None left on site", line:"No extra locks or hardware left on site"}},
+        {type:"list", id:"coached", title:"👷 What I showed the installer", kind:"text", prefix:"- ", header:"Told the installer:",
+         add:"+ Add what you showed them", more:"+ Add another", ph:"e.g. Catch plates need adjusting, not just set in the mortise"},
+        {type:"notes", title:"📝 Notes", ph:"Anything else..."}
+      ]
     }
   };
 
   // ════════════════════════════════════════════════════════════════
-  // MAIN PAGE + WALK ENGINE — builds every pre-walk from the WALKS block above
+  // MAIN PAGE + WALK ENGINE — builds all six walks from the WALKS block above
   // ════════════════════════════════════════════════════════════════
   const WK_HIST='bfs_test_prewalk_history', WK_DRAFTS='bfs_test_walk_drafts';
-  let pwMode='post1';   // which walk the job-search screen is feeding: post1 | trim1 | trim2 | lockout
-  let wk=null;          // the pre-walk currently being filled in
+  let pwMode='';        // which walk is open: trim1 | trim2 | lockout | post1 | post2 | postlo
+  let wk=null;          // the walk currently being filled in
   let wkDirty=false;    // true once the PM has typed in the generated text
+  let wkReg={};         // item id -> which section it lives in
 
   // ── navigation: Main Page ⇄ Trim Takeoff / Lockout Takeoff / Walks ──
   function showView(v){
@@ -1317,40 +1231,61 @@
   }
   function goHome(){
     ['pw-overlay','lo-overlay'].forEach(id=>{document.getElementById(id).style.display='none';});
-    wk=null;pwMode='post1';
+    wk=null;pwMode='';
     document.getElementById('pw-active-banner').style.display='none';
     showView('home');homeInfo();renderPwHistory();window.scrollTo(0,0);
   }
   function openTrim(){showView('trim');window.scrollTo(0,0);}
   function wkEnsureOverlay(){const ov=document.getElementById('pw-overlay');ov.style.display='block';ov.scrollTop=0;}
-  function openWalk(kind){
-    wkEnsureOverlay();
-    pw1Result='';pw1DoorCheck='';pw1SelectedReasons.clear();clearQNotes('pw1');
-    document.getElementById('pw-active-banner').style.display='none';
-    if(kind==='post1')selectPwType('1st');else startWalkFlow(kind);
-  }
 
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-  function wkCap(s){s=String(s||'');return s.charAt(0).toUpperCase()+s.slice(1);}
-  function wkCfg(){return WALKS[wk.mode];}
+  function wkCfg(){return WALKS[wk?wk.mode:pwMode];}
   function wkKeyFor(mode,c,j){return mode+'|'+String(c||'').trim().toLowerCase()+'|'+String(j||'').trim().toLowerCase();}
-  function wkBlank(mode,c,j){
-    const st={};WALKS[mode].status.forEach(s=>{st[s.id]={v:'',when:'',note:'',extra:'',lines:[]};});
-    return {mode:mode,customer:c,jobId:j,status:st,ready:'',issues:[],deliver:[],notes:'',hid:Date.now(),done:false};
-  }
-  // Keeps saved drafts/history working even after the content block above is edited
-  function wkNormalize(){
-    const cfg=wkCfg(),st={};
-    cfg.status.forEach(s=>{
-      const o=(wk.status||{})[s.id]||{};
-      const ln=Array.isArray(o.lines)?o.lines.map(x=>String(x)):[];
-      if(s.lines&&!ln.length&&o.note)ln.push(String(o.note));   // an older save kept one long note — it becomes the first line
-      st[s.id]={v:(o.v==='in'||o.v==='out')?o.v:'',when:o.when||'',note:o.note||'',extra:(o.extra==='yes'||o.extra==='no')?o.extra:'',lines:ln};
+  function wkBuildIndex(cfg){
+    wkReg={};
+    cfg.sections.forEach((s,si)=>{
+      if(s.items)s.items.forEach(it=>{wkReg[it.id]={si:si,item:it,sec:s};});
+      if(s.type==='list'||s.type==='choice')wkReg[s.id]={si:si,item:s,sec:s};
     });
-    wk.status=st;
-    wk.issues=(wk.issues||[]).map(i=>({text:String(i.text||'')}));
-    wk.deliver=(wk.deliver||[]).map(d=>String(d));
-    wk.notes=wk.notes||'';wk.ready=wk.ready||'';
+  }
+
+  // ── a walk's saved state ──
+  function wkBlank(mode,c,j){
+    const o={mode:mode,customer:c,jobId:j,status:{},choice:{},flags:{},lists:{},reasons:{},ready:'',notes:'',hid:Date.now(),done:false};
+    return o;
+  }
+  // Fills in anything missing and drops anything the content block no longer has,
+  // so saved drafts/history keep working after the content is edited.
+  function wkNormalize(){
+    const cfg=wkCfg();
+    wk.lists=wk.lists||{};
+    // the first pre-walk versions kept issues / deliveries at the top level
+    if(Array.isArray(wk.issues)){if(!wk.lists.issues)wk.lists.issues={lines:wk.issues.map(i=>({q:'',t:String((i&&i.text)||'')})),none:false};delete wk.issues;}
+    if(Array.isArray(wk.deliver)){if(!wk.lists.deliver)wk.lists.deliver={lines:wk.deliver.map(d=>({q:'',t:String(d)})),none:false};delete wk.deliver;}
+    const S={},C={},F={},Ls={},R={};
+    cfg.sections.forEach(sec=>{
+      if(sec.type==='checks')sec.items.forEach(it=>{
+        const o=(wk.status||{})[it.id]||{};
+        const ln=Array.isArray(o.lines)?o.lines.map(x=>String(x)):[];
+        if(it.lines&&!ln.length&&o.note)ln.push(String(o.note));   // an older save kept one long note — it becomes the first line
+        S[it.id]={v:(o.v==='in'||o.v==='out')?o.v:'',when:o.when||'',note:o.note||'',extra:(o.extra==='yes'||o.extra==='no')?o.extra:'',lines:ln};
+      });
+      else if(sec.type==='choice'){const v=(wk.choice||{})[sec.id];C[sec.id]=(v==='yes'||v==='no')?v:'';}
+      else if(sec.type==='flags')sec.items.forEach(it=>{F[it.id]=!!((wk.flags||{})[it.id]);});
+      else if(sec.type==='list'){
+        const o=wk.lists[sec.id]||{};
+        Ls[sec.id]={lines:(Array.isArray(o.lines)?o.lines:[]).map(l=>({q:String((l&&l.q)||''),t:String((l&&l.t)||'')})),none:!!(o.none&&sec.none)};
+      }
+      else if(sec.type==='reasons')sec.items.forEach(it=>{
+        const o=(wk.reasons||{})[it.id]||{};
+        R[it.id]={on:!!o.on,lines:Array.isArray(o.lines)?o.lines.map(x=>String(x)):[]};
+      });
+    });
+    wk.status=S;wk.choice=C;wk.flags=F;wk.lists=Ls;wk.reasons=R;
+    const rd=cfg.sections.find(s=>s.type==='ready');
+    wk.ready=(rd&&rd.options.some(o=>o.v===wk.ready))?wk.ready:'';
+    wk.notes=wk.notes||'';
+    wkBuildIndex(cfg);
   }
 
   // ── drafts: a walk in progress survives a phone lock, a call, or leaving the screen ──
@@ -1364,18 +1299,74 @@
   }
   function wkDropDraft(){const d=wkDrafts();delete d[wkKeyFor(wk.mode,wk.customer,wk.jobId)];try{localStorage.setItem(WK_DRAFTS,JSON.stringify(d));}catch(e){}}
 
-  // ── entering a walk ──
-  function startWalkFlow(mode){
-    pwMode=mode;
-    document.getElementById('pw-header-title').innerText=WALKS[mode].headerTitle;
+  // ── the walk page: How this walk works (open) + the form (collapsed) ──
+  function openWalk(kind){wkEnsureOverlay();wk=null;pwCustomer='';pwJobId='';wkShowPage(kind,false);}
+  function wkSetHow(open){
+    document.getElementById('wk-how').style.display=open?'block':'none';
+    document.getElementById('wk-how-chev').textContent=open?'▲':'▼';
+  }
+  function wkSetForm(open){
+    document.getElementById('wk-form-body').style.display=open?'block':'none';
+    document.getElementById('wk-form-chev').textContent=open?'▲':'▼';
+  }
+  function wkToggleHow(){wkSetHow(document.getElementById('wk-how').style.display==='none');}
+  function wkToggleForm(){
+    const opening=document.getElementById('wk-form-body').style.display==='none';
+    wkSetForm(opening);
+    if(opening)wkSetHow(false);     // making room: the steps fold away when the form opens (tap to bring them back)
+  }
+  function wkShowPage(kind,formOpen){
+    pwMode=kind;const cfg=WALKS[kind];
+    document.getElementById('pw-header-title').innerText=cfg.headerTitle;
+    document.getElementById('pw-active-banner').style.display='none';
+    document.getElementById('wk-kicker').textContent=cfg.kind==='pre'?'Pre-walk':'Post walk';
+    document.getElementById('wk-title').textContent=cfg.title;
+    document.getElementById('wk-form-title').textContent=cfg.kind==='pre'?'📋 Pre-walk form':'📋 Post-walk form';
+    document.getElementById('wk-how').innerHTML=
+      '<div style="font-weight:900;margin-bottom:6px;">How this walk works</div><ol style="margin:0'+(cfg.tips.length?' 0 10px':'')+' 18px;padding:0;">'+
+      cfg.how.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('')+'</ol>'+
+      (cfg.tips.length?'<div style="font-weight:900;margin-bottom:6px;">Things to look for</div><ul style="margin:0 0 0 18px;padding:0;">'+cfg.tips.map(x=>'<li style="margin-bottom:3px;">'+esc(x)+'</li>').join('')+'</ul>':'');
+    document.getElementById('wk-gen-btn').textContent=cfg.kind==='pre'?'⚡ Generate Pre-Walk':'⚡ Generate Post Walk';
+    document.getElementById('wk-another').textContent='+ Another '+cfg.title;
+    // job picker is the first thing inside the form
     document.getElementById('pw-search-input').value='';
     document.getElementById('pw-search-results').innerHTML='';
     document.getElementById('pw-cust-manual').value='';
     document.getElementById('pw-jobid-manual').value='';
-    showPwScreen('pw-screen-search');
+    document.getElementById('wk-picker').style.display='block';
+    document.getElementById('wk-formwrap').style.display='none';
+    document.getElementById('wk-legacy').style.display='none';
+    wkSetForm(formOpen);wkSetHow(!formOpen);
+    document.getElementById('pw-overlay').scrollTop=0;
   }
-  function routeWalk(){if(pwMode==='post1')startPwForm();else startPreForm();}
-  function startPreForm(){
+  function wkChangeJob(){
+    wk=null;pwCustomer='';pwJobId='';
+    document.getElementById('pw-active-banner').style.display='none';
+    document.getElementById('wk-picker').style.display='block';
+    document.getElementById('wk-formwrap').style.display='none';
+  }
+  function wkAnother(){const m=wk?wk.mode:pwMode;wk=null;wkShowPage(m,true);}
+
+  // ── picking the job ──
+  function searchPwJobs(){
+    const q=document.getElementById('pw-search-input').value.trim().toLowerCase();
+    const results=[],seen=new Set();
+    const all=[...(JSON.parse(localStorage.getItem('bfs_history'))||[]),...(JSON.parse(localStorage.getItem(TEST_HIST))||[])];
+    all.forEach(h=>{if(!h.fullData?.customer)return;const c=h.fullData.customer||'',j=h.fullData.jobId||h.fullData.lot||'',k=`${c}|${j}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||c.toLowerCase().includes(q)||j.toLowerCase().includes(q)||(h.label||'').toLowerCase().includes(q))results.push({customer:c,jobId:j,time:h.time||''});});
+    try{(JSON.parse(localStorage.getItem('bfs_takeoff_index'))||[]).forEach(e=>{const k=`${e.customer}|${e.jobId||''}`.toLowerCase();if(seen.has(k))return;seen.add(k);if(!q||e.customer.toLowerCase().includes(q)||(e.jobId||'').toLowerCase().includes(q))results.push({customer:e.customer,jobId:e.jobId||'',time:''});});}catch(ex){}
+    _pwSearchResults=results;
+    const el=document.getElementById('pw-search-results');
+    if(!results.length){el.innerHTML='<p style="font-size:12px;color:#94a3b8;margin:8px 0;">No matches found. Enter it below.</p>';return;}
+    el.innerHTML=results.slice(0,8).map((r,i)=>'<div class="pw-result-item"><div><div class="pw-result-label">'+esc(r.customer)+'</div><div class="pw-result-sub">'+esc(r.jobId||'No Job ID')+(r.time?' · '+esc(r.time):'')+'</div></div><button class="pw-use-btn" onclick="usePwResult('+i+')">Use →</button></div>').join('');
+  }
+  function usePwResult(i){const r=_pwSearchResults[i];if(!r)return;pwCustomer=r.customer;pwJobId=r.jobId;startWalk();}
+  function startPwFormManual(){
+    pwCustomer=document.getElementById('pw-cust-manual').value.trim();pwJobId=document.getElementById('pw-jobid-manual').value.trim();
+    if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}
+    startWalk();
+  }
+  function startWalk(){
+    if(!pwMode||!WALKS[pwMode])return;
     const dr=wkDrafts()[wkKeyFor(pwMode,pwCustomer,pwJobId)];
     wk=dr?JSON.parse(JSON.stringify(dr.data)):wkBlank(pwMode,pwCustomer,pwJobId);
     wk.mode=pwMode;wk.customer=pwCustomer;wk.jobId=pwJobId;wk.done=false;
@@ -1388,36 +1379,21 @@
     document.getElementById('pw-header-title').innerText=cfg.headerTitle;
     const b=document.getElementById('pw-active-banner');
     b.innerHTML='📋 <span style="opacity:0.75;font-weight:600;">ACTIVE JOB:</span> '+esc(jobTxt);b.style.display='flex';
-    document.getElementById('wk-kicker').textContent=cfg.title;
     document.getElementById('wk-job-display').textContent=jobTxt;
-    document.getElementById('wk-allok').textContent=cfg.allOk;
-    document.getElementById('wk-another').textContent='+ Another '+cfg.title;
-    document.getElementById('wk-how').innerHTML=
-      '<div style="font-weight:900;margin-bottom:6px;">How this walk works</div><ol style="margin:0 0 10px 18px;padding:0;">'+
-      cfg.how.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('')+'</ol>'+
-      '<div style="font-weight:900;margin-bottom:6px;">Things to look for</div><ul style="margin:0 0 0 18px;padding:0;">'+
-      cfg.tips.map(x=>'<li style="margin-bottom:3px;">'+esc(x)+'</li>').join('')+'</ul>';
-    document.getElementById('wk-how').style.display='none';
-    document.getElementById('wk-how-chev').textContent='▼';
-    document.getElementById('wk-notes').value=wk.notes;
-    document.getElementById('wk-deliver-sec').style.display=(cfg.deliver===false)?'none':'block';
-    document.getElementById('wk-issues-hdr').textContent=cfg.issuesTitle||'⚠️ Issues found';
+    document.getElementById('wk-picker').style.display='none';
+    document.getElementById('wk-legacy').style.display='none';
+    document.getElementById('wk-formwrap').style.display='block';
     document.getElementById('wk-result').style.display='none';
     wkSetEdit(false);wkDirty=false;
-    wkRenderExpected();wkRenderStatus();wkRenderReady();wkRenderChips();wkRenderIssues();wkRenderDeliver();
-    showPwScreen('pw-screen-pre');
-  }
-  function wkAnother(){startWalkFlow(wk?wk.mode:pwMode);}
-  function wkToggleHow(){
-    const el=document.getElementById('wk-how'),open=el.style.display!=='none';
-    el.style.display=open?'none':'block';
-    document.getElementById('wk-how-chev').textContent=open?'▼':'▲';
+    wkRenderExpected();wkRenderForm();
+    wkSetForm(true);wkSetHow(false);
+    document.getElementById('pw-overlay').scrollTop=0;
   }
 
-  // ── lockout only: locks needed, pulled from the trim takeoff for this job ──
+  // ── lockout walks: locks needed, pulled from the trim takeoff for this job ──
   function wkRenderExpected(){
     const el=document.getElementById('wk-expected');el.style.display='none';el.innerHTML='';
-    if(wk.mode!=='lockout')return;
+    if(!wkCfg().expected)return;
     const m=lookupTrimTakeoff(wk.customer,wk.jobId);
     window._loTrimMatch=m||null;
     el.style.display='block';
@@ -1428,29 +1404,53 @@
     }
   }
 
-  // ── checklist (tap what applies; skip what doesn't) ──
-  function wkRenderStatus(){
-    const cfg=wkCfg();let n=0;
-    document.getElementById('wk-status').innerHTML=cfg.status.map(s=>{
+  // ── drawing the form, one section at a time ──
+  function wkVisible(sec){
+    if(!sec.showWhen||!sec.showWhen.ready)return true;
+    const w=sec.showWhen.ready;return (Array.isArray(w)?w:[w]).indexOf(wk.ready)>-1;
+  }
+  function wkRenderForm(){
+    const cfg=wkCfg();
+    document.getElementById('wk-form').innerHTML=cfg.sections.map((s,i)=>'<div class="wk-sec" id="wk-sec-'+i+'"></div>').join('');
+    cfg.sections.forEach((s,i)=>wkRenderSec(i));
+  }
+  function wkRenderSec(i){
+    const s=wkCfg().sections[i],el=document.getElementById('wk-sec-'+i);if(!el)return;
+    if(!wkVisible(s)){el.style.display='none';el.innerHTML='';return;}
+    el.style.display='block';
+    const fn={checks:wkHtmlChecks,ready:wkHtmlReady,choice:wkHtmlChoice,flags:wkHtmlFlags,list:wkHtmlList,reasons:wkHtmlReasons,notes:wkHtmlNotes}[s.type];
+    el.innerHTML=fn?fn(s,i):'';
+    if(s.type==='ready')wkReadyHint();
+  }
+  function wkRenderDeps(){wkCfg().sections.forEach((s,i)=>{if(s.showWhen)wkRenderSec(i);});}
+  function wkRefresh(id){if(wkReg[id])wkRenderSec(wkReg[id].si);}
+  function wkFocusIn(containerId,last){
+    const c=document.getElementById(containerId);if(!c)return;
+    const ins=c.querySelectorAll('.qnote-input');if(!ins.length)return;
+    const el=last?ins[ins.length-1]:ins[0];el.focus();
+    try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
+  }
+
+  // checks: two buttons per item, skip what doesn't apply
+  function wkHtmlChecks(sec,si){
+    let n=0;
+    const rows=sec.items.map(s=>{
       const o=wk.status[s.id];if(o.v)n++;
+      const ask=s.ask||'when';
       let out='';
       if(o.v==='out'){
-        out='<div class="wk-out">';
-        if(s.extra){
-          out+='<div class="wk-out-lbl">'+esc(s.extra.label)+'</div><div class="wk-chips">'+
-            ['yes','no'].map(k=>'<button class="wk-chip'+(o.extra===k?' sel':'')+'" onclick="wkExtra(\''+s.id+'\',\''+k+'\')">'+esc(s.extra[k])+'</button>').join('')+'</div>';
-        }
-        if(s.ask!=='note'){
-          out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips">'+
-            WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\''+s.id+'\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
-        }
+        if(s.extra)out+='<div class="wk-out-lbl">'+esc(s.extra.label)+'</div><div class="wk-chips">'+
+          ['yes','no'].map(k=>'<button class="wk-chip'+(o.extra===k?' sel':'')+'" onclick="wkExtra(\''+s.id+'\',\''+k+'\')">'+esc(s.extra[k])+'</button>').join('')+'</div>';
+        if(ask==='when')out+='<div class="wk-out-lbl">'+esc(s.whenLabel||'Per super — when will it be in?')+'</div><div class="wk-chips">'+
+          WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\''+s.id+'\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
         if(s.lines){
           out+='<div class="wk-out-lbl">'+esc(s.linesLabel||'Which ones? One line for each')+'</div>'+
             o.lines.map((ln,i)=>'<div class="qnote-item"><span class="qnote-emoji">❌</span><input type="text" class="qnote-input is-x" style="font-size:16px;" value="'+esc(ln)+'" placeholder="'+esc(s.linePh||'')+'" oninput="wkLine(\''+s.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkDelLine(\''+s.id+'\','+i+')">✕</button></div>').join('')+
-            '<button class="wk-chip add" onclick="wkAddLine(\''+s.id+'\')">'+esc(s.addLabel||'+ Add another')+'</button></div>';
-        }else{
-          out+='<input class="wk-in" type="text" placeholder="'+esc(s.notePh||cfg.outPlaceholder)+'" value="'+esc(o.note)+'" oninput="wkNote(\''+s.id+'\',this.value)"></div>';
+            '<button class="wk-chip add" onclick="wkAddLine(\''+s.id+'\')">'+esc(s.addLabel||'+ Add another')+'</button>';
+        }else if(ask!=='none'){
+          out+='<input class="wk-in" type="text" placeholder="'+esc(s.notePh||wkCfg().outPlaceholder)+'" value="'+esc(o.note)+'" oninput="wkNote(\''+s.id+'\',this.value)">';
         }
+        if(out)out='<div class="wk-out">'+out+'</div>';
       }
       return '<div class="wk-row'+(o.v?' st-'+o.v:'')+'" id="wk-row-'+s.id+'">'+
         '<div class="wk-row-top"><span class="wk-row-label">'+esc(s.label)+'</span><button class="wk-help-btn" onclick="wkHelp(\''+s.id+'\')">?</button></div>'+
@@ -1460,134 +1460,186 @@
           '<button class="wk-tri-btn'+(o.v==='out'?' sel-out':'')+'" onclick="wkSetStatus(\''+s.id+'\',\'out\')">'+esc(s.no||'❌ Not in')+'</button>'+
         '</div>'+out+'</div>';
     }).join('');
-    document.getElementById('wk-status-hdr').innerHTML=esc(cfg.statusTitle)+'<span class="wk-count">'+n+' / '+cfg.status.length+'</span>';
-    const left=cfg.status.length-n;
-    document.getElementById('wk-unchecked').textContent=left?(left+' not tapped — left out of the report'):'';
+    const left=sec.items.length-n;
+    return '<div class="pw-sec-hdr">'+esc(sec.title)+'<span class="wk-count">'+n+' / '+sec.items.length+'</span></div>'+rows+
+      '<div class="wk-muted">'+(left?left+' not tapped — left out of the report':'')+'</div>'+
+      (sec.allOk?'<button class="actionBtn wk-allok" onclick="wkAllOk('+si+')">'+esc(sec.allOk)+'</button>':'');
   }
   function wkHelp(id){const el=document.getElementById('wk-help-'+id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
   function wkSetStatus(id,v){
-    const s=wkCfg().status.find(x=>x.id===id),o=wk.status[id];
+    const s=wkReg[id].item,o=wk.status[id];
     o.v=(o.v===v)?'':v;
-    const opened=(o.v==='out'&&s&&s.lines&&!o.lines.length);
+    const opened=(o.v==='out'&&s.lines&&!o.lines.length);
     if(opened)o.lines=[''];
-    wkRenderStatus();wkReadyHint();wkSave();
-    if(opened)wkFocusLine(id,false);        // keyboard opens on the first line
+    wkRefresh(id);wkReadyHint();wkSave();
+    if(opened)wkFocusIn('wk-row-'+id,false);        // keyboard opens on the first line
   }
-  function wkFocusLine(id,last){
-    const ins=document.querySelectorAll('#wk-row-'+id+' .qnote-input');if(!ins.length)return;
-    const el=last?ins[ins.length-1]:ins[0];el.focus();
-    try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
-  }
-  function wkLine(id,i,v){if(wk.status[id].lines[i]!==undefined)wk.status[id].lines[i]=v;wkSave();}
-  function wkAddLine(id){wk.status[id].lines.push('');wkRenderStatus();wkFocusLine(id,true);wkSave();}
-  function wkDelLine(id,i){wk.status[id].lines.splice(i,1);wkRenderStatus();wkSave();}
-  function wkWhen(id,wi){const o=wk.status[id],w=WK_WHEN[wi];o.when=(o.when===w)?'':w;wkRenderStatus();wkSave();}
-  function wkExtra(id,k){const o=wk.status[id];o.extra=(o.extra===k)?'':k;wkRenderStatus();wkSave();}
+  function wkWhen(id,wi){const o=wk.status[id],w=WK_WHEN[wi];o.when=(o.when===w)?'':w;wkRefresh(id);wkSave();}
+  function wkExtra(id,k){const o=wk.status[id];o.extra=(o.extra===k)?'':k;wkRefresh(id);wkSave();}
   function wkNote(id,val){wk.status[id].note=val;wkSave();}
-  function wkAllInstalled(){
-    let c=0;wkCfg().status.forEach(s=>{if(!wk.status[s.id].v){wk.status[s.id].v='in';c++;}});
+  function wkLine(id,i,v){if(wk.status[id].lines[i]!==undefined)wk.status[id].lines[i]=v;wkSave();}
+  function wkAddLine(id){wk.status[id].lines.push('');wkRefresh(id);wkFocusIn('wk-row-'+id,true);wkSave();}
+  function wkDelLine(id,i){wk.status[id].lines.splice(i,1);wkRefresh(id);wkSave();}
+  function wkAllOk(si){
+    const sec=wkCfg().sections[si];let c=0;
+    sec.items.forEach(s=>{if(!wk.status[s.id].v){wk.status[s.id].v='in';c++;}});
     if(!c){showToast('Nothing left to mark');return;}
-    wkRenderStatus();wkReadyHint();wkSave();showToast('✅ '+c+' marked');
+    wkRenderSec(si);wkReadyHint();wkSave();showToast('✅ '+c+' marked');
   }
 
-  // ── ready? ──
-  function wkRenderReady(){
-    document.getElementById('wk-ready').innerHTML=wkCfg().ready.map(r=>
+  // ready / result
+  function wkHtmlReady(sec){
+    return '<div class="pw-sec-hdr">'+esc(sec.title)+'</div><div class="wk-ready">'+sec.options.map(r=>
       '<button class="wk-ready-btn'+(wk.ready===r.v?' sel-'+r.v:'')+'" onclick="wkSetReady(\''+r.v+'\')"><span class="ico">'+r.icon+'</span><span><b>'+esc(r.t)+'</b><small>'+esc(r.s)+'</small></span></button>'
-    ).join('');
-    wkReadyHint();
+    ).join('')+'</div><div id="wk-ready-hint"></div>';
   }
-  function wkSetReady(v){wk.ready=(wk.ready===v)?'':v;wkRenderReady();wkSave();}
+  function wkSetReady(v){
+    wk.ready=(wk.ready===v)?'':v;
+    const cfg=wkCfg();cfg.sections.forEach((s,i)=>{if(s.type==='ready')wkRenderSec(i);});
+    wkRenderDeps();wkSave();
+  }
   function wkReadyHint(){
-    const el=document.getElementById('wk-ready-hint');if(!el)return;
-    // items marked holds:false (e.g. countertops on the 1st trim walk) never count against "Ready"
-    const holding=wkCfg().status.filter(s=>wk.status[s.id].v==='out'&&s.holds!==false).length;
+    const el=document.getElementById('wk-ready-hint');if(!el||!wk)return;
+    const rd=wkCfg().sections.find(s=>s.type==='ready');if(!rd)return;
+    let holding=0,flagged=0;
+    wkCfg().sections.forEach(s=>{
+      if(s.type==='checks')s.items.forEach(it=>{if(wk.status[it.id].v==='out'){flagged++;if(it.holds!==false)holding++;}});
+      else if(s.type==='reasons'&&wkVisible(s))s.items.forEach(it=>{if(wk.reasons[it.id].on)flagged++;});
+      else if(s.type==='list'&&s.counts)flagged+=wk.lists[s.id].lines.filter(l=>l.t.trim()).length;
+    });
     let h='';
-    if(wk.ready==='yes'&&holding)h='⚠️ '+holding+' item'+(holding>1?'s that hold':' that holds')+' up the job '+(holding>1?'are':'is')+' marked Not in. If they will be done before we start, choose “Ready once items are in.”';
-    else if(wk.ready==='pending'&&!holding)h='Nothing that holds up the job is marked Not in. Choose “Ready” unless something is still missing.';
+    if(rd.hints==='pre'){
+      // items marked holds:false (e.g. countertops on the 1st trim walk) never count against "Ready"
+      if(wk.ready==='yes'&&holding)h='⚠️ '+holding+' item'+(holding>1?'s that hold':' that holds')+' up the job '+(holding>1?'are':'is')+' marked Not in. If they will be done before we start, choose “Ready once items are in.”';
+      else if(wk.ready==='pending'&&!holding)h='Nothing that holds up the job is marked Not in. Choose “Ready” unless something is still missing.';
+    }else if(rd.hints==='post'){
+      if(wk.ready==='complete'&&flagged)h='⚠️ Something is marked as a problem. If it kept you from finishing, choose Incomplete.';
+      else if(wk.ready==='incomplete'&&!flagged)h='Tell the office what is left — tap what stopped you, or add it in Notes.';
+    }
     el.innerHTML=h?'<div class="wk-hint">'+h+'</div>':'';
   }
 
-  // ── issues & deliveries ──
-  function wkRenderChips(){
-    const cfg=wkCfg();
-    document.getElementById('wk-issue-chips').innerHTML=cfg.issueChips.map((c,i)=>'<button class="wk-chip add" onclick="wkAddIssue('+i+')">+ '+esc(c.label)+'</button>').join('');
-    document.getElementById('wk-deliver-chips').innerHTML=(cfg.deliverChips||[]).map((c,i)=>'<button class="wk-chip add" onclick="wkAddDeliver('+i+')">+ '+esc(wkCap(c))+'</button>').join('')+'<button class="wk-chip add" onclick="wkAddDeliverBlank()">+ Other</button>';
+  // one two-button question
+  function wkHtmlChoice(sec){
+    const v=wk.choice[sec.id];
+    return '<div class="pw-sec-hdr">'+esc(sec.title)+'</div><div class="wk-tri">'+
+      '<button class="wk-tri-btn'+(v==='yes'?' sel-in':'')+'" onclick="wkChoice(\''+sec.id+'\',\'yes\')">'+esc(sec.yes)+'</button>'+
+      '<button class="wk-tri-btn'+(v==='no'?' sel-out':'')+'" onclick="wkChoice(\''+sec.id+'\',\'no\')">'+esc(sec.no)+'</button></div>';
   }
-  function wkFocusLast(sel){
-    const ins=document.querySelectorAll(sel);if(!ins.length)return;
-    const el=ins[ins.length-1];el.focus();
-    try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){}
-  }
-  function wkRenderIssues(){
-    document.getElementById('wk-issues').innerHTML=wk.issues.map((it,i)=>
-      '<div class="qnote-item"><span class="qnote-emoji">❌</span><input type="text" class="qnote-input is-x" style="font-size:16px;" value="'+esc(it.text)+'" placeholder="Describe the issue..." oninput="wkIssueText('+i+',this.value)"><button class="qnote-del" onclick="wkDelIssue('+i+')">✕</button></div>'
-    ).join('');
-  }
-  function wkAddIssue(ci){wk.warnedBare=false;wk.issues.push({text:wkCfg().issueChips[ci].text||''});wkRenderIssues();wkFocusLast('#wk-issues .qnote-input');wkSave();}
-  function wkIssueText(i,v){wk.warnedBare=false;if(wk.issues[i])wk.issues[i].text=v;wkSave();}
-  function wkDelIssue(i){wk.issues.splice(i,1);wkRenderIssues();wkSave();}
+  function wkChoice(id,v){wk.choice[id]=(wk.choice[id]===v)?'':v;wkRefresh(id);wkSave();}
 
-  function wkRenderDeliver(){
-    document.getElementById('wk-deliver').innerHTML=wk.deliver.map((d,i)=>
-      '<div class="qnote-item"><span class="qnote-emoji">📦</span><input type="text" class="qnote-input" style="font-size:16px;" value="'+esc(d)+'" placeholder="What needs to be delivered?" oninput="wkDeliverText('+i+',this.value)"><button class="qnote-del" onclick="wkDelDeliver('+i+')">✕</button></div>'
-    ).join('');
+  // tap-to-switch-on lines
+  function wkHtmlFlags(sec){
+    return (sec.title?'<div class="pw-sec-hdr">'+esc(sec.title)+'</div>':'')+'<div class="wk-chips">'+
+      sec.items.map(it=>'<button class="wk-chip'+(wk.flags[it.id]?' sel':'')+'" onclick="wkFlag(\''+it.id+'\')">'+(wk.flags[it.id]?'✓ ':'')+esc(it.label)+'</button>').join('')+'</div>';
   }
-  function wkAddDeliver(ci){
-    const t=wkCfg().deliverChips[ci];
-    if(wk.deliver.some(d=>d.trim().toLowerCase()===t.toLowerCase())){showToast('Already on the list');return;}
-    wk.deliver.push(t);wkRenderDeliver();wkSave();
+  function wkFlag(id){wk.flags[id]=!wk.flags[id];wkRefresh(id);wkSave();}
+
+  // add-another lists (text lines, or quantity + material)
+  function wkHtmlList(sec){
+    const o=wk.lists[sec.id],q=sec.kind==='qty';
+    let h='<div class="pw-sec-hdr">'+esc(sec.title)+'</div><div id="wk-list-'+sec.id+'">';
+    if(o.none){
+      h+='<div class="wk-none">✅ '+esc(sec.none.label)+'</div>';
+    }else if(o.lines.length){
+      if(q)h+='<div class="wk-qhead"><span>'+esc(sec.qtyLabel||'Qty')+'</span><span>'+esc(sec.txtLabel||'Material')+'</span></div>';
+      h+=o.lines.map((ln,i)=>q
+        ?'<div class="wk-qrow"><input type="text" class="qnote-input wk-qty" style="font-size:16px;" value="'+esc(ln.q)+'" placeholder="'+esc(sec.qtyPh||'')+'" oninput="wkListQ(\''+sec.id+'\','+i+',this.value)"><input type="text" class="qnote-input wk-mat" style="font-size:16px;" value="'+esc(ln.t)+'" placeholder="'+esc(sec.txtPh||'')+'" oninput="wkListT(\''+sec.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkListDel(\''+sec.id+'\','+i+')">✕</button></div>'
+        :'<div class="qnote-item">'+(sec.icon?'<span class="qnote-emoji">'+sec.icon+'</span>':'')+'<input type="text" class="qnote-input'+(sec.icon==='❌'?' is-x':'')+'" style="font-size:16px;" value="'+esc(ln.t)+'" placeholder="'+esc(sec.ph||'')+'" oninput="wkListT(\''+sec.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkListDel(\''+sec.id+'\','+i+')">✕</button></div>'
+      ).join('');
+    }
+    h+='<div class="wk-chips" style="margin-top:6px;margin-bottom:0;"><button class="wk-chip add" onclick="wkListAdd(\''+sec.id+'\')">'+esc((o.lines.length&&!o.none)?(sec.more||sec.add):sec.add)+'</button>'+
+      (sec.none?'<button class="wk-chip'+(o.none?' sel':'')+'" onclick="wkListNone(\''+sec.id+'\')">'+(o.none?'✓ ':'')+esc(sec.none.label)+'</button>':'')+'</div></div>';
+    return h;
   }
-  function wkAddDeliverBlank(){wk.deliver.push('');wkRenderDeliver();wkFocusLast('#wk-deliver .qnote-input');wkSave();}
-  function wkDeliverText(i,v){if(wk.deliver[i]!==undefined)wk.deliver[i]=v;wkSave();}
-  function wkDelDeliver(i){wk.deliver.splice(i,1);wkRenderDeliver();wkSave();}
+  function wkListAdd(id){const o=wk.lists[id];o.none=false;o.lines.push({q:'',t:''});wkRefresh(id);
+    const c=document.getElementById('wk-list-'+id),ins=c?c.querySelectorAll('.qnote-input'):[];
+    if(ins.length){const el=wkReg[id].sec.kind==='qty'?ins[ins.length-2]:ins[ins.length-1];el.focus();}   // qty lists start on the quantity box
+    wkReadyHint();wkSave();}
+  function wkListQ(id,i,v){if(wk.lists[id].lines[i])wk.lists[id].lines[i].q=v;wkSave();}
+  function wkListT(id,i,v){if(wk.lists[id].lines[i])wk.lists[id].lines[i].t=v;wkReadyHint();wkSave();}
+  function wkListDel(id,i){wk.lists[id].lines.splice(i,1);wkRefresh(id);wkReadyHint();wkSave();}
+  function wkListNone(id){const o=wk.lists[id];o.none=!o.none;wkRefresh(id);wkSave();}
+
+  // "why incomplete" cards
+  function wkHtmlReasons(sec){
+    return '<div class="pw-sec-hdr">'+esc(sec.title)+'</div>'+sec.items.map(it=>{
+      const o=wk.reasons[it.id];
+      let h='<div class="wk-reason'+(o.on?' on':'')+'" id="wk-r-'+it.id+'"><button class="wk-reason-top" onclick="wkReason(\''+it.id+'\')"><span class="wk-reason-ico">'+(o.on?'❌':'○')+'</span><span class="wk-reason-lbl">'+esc(it.label)+'</span></button>';
+      if(o.on)h+='<div class="wk-reason-body">'+o.lines.map((ln,i)=>'<div class="qnote-item"><input type="text" class="qnote-input is-x" style="font-size:16px;" value="'+esc(ln)+'" placeholder="'+esc(it.ph||'')+'" oninput="wkReasonLine(\''+it.id+'\','+i+',this.value)"><button class="qnote-del" onclick="wkReasonDel(\''+it.id+'\','+i+')">✕</button></div>').join('')+
+        '<button class="wk-chip add" onclick="wkReasonAdd(\''+it.id+'\')">'+esc(o.lines.length?(it.more||'+ Add another'):(it.add||'+ Add a line'))+'</button></div>';
+      return h+'</div>';
+    }).join('');
+  }
+  function wkReason(id){
+    const o=wk.reasons[id];o.on=!o.on;
+    const opened=o.on&&!o.lines.length;if(opened)o.lines=[''];
+    wkRefresh(id);wkReadyHint();wkSave();
+    if(opened)wkFocusIn('wk-r-'+id,false);
+  }
+  function wkReasonLine(id,i,v){if(wk.reasons[id].lines[i]!==undefined)wk.reasons[id].lines[i]=v;wkSave();}
+  function wkReasonAdd(id){wk.reasons[id].lines.push('');wkRefresh(id);wkFocusIn('wk-r-'+id,true);wkSave();}
+  function wkReasonDel(id,i){wk.reasons[id].lines.splice(i,1);wkRefresh(id);wkSave();}
+
+  function wkHtmlNotes(sec){
+    return '<div class="pw-sec-hdr">'+esc(sec.title)+'</div><textarea style="height:60px;" placeholder="'+esc(sec.ph||'')+'" oninput="wkNotesInput(this.value)">'+esc(wk.notes)+'</textarea>';
+  }
   function wkNotesInput(v){wk.notes=v;wkSave();}
 
   // ── the AppWright text ──
-  const WK_READY_LINE={yes:'✅ YES',pending:'🟡 READY ONCE ITEMS ARE IN',no:'❌ NOT READY'};
-  function wkList(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];}
-  function wkClean(t){return String(t||'').replace(/[\s\-–—]+$/,'').trim();}
+  function wkQty(q){return String(q||'').trim().replace(/^\(+/,'').replace(/\)+$/,'').trim();}
   function wkBuildReport(){
     const cfg=wkCfg(),L=[];
     L.push([cfg.reportTitle,wk.customer,wk.jobId].filter(Boolean).join(' -- '));
     L.push('----------------------------');
-    L.push('Ready: '+WK_READY_LINE[wk.ready]);
-    const oks=cfg.status.filter(s=>wk.status[s.id].v==='in').map(s=>s.ok||s.label);
-    if(oks.length)L.push('✅ '+(cfg.okPrefix||'')+oks.join(', '));
-    cfg.status.filter(s=>wk.status[s.id].v==='out').forEach(s=>{
-      const o=wk.status[s.id],note=(o.note||'').trim();
-      let line='❌ '+(s.bad||('NOT IN: '+s.label))+((!s.lines&&note)?' ('+note+')':'');
-      if(s.extra&&o.extra)line+=' — '+String(s.extra[o.extra]).toLowerCase();
-      if(s.ask!=='note')line+=o.when?' — per super: '+o.when.toLowerCase():' — no date from super yet';
-      if(s.holds===false)line+=' — not holding up the job';
-      L.push(line);
-      if(s.lines)o.lines.map(x=>x.trim()).filter(Boolean).forEach(x=>L.push('   - '+x));
+    // the headline answer first
+    cfg.sections.forEach(s=>{if(s.type==='ready'){const o=s.options.find(x=>x.v===wk.ready);if(o)L.push((s.label||'Ready')+': '+o.line);}});
+    // findings: checks, questions, flags, reasons — in the order they appear on the form
+    cfg.sections.forEach(s=>{
+      if(!wkVisible(s))return;
+      if(s.type==='checks'){
+        const oks=s.items.filter(it=>wk.status[it.id].v==='in').map(it=>it.ok||it.label);
+        if(oks.length)L.push('✅ '+(s.okPrefix||'')+oks.join(', '));
+        s.items.filter(it=>wk.status[it.id].v==='out').forEach(it=>{
+          const o=wk.status[it.id],note=(o.note||'').trim(),ask=it.ask||'when';
+          let line='❌ '+(it.bad||('NOT IN: '+it.label))+((!it.lines&&ask!=='none'&&note)?' ('+note+')':'');
+          if(it.extra&&o.extra)line+=' — '+String(it.extra[o.extra]).toLowerCase();
+          if(ask==='when')line+=o.when?' — per super: '+o.when.toLowerCase():' — no date from super yet';
+          if(it.holds===false)line+=' — not holding up the job';
+          L.push(line);
+          if(it.lines)o.lines.map(x=>x.trim()).filter(Boolean).forEach(x=>L.push('   - '+x));
+        });
+      }else if(s.type==='choice'){
+        const v=wk.choice[s.id];if(v==='yes'&&s.yesLine)L.push(s.yesLine);if(v==='no'&&s.noLine)L.push(s.noLine);
+      }else if(s.type==='flags'){
+        s.items.forEach(it=>{if(wk.flags[it.id])L.push(it.line);});
+      }else if(s.type==='reasons'){
+        s.items.forEach(it=>{const o=wk.reasons[it.id];if(!o.on)return;L.push('❌ '+it.label);o.lines.map(x=>x.trim()).filter(Boolean).forEach(x=>L.push('   - '+x));});
+      }
     });
-    const iss=wk.issues.map(i=>wkClean(i.text)).filter(Boolean);
-    if(iss.length){L.push('---');iss.forEach(t=>L.push('❌ '+t));}
-    const del=(cfg.deliver===false)?[]:wk.deliver.map(d=>d.trim()).filter(Boolean);
-    if(del.length){L.push('---');L.push('Please deliver the '+wkList(del)+'.');}
-    const n=(wk.notes||'').trim();
-    if(n){L.push('---');L.push('Notes: '+n);}
+    // lists and notes, each under a divider
+    cfg.sections.forEach(s=>{
+      if(!wkVisible(s))return;
+      if(s.type==='list'){
+        const o=wk.lists[s.id];
+        if(o.none&&s.none){L.push('---');L.push(s.none.line);return;}
+        const items=o.lines.map(l=>({q:wkQty(l.q),t:l.t.trim()})).filter(l=>l.t);
+        if(!items.length)return;
+        L.push('---');
+        if(s.header)L.push(s.header);
+        items.forEach(l=>L.push((s.prefix||'')+(s.kind==='qty'&&l.q?'('+l.q+') ':'')+l.t));
+      }else if(s.type==='notes'){
+        const n=(wk.notes||'').trim();if(n){L.push('---');L.push('Notes: '+n);}
+      }
+    });
     return L.join('\n');
   }
   function wkGenerate(){
-    const cfg=wkCfg();
-    // Only "Ready?" is required — checklist items the house doesn't have can simply be skipped.
-    if(!wk.ready){
-      showToast('⚠️ CHOOSE READY OR NOT READY');
-      const el=document.getElementById('wk-ready');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
-      return;
-    }
-    // An issue button tapped but never filled in (e.g. just "Door slab is off its frame") gives the office no location.
-    // Pause once so the PM can add the room; tapping Generate again sends it as is.
-    const presets=cfg.issueChips.map(c=>wkClean(c.text)).filter(Boolean);
-    const bare=wk.issues.map((i,ix)=>({ix:ix,t:wkClean(i.text)})).filter(o=>o.t&&presets.indexOf(o.t)>-1);
-    if(bare.length&&!wk.warnedBare){
-      wk.warnedBare=true;
-      showToast('⚠️ ADD A ROOM TO THE ISSUE — or tap Generate again');
-      const ins=document.querySelectorAll('#wk-issues .qnote-input'),el=ins[bare[0].ix];
-      if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.focus();}
+    const cfg=wkCfg(),ri=cfg.sections.findIndex(s=>s.type==='ready');
+    // Only the headline answer is required — items the house doesn't have can simply be skipped.
+    if(ri>-1&&!wk.ready){
+      showToast('⚠️ CHOOSE '+(cfg.kind==='pre'?'READY OR NOT READY':'COMPLETE OR INCOMPLETE'));
+      const el=document.getElementById('wk-sec-'+ri);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
       return;
     }
     if(wkDirty&&!confirm('Generating again will replace the changes you made to the text. Continue?'))return;
@@ -1634,7 +1686,8 @@
     const h=JSON.parse(localStorage.getItem(WK_HIST)||'[]'),it=h[i];
     if(!it||!it.structured||!WALKS[it.mode])return;
     wkEnsureOverlay();
-    pwMode=it.mode;pwCustomer=it.customer;pwJobId=it.jobId;
+    wkShowPage(it.mode,true);
+    pwCustomer=it.customer;pwJobId=it.jobId;
     wk=JSON.parse(JSON.stringify(it.structured));wk.mode=it.mode;wk.hid=it.hid;wk.done=true;
     wkNormalize();wkOpenForm();
     document.getElementById('wk-out-text').value=it.text;wkDirty=false;wkSetEdit(false);
@@ -1644,18 +1697,33 @@
     const h=JSON.parse(localStorage.getItem(WK_HIST)||'[]');h.splice(i,1);
     localStorage.setItem(WK_HIST,JSON.stringify(h));renderPwHistory();
   }
+  // post walks saved by the first beta: view only
+  function loadPwHist(i){
+    const h=JSON.parse(localStorage.getItem(PW1_HIST)||'[]'),it=h[i];if(!it)return;
+    wkEnsureOverlay();wkShowPage('post1',true);
+    document.getElementById('wk-picker').style.display='none';
+    document.getElementById('wk-formwrap').style.display='none';
+    document.getElementById('wk-legacy-text').value=it.text||'';
+    document.getElementById('wk-legacy').style.display='block';
+  }
+  function wkCopyLegacy(){
+    const ta=document.getElementById('wk-legacy-text');
+    navigator.clipboard.writeText(ta.value).then(()=>showToast('✓ COPIED — Paste into AppWright')).catch(()=>{ta.select();document.execCommand('copy');showToast('✓ COPIED');});
+  }
+  function delPwHist(i){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];h.splice(i,1);localStorage.setItem(PW1_HIST,JSON.stringify(h));renderPwHistory();}
+  function togglePwHist(){const b=document.getElementById('pw-history-body'),c=document.getElementById('pw-history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
   // One list on the Main Page for every kind of walk, newest first
-  const WK_TAGS={trim1:'PRE · 1ST TRIM',trim2:'PRE · 2ND TRIM',lockout:'PRE · LOCKOUT'};
-  function showPwHistory(){
+  const WK_TAGS={trim1:'PRE · 1ST TRIM',trim2:'PRE · 2ND TRIM',lockout:'PRE · LOCKOUT',post1:'POST · 1ST TRIM',post2:'POST · 2ND TRIM',postlo:'POST · LOCKOUT'};
+  function renderPwHistory(){
     const el=document.getElementById('pw-history-list');if(!el)return;
-    let post=[],pre=[];
-    try{post=(JSON.parse(localStorage.getItem(PW1_HIST))||[]).map((h,i)=>({k:'post',i:i,h:h}));}catch(e){}
-    try{pre=(JSON.parse(localStorage.getItem(WK_HIST))||[]).map((h,i)=>({k:'pre',i:i,h:h}));}catch(e){}
-    const all=pre.concat(post).sort((a,b)=>(b.h.ts||0)-(a.h.ts||0));
+    let old=[],cur=[];
+    try{old=(JSON.parse(localStorage.getItem(PW1_HIST))||[]).map((h,i)=>({k:'old',i:i,h:h}));}catch(e){}
+    try{cur=(JSON.parse(localStorage.getItem(WK_HIST))||[]).map((h,i)=>({k:'cur',i:i,h:h}));}catch(e){}
+    const all=cur.concat(old).sort((a,b)=>(b.h.ts||0)-(a.h.ts||0));
     el.innerHTML=all.length?all.map(x=>{
-      const isPost=x.k==='post';
-      const tag=isPost?'POST · 1ST TRIM':(WK_TAGS[x.h.mode]||'PRE-WALK'),cls=isPost?'post':(x.h.mode==='lockout'?'lock':'pre');
-      return '<div class="pw-history-entry"><span><span class="wk-tag '+cls+'">'+tag+'</span><br><b>'+esc(x.h.label)+'</b><br><small style="color:#64748b">'+esc(x.h.time||'')+'</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="'+(isPost?'loadPwHist(':'loadPreHist(')+x.i+')">✏️ EDIT</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="'+(isPost?'delPwHist(':'delPreHist(')+x.i+')">✕</button></div></div>';
+      const isOld=x.k==='old',mode=isOld?'post1':x.h.mode;
+      const tag=WK_TAGS[mode]||'WALK',cls=(mode==='lockout'||mode==='postlo')?'lock':(mode.indexOf('post')===0?'post':'pre');
+      return '<div class="pw-history-entry"><span><span class="wk-tag '+cls+'">'+tag+'</span><br><b>'+esc(x.h.label)+'</b><br><small style="color:#64748b">'+esc(x.h.time||'')+'</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="'+(isOld?'loadPwHist(':'loadPreHist(')+x.i+')">'+(isOld?'👁 VIEW':'✏️ EDIT')+'</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="'+(isOld?'delPwHist(':'delPreHist(')+x.i+')">✕</button></div></div>';
     }).join(''):'<p style="font-size:11px;color:#94a3b8;text-align:center;">No walks yet.</p>';
   }
   renderPwHistory();
