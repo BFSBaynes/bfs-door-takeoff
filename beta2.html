@@ -317,7 +317,14 @@
     .wk-qn-btn{padding:15px 6px;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;}
     .wk-qn-btn.chk{background:#f0fdf4;border:2px solid #86efac;color:#15803d;}
     .wk-qn-btn.iss{background:#fef2f2;border:2px solid #fca5a5;color:#b91c1c;}
-    .wk-pre-note{margin-top:8px;height:68px;font-size:16px;margin-bottom:0;}
+    .wk-pre-note{margin-top:8px;height:98px;font-size:16px;margin-bottom:0;}
+
+    /* ── RECENT list: one heading per kind ── */
+    .pw-rsec{border-bottom:1px solid #eef2f7;}
+    .pw-rsec-hdr{display:flex;justify-content:space-between;align-items:center;padding:13px 4px;font-weight:800;font-size:14px;color:var(--navy);cursor:pointer;}
+    .pw-rsec-n{display:inline-block;min-width:22px;text-align:center;margin-left:6px;padding:1px 7px;border-radius:10px;background:#e2e8f0;color:#475569;font-size:11px;font-weight:800;}
+    .pw-rsec-chev{font-size:11px;color:#64748b;}
+    .pw-rsec-more{font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 10px;}
 
   </style>
 </head>
@@ -362,7 +369,7 @@
     <div onclick="togglePwHist()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:2px 0 10px 0;border-bottom:1.5px solid #f1f5f9;">
       <div style="display:flex;align-items:center;gap:8px;">
         <div style="width:3px;height:16px;background:var(--navy);border-radius:2px;"></div>
-        <label style="cursor:pointer;margin:0;font-size:11px;color:var(--navy);font-weight:900;">RECENT WALKS</label>
+        <label style="cursor:pointer;margin:0;font-size:11px;color:var(--navy);font-weight:900;">RECENT</label>
       </div>
       <span id="pw-history-chevron" style="font-size:11px;color:#64748b;font-weight:800;">▼ SHOW</span>
     </div>
@@ -861,7 +868,7 @@
   function confirmNewLot(){const c=document.getElementById('customer').value;state={fireRated:false};document.getElementById('summary').value='';document.getElementById('job-id').value='';document.getElementById('notes').value='';document.querySelectorAll('.section-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.section-title').forEach(el=>el.classList.remove('active-header'));clearQNotes('main');refreshAllCards();updateSummaryStyle();document.getElementById('customer').value=c;saveState();updateJobBanner();updateDoorTotal();document.getElementById('job-id').focus();window.scrollTo(0,0);}
   function showToast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('show');void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
   function toggleHist(){const b=document.getElementById('history-body'),c=document.getElementById('history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
-  function saveToHistory(text,label,fullData){let h=JSON.parse(localStorage.getItem(TEST_HIST))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${label}`,text,time:ts,fullData});if(h.length>20)h.pop();localStorage.setItem(TEST_HIST,JSON.stringify(h));renderHistory();}
+  function saveToHistory(text,label,fullData){let h=JSON.parse(localStorage.getItem(TEST_HIST))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});h.unshift({label:`${ds} — ${label}`,text,time:ts,fullData});if(h.length>RECENT_KEEP_TAKEOFFS)h.pop();localStorage.setItem(TEST_HIST,JSON.stringify(h));renderHistory();}
   function renderHistory(){const list=document.getElementById('history-list'),h=JSON.parse(localStorage.getItem(TEST_HIST))||[],q=(document.getElementById('history-search')?.value||'').trim().toLowerCase();const f=q?h.filter(i=>i.label.toLowerCase().includes(q)||(i.fullData?.customer||'').toLowerCase().includes(q)):h;list.innerHTML=f.length?'': `<p style='font-size:11px;color:#94a3b8;'>No takeoffs yet.</p>`;f.forEach((item,i)=>{const ri=h.indexOf(item);list.innerHTML+=`<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div class="history-controls"><button class="load-btn" onclick="loadHistory(${ri})">LOAD</button><button class="del-btn" onclick="delHistory(${ri})">✕</button></div></div>`;});}
   function loadHistory(i){const h=JSON.parse(localStorage.getItem(TEST_HIST))[i];if(!h)return;document.getElementById('summary').value=h.text;document.getElementById('customer').value=h.fullData.customer||'';document.getElementById('job-id').value=h.fullData.jobId||'';document.getElementById('notes').value=h.fullData.notes||'';state=JSON.parse(JSON.stringify(h.fullData.state));refreshAllCards();saveState();updateJobBanner();updateSummaryStyle();updateDoorTotal();document.getElementById('summary-section').scrollIntoView({behavior:'smooth'});}
   function delHistory(i){let h=JSON.parse(localStorage.getItem(TEST_HIST));h.splice(i,1);localStorage.setItem(TEST_HIST,JSON.stringify(h));renderHistory();}
@@ -880,7 +887,7 @@
   // TAKEOFF INDEX — persistent 90-day cross-reference
   // ════════════════════════════════════════════════════════════════
   const TAKEOFF_INDEX_KEY='bfs_takeoff_index';
-  const EXPIRY_MS=90*24*60*60*1000;
+  const EXPIRY_MS=120*24*60*60*1000;
   function getTakeoffIndex(){try{return JSON.parse(localStorage.getItem(TAKEOFF_INDEX_KEY))||[];}catch(e){return[];}}
   function migrateOldIndexKeys(){const index=getTakeoffIndex();if(!index.length)return;const newEntries=[],removeKeys=[];index.forEach(entry=>{const parts=(entry.key||'').split('|');if(parts.length===3){const newKey=`${parts[0]}|${parts[2]}`;const alreadyExists=index.some(e=>e.key===newKey)||newEntries.some(e=>e.key===newKey);if(!alreadyExists)newEntries.push({...entry,key:newKey,jobId:entry.lot||entry.subdivision||parts[2]});removeKeys.push(entry.key);}});if(newEntries.length||removeKeys.length){const migrated=[...index.filter(e=>!removeKeys.includes(e.key)),...newEntries];localStorage.setItem(TAKEOFF_INDEX_KEY,JSON.stringify(migrated));}}
   function expireTakeoffIndex(){const now=Date.now(),index=getTakeoffIndex(),fresh=index.filter(e=>(now-(e.timestamp||0))<EXPIRY_MS);if(fresh.length!==index.length)localStorage.setItem(TAKEOFF_INDEX_KEY,JSON.stringify(fresh));}
@@ -936,7 +943,7 @@
   function copyLoSummary(){const text=document.getElementById('lo-summary').value;if(!text.trim()){showToast('⚠️ GENERATE FIRST');return;}navigator.clipboard.writeText(text).then(()=>showToast('✓ COPIED TO CLIPBOARD')).catch(()=>{document.getElementById('lo-summary').select();document.execCommand('copy');showToast('✓ COPIED');});}
   function loNewLot(){const c=document.getElementById('lo-customer').value;loState={};['lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-customer').value=c;clearQNotes('lo');buildLoCounters();saveLoState();document.getElementById('lo-job-id').focus();showToast('✓ READY FOR NEW LOT');}
   function loReset(){if(!confirm('Reset all lockout walk fields?'))return;loState={};['lo-customer','lo-job-id','lo-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('lo-summary').value='';document.getElementById('lo-trim-match').style.display='none';window._loTrimMatch=null;localStorage.removeItem('bfs_lo_active_work');clearQNotes('lo');buildLoCounters();updateLoSummaryStyle();updateLoJobBanner();}
-  function saveLoToHistory(text,fullData){let h=JSON.parse(localStorage.getItem('bfs_lo_history'))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),label=[fullData.customer,fullData.jobId].filter(Boolean).join(' — ');h.unshift({label:`${ds} — ${label}`,text,time:ts,fullData});if(h.length>20)h.pop();localStorage.setItem('bfs_lo_history',JSON.stringify(h));renderLoHistory();}
+  function saveLoToHistory(text,fullData){let h=JSON.parse(localStorage.getItem('bfs_lo_history'))||[];const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),ts=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),label=[fullData.customer,fullData.jobId].filter(Boolean).join(' — ');h.unshift({label:`${ds} — ${label}`,text,time:ts,fullData});if(h.length>RECENT_KEEP_TAKEOFFS)h.pop();localStorage.setItem('bfs_lo_history',JSON.stringify(h));renderLoHistory();}
   function renderLoHistory(){const list=document.getElementById('lo-history-list'),h=JSON.parse(localStorage.getItem('bfs_lo_history'))||[];list.innerHTML=h.length?h.map((item,i)=>`<div class="history-item"><span><b>${item.label}</b><br><small style="color:#64748b">${item.time||''}</small></span><div class="history-controls"><button class="load-btn" onclick="loadLoHistory(${i})">LOAD</button><button class="del-btn" onclick="delLoHistory(${i})">✕</button></div></div>`).join(''):`<p style="font-size:11px;color:#94a3b8;padding:8px 0;">No lockout walks yet.</p>`;}
   function loadLoHistory(i){const h=JSON.parse(localStorage.getItem('bfs_lo_history'))[i];document.getElementById('lo-customer').value=h.fullData.customer||'';document.getElementById('lo-job-id').value=h.fullData.jobId||'';document.getElementById('lo-notes').value=h.fullData.notes||'';document.getElementById('lo-summary').value=h.text||'';loState=JSON.parse(JSON.stringify(h.fullData.loState||{}));buildLoCounters();saveLoState();updateLoSummaryStyle();checkLoTrimMatch();}
   function delLoHistory(i){let h=JSON.parse(localStorage.getItem('bfs_lo_history'));h.splice(i,1);localStorage.setItem('bfs_lo_history',JSON.stringify(h));renderLoHistory();}
@@ -979,7 +986,7 @@
   // ════════════════════════════════════════════════════════════════
   // ── ROLLOUT SETTINGS ──
   // The version shows on the Main Page and is sent with every problem report — change it each time you upload a new file.
-  const APP_VERSION = "Beta 1.5";
+  const APP_VERSION = "Beta 1.9";
   // Where "Report a problem" emails go. Leave it empty ("") and the button copies the report so it can be pasted into an email.
   const REPORT_EMAIL = "miller.baynes@bldr.com";
 
@@ -987,6 +994,18 @@
   // true  = every item in the AppWright text sits on its own line with a blank line between items
   // false = every item on its own line, no blank lines in between
   const WK_BLANK_BETWEEN_ITEMS = true;
+
+  // ── RECENT LIST on the Main Page ──
+  const RECENT_SHOW = 6;   // how many of each kind show under each Recent heading
+  const WK_KEEP = 25;      // how many walks of each type the EDIT history keeps
+  const RECENT_KEEP_TAKEOFFS = 40;   // how many Recent Trim Takeoffs and Recent Lockout Takeoffs the phone keeps
+  const WK_DRAFT_DAYS = 30;          // a half-finished walk that hasn't been touched for this many days is thrown away
+  // The post walk's "flagged on the pre-walk" card does NOT depend on the Recent list: every pre-walk leaves a small copy of what it flagged,
+  // kept this many days (the same 120 days the lockout keeps a trim takeoff). Set to a bigger number to remember longer.
+  const WK_FOLLOWUP_DAYS = 120;
+  // The grey writing in the "Still open" box on a post walk. Every pre-walk item can have its own  hint:"..."  (see the walks below);
+  // these are what is used for added issues, deliveries, and anything without its own hint. Deliveries start with "When is it coming?".
+  const WK_FOLLOW_HINTS = {issue:"we will take care of it on the return trip", deliver:"delivery is scheduled for Friday", fallback:"we will take care of it on the return trip"};
 
   const WALKS = {
 
@@ -1015,20 +1034,20 @@
       ],
       sections: [
         {type:"checks", title:"🏠 Ready for trim?", allOk:"✅ Mark everything good", items:[
-          {id:"openings", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
+          {id:"openings", hint:"the framer is fixing the opening Monday — we will install after", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
            ok:"Openings framed correctly", bad:"Openings NOT framed correctly", ask:"note",
            lines:true, linesLabel:"Which openings? One line for each opening", linePh:"Which opening? (e.g. Master bath — too narrow)", addLabel:"+ Add another opening",
            help:"Check all doors, attic stair, cased openings, etc. Make sure the rough opening is correct and the framing is plumb/square. If one is wrong, mark Problem and add a line for each opening."},
-          {id:"drywall", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
+          {id:"drywall", hint:"drywall is finished Friday — we will start Monday", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
            ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", whenLine:"this will be finished {when}", notePh:"What's left — not hung, not mudded, not sanded?",
            help:"Drywall should be hung, mudded and sanded. If anything is left, mark Not done and say what's left."},
-          {id:"cabinets", label:"Cabinets installed", yes:"✅ Installed", no:"❌ Not in", holds:false,
+          {id:"cabinets", hint:"cabinets are coming next week — we will do that trim at 2nd trim", label:"Cabinets installed", yes:"✅ Installed", no:"❌ Not in", holds:false,
            ok:"Cabinets installed", bad:"Cabinets NOT installed",
            help:"Cabinets do not hold up the job — the base and casing/trim will get tied into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
-          {id:"counters", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
+          {id:"counters", hint:"countertops are set Thursday — we will finish that trim at 2nd trim", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
            ok:"Countertops in", bad:"Countertops NOT in",
            help:"Countertops do not hold up the job — we tie the casing/trim into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
-          {id:"power", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
+          {id:"power", hint:"power goes on Wednesday — the installer is bringing a generator until then", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
            ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?", whenLine:"power will be on {when}",
            extra:{label:"Generator?", yes:"Generator needed", no:"No generator needed"},
            help:"Check that the electricity is on. If there is no power, mark it and say whether a generator is needed."}
@@ -1073,11 +1092,11 @@
       ],
       sections: [
         {type:"checks", title:"🧱 Floors & surfaces", allOk:"✅ Mark everything installed", items:[
-          {id:"counters", label:"Countertops",             ok:"Countertops installed",   help:"Check every kitchen, bath and laundry. Not in? Get a date from the super and tap what they tell you."},
-          {id:"cabinets", label:"Cabinets & vanities set", ok:"Cabinets & vanities set", help:"Base cabinets and vanities should be set so the shoe/trim can be installed to them."},
-          {id:"lvp",      label:"LVP",                     ok:"LVP installed",           help:"Check every area where shoe will be installed that gets LVP. If only some rooms are done, mark Not in and say which rooms."},
-          {id:"wood",     label:"Wood flooring",           ok:"Wood flooring installed", help:"Check every area where shoe will be installed that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
-          {id:"tile",     label:"Tile",                    ok:"Tile installed",          help:"Check baths, laundry and any other tile areas where shoe will be installed."}
+          {id:"counters", hint:"countertops are set Friday — shoe goes in after", label:"Countertops",             ok:"Countertops installed",   help:"Check every kitchen, bath and laundry. Not in? Get a date from the super and tap what they tell you."},
+          {id:"cabinets", hint:"vanities are set Monday — we will come back for that trim", label:"Cabinets & vanities set", ok:"Cabinets & vanities set", help:"Base cabinets and vanities should be set so the shoe/trim can be installed to them."},
+          {id:"lvp", hint:"LVP goes down Tuesday — we will come back for the shoe",      label:"LVP",                     ok:"LVP installed",           help:"Check every area where shoe will be installed that gets LVP. If only some rooms are done, mark Not in and say which rooms."},
+          {id:"wood", hint:"wood floors are being sanded this week — we will come back after they cure",     label:"Wood flooring",           ok:"Wood flooring installed", help:"Check every area where shoe will be installed that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
+          {id:"tile", hint:"tile is grouted Thursday — we will set the shoe after",     label:"Tile",                    ok:"Tile installed",          help:"Check baths, laundry and any other tile areas where shoe will be installed."}
         ]},
         {type:"quick", title:"🔎 Anything else you noticed?"},
         {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
@@ -1085,7 +1104,7 @@
           {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the quarter round and shoe", line:"🟡 READY ONCE ITEMS ARE IN"},
           {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the install yet",                                       line:"❌ NOT READY"}
         ]},
-        {type:"choice", id:"tieins", title:"🧰 Enough material on site for trim tie-ins?", yes:"✅ Enough on site", no:"❌ Not enough",
+        {type:"choice", id:"tieins", hint:"the 1x8 is being delivered Friday — we will tie in then", title:"🧰 Enough material on site for trim tie-ins?", yes:"✅ Enough on site", no:"❌ Not enough",
          yesLine:"✅ Enough material on site for trim tie-ins", noLine:"❌ NOT enough material on site for trim tie-ins"},
         {type:"list", id:"deliver", title:"📦 Please deliver", kind:"qty", header:"Please deliver:",
          qtyLabel:"Qty", txtLabel:"Material", qtyPh:"12", txtPh:"1x8",
@@ -1120,16 +1139,16 @@
       ],
       sections: [
         {type:"checks", title:"🚪 Doors", allOk:"✅ Mark everything done", items:[
-          {id:"intdoors", label:"Interior doors installed", yes:"✅ Installed", no:"❌ Not in",
+          {id:"intdoors", hint:"two doors are still being hung — we will lock those out on the return trip", label:"Interior doors installed", yes:"✅ Installed", no:"❌ Not in",
            ok:"Interior doors installed", bad:"Interior doors NOT installed", notePh:"Which doors?",
            help:"Every interior door hung on its frame. A slab leaning in the garage or sitting off its frame counts as Not in — note which doors."},
-          {id:"painted",  label:"Doors painted", yes:"✅ Painted", no:"❌ Not painted",
+          {id:"painted", hint:"painters finish Tuesday — we will lock out after",  label:"Doors painted", yes:"✅ Painted", no:"❌ Not painted",
            ok:"Doors painted", bad:"Doors NOT painted", notePh:"Which doors / areas?", whenLine:"this will be painted {when}",
            help:"Doors painted before locks go on. If only some are done, mark Not painted and say which areas."},
-          {id:"extdoors", label:"Exterior & garage entry doors installed", yes:"✅ Installed", no:"❌ Not in",
+          {id:"extdoors", hint:"the garage entry door goes in Wednesday — we will lock it out then", label:"Exterior & garage entry doors installed", yes:"✅ Installed", no:"❌ Not in",
            ok:"Exterior & garage entry doors installed", bad:"Exterior / garage entry doors NOT installed", notePh:"Which doors?",
            help:"Front, rear/patio and garage entry doors installed and ready for locks."},
-          {id:"base",     label:"Baseboard installed (for base bumps)", yes:"✅ Installed", no:"❌ Not in",
+          {id:"base", hint:"base goes in Wednesday — we will set the base bumps on the return trip",     label:"Baseboard installed (for base bumps)", yes:"✅ Installed", no:"❌ Not in",
            ok:"Baseboard installed", bad:"Baseboard NOT installed", notePh:"Which rooms?",
            help:"Baseboard needs to be in where base bumps go. Skip this one if the house has no base bumps."}
         ]},
@@ -1170,7 +1189,7 @@
         "Tap Mark everything good, or tap what's wrong on any check and add a line for each.",
         "Tap Add Check or Add Issue for anything else you notice.",
         "Then tap Complete or Incomplete. If it's incomplete, tap each reason and add a line for each item.",
-        "List any extra material left on site to pick up (quantity, then what it is) — or tap No extra material.",
+        "List anything that has to be delivered under Please deliver, and any extra material left on site to pick up (quantity, then what it is) — or tap No extra material.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
@@ -1208,6 +1227,9 @@
           {id:"damaged",   label:"Damaged Material",           ph:"What is damaged?",                         add:"+ Add an item",    more:"+ Add another item"},
           {id:"other",     label:"Other",                      ph:"Describe the issue...",                    add:"+ Add an issue",   more:"+ Add another issue"}
         ]},
+        {type:"list", id:"deliver", title:"📦 Please deliver", kind:"qty", header:"Please deliver:",
+         qtyLabel:"Qty", txtLabel:"Material", qtyPh:"12", txtPh:"1x8",
+         add:"+ Add material", more:"+ Add more material"},
         {type:"list", id:"material", title:"📦 Extra Material on Site to Pick Up", kind:"qty", header:"Extra material on site to pick up:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"48 LF", txtPh:"Baseboard",
          add:"+ Add extra material", more:"+ Add more extra material",
@@ -1236,7 +1258,7 @@
         "Tap Mark everything good, or tap what's wrong on any check and add a line for each.",
         "Tap Add Check or Add Issue for anything else you notice.",
         "Then tap Complete or Incomplete. If it's incomplete, tap each problem under 2nd Trim Issues and add a line for each. Tap Trip charge needed if the installer will have to come back.",
-        "List any extra material left on site to pick up (quantity, then what it is) — or tap No extra material.",
+        "List anything that has to be delivered under Please deliver, and any extra material left on site to pick up (quantity, then what it is) — or tap No extra material.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
@@ -1267,6 +1289,9 @@
         {type:"flags", showWhen:{ready:"incomplete"}, items:[
           {id:"trip", label:"Trip charge needed for installer when ready", line:"💲 Trip charge needed for installer when ready"}
         ]},
+        {type:"list", id:"deliver", title:"📦 Please deliver", kind:"qty", header:"Please deliver:",
+         qtyLabel:"Qty", txtLabel:"Material", qtyPh:"12", txtPh:"1x8",
+         add:"+ Add material", more:"+ Add more material"},
         {type:"list", id:"material", title:"📦 Extra Material on Site to Pick Up", kind:"qty", header:"Extra material on site to pick up:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"13", txtPh:"shoe",
          add:"+ Add extra material", more:"+ Add more extra material",
@@ -1278,7 +1303,6 @@
     // ═════════════ LOCKOUT POST WALK ═════════════
     postlo: {
       kind: "post",
-      expected: true,
       title: "Lockout Post Walk",
       headerTitle: "🔒 LOCKOUT POST WALK",
       reportTitle: "POST WALK — LOCKOUT",
@@ -1298,7 +1322,7 @@
         "If you adjusted any doors or catch plates, list how many.",
         "Tap Add Check or Add Issue for anything else you notice.",
         "Then tap Complete or Incomplete.",
-        "List any extra locks or hardware left on site (quantity, then what it is) — or tap None left on site.",
+        "List the hardware needed to finish under Hardware needed, and any extra locks or hardware left on site (quantity, then what it is) — or tap None left on site.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
@@ -1327,6 +1351,9 @@
           {v:"complete",   icon:"✅", t:"Complete",   s:"Lockout is complete",     line:"✅ COMPLETE"},
           {v:"incomplete", icon:"❌", t:"Incomplete", s:"Something is left to do", line:"❌ INCOMPLETE"}
         ]},
+        {type:"list", id:"hwneeded", title:"🔩 Hardware needed", kind:"qty", header:"Hardware needed:",
+         qtyLabel:"Qty", txtLabel:"Hardware", qtyPh:"4", txtPh:"hinge stops",
+         add:"+ Add hardware", more:"+ Add more hardware"},
         {type:"list", id:"extra", title:"🔑 Extra locks & hardware on site", kind:"qty", header:"Extra locks / hardware on site:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"2", txtPh:"passage knobs",
          add:"+ Add extra", more:"+ Add more extra",
@@ -1432,7 +1459,12 @@
   }
 
   // ── drafts: a walk in progress survives a phone lock, a call, or leaving the screen ──
-  function wkDrafts(){try{return JSON.parse(localStorage.getItem(WK_DRAFTS))||{};}catch(e){return {};}}
+  function wkDrafts(){
+    let d={};try{d=JSON.parse(localStorage.getItem(WK_DRAFTS))||{};}catch(e){}
+    const cut=Date.now()-WK_DRAFT_DAYS*86400000;                       // a draft nobody touched for WK_DRAFT_DAYS days is gone
+    Object.keys(d).forEach(k=>{if(!d[k]||(d[k].ts||0)<cut)delete d[k];});
+    return d;
+  }
   function wkSave(){
     if(!wk||wk.done)return;
     const d=wkDrafts();d[wkKeyFor(wk.mode,wk.customer,wk.jobId)]={ts:Date.now(),data:wk};
@@ -1907,14 +1939,32 @@
   }
   function wkToggleEdit(){wkSetEdit(document.getElementById('wk-out-text').readOnly);}
 
+  // ── follow-up memory: a small copy of what each PRE-walk flagged, kept by age, so the size of the Recent list never matters ──
+  const WK_FU='bfs_test_followup_index';
+  function wkFuRead(){let a=[];try{a=JSON.parse(localStorage.getItem(WK_FU))||[];}catch(e){}const cut=Date.now()-WK_FOLLOWUP_DAYS*86400000;return a.filter(x=>x&&(x.ts||0)>=cut);}
+  function wkFuWrite(a){try{localStorage.setItem(WK_FU,JSON.stringify(a));}catch(e){}}
+  function wkFuTrim(st){   // only what a post walk reads back
+    const S={},C={},L={};
+    Object.keys(st.status||{}).forEach(k=>{if(st.status[k]&&st.status[k].v==='out')S[k]=st.status[k];});
+    Object.keys(st.choice||{}).forEach(k=>{if(st.choice[k]==='no')C[k]='no';});
+    Object.keys(st.lists||{}).forEach(k=>{if(k==='deliver'||k==='issues')L[k]=st.lists[k];});
+    return {mode:st.mode,customer:st.customer,jobId:st.jobId,hid:st.hid,status:S,choice:C,lists:L,quick:(st.quick||[]).filter(q=>q&&q.k==='issue'),ready:st.ready||''};
+  }
+  function wkFuSave(){
+    if(Object.keys(WK_PAIR).map(k=>WK_PAIR[k]).indexOf(wk.mode)<0)return;   // only pre-walks have a post walk
+    const a=wkFuRead().filter(x=>x.hid!==wk.hid);
+    a.unshift({mode:wk.mode,customer:wk.customer,jobId:wk.jobId,hid:wk.hid,ts:Date.now(),structured:wkFuTrim(wk)});
+    wkFuWrite(a);
+  }
   // ── history (EDIT brings the whole walk back into the form) ──
   function wkSaveHistory(text){
     let h=[];try{h=JSON.parse(localStorage.getItem(WK_HIST))||[];}catch(e){}
     const now=new Date(),ds=(now.getMonth()+1)+'/'+now.getDate(),tm=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     h=h.filter(x=>x.hid!==wk.hid);
     h.unshift({label:ds+' — '+wk.customer+(wk.jobId?' — '+wk.jobId:''),text:text,time:tm,ts:Date.now(),mode:wk.mode,customer:wk.customer,jobId:wk.jobId,hid:wk.hid,structured:JSON.parse(JSON.stringify(wk))});
-    if(h.length>20)h.pop();
+    {const same=h.filter(x=>x.mode===wk.mode);if(same.length>WK_KEEP){const drop=same.slice(WK_KEEP);h=h.filter(x=>drop.indexOf(x)<0);}}   // keep the newest WK_KEEP of each type
     localStorage.setItem(WK_HIST,JSON.stringify(h));
+    wkFuSave();
     renderPwHistory();
   }
   function wkOutEdited(){
@@ -1934,8 +1984,10 @@
     document.getElementById('wk-result').style.display='block';
   }
   function delPreHist(i){
-    const h=JSON.parse(localStorage.getItem(WK_HIST)||'[]');h.splice(i,1);
-    localStorage.setItem(WK_HIST,JSON.stringify(h));renderPwHistory();
+    const h=JSON.parse(localStorage.getItem(WK_HIST)||'[]'),gone=h[i];h.splice(i,1);
+    localStorage.setItem(WK_HIST,JSON.stringify(h));
+    if(gone)wkFuWrite(wkFuRead().filter(x=>x.hid!==gone.hid));   // deleting a walk removes its follow-up memory too
+    renderPwHistory();
   }
   // post walks saved by the first beta: view only
   function loadPwHist(i){
@@ -1952,22 +2004,36 @@
   }
   function delPwHist(i){let h=JSON.parse(localStorage.getItem(PW1_HIST))||[];h.splice(i,1);localStorage.setItem(PW1_HIST,JSON.stringify(h));renderPwHistory();}
   function togglePwHist(){const b=document.getElementById('pw-history-body'),c=document.getElementById('pw-history-chevron'),o=b.style.display!=='none';b.style.display=o?'none':'block';c.innerText=o?'▼ SHOW':'▲ HIDE';}
-  // One list on the Main Page for every kind of walk, newest first
-  const WK_TAGS={trim1:'PRE · 1ST TRIM',trim2:'PRE · 2ND TRIM',lockout:'PRE · LOCKOUT',post1:'POST · 1ST TRIM',post2:'POST · 2ND TRIM',postlo:'POST · LOCKOUT'};
+  // Recent list on the Main Page: one heading for each kind of takeoff / walk, newest first, RECENT_SHOW of each
+  const WK_SECTION={trim1:'🔍 1st Trim Pre-Walks',post1:'✅ 1st Trim Post Walks',trim2:'🔍 2nd Trim Pre-Walks',post2:'✅ 2nd Trim Post Walks',lockout:'🔍 Lockout Pre-Walks',postlo:'✅ Lockout Post Walks'};
+  const PW_SEC_OPEN={};
+  function togglePwSec(k){PW_SEC_OPEN[k]=!PW_SEC_OPEN[k];renderPwHistory();}
+  function homeLoadTrim(i){openTrim();loadHistory(i);}
+  function homeLoadLo(i){openLockoutWalk();loadLoHistory(i);}
+  function homeDelTrim(i){delHistory(i);renderPwHistory();}
+  function homeDelLo(i){delLoHistory(i);renderPwHistory();}
   function renderPwHistory(){
     const el=document.getElementById('pw-history-list');if(!el)return;
-    let old=[],cur=[];
-    try{old=(JSON.parse(localStorage.getItem(PW1_HIST))||[]).map((h,i)=>({k:'old',i:i,h:h}));}catch(e){}
-    try{cur=(JSON.parse(localStorage.getItem(WK_HIST))||[]).map((h,i)=>({k:'cur',i:i,h:h}));}catch(e){}
-    const all=cur.concat(old).sort((a,b)=>(b.h.ts||0)-(a.h.ts||0));
-    el.innerHTML=all.length?all.map(x=>{
-      const isOld=x.k==='old',mode=isOld?'post1':x.h.mode;
-      const tag=WK_TAGS[mode]||'WALK',cls=(mode==='lockout'||mode==='postlo')?'lock':(mode.indexOf('post')===0?'post':'pre');
-      return '<div class="pw-history-entry"><span><span class="wk-tag '+cls+'">'+tag+'</span><br><b>'+esc(x.h.label)+'</b><br><small style="color:#64748b">'+esc(x.h.time||'')+'</small></span><div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="'+(isOld?'loadPwHist(':'loadPreHist(')+x.i+')">'+(isOld?'👁 VIEW':'✏️ EDIT')+'</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="'+(isOld?'delPwHist(':'delPreHist(')+x.i+')">✕</button></div></div>';
-    }).join(''):'<p style="font-size:11px;color:#94a3b8;text-align:center;">No walks yet.</p>';
+    const rd=k=>{try{return JSON.parse(localStorage.getItem(k))||[];}catch(e){return [];}};
+    const btn=(lbl,load,del)=>'<div style="display:flex;gap:6px;"><button class="load-btn" style="font-size:11px;padding:6px 10px;" onclick="'+load+'">'+lbl+'</button><button class="del-btn" style="padding:6px 10px;font-size:12px;" onclick="'+del+'">✕</button></div>';
+    const groups=[
+      {k:'trimto',t:'📐 Trim Takeoffs',rows:rd(TEST_HIST).map((h,i)=>({ts:0,h:h,b:btn('LOAD','homeLoadTrim('+i+')','homeDelTrim('+i+')')}))},
+      {k:'loto',t:'🔒 Lockout Takeoffs',rows:rd('bfs_lo_history').map((h,i)=>({ts:0,h:h,b:btn('LOAD','homeLoadLo('+i+')','homeDelLo('+i+')')}))}
+    ];
+    const byMode={};
+    rd(WK_HIST).forEach((h,i)=>{(byMode[h.mode]=byMode[h.mode]||[]).push({ts:h.ts||0,h:h,b:btn('✏️ EDIT','loadPreHist('+i+')','delPreHist('+i+')')});});
+    rd(PW1_HIST).forEach((h,i)=>{(byMode.post1=byMode.post1||[]).push({ts:h.ts||0,h:h,b:btn('👁 VIEW','loadPwHist('+i+')','delPwHist('+i+')')});});
+    ['trim1','post1','trim2','post2','lockout','postlo'].forEach(m=>{const r=(byMode[m]||[]).sort((a,b)=>b.ts-a.ts);groups.push({k:m,t:WK_SECTION[m],rows:r});});
+    const shown=groups.filter(g=>g.rows.length);
+    el.innerHTML=shown.length?shown.map(g=>{
+      const open=!!PW_SEC_OPEN[g.k];
+      const body=open?g.rows.slice(0,RECENT_SHOW).map(x=>'<div class="pw-history-entry"><span><b>'+esc(x.h.label)+'</b><br><small style="color:#64748b">'+esc(x.h.time||'')+'</small></span>'+x.b+'</div>').join('')+(g.rows.length>RECENT_SHOW?'<div class="pw-rsec-more">Showing the '+RECENT_SHOW+' most recent</div>':''):'';
+      return '<div class="pw-rsec"><div class="pw-rsec-hdr" onclick="togglePwSec(\''+g.k+'\')"><span>'+g.t+' <span class="pw-rsec-n">'+Math.min(g.rows.length,RECENT_SHOW)+(g.rows.length>RECENT_SHOW?'+':'')+'</span></span><span class="pw-rsec-chev">'+(open?'▲':'▼')+'</span></div>'+body+'</div>';
+    }).join(''):'<p style="font-size:11px;color:#94a3b8;text-align:center;">Nothing yet.</p>';
   }
   renderPwHistory();
-
+  try{wkFuWrite(wkFuRead());}catch(e){}   // forget pre-walks older than WK_FOLLOWUP_DAYS
+  try{localStorage.setItem(WK_DRAFTS,JSON.stringify(wkDrafts()));}catch(e){}   // clear out old drafts on start
   // ════════════════════════════════════════════════════════════════
   // IN-PROGRESS TAKEOFFS · RECENT JOBS · PRE-WALK FOLLOW-UP · REPORT A PROBLEM
   // These were added AROUND the existing takeoff code. The original takeoff and
@@ -2141,7 +2207,13 @@
     return Object.keys(map).map(k=>map[k]).sort((a,b)=>b.ts-a.ts);
   }
 
-  function wkLatest(mode,c,j){const k=jobKey(c,j);return wkArr(WK_HIST).find(x=>x.mode===mode&&jobKey(x.customer,x.jobId)===k);}
+  function wkLatest(mode,c,j){
+    const k=jobKey(c,j);
+    const a=wkArr(WK_HIST).find(x=>x.mode===mode&&jobKey(x.customer,x.jobId)===k);      // the Recent list's copy
+    const b=wkFuRead().find(x=>x.mode===mode&&jobKey(x.customer,x.jobId)===k);           // the follow-up memory (kept by age, not by count)
+    if(a&&b)return (b.ts||0)>(a.ts||0)?b:a;
+    return a||b;
+  }
 
   // ── post walks: what the pre-walk flagged, and was it done? ──
   const WK_PAIR={post1:'trim1',post2:'trim2',postlo:'lockout'};
@@ -2167,6 +2239,16 @@
     const rd=cfg.sections.find(s=>s.type==='ready'),ro=rd&&rd.options.find(x=>x.v===st.ready);
     return {hid:e.hid,ts:e.ts||0,ready:ro?ro.icon+' '+ro.t:'',rows:rows};
   }
+  // grey writing inside the "Still open" box — comes from the hint:"..." on that pre-walk item (see WALK CONTENT)
+  function wkFollowHint(r){
+    const cfg=WALKS[WK_PAIR[wk.mode]],k=String(r.id||'').split(':');let h='';
+    if(cfg){
+      if(k[0]==='c')cfg.sections.forEach(sec=>{if(sec.type==='checks')sec.items.forEach(it=>{if(it.id===k[1]&&it.hint)h=it.hint;});});
+      else if(k[0]==='t'){const sec=cfg.sections.find(x=>x.id===k[1]);if(sec&&sec.hint)h=sec.hint;}
+    }
+    if(!h)h=WK_FOLLOW_HINTS[r.kind]||WK_FOLLOW_HINTS.fallback;
+    return (r.kind==='deliver'?'When is it coming? (e.g. ':'What happens next? (e.g. ')+h+')';
+  }
   function wkRenderPrewalk(){
     const el=wkEl('wk-prewalk');if(!el)return;
     el.style.display='none';el.innerHTML='';
@@ -2178,7 +2260,7 @@
     if(!p.rows.length){el.innerHTML='<div class="wk-pre ok">📋 Pre-walk ('+esc(when)+'): '+esc(p.ready)+' — nothing was flagged</div>';return;}
     el.innerHTML='<div class="wk-pre"><div class="wk-pre-hdr">📋 Flagged on the pre-walk ('+esc(when)+')'+(p.ready?' — '+esc(p.ready):'')+'</div>'+p.rows.map((r,i)=>{
       const a=wk.followup[r.key]||'',dv=(r.kind==='deliver');
-      return '<div class="wk-pre-row"><div class="wk-pre-txt">'+esc(r.show)+'</div><div class="wk-pre-btns"><button class="wk-pre-btn'+(a==='done'?' sel-in':'')+'" onclick="wkFollow('+i+',\'done\')">'+(dv?'✅ Delivered':'✅ Done')+'</button><button class="wk-pre-btn'+(a==='open'?' sel-out':'')+'" onclick="wkFollow('+i+',\'open\')">'+(dv?'❌ Not yet':'❌ Still open')+'</button></div>'+(a==='open'?'<textarea id="wk-pn-'+i+'" class="wk-pre-note" placeholder="What happens next? (e.g. we can install at 2nd trim — door is on site)" oninput="wkFollowNote('+i+',this.value)">'+esc(wk.followNote[r.key]||'')+'</textarea>':'')+'</div>';
+      return '<div class="wk-pre-row"><div class="wk-pre-txt">'+esc(r.show)+'</div><div class="wk-pre-btns"><button class="wk-pre-btn'+(a==='done'?' sel-in':'')+'" onclick="wkFollow('+i+',\'done\')">'+(dv?'✅ Delivered':'✅ Done')+'</button><button class="wk-pre-btn'+(a==='open'?' sel-out':'')+'" onclick="wkFollow('+i+',\'open\')">'+(dv?'❌ Not yet':'❌ Still open')+'</button></div>'+(a==='open'?'<textarea id="wk-pn-'+i+'" class="wk-pre-note" placeholder="'+esc(wkFollowHint(r))+'" oninput="wkFollowNote('+i+',this.value)">'+esc(wk.followNote[r.key]||'')+'</textarea>':'')+'</div>';
     }).join('')+'<div class="wk-muted" style="margin-top:6px;">Tap what was done — it goes in the text for the office. If it\'s still open, say what happens next. Skip any you don\'t need.</div></div>';
   }
   function wkFollow(i,v){
