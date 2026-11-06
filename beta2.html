@@ -994,7 +994,7 @@
   // ════════════════════════════════════════════════════════════════
   // ── ROLLOUT SETTINGS ──
   // The version shows on the Main Page and is sent with every problem report — change it each time you upload a new file.
-  const APP_VERSION = "Beta 2.1";
+  const APP_VERSION = "Beta 2.2";
   // Where "Report a problem" emails go. Leave it empty ("") and the button copies the report so it can be pasted into an email.
   const REPORT_EMAIL = "miller.baynes@bldr.com";
 
@@ -1036,6 +1036,7 @@
         "Tap what you find on each item. Skip anything that doesn't apply to this house.",
         "If something isn't done, get with the superintendent for a date and tap what the super tells you.",
         "Cabinets and countertops don't hold up the job — the house can still be Ready if they aren't in.",
+        "If something that holds up the job isn't done, choose Not ready and say when it will be ready for install.",
         "No power? Mark it and say whether a generator is needed.",
         "Tap Add Check or Add Issue for anything else you notice, and upload your photos of problems to AppWright.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
@@ -1044,7 +1045,7 @@
         {type:"checks", title:"🏠 Ready for trim?", allOk:"✅ Mark everything good", items:[
           {id:"openings", hint:"the framer is fixing the opening Monday — we will install after", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
            ok:"Openings framed correctly", bad:"Openings NOT framed correctly", ask:"note",
-           lines:true, linesLabel:"Which openings? One line for each opening", linePh:"Which opening? (e.g. Master bath — too narrow)", addLabel:"+ Add another opening",
+           lines:true, linesLabel:"Which openings, and what needs to change? One line for each opening", linePh:"Which opening and what needs to change? (e.g. Master bath door needs to be framed at 34\" — currently 32\")", addLabel:"+ Add another opening",
            help:"Check all doors, attic stair, cased openings, etc. Make sure the rough opening is correct and the framing is plumb/square. If one is wrong, mark Problem and add a line for each opening."},
           {id:"drywall", hint:"drywall is finished Friday — we will start Monday", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
            ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", whenLine:"this will be finished {when}", notePh:"What's left — not hung, not mudded, not sanded?",
@@ -1061,9 +1062,8 @@
            help:"Check that the electricity is on. If there is no power, mark it and say whether a generator is needed."}
         ]},
         {type:"quick", title:"🔎 Anything else you noticed?"},
-        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
+        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", whenOn:"no", whenLabel:"When will it be ready for install?", whenLine:"will be ready for install {when}", whenUnknown:"ready date unknown", whenNone:"no ready date yet", options:[
           {v:"yes",     icon:"✅", t:"Ready",                  s:"Ready to start trim",                              line:"✅ YES"},
-          {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be done before we start trim",  line:"🟡 READY ONCE ITEMS ARE IN"},
           {v:"no",      icon:"❌", t:"Not ready",              s:"Can't start trim yet",                             line:"❌ NOT READY"}
         ]},
         {type:"notes", title:"📝 Notes", ph:"Anything else the office needs to know..."}
@@ -1094,7 +1094,7 @@
         "Walk the whole house — every room, closet and bath. If the last post walk left anything open, a blue box at the top of the form lists it.",
         "Tap Installed or Not in on each item. Skip anything this house doesn't have (no wood flooring? just leave it).",
         "If something is not in, get with the superintendent for a date and tap what the super tells you.",
-        "The house is still Ready if the missing items will be in before we install the quarter round and shoe.",
+        "If something that holds up the job isn't in, choose Not ready and say when it will be ready for install.",
         "Tap Add Check or Add Issue for anything else you notice, say whether there is enough material for the trim tie-ins, and list anything that has to be delivered (quantity, then what it is).",
         "Upload your photos of any problems to AppWright.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
@@ -1108,9 +1108,8 @@
           {id:"tile", hint:"tile is grouted Thursday — we will set the shoe after",     label:"Tile",                    ok:"Tile installed",          help:"Check baths, laundry and any other tile areas where shoe will be installed."}
         ]},
         {type:"quick", title:"🔎 Anything else you noticed?"},
-        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
+        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", whenOn:"no", whenLabel:"When will it be ready for install?", whenLine:"will be ready for install {when}", whenUnknown:"ready date unknown", whenNone:"no ready date yet", options:[
           {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in",                                              line:"✅ YES"},
-          {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the quarter round and shoe", line:"🟡 READY ONCE ITEMS ARE IN"},
           {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the install yet",                                       line:"❌ NOT READY"}
         ]},
         {type:"choice", id:"tieins", hint:"the 1x8 is being delivered Friday — we will tie in then", title:"🧰 Enough material on site for trim tie-ins?", yes:"✅ Enough on site", no:"❌ Not enough",
@@ -1140,7 +1139,7 @@
       how: [
         "Walk the whole house, including the garage entry and the exterior doors.",
         "Tap what you find on each item. Skip anything that doesn't apply. Locks go on after the doors are hung and painted.",
-        "If something is not ready, get with the superintendent for a date and tap what the super tells you.",
+        "If something is not ready, get with the superintendent for a date and tap what the super tells you. If the house isn't ready, choose Not ready and say when it will be ready for install.",
         "Check the locks needed (shown in the form when a trim takeoff is saved for this job) against what is on site.",
         "Tap Add Check or Add Issue for anything else you notice, and list anything that has to be delivered (quantity, then what it is).",
         "Upload your photos of any problems to AppWright.",
@@ -1162,13 +1161,12 @@
            help:"Baseboard needs to be in where base bumps go. Skip this one if the house has no base bumps."}
         ]},
         {type:"quick", title:"🔎 Anything else you noticed?"},
-        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", options:[
+        {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", whenOn:"no", whenLabel:"When will it be ready for install?", whenLine:"will be ready for install {when}", whenUnknown:"ready date unknown", whenNone:"no ready date yet", options:[
           {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in",                              line:"✅ YES"},
-          {v:"pending", icon:"🟡", t:"Ready once items are in", s:"Missing items will be in before we install the locks", line:"🟡 READY ONCE ITEMS ARE IN"},
           {v:"no",      icon:"❌", t:"Not ready",              s:"Can't schedule the lockout yet",                       line:"❌ NOT READY"}
         ]},
         {type:"list", id:"deliver", title:"📦 Please deliver", kind:"qty", header:"Please deliver:",
-         qtyLabel:"Qty", txtLabel:"Material", qtyPh:"4", txtPh:"hinge stops",
+         qtyLabel:"Qty", txtLabel:"Material", qtyPh:"2", txtPh:"deadbolts",
          add:"+ Add material", more:"+ Add more material"},
         {type:"notes", title:"📝 Notes", ph:"Anything else the office needs to know..."}
       ]
@@ -1197,7 +1195,7 @@
       how: [
         "Tap Mark everything good, or tap what's wrong on any check and add a line for each.",
         "Tap Add Check or Add Issue for anything else you notice.",
-        "Then tap Complete or Incomplete. If it's incomplete, tap each reason and add a line for each item.",
+        "Then tap Complete or Incomplete. If it's incomplete, tap each reason and add a line for each item. Tap Trip charge needed if the installer will have to come back.",
         "List anything that has to be delivered under Please deliver, and any extra material left on site to pick up (quantity, then what it is) — or tap No extra material.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
@@ -1235,6 +1233,9 @@
           {id:"framing",   label:"Framing / RO Issue",         ph:"Which opening and what is the issue?",     add:"+ Add an opening", more:"+ Add another opening"},
           {id:"damaged",   label:"Damaged Material",           ph:"What is damaged?",                         add:"+ Add an item",    more:"+ Add another item"},
           {id:"other",     label:"Other",                      ph:"Describe the issue...",                    add:"+ Add an issue",   more:"+ Add another issue"}
+        ]},
+        {type:"flags", showWhen:{ready:"incomplete"}, items:[
+          {id:"trip", label:"Trip charge needed for installer when ready", line:"💲 Trip charge needed for installer when ready"}
         ]},
         {type:"list", id:"deliver", title:"📦 Please deliver", kind:"qty", header:"Please deliver:",
          qtyLabel:"Qty", txtLabel:"Material", qtyPh:"12", txtPh:"1x8",
@@ -1330,7 +1331,7 @@
         "Tap Mark everything good, or tap what's wrong. If hardware is missing, add a line for what and where.",
         "If you adjusted any doors or catch plates, list how many.",
         "Tap Add Check or Add Issue for anything else you notice.",
-        "Then tap Complete or Incomplete.",
+        "Then tap Complete or Incomplete. If it's incomplete and the installer will have to come back, tap Trip charge needed.",
         "List the hardware needed to finish under Hardware needed, and any extra locks or hardware left on site (quantity, then what it is) — or tap None left on site.",
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
@@ -1338,7 +1339,7 @@
         {type:"checks", title:"🔒 Walk checks", allOk:"✅ Mark everything good", items:[
           {id:"hardware",  label:"All hardware installed", yes:"✅ All in", no:"❌ Missing some", ask:"note",
            ok:"All hardware installed", bad:"Hardware NOT all installed",
-           lines:true, qty:true, linesLabel:"What's missing, and where? One line for each", qtyLabel:"Qty", txtLabel:"What's missing & where", qtyPh:"4", linePh:"Hinge stops — garage door", addLabel:"+ Add more missing hardware",
+           lines:true, qty:true, linesLabel:"What's missing, and where? One line for each", qtyLabel:"Qty", txtLabel:"What's missing & where", qtyPh:"1", linePh:"Hinge stop — garage door", addLabel:"+ Add more missing hardware",
            help:"Check every door has its hardware. If something is missing, tap Missing some and add a line for what and where."},
           {id:"deadbolts", label:"Deadbolts lock smoothly", yes:"✅ All good", no:"❌ Problem", ask:"note",
            ok:"Deadbolts lock smoothly", bad:"Deadbolt problems",
@@ -1360,8 +1361,11 @@
           {v:"complete",   icon:"✅", t:"Complete",   s:"Lockout is complete",     line:"✅ COMPLETE"},
           {v:"incomplete", icon:"❌", t:"Incomplete", s:"Something is left to do", line:"❌ INCOMPLETE"}
         ]},
+        {type:"flags", showWhen:{ready:"incomplete"}, items:[
+          {id:"trip", label:"Trip charge needed for installer when ready", line:"💲 Trip charge needed for installer when ready"}
+        ]},
         {type:"list", id:"hwneeded", title:"🔩 Hardware needed", kind:"qty", header:"Hardware needed:",
-         qtyLabel:"Qty", txtLabel:"Hardware", qtyPh:"4", txtPh:"hinge stops",
+         qtyLabel:"Qty", txtLabel:"Hardware", qtyPh:"1", txtPh:"hinge stop — garage door",
          add:"+ Add hardware", more:"+ Add more hardware"},
         {type:"list", id:"extra", title:"🔑 Extra locks & hardware on site", kind:"qty", header:"Extra locks / hardware on site:",
          qtyLabel:"Qty", txtLabel:"What's left over", qtyPh:"2", txtPh:"passage knobs",
@@ -1454,6 +1458,8 @@
         R[it.id]={on:!!o.on,lines:Array.isArray(o.lines)?o.lines.map(x=>String(x)):[]};
       });
     });
+    const rdq=cfg.sections.find(s=>s.type==='ready');
+    if(rdq&&rdq.whenOn){const o=(wk.status||{}).readyby||{};S.readyby={v:'',when:o.when||'',date:/^\d{4}-\d{2}-\d{2}$/.test(o.date||'')?o.date:'',note:'',extra:'',lines:[]};}   // "Not ready — when will it be ready for install?"
     wk.status=S;wk.choice=C;wk.flags=F;wk.lists=Ls;wk.reasons=R;
     // what the pre-walk flagged, and what the PM said about it (only post walks use these)
     const okRows=wk.pre&&Array.isArray(wk.pre.rows)?wk.pre.rows:[];
@@ -1462,9 +1468,10 @@
     wk.followup=FU;
     const FN={};Object.keys(FU).forEach(k=>{if(FU[k]==='open'&&wk.followNote&&wk.followNote[k])FN[k]=String(wk.followNote[k]);});wk.followNote=FN;
     const rd=cfg.sections.find(s=>s.type==='ready');
-    wk.ready=(rd&&rd.options.some(o=>o.v===wk.ready))?wk.ready:'';
+    wk.ready=(rd&&rd.options.some(o=>o.v===wk.ready))?wk.ready:((wk.ready==='pending'&&rd&&rd.whenOn==='no')?'no':'');   // an old "Ready once items are in" is now Not ready
     wk.notes=wk.notes||'';
     wkBuildIndex(cfg);
+    if(rd&&rd.whenOn)wkReg.readyby={si:cfg.sections.indexOf(rd),item:{}};
   }
 
   // ── drafts: a walk in progress survives a phone lock, a call, or leaving the screen ──
@@ -1741,7 +1748,29 @@
   function wkHtmlReady(sec){
     return '<div class="pw-sec-hdr">'+esc(sec.title)+'</div><div class="wk-ready">'+sec.options.map(r=>
       '<button class="wk-ready-btn'+(wk.ready===r.v?' sel-'+r.v:'')+'" onclick="wkSetReady(\''+r.v+'\')"><span class="ico">'+r.icon+'</span><span><b>'+esc(r.t)+'</b><small>'+esc(r.s)+'</small></span></button>'
-    ).join('')+'</div><div id="wk-ready-hint"></div>';
+    ).join('')+'</div><div id="wk-ready-hint"></div>'+((sec.whenOn&&wk.ready===sec.whenOn)?wkHtmlReadyBy(sec):'');
+  }
+  // Not ready → "When will it be ready for install?" (same date buttons as the checklist)
+  function wkHtmlReadyBy(sec){
+    const o=wk.status.readyby;
+    let out='<div class="wk-out" id="wk-row-readyby"><div class="wk-out-lbl">'+esc(sec.whenLabel||'When will it be ready for install?')+'</div><div class="wk-chips wk-when-chips">'+
+      WK_WHEN.map((w,wi)=>'<button class="wk-chip'+(o.when===w?' sel':'')+'" onclick="wkWhen(\'readyby\','+wi+')">'+esc(w)+'</button>').join('')+'</div>';
+    if(o.when==='This week'||o.when==='Next week'){
+      const days=wkWeekDays(o.when);
+      out+='<div class="wk-day-block"><div class="wk-out-lbl">Which day? (if you know it)</div><div class="wk-chips">'+(days.length
+        ?days.map(d=>{const iso=wkIso(d);return '<button class="wk-chip'+(o.date===iso?' sel':'')+'" onclick="wkDay(\'readyby\',\''+iso+'\')">'+esc(wkNice(d))+'</button>';}).join('')
+        :'<span class="wk-muted">No days left this week — pick a date below.</span>')+'</div></div>';
+    }
+    if(o.when!=='Today'&&o.when!=='Tomorrow'&&o.when!=='Date unknown')
+      out+='<div class="wk-out-lbl">Or pick an exact date</div><input class="wk-in" type="date" min="'+wkIso(wkToday())+'" value="'+esc(o.date)+'" onchange="wkDate(\'readyby\',this.value)" style="margin-bottom:8px;">';
+    if(!o.when&&!o.date)out+='<div class="wk-muted">Pick when — or tap Date unknown.</div>';
+    return out+'</div>';
+  }
+  function wkReadyByText(s){
+    const o=wk.status.readyby||{},wt=wkWhenText(o);
+    if(o.when==='Date unknown'&&!o.date)return s.whenUnknown||'ready date unknown';
+    if(wt)return (s.whenLine||'will be ready for install {when}').replace('{when}',wt);
+    return s.whenNone||'no ready date yet';
   }
   function wkSetReady(v){
     wk.ready=(wk.ready===v)?'':v;
@@ -1761,8 +1790,8 @@
     let h='';
     if(rd.hints==='pre'){
       // items marked holds:false (e.g. countertops on the 1st trim walk) never count against "Ready"
-      if(wk.ready==='yes'&&holding)h='⚠️ '+holding+' item'+(holding>1?'s that hold':' that holds')+' up the job '+(holding>1?'are':'is')+' marked Not in. If they will be done before we start, choose “Ready once items are in.”';
-      else if(wk.ready==='pending'&&!holding)h='Nothing that holds up the job is marked Not in. Choose “Ready” unless something is still missing.';
+      if(wk.ready==='yes'&&holding)h='⚠️ '+holding+' item'+(holding>1?'s that hold':' that holds')+' up the job '+(holding>1?'are':'is')+' marked Not in. If '+(holding>1?'they':'it')+' won’t be done before we start, choose “Not ready” and say when it will be ready.';
+      else if(wk.ready==='no'&&!holding&&!flagged)h='Nothing is marked as a problem. Choose “Ready” unless something is still missing.';
     }else if(rd.hints==='post'){
       if(wk.ready==='complete'&&flagged)h='⚠️ Something is marked as a problem. If it kept you from finishing, choose Incomplete.';
       else if(wk.ready==='incomplete'&&!flagged)h='Tell the office what is left — tap an issue below, or add it in Notes.';
@@ -1869,7 +1898,7 @@
     L.push([cfg.reportTitle,wk.customer,wk.jobId].filter(Boolean).join(' -- '));
     L.push('----------------------------');
     // the headline answer first
-    cfg.sections.forEach(s=>{if(s.type==='ready'){const o=s.options.find(x=>x.v===wk.ready);if(o)L.push((s.label||'Ready')+': '+o.line);}});
+    cfg.sections.forEach(s=>{if(s.type==='ready'){const o=s.options.find(x=>x.v===wk.ready);if(o)L.push((s.label||'Ready')+': '+o.line+((s.whenOn&&wk.ready===s.whenOn)?' — '+wkReadyByText(s):''));}});
     // what the pre-walk flagged, and what got done
     if(wk.pre&&wk.pre.rows)wk.pre.rows.forEach(r=>{
       const a=wk.followup[r.key];if(!a)return;
@@ -2092,7 +2121,7 @@
       T.dedupe(d);
       const me=d[T.id];
       if(me&&!me.generated){
-        const clash=Object.keys(d).find(k=>k!==T.id&&!d[k].generated&&jobKey(d[k].customer,d[k].jobId)===jobKey(s.customer,s.jobId));
+        const clash=Object.keys(d).find(k=>k!==T.id &&!d[k].generated&&jobKey(d[k].customer,d[k].jobId)===jobKey(s.customer,s.jobId));
         const wk2=T.id+'|'+jobKey(s.customer,s.jobId);
         if(clash&&T.warned!==wk2){T.warned=wk2;wkSafe(()=>showToast('⚠️ This job is already in progress — open it from 📂 In progress'));}
       }
@@ -2211,7 +2240,7 @@
     Object.values(TK.trim.all()).forEach(d=>add(d.customer,d.jobId,d.ts));
     Object.values(TK.lock.all()).forEach(d=>add(d.customer,d.jobId,d.ts));
     wkArr(WK_HIST).forEach((h,i)=>add(h.customer,h.jobId,h.ts||pseudo(i)));
-    Object.values(wkDrafts()).forEach(d=>d&&d.data&&add(d.data.customer,d.data.jobId,d.ts));
+    Object.values(wkDrafts()).forEach(d=>d&&d.data &&add(d.data.customer,d.data.jobId,d.ts));
     wkArr(TEST_HIST).forEach((h,i)=>h.fullData&&add(h.fullData.customer,h.fullData.jobId||h.fullData.lot,pseudo(i)));
     wkArr('bfs_history').forEach((h,i)=>h.fullData&&add(h.fullData.customer,h.fullData.jobId||h.fullData.lot,pseudo(i)));
     wkArr('bfs_lo_history').forEach((h,i)=>h.fullData&&add(h.fullData.customer,h.fullData.jobId,pseudo(i)));
@@ -2249,7 +2278,7 @@
       else if(sec.type==='list'&&sec.id==='deliver')lines('deliver').forEach((l,i)=>{const t=String(l.t||'').trim(),q=wkQty(l.q);if(t){const txt=(q?'('+q+') ':'')+t;rows.push({id:'d:'+i,kind:'deliver',short:txt,show:'📦 Requested delivery: '+txt,detail:''});}});
     });
     rows.forEach(r=>{r.key=e.hid+'|'+r.id;});
-    const rd=cfg.sections.find(s=>s.type==='ready'),ro=rd&&rd.options.find(x=>x.v===st.ready);
+    const rd=cfg.sections.find(s=>s.type==='ready'),ro=rd&&rd.options.find(x=>x.v===(st.ready==='pending'?'no':st.ready));
     return {hid:e.hid,ts:e.ts||0,ready:ro?ro.icon+' '+ro.t:'',rows:rows};
   }
   // grey writing inside the "Still open" box — comes from the hint:"..." on that pre-walk item (see WALK CONTENT)
