@@ -326,6 +326,13 @@
     .pw-rsec-chev{font-size:11px;color:#64748b;}
     .pw-rsec-more{font-size:11px;color:#94a3b8;text-align:center;padding:4px 0 10px;}
 
+    /* ── pre-walk: "left over from the last post walk" ── */
+    .wk-carry{background:#eff6ff;border:2px solid #93c5fd;border-radius:12px;padding:12px;margin-bottom:12px;}
+    .wk-carry.ok{background:#f0fdf4;border-color:#86efac;font-size:13px;font-weight:800;color:#15803d;}
+    .wk-carry-hdr{font-size:12px;font-weight:900;color:#1e3a8a;margin-bottom:6px;line-height:1.35;}
+    .wk-carry-line{font-size:13px;font-weight:700;color:#1e293b;line-height:1.4;padding:6px 0;border-top:1px dashed #93c5fd;}
+    .wk-carry-line.sub{font-weight:600;color:#475569;padding:1px 0 3px 16px;border-top:none;}
+
   </style>
 </head>
 <body class="view-home">
@@ -659,6 +666,7 @@
           <div id="wk-formwrap" style="display:none;">
             <div class="wk-jobline"><span id="wk-job-display">—</span><button class="wk-link" onclick="wkChangeJob()">Change job</button></div>
             <div id="wk-expected" style="display:none;"></div>
+            <div id="wk-carry" style="display:none;"></div>
             <div id="wk-prewalk" style="display:none;"></div>
             <div id="wk-form"></div>
             <button class="actionBtn" id="wk-gen-btn" style="width:100%;background:var(--bfs-red);color:white;margin-top:4px;" onclick="wkGenerate()">⚡ Generate</button>
@@ -986,7 +994,7 @@
   // ════════════════════════════════════════════════════════════════
   // ── ROLLOUT SETTINGS ──
   // The version shows on the Main Page and is sent with every problem report — change it each time you upload a new file.
-  const APP_VERSION = "Beta 1.9";
+  const APP_VERSION = "Beta 2.1";
   // Where "Report a problem" emails go. Leave it empty ("") and the button copies the report so it can be pasted into an email.
   const REPORT_EMAIL = "miller.baynes@bldr.com";
 
@@ -1064,6 +1072,7 @@
 
     // ═════════════ 2ND TRIM / SHOE PRE-WALK ═════════════
     trim2: {
+      carryFrom: "post1",   // the blue "left over from the last post walk" box at the top of the form
       kind: "pre",
       title: "2nd Trim Pre-Walk",
       headerTitle: "📋 2ND TRIM PRE-WALK",
@@ -1082,7 +1091,7 @@
         "Any other material needed to finish besides 1/4 round and shoe mold"
       ],
       how: [
-        "Walk the whole house — every room, closet and bath.",
+        "Walk the whole house — every room, closet and bath. If the last post walk left anything open, a blue box at the top of the form lists it.",
         "Tap Installed or Not in on each item. Skip anything this house doesn't have (no wood flooring? just leave it).",
         "If something is not in, get with the superintendent for a date and tap what the super tells you.",
         "The house is still Ready if the missing items will be in before we install the quarter round and shoe.",
@@ -1343,8 +1352,8 @@
            ok:"House numbers installed", bad:"House numbers missing or NOT installed properly", notePh:"What's missing, or what isn't installed properly?",
            help:"Check the house numbers are installed and installed properly. Skip this one if the house doesn't get numbers."}
         ]},
-        {type:"list", id:"adjusted", title:"🔧 Adjustments I made", kind:"qty", header:"Adjusted:",
-         qtyLabel:"#", txtLabel:"What I adjusted", qtyPh:"2", txtPh:"doors",
+        {type:"list", id:"adjusted", title:"🔧 Adjustments I made", header:"Adjusted:", prefix:"- ",
+         ph:"What did you adjust? (e.g. 2 doors, front door catch plate)",
          add:"+ Add an adjustment", more:"+ Add another adjustment"},
         {type:"quick", title:"🔎 Anything else you noticed?"},
         {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
@@ -1438,7 +1447,7 @@
       else if(sec.type==='flags')sec.items.forEach(it=>{F[it.id]=!!((wk.flags||{})[it.id]);});
       else if(sec.type==='list'){
         const o=wk.lists[sec.id]||{};
-        Ls[sec.id]={lines:(Array.isArray(o.lines)?o.lines:[]).map(l=>({q:String((l&&l.q)||''),t:String((l&&l.t)||'')})),none:!!(o.none&&sec.none)};
+        Ls[sec.id]={lines:(Array.isArray(o.lines)?o.lines:[]).map(l=>{const q=String((l&&l.q)||''),t=String((l&&l.t)||'');return sec.kind==='qty'?{q:q,t:t}:{q:'',t:(q&&t)?q+' '+t:(t||q)};}),none:!!(o.none&&sec.none)};   // a plain list has no quantity box: an old quantity moves into the text
       }
       else if(sec.type==='reasons')sec.items.forEach(it=>{
         const o=(wk.reasons||{})[it.id]||{};
@@ -1565,7 +1574,7 @@
     document.getElementById('wk-formwrap').style.display='block';
     document.getElementById('wk-result').style.display='none';
     wkSetEdit(false);wkDirty=false;
-    wkRenderExpected();wkRenderPrewalk();wkRenderForm();
+    wkRenderExpected();wkRenderPrewalk();wkRenderCarry();wkRenderForm();
     wkSetForm(true);wkSetLook(false);wkSetHow(false);
     document.getElementById('pw-overlay').scrollTop=0;
   }
@@ -1950,10 +1959,14 @@
     Object.keys(st.lists||{}).forEach(k=>{if(k==='deliver'||k==='issues')L[k]=st.lists[k];});
     return {mode:st.mode,customer:st.customer,jobId:st.jobId,hid:st.hid,status:S,choice:C,lists:L,quick:(st.quick||[]).filter(q=>q&&q.k==='issue'),ready:st.ready||''};
   }
-  function wkFuSave(){
-    if(Object.keys(WK_PAIR).map(k=>WK_PAIR[k]).indexOf(wk.mode)<0)return;   // only pre-walks have a post walk
+  function wkFuSave(text){
+    const isPre=Object.keys(WK_PAIR).map(k=>WK_PAIR[k]).indexOf(wk.mode)>=0;
+    const isSrc=Object.keys(WALKS).some(k=>WALKS[k].carryFrom===wk.mode);   // a post walk whose leftovers the next pre-walk shows
+    if(!isPre&&!isSrc)return;
     const a=wkFuRead().filter(x=>x.hid!==wk.hid);
-    a.unshift({mode:wk.mode,customer:wk.customer,jobId:wk.jobId,hid:wk.hid,ts:Date.now(),structured:wkFuTrim(wk)});
+    if(isPre)a.unshift({mode:wk.mode,customer:wk.customer,jobId:wk.jobId,hid:wk.hid,ts:Date.now(),structured:wkFuTrim(wk)});
+    else{const cfg=WALKS[wk.mode],rd=cfg.sections.find(s=>s.type==='ready'),ro=rd&&rd.options.find(x=>x.v===wk.ready);
+      a.unshift({mode:wk.mode,customer:wk.customer,jobId:wk.jobId,hid:wk.hid,ts:Date.now(),carry:{ready:ro?ro.icon+' '+ro.t:'',lines:wkCarryLines(text)}});}
     wkFuWrite(a);
   }
   // ── history (EDIT brings the whole walk back into the form) ──
@@ -1964,7 +1977,7 @@
     h.unshift({label:ds+' — '+wk.customer+(wk.jobId?' — '+wk.jobId:''),text:text,time:tm,ts:Date.now(),mode:wk.mode,customer:wk.customer,jobId:wk.jobId,hid:wk.hid,structured:JSON.parse(JSON.stringify(wk))});
     {const same=h.filter(x=>x.mode===wk.mode);if(same.length>WK_KEEP){const drop=same.slice(WK_KEEP);h=h.filter(x=>drop.indexOf(x)<0);}}   // keep the newest WK_KEEP of each type
     localStorage.setItem(WK_HIST,JSON.stringify(h));
-    wkFuSave();
+    wkFuSave(text);
     renderPwHistory();
   }
   function wkOutEdited(){
@@ -2248,6 +2261,33 @@
     }
     if(!h)h=WK_FOLLOW_HINTS[r.kind]||WK_FOLLOW_HINTS.fallback;
     return (r.kind==='deliver'?'When is it coming? (e.g. ':'What happens next? (e.g. ')+h+')';
+  }
+  // ── pre-walks: what the PREVIOUS post walk left behind (read from that walk's own report, so it matches what the office saw) ──
+  function wkCarryLines(text){
+    const L=String(text||'').split('\n');L.shift();                                   // the title line
+    return L.filter(l=>l.trim()&&!/^-{3,}$/.test(l.trim())&&!/^Result:/.test(l)&&l.trim().indexOf('✅')!==0);   // no dividers, no Result line, no "all good" lines
+  }
+  function wkCarryRecord(mode,c,j){
+    const k=jobKey(c,j);
+    const a=wkArr(WK_HIST).find(x=>x.mode===mode&&jobKey(x.customer,x.jobId)===k&&x.text);
+    const b=wkFuRead().find(x=>x.mode===mode&&jobKey(x.customer,x.jobId)===k&&x.carry);
+    if(a&&(!b||(a.ts||0)>=(b.ts||0))){
+      const cfg=WALKS[mode],rd=cfg&&cfg.sections.find(x=>x.type==='ready'),st=a.structured||{},ro=rd&&rd.options.find(x=>x.v===st.ready);
+      return {ts:a.ts,ready:ro?ro.icon+' '+ro.t:'',lines:wkCarryLines(a.text)};
+    }
+    return b?{ts:b.ts,ready:b.carry.ready,lines:b.carry.lines||[]}:null;
+  }
+  function wkRenderCarry(){
+    const el=wkEl('wk-carry');if(!el)return;
+    el.style.display='none';el.innerHTML='';
+    const cfg=wk&&WALKS[wk.mode];if(!cfg||!cfg.carryFrom)return;
+    const r=wkCarryRecord(cfg.carryFrom,wk.customer,wk.jobId);if(!r)return;
+    const title=WALKS[cfg.carryFrom].title,when=r.ts?jbDate(r.ts):'earlier';
+    el.style.display='block';
+    if(!r.lines.length){el.innerHTML='<div class="wk-carry ok">📋 '+esc(title)+' ('+esc(when)+')'+(r.ready?': '+esc(r.ready):'')+' — nothing was left open</div>';return;}
+    el.innerHTML='<div class="wk-carry"><div class="wk-carry-hdr">📋 Left over from the '+esc(title)+' ('+esc(when)+')'+(r.ready?' — '+esc(r.ready):'')+'</div>'+
+      r.lines.map(l=>/^\s+-/.test(l)?'<div class="wk-carry-line sub">• '+esc(l.replace(/^\s*-\s*/,''))+'</div>':'<div class="wk-carry-line">'+esc(l.trim())+'</div>').join('')+
+      '<div class="wk-muted" style="margin-top:6px;">This is what the last post walk told the office. Read it before you start.</div></div>';
   }
   function wkRenderPrewalk(){
     const el=wkEl('wk-prewalk');if(!el)return;
