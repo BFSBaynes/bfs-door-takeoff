@@ -332,6 +332,10 @@
     .wk-carry-hdr{font-size:12px;font-weight:900;color:#1e3a8a;margin-bottom:6px;line-height:1.35;}
     .wk-carry-line{font-size:13px;font-weight:700;color:#1e293b;line-height:1.4;padding:6px 0;border-top:1px dashed #93c5fd;}
     .wk-carry-line.sub{font-weight:600;color:#475569;padding:1px 0 3px 16px;border-top:none;}
+    .wk-carry .wk-pre-row{border-top-color:#93c5fd;}
+    .wk-prefill{display:flex;gap:10px;align-items:center;justify-content:space-between;background:#eff6ff;border:2px solid #93c5fd;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#1e3a8a;line-height:1.4;}
+    .td-bar.wide{grid-template-columns:1fr;}
+    .td-bar.wide .td-new{padding:20px 10px;font-size:18px;border-radius:14px;}
 
     /* ── Edit button on the takeoff report boxes ── */
     .rb-edit-bar{display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px;}
@@ -402,7 +406,7 @@
 
 <div id="trim-view" style="display:none;">
 <!-- In-progress takeoffs (Trim) -->
-  <div class="td-bar">
+  <div class="td-bar wide">
     <button class="td-new" onclick="tkNew('trim')">＋ Start new takeoff</button>
     <button class="td-prog" onclick="tkToggle('trim')">📂 In progress <b id="td-count-trim">0</b> <span id="td-chev-trim">▾</span></button>
   </div>
@@ -677,6 +681,7 @@
           <!-- 2) the walk itself — filled in by the walk engine -->
           <div id="wk-formwrap" style="display:none;">
             <div class="wk-jobline"><span id="wk-job-display">—</span><button class="wk-link" onclick="wkChangeJob()">Change job</button></div>
+            <div id="wk-prefill" style="display:none;"></div>
             <div id="wk-expected" style="display:none;"></div>
             <div id="wk-carry" style="display:none;"></div>
             <div id="wk-prewalk" style="display:none;"></div>
@@ -1006,8 +1011,8 @@
   // ════════════════════════════════════════════════════════════════
   // ── ROLLOUT SETTINGS ──
   // The version shows on the Main Page and is sent with every problem report — change it each time you upload a new file.
-  const APP_VERSION = "Beta 2.6";
-  const BUILD_ID = "bc97708f0c";          // stamped automatically with a fingerprint of the whole file each time it is built — do not edit
+  const APP_VERSION = "Beta 2.7";
+  const BUILD_ID = "d48cf60772";          // stamped automatically with a fingerprint of the whole file each time it is built — do not edit
   const UPDATE_CHECK = true;       // true = the app checks for a newer copy of itself (the saved Home Screen app can hold on to an old one)
   // Where "Report a problem" emails go. Leave it empty ("") and the button copies the report so it can be pasted into an email.
   const REPORT_EMAIL = "miller.baynes@bldr.com";
@@ -1033,6 +1038,7 @@
 
     // ═════════════ 1ST TRIM PRE-WALK ═════════════
     trim1: {
+      takeoffIssues: true,   // the ❌ problems typed on the Trim Take-Off for this job show at the top of the form, with Fixed / Still open buttons
       kind: "pre",
       title: "1st Trim Pre-Walk",
       headerTitle: "📋 1ST TRIM PRE-WALK",
@@ -1041,15 +1047,16 @@
       look: [
         "Check all doors, attic stair, cased openings, etc. and make sure the rough opening is correct and the framing is plumb/square",
         "Drywall hung, mudded and sanded",
+        "Selections written on the wall",
         "Cabinets installed — they don't hold up the job; the base and casing/trim will get tied into them at 2nd trim",
-        "Countertops installed — they don't hold up the job; we tie the casing/trim into them at 2nd trim",
         "Electricity on, or a generator needed"
       ],
       how: [
         "Walk the whole house.",
+        "If the take-off noted any problems, a box at the top of the form lists them — tap Fixed or Still open on each one.",
         "Tap what you find on each item. Skip anything that doesn't apply to this house.",
         "If something isn't done, get with the superintendent for a date and tap what the super tells you.",
-        "Cabinets and countertops don't hold up the job — the house can still be Ready if they aren't in.",
+        "Cabinets don't hold up the job — the house can still be Ready if they aren't in.",
         "If something that holds up the job isn't done, choose Not ready and say when it will be ready for install.",
         "No power? Mark it and say whether a generator is needed.",
         "Tap Add Check or Add Issue for anything else you notice, and upload your photos of problems to AppWright.",
@@ -1060,16 +1067,17 @@
           {id:"openings", hint:"the framer is fixing the opening Monday — we will install after", label:"Openings framed correctly", yes:"✅ Good", no:"❌ Problem",
            ok:"Openings framed correctly", bad:"Openings NOT framed correctly", ask:"note",
            lines:true, linesLabel:"Which openings, and what needs to change? One line for each opening", linePh:"Which opening and what needs to change? (e.g. Master bath door needs to be framed at 34\" — currently 32\")", addLabel:"+ Add another opening",
-           help:"Check all doors, attic stair, cased openings, etc. Make sure the rough opening is correct and the framing is plumb/square. If one is wrong, mark Problem and add a line for each opening."},
+           outNote:"Rough opening problem — find out who framed it. If BFS framed it, let the framing project manager know. If someone else framed it, let the superintendent know.",
+           help:"Check all doors, attic stair, cased openings, etc. Make sure the rough opening is correct and the framing is plumb/square. If one is wrong, mark Problem and add a line for each opening. Then find out who framed it: if BFS framed it, let the framing project manager know; if not, let the superintendent know."},
           {id:"drywall", hint:"drywall is finished Friday — we will start Monday", label:"Drywall in, mudded & sanded", yes:"✅ Done", no:"❌ Not done",
            ok:"Drywall in, mudded & sanded", bad:"Drywall NOT finished", whenLabel:"Per super — when will it be done?", whenLine:"this will be finished {when}", notePh:"What's left — not hung, not mudded, not sanded?",
            help:"Drywall should be hung, mudded and sanded. If anything is left, mark Not done and say what's left."},
+          {id:"selections", label:"Selections written on wall", yes:"✅ Written", no:"❌ Not written", ask:"none",
+           ok:"Selections written on wall", bad:"Selections NOT written on wall",
+           help:"Check that the selections are written on the wall. This is a PM task — if they aren't, mark Not written and get them written."},
           {id:"cabinets", hint:"cabinets are coming next week — we will do that trim at 2nd trim", label:"Cabinets installed", yes:"✅ Installed", no:"❌ Not in", holds:false,
            ok:"Cabinets installed", bad:"Cabinets NOT installed",
            help:"Cabinets do not hold up the job — the base and casing/trim will get tied into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
-          {id:"counters", hint:"countertops are set Thursday — we will finish that trim at 2nd trim", label:"Countertops in", yes:"✅ In", no:"❌ Not in", holds:false,
-           ok:"Countertops in", bad:"Countertops NOT in",
-           help:"Countertops do not hold up the job — we tie the casing/trim into them at 2nd trim. If they aren't in you can still mark the house Ready — just get a date from the super."},
           {id:"power", hint:"power goes on Wednesday — the installer is bringing a generator until then", label:"Electricity", yes:"✅ Power on", no:"❌ No power",
            ok:"Power on", bad:"NO POWER", whenLabel:"Per super — when will power be on?", whenLine:"power will be on {when}",
            extra:{label:"Generator?", yes:"Generator needed", no:"No generator needed"},
@@ -1105,7 +1113,7 @@
         "Any other material needed to finish besides 1/4 round and shoe mold"
       ],
       how: [
-        "Walk the whole house — every room, closet and bath. If the last post walk left anything open, a blue box at the top of the form lists it.",
+        "Walk the whole house — every room, closet and bath. If the last post walk left anything open, a blue box at the top of the form lists it — tap Done or Still open on each item.",
         "Tap Installed or Not in on each item. Skip anything this house doesn't have (no wood flooring? just leave it).",
         "If something is not in, get with the superintendent for a date and tap what the super tells you.",
         "If something that holds up the job isn't in, choose Not ready and say when it will be ready for install.",
@@ -1579,14 +1587,49 @@
     if(!pwCustomer){showToast('⚠️ ENTER CUSTOMER');return;}
     startWalk();
   }
+  // The same walk for the same job (customer + Job ID) that was done before: start from what was written then, so only the changes need tapping.
+  let wkFrom=null;      // set for one moment: tells the form to show the "Filled in from your last…" bar
+  function wkPrevWalk(mode,c,j){
+    const k=jobKey(c,j);
+    return wkArr(WK_HIST).find(x=>x&&x.mode===mode&&x.structured&&jobKey(x.customer,x.jobId)===k)||null;     // newest first
+  }
+  function wkFromPrev(from){
+    const o=wkClone(from.structured),today=wkIso(wkToday());
+    o.mode=pwMode;o.customer=pwCustomer;o.jobId=pwJobId;o.hid=Date.now();o.done=false;
+    o.pre=null;o.followup={};o.followNote={};       // what was flagged / carried in is looked up fresh for this walk
+    // a date the super gave last time only stays if it is still ahead of us ("tomorrow" from last week, or a date that has passed, would be wrong)
+    Object.keys(o.status||{}).forEach(k=>{
+      const s=o.status[k];if(!s)return;
+      const past=!!s.date&&s.date<today,rel=!s.date&&(s.when==='Today'||s.when==='Tomorrow'||s.when==='This week'||s.when==='Next week');
+      if(past||rel){s.when='';s.date='';}
+    });
+    return o;
+  }
+  function wkRenderPrefill(){
+    const el=wkEl('wk-prefill');if(!el)return;
+    el.style.display='none';el.innerHTML='';
+    const f=wkFrom;wkFrom=null;
+    if(!f||!wk)return;
+    el.style.display='block';
+    el.innerHTML='<div class="wk-prefill"><div><b>↩ Filled in from your last '+esc(WALKS[wk.mode].title)+' for this job ('+esc(jbDate(f.ts))+').</b> Check each answer and change what is different.</div><button class="wk-link" onclick="wkStartBlank()">Start blank</button></div>';
+  }
+  function wkStartBlank(){
+    if(!wk)return;
+    wk=wkBlank(pwMode,pwCustomer,pwJobId);
+    wkNormalize();wkOpenForm();wkDropDraft();
+    showToast('Started blank');
+  }
   function startWalk(){
     if(!pwMode||!WALKS[pwMode])return;
     const dr=wkDrafts()[wkKeyFor(pwMode,pwCustomer,pwJobId)];
-    wk=dr?JSON.parse(JSON.stringify(dr.data)):wkBlank(pwMode,pwCustomer,pwJobId);
+    const prev=dr?null:wkPrevWalk(pwMode,pwCustomer,pwJobId);
+    wk=dr?JSON.parse(JSON.stringify(dr.data)):(prev?wkFromPrev(prev):wkBlank(pwMode,pwCustomer,pwJobId));
     wk.mode=pwMode;wk.customer=pwCustomer;wk.jobId=pwJobId;wk.done=false;
     wkNormalize();
+    wkFrom=prev;
     wkOpenForm();
     if(dr)showToast('↩ Draft restored');
+    else if(prev)showToast('↩ Filled in from your last one for this job');
   }
   function wkOpenForm(){
     const cfg=wkCfg(),jobTxt=wk.customer+(wk.jobId?' — '+wk.jobId:'');
@@ -1599,7 +1642,7 @@
     document.getElementById('wk-formwrap').style.display='block';
     document.getElementById('wk-result').style.display='none';
     wkSetEdit(false);wkDirty=false;
-    wkRenderExpected();wkRenderPrewalk();wkRenderCarry();wkRenderForm();
+    wkRenderExpected();wkRenderPrewalk();wkRenderCarry();wkRenderPrefill();wkRenderForm();
     wkSetForm(true);wkSetLook(false);wkSetHow(false);
     document.getElementById('pw-overlay').scrollTop=0;
   }
@@ -1702,6 +1745,7 @@
         }else if(ask!=='none'){
           out+='<input class="wk-in" type="text" placeholder="'+esc(s.notePh||wkCfg().outPlaceholder)+'" value="'+esc(o.note)+'" oninput="wkNote(\''+s.id+'\',this.value)">';
         }
+        if(s.outNote)out+='<div class="wk-hint">📣 '+esc(s.outNote)+'</div>';      // a reminder for the PM (not part of the report)
         if(out)out='<div class="wk-out">'+out+'</div>';
       }
       return '<div class="wk-row'+(o.v?' st-'+o.v:'')+'" id="wk-row-'+s.id+'">'+
@@ -1807,7 +1851,7 @@
     });
     let h='';
     if(rd.hints==='pre'){
-      // items marked holds:false (e.g. countertops on the 1st trim walk) never count against "Ready"
+      // items marked holds:false (e.g. cabinets on the 1st trim walk) never count against "Ready"
       if(wk.ready==='yes'&&holding)h='⚠️ '+holding+' item'+(holding>1?'s that hold':' that holds')+' up the job '+(holding>1?'are':'is')+' marked Not in. If '+(holding>1?'they':'it')+' won’t be done before we start, choose “Not ready” and say when it will be ready.';
       else if(wk.ready==='no'&&!holding&&!flagged)h='Nothing is marked as a problem. Choose “Ready” unless something is still missing.';
     }else if(rd.hints==='post'){
@@ -1920,8 +1964,8 @@
     // what the pre-walk flagged, and what got done
     if(wk.pre&&wk.pre.rows)wk.pre.rows.forEach(r=>{
       const a=wk.followup[r.key];if(!a)return;
-      const lead=r.kind==='deliver'?(a==='done'?'✅ Delivered':'❌ Not delivered'):(a==='done'?'✅ Done':'❌ Still open');
-      const tail=r.kind==='deliver'?' (requested on the pre-walk)':' (flagged on the pre-walk'+(r.detail?' — '+r.detail:'')+')';
+      const lead=r.kind==='deliver'?(a==='done'?'✅ Delivered':'❌ Not delivered'):(a==='done'?(r.doneLead||'✅ Done'):'❌ Still open');
+      const tail=r.kind==='deliver'?' (requested on '+(wk.pre.dtag||'the pre-walk')+')':' ('+(wk.pre.tag||'flagged on the pre-walk')+(r.detail?' — '+r.detail:'')+')';
       const fnote=(a==='open'&&wk.followNote&&String(wk.followNote[r.key]||'').trim())?' — Note: '+String(wk.followNote[r.key]).trim():'';
       gap();L.push(lead+': '+r.short+tail+fnote);
     });
@@ -2250,6 +2294,39 @@
     TK.trim.renderBar();TK.lock.renderBar();
   }
 
+  // ── typing a Customer + Job ID that already has a takeoff brings that takeoff back ──
+  // Only when the screen is still empty (nothing counted, no notes), so nothing the PM already entered is ever replaced.
+  function tkScreenEmpty(k){
+    const lo=(k==='lock');
+    if(wkVal(lo?'lo-summary':'summary')||wkVal(lo?'lo-notes':'notes'))return false;
+    if((lo?quickNotes.lo:quickNotes.main).some(q=>q&&String(q.text||'').trim()))return false;
+    if(lo)return !LO_ITEMS.some(i=>(loState[i]||0)>0);
+    return !Object.keys(state).some(x=>x==='fireRated'?!!state[x]:(typeof state[x]==='number'?state[x]>0:(typeof state[x]==='string'&&state[x].trim()!=='')));
+  }
+  function tkAutoFill(k){
+    wkSafe(()=>{
+      const T=TK[k],lo=(k==='lock'),c=wkVal(lo?'lo-customer':'customer'),j=wkVal(lo?'lo-job-id':'job-id');
+      if(!c||!j||!tkScreenEmpty(k))return;
+      const key=jobKey(c,j),d=T.all(),ghost=T.id;       // the ghost is the empty takeoff that typing the Job ID just started
+      // 1) a takeoff of this job that is still kept under In progress (counts, Quick Notes and all)
+      const m=Object.keys(d).map(i=>d[i]).filter(x=>x&&x.id!==T.id&&jobKey(x.customer,x.jobId)===key&&(x.count>0||String(x.summaryText||'').trim()||String(x.notes||'').trim()||(x.qn||[]).some(q=>q&&String(q.text||'').trim()))).sort((a,b)=>b.ts-a.ts)[0];
+      if(m){
+        T.skipSave=true;try{T.open(m.id);}finally{T.skipSave=false;}
+        if(ghost&&ghost!==m.id)T.remove(ghost);
+        showToast('↩ Brought back the takeoff you already started for this job');
+        return;
+      }
+      // 2) otherwise the newest generated one in Recent
+      const h=wkArr(lo?'bfs_lo_history':TEST_HIST),i=h.findIndex(x=>x&&x.fullData&&jobKey(x.fullData.customer,x.fullData.jobId)===key&&(lo?x.fullData.loState:x.fullData.state));
+      if(i<0)return;
+      if(lo)loadLoHistory(i);else loadHistory(i);
+      if(ghost&&ghost!==T.id)T.remove(ghost);
+      window.scrollTo(0,0);
+      showToast('↩ Brought back the last takeoff for this job');
+    });
+  }
+  [['customer','trim'],['job-id','trim'],['lo-customer','lock'],['lo-job-id','lock']].forEach(p=>{const e=wkEl(p[0]);if(e)e.addEventListener('change',()=>tkAutoFill(p[1]));});
+
   // ── every job the app knows about, newest first (feeds the job picker on the walks) ──
   function jobsAll(){
     const map={};
@@ -2278,7 +2355,7 @@
   // ── post walks: what the pre-walk flagged, and was it done? ──
   const WK_PAIR={post1:'trim1',post2:'trim2',postlo:'lockout'};
   function wkFindPre(){
-    const pm=WK_PAIR[wk.mode];if(!pm)return null;
+    const pm=WK_PAIR[wk.mode];if(!pm)return wkFindOther();      // a pre-walk: carried-in work (see wkFindOther)
     const e=wkLatest(pm,wk.customer,wk.jobId);if(!e||!e.structured)return null;
     const cfg=WALKS[pm],st=e.structured,S=st.status||{},rows=[];
     const lines=id=>{const L=(st.lists||{})[id];if(L&&Array.isArray(L.lines))return L.lines;const old=st[id];return Array.isArray(old)?old.map(x=>({q:'',t:typeof x==='object'?(x.text||''):String(x)})):[];};
@@ -2309,6 +2386,58 @@
     if(!h)h=WK_FOLLOW_HINTS[r.kind]||WK_FOLLOW_HINTS.fallback;
     return (r.kind==='deliver'?'When is it coming? (e.g. ':'What happens next? (e.g. ')+h+')';
   }
+  // ── pre-walks: work carried in from earlier, with the same Done / Still open buttons a post walk has ──
+  //   1st trim pre-walk: the ❌ problems typed on the Trim Take-Off for this job (read from that take-off's report, so it matches what the office saw)
+  //   2nd trim pre-walk: what the last post walk left open (read from that walk's report)
+  function wkTakeoffIssues(text){
+    let on=false;const out=[];
+    String(text||'').split('\n').forEach(l=>{
+      const t=l.trim();
+      if(/^GENERAL NOTES$/i.test(t)){on=true;return;}
+      if(!on)return;
+      const m=/^❌\s*(.+)$/.exec(t);if(m&&m[1].trim())out.push(m[1].trim());
+    });
+    return out;
+  }
+  // the lines of a post walk's report → rows that get buttons (❌ problems and Please deliver items) and lines that are only shown
+  function wkCarryRows(lines){
+    const R=[],info=[];let cur=null,hdr='';
+    (lines||[]).forEach(l=>{
+      if(/^\s+-/.test(l)){const s=l.replace(/^\s*-\s*/,'').trim();if(s){if(cur)cur.subs.push(s);else info.push({t:s,sub:true});}return;}
+      const t=l.trim();if(!t)return;
+      if(/^Notes:/i.test(t)||/^No extra material/i.test(t)){info.push({t:t,sub:false});cur=null;hdr='';return;}
+      if(t.indexOf('❌')===0){cur={kind:'issue',head:t.replace(/^❌\s*/,''),subs:[]};R.push(cur);hdr='';return;}
+      if(/:$/.test(t)){hdr=t;cur=null;if(!/^please deliver/i.test(t))info.push({t:t,sub:false});return;}
+      if(hdr&&/^please deliver/i.test(hdr)){cur={kind:'deliver',head:t,subs:[]};R.push(cur);return;}
+      if(hdr){info.push({t:t,sub:true});return;}
+      info.push({t:t,sub:false});cur=null;
+    });
+    const rows=R.map((r,i)=>{
+      const subs=r.subs.join('; ');
+      if(r.kind==='deliver')return {id:'k:'+i,kind:'deliver',short:r.head,show:'📦 To be delivered: '+r.head,detail:''};
+      return {id:'k:'+i,kind:'issue',short:r.head+(subs?' — '+subs:''),show:'❌ '+r.head+(subs?' — '+subs:''),detail:''};
+    });
+    return {rows:rows,info:info};
+  }
+  function wkFindOther(){
+    const cfg=WALKS[wk.mode];if(!cfg)return null;
+    if(cfg.takeoffIssues){
+      const c=String(wk.customer||'').trim(),j=String(wk.jobId||'').trim(),k=jobKey(c,j),m=lookupTrimTakeoff(c,j);
+      const h=wkArr(TEST_HIST).find(x=>x&&x.text&&x.fullData&&jobKey(x.fullData.customer,x.fullData.jobId||x.fullData.lot)===k);   // newest first; holds any edits the PM made to the report
+      const text=h?h.text:(m?m.summaryText:'');
+      if(!text)return null;
+      const hid=(m&&m.timestamp)||1;
+      const rows=wkTakeoffIssues(text).map((t,i)=>({id:'x:'+i,kind:'issue',short:t,show:'❌ '+t,detail:'',doneLbl:'✅ Fixed',doneLead:'✅ Fixed',key:hid+'|x:'+i}));
+      return {hid:hid,ts:m?m.timestamp:0,ready:'',rows:rows,info:[],head:'Noted on the take-off',tag:'noted on the take-off',okLine:'Take-off ({when}) — no problems were noted'};
+    }
+    if(cfg.carryFrom){
+      const r=wkCarryRecord(cfg.carryFrom,wk.customer,wk.jobId);if(!r)return null;
+      const t=WALKS[cfg.carryFrom].title,x=wkCarryRows(r.lines),hid=r.hid||1;
+      x.rows.forEach(q=>{q.key=hid+'|'+q.id;});
+      return {hid:hid,ts:r.ts||0,ready:r.ready||'',rows:x.rows,info:x.info,head:'Left over from the '+t,tag:'left over from the '+t,dtag:'the '+t};
+    }
+    return null;
+  }
   // ── pre-walks: what the PREVIOUS post walk left behind (read from that walk's own report, so it matches what the office saw) ──
   function wkCarryLines(text){
     const L=String(text||'').split('\n');L.shift();                                   // the title line
@@ -2320,41 +2449,48 @@
     const b=wkFuRead().find(x=>x.mode===mode&&jobKey(x.customer,x.jobId)===k&&x.carry);
     if(a&&(!b||(a.ts||0)>=(b.ts||0))){
       const cfg=WALKS[mode],rd=cfg&&cfg.sections.find(x=>x.type==='ready'),st=a.structured||{},ro=rd&&rd.options.find(x=>x.v===st.ready);
-      return {ts:a.ts,ready:ro?ro.icon+' '+ro.t:'',lines:wkCarryLines(a.text)};
+      return {ts:a.ts,hid:a.hid,ready:ro?ro.icon+' '+ro.t:'',lines:wkCarryLines(a.text)};
     }
-    return b?{ts:b.ts,ready:b.carry.ready,lines:b.carry.lines||[]}:null;
+    return b?{ts:b.ts,hid:b.hid,ready:b.carry.ready,lines:b.carry.lines||[]}:null;
   }
+  // the 2nd trim pre-walk's blue box: what the last post walk left — problems and deliveries get Done / Still open buttons, the rest is just shown
   function wkRenderCarry(){
     const el=wkEl('wk-carry');if(!el)return;
     el.style.display='none';el.innerHTML='';
     const cfg=wk&&WALKS[wk.mode];if(!cfg||!cfg.carryFrom)return;
-    const r=wkCarryRecord(cfg.carryFrom,wk.customer,wk.jobId);if(!r)return;
-    const title=WALKS[cfg.carryFrom].title,when=r.ts?jbDate(r.ts):'earlier';
+    if(!wk.pre)wk.pre=wkFindPre();
+    const p=wk.pre;if(!p)return;
+    const title=WALKS[cfg.carryFrom].title,when=p.ts?jbDate(p.ts):'earlier',info=p.info||[];
     el.style.display='block';
-    if(!r.lines.length){el.innerHTML='<div class="wk-carry ok">📋 '+esc(title)+' ('+esc(when)+')'+(r.ready?': '+esc(r.ready):'')+' — nothing was left open</div>';return;}
-    el.innerHTML='<div class="wk-carry"><div class="wk-carry-hdr">📋 Left over from the '+esc(title)+' ('+esc(when)+')'+(r.ready?' — '+esc(r.ready):'')+'</div>'+
-      r.lines.map(l=>/^\s+-/.test(l)?'<div class="wk-carry-line sub">• '+esc(l.replace(/^\s*-\s*/,''))+'</div>':'<div class="wk-carry-line">'+esc(l.trim())+'</div>').join('')+
-      '<div class="wk-muted" style="margin-top:6px;">This is what the last post walk told the office. Read it before you start.</div></div>';
+    if(!p.rows.length&&!info.length){el.innerHTML='<div class="wk-carry ok">📋 '+esc(title)+' ('+esc(when)+')'+(p.ready?': '+esc(p.ready):'')+' — nothing was left open</div>';return;}
+    el.innerHTML='<div class="wk-carry"><div class="wk-carry-hdr">📋 Left over from the '+esc(title)+' ('+esc(when)+')'+(p.ready?' — '+esc(p.ready):'')+'</div>'+
+      wkPreRows(p)+
+      info.map(l=>l.sub?'<div class="wk-carry-line sub">• '+esc(l.t)+'</div>':'<div class="wk-carry-line">'+esc(l.t)+'</div>').join('')+
+      '<div class="wk-muted" style="margin-top:6px;">'+(p.rows.length?'This is what the last post walk told the office. Tap Done or Still open on each item — it goes in the text for the office. Skip any you don\'t need.':'This is what the last post walk told the office. Read it before you start.')+'</div></div>';
+  }
+  // one row per item, with its two buttons (and the "Still open" note box)
+  function wkPreRows(p){
+    return p.rows.map((r,i)=>{
+      const a=wk.followup[r.key]||'',dv=(r.kind==='deliver');
+      return '<div class="wk-pre-row"><div class="wk-pre-txt">'+esc(r.show)+'</div><div class="wk-pre-btns"><button class="wk-pre-btn'+(a==='done'?' sel-in':'')+'" onclick="wkFollow('+i+',\'done\')">'+(dv?'✅ Delivered':(r.doneLbl||'✅ Done'))+'</button><button class="wk-pre-btn'+(a==='open'?' sel-out':'')+'" onclick="wkFollow('+i+',\'open\')">'+(dv?'❌ Not yet':'❌ Still open')+'</button></div>'+(a==='open'?'<textarea id="wk-pn-'+i+'" class="wk-pre-note" placeholder="'+esc(wkFollowHint(r))+'" oninput="wkFollowNote('+i+',this.value)">'+esc(wk.followNote[r.key]||'')+'</textarea>':'')+'</div>';
+    }).join('');
   }
   function wkRenderPrewalk(){
     const el=wkEl('wk-prewalk');if(!el)return;
     el.style.display='none';el.innerHTML='';
-    if(!wk||!WK_PAIR[wk.mode])return;
+    if(!wk||!(WK_PAIR[wk.mode]||wkCfg().takeoffIssues))return;
     if(!wk.pre)wk.pre=wkFindPre();
     const p=wk.pre;if(!p)return;
     el.style.display='block';
     const when=p.ts?jbDate(p.ts):'earlier';
-    if(!p.rows.length){el.innerHTML='<div class="wk-pre ok">📋 Pre-walk ('+esc(when)+'): '+esc(p.ready)+' — nothing was flagged</div>';return;}
-    el.innerHTML='<div class="wk-pre"><div class="wk-pre-hdr">📋 Flagged on the pre-walk ('+esc(when)+')'+(p.ready?' — '+esc(p.ready):'')+'</div>'+p.rows.map((r,i)=>{
-      const a=wk.followup[r.key]||'',dv=(r.kind==='deliver');
-      return '<div class="wk-pre-row"><div class="wk-pre-txt">'+esc(r.show)+'</div><div class="wk-pre-btns"><button class="wk-pre-btn'+(a==='done'?' sel-in':'')+'" onclick="wkFollow('+i+',\'done\')">'+(dv?'✅ Delivered':'✅ Done')+'</button><button class="wk-pre-btn'+(a==='open'?' sel-out':'')+'" onclick="wkFollow('+i+',\'open\')">'+(dv?'❌ Not yet':'❌ Still open')+'</button></div>'+(a==='open'?'<textarea id="wk-pn-'+i+'" class="wk-pre-note" placeholder="'+esc(wkFollowHint(r))+'" oninput="wkFollowNote('+i+',this.value)">'+esc(wk.followNote[r.key]||'')+'</textarea>':'')+'</div>';
-    }).join('')+'<div class="wk-muted" style="margin-top:6px;">Tap what was done — it goes in the text for the office. If it\'s still open, say what happens next. Skip any you don\'t need.</div></div>';
+    if(!p.rows.length){el.innerHTML='<div class="wk-pre ok">📋 '+(p.okLine?esc(p.okLine.replace('{when}',when)):'Pre-walk ('+esc(when)+'): '+esc(p.ready)+' — nothing was flagged')+'</div>';return;}
+    el.innerHTML='<div class="wk-pre"><div class="wk-pre-hdr">📋 '+esc(p.head||'Flagged on the pre-walk')+' ('+esc(when)+')'+(p.ready?' — '+esc(p.ready):'')+'</div>'+wkPreRows(p)+'<div class="wk-muted" style="margin-top:6px;">Tap what was done — it goes in the text for the office. If it\'s still open, say what happens next. Skip any you don\'t need.</div></div>';
   }
   function wkFollow(i,v){
     const r=wk.pre.rows[i];wk.followup[r.key]=(wk.followup[r.key]===v)?'':v;
     if(!wk.followup[r.key])delete wk.followup[r.key];
     if(wk.followup[r.key]!=='open')delete wk.followNote[r.key];
-    wkRenderPrewalk();wkSave();
+    wkRenderPrewalk();wkRenderCarry();wkSave();
     if(wk.followup[r.key]==='open'){const el=wkEl('wk-pn-'+i);if(el)el.focus();}      // "Still open" opens a box, ready to type
   }
   function wkFollowNote(i,v){const r=wk.pre.rows[i];wk.followNote[r.key]=v;wkSave();}
