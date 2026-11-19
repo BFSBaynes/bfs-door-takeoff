@@ -1013,7 +1013,7 @@
   // ── ROLLOUT SETTINGS ──
   // The version shows on the Main Page and is sent with every problem report — change it each time you upload a new file.
   const APP_VERSION = "Beta 2.7";
-  const BUILD_ID = "79cd982803";          // stamped automatically with a fingerprint of the whole file each time it is built — do not edit
+  const BUILD_ID = "7ebf6e4ac6";          // stamped automatically with a fingerprint of the whole file each time it is built — do not edit
   const UPDATE_CHECK = true;       // true = the app checks for a newer copy of itself (the saved Home Screen app can hold on to an old one)
   // Where "Report a problem" emails go. Leave it empty ("") and the button copies the report so it can be pasted into an email.
   const REPORT_EMAIL = "miller.baynes@bldr.com";
@@ -1157,6 +1157,7 @@
         "Doors not painted yet",
         "Doors that bind or will not latch",
         "Exterior and garage entry doors ready for locks",
+        "Porch posts (house number spot) framed and ready",
         "Missing hardware"
       ],
       how: [
@@ -1169,7 +1170,7 @@
         "Tap Generate, then Copy, and paste the text into AppWright — the app doesn't send it for you."
       ],
       sections: [
-        {type:"checks", title:"🚪 Doors", allOk:"✅ Mark everything done", items:[
+        {type:"checks", title:"🔒 Lock hardware pre-walk checks", allOk:"✅ Mark everything done", items:[
           {id:"intdoors", hint:"two doors are still being hung — we will lock those out on the return trip", label:"Interior doors installed", yes:"✅ Installed", no:"❌ Not in",
            ok:"Interior doors installed", bad:"Interior doors NOT installed", notePh:"Which doors?",
            help:"Every interior door hung on its frame. A slab leaning in the garage or sitting off its frame counts as Not in — note which doors."},
@@ -1181,7 +1182,10 @@
            help:"Front, rear/patio and garage entry doors installed and ready for locks."},
           {id:"base", hint:"base goes in Wednesday — we will set the base bumps on the return trip",     label:"Baseboard installed (for base bumps)", yes:"✅ Installed", no:"❌ Not in",
            ok:"Baseboard installed", bad:"Baseboard NOT installed", notePh:"Which rooms?",
-           help:"Baseboard needs to be in where base bumps go. Skip this one if the house has no base bumps."}
+           help:"Baseboard needs to be in where base bumps go. Skip this one if the house has no base bumps."},
+          {id:"porchposts", hint:"the porch posts get framed Friday — we will install the house numbers after", label:"Porch posts (house number spot) framed & ready", yes:"✅ Ready", no:"❌ Not ready",
+           ok:"Porch posts (house number spot) framed & ready", bad:"Porch posts (house number spot) NOT framed & ready", notePh:"Which posts / where do the numbers go?",
+           help:"The porch posts — or wherever the house numbers go, like above the garage door — are framed and ready for the numbers. If not, mark Not ready and say which spot."}
         ]},
         {type:"quick", title:"🔎 Anything else you noticed?"},
         {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", whenOn:"no", whenLabel:"When will it be ready for install?", whenLine:"will be ready for install {when}", whenUnknown:"ready date unknown", whenNone:"no ready date yet", options:[
