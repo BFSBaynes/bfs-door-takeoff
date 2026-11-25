@@ -757,7 +757,8 @@
   const doorSizes=["1/4","1/6","1/8","1/10","2/0","2/4","2/6","2/8","2/10","3/0"];
   const dblSizes=["2/8","3/0","3/4","4/0","4/8","5/0","5/4","6/0"];
   const railLengths=["8'","12'","16'","18'"];
-  const stairItems=["Brackets","Newels","Anchor","Rosettes","Balusters","Shoes","Epoxy"];
+  const stairItems=["Brackets","Newels","Anchor","Rosettes","Balusters","Shoes","Epoxy","1x8 Oak","1x10 Oak"];
+  const halfWallItems=["1x8","1x10"];
   const directInputItems=["Brackets","Balusters","Shoes"];
 
   const layout=[
@@ -767,7 +768,8 @@
     {title:"8/0 Double",  id:"DBL80",color:"bg-red", items:dblSizes,   types:["DBL","T-AST"]},
     {title:"Attic W/S",   id:"atws", color:"bg-navy",items:doorSizes,  types:["LH","RH"]},
     {title:"Attic Stairs",id:"AS",   color:"bg-red", items:["22x54","25x54","Scuttle"],types:["QTY"]},
-    {title:"Stair Parts", id:"sp",   color:"bg-navy",items:[...railLengths,...stairItems]}
+    {title:"Stair Parts", id:"sp",   color:"bg-navy",items:[...railLengths,...stairItems]},
+    {title:"1/2 Walls",   id:"hw",   color:"bg-red", items:halfWallItems,types:["QTY"]}
   ];
 
   // ── QUICK NOTE BUILDER ─────────────────────────────────────────
@@ -874,7 +876,7 @@
     if(!cust||!jobId){showToast('⚠️ ENTER CUSTOMER & JOB ID');return;}
     const gN=document.getElementById('notes').value||'',cV=cust||'NA',jV=jobId||'NA';
     let r=`TAKEOFF -- ${cV} -- ${jV}\n----------------------------\n\n`;
-    const gs=[{id:"68",head:"--- 6/8 SINGLE DOORS ---",types:["LH","RH","SLAB"],items:doorSizes,suffix:""},{id:"DBL68",head:"--- 6/8 DOUBLE DOORS ---",types:["DBL","T-AST"],items:dblSizes,suffix:""},{id:"80",head:"--- 8/0 SINGLE DOORS ---",types:["LH","RH","SLAB"],items:doorSizes,suffix:"x8/0"},{id:"DBL80",head:"--- 8/0 DOUBLE DOORS ---",types:["DBL","T-AST"],items:dblSizes,suffix:"x8/0"},{id:"atws",head:"--- ATTIC WS DOORS ---",types:["LH","RH"],items:doorSizes,suffix:""},{id:"AS",head:"--- ATTIC STAIRS ---",types:["QTY"],items:["22x54","25x54","Scuttle"],suffix:""},{id:"HR",head:"--- HANDRAIL ---",types:["OPEN","WALL"],items:railLengths,suffix:""},{id:"ST",head:"--- STAIR HARDWARE ---",types:["QTY"],items:stairItems.filter(i=>i!=="Shoes"),suffix:""},{id:"STSH",head:"--- SHOES ---",types:["FLAT","ANGLE"],items:["Shoes"],suffix:""}];
+    const gs=[{id:"68",head:"--- 6/8 SINGLE DOORS ---",types:["LH","RH","SLAB"],items:doorSizes,suffix:""},{id:"DBL68",head:"--- 6/8 DOUBLE DOORS ---",types:["DBL","T-AST"],items:dblSizes,suffix:""},{id:"80",head:"--- 8/0 SINGLE DOORS ---",types:["LH","RH","SLAB"],items:doorSizes,suffix:"x8/0"},{id:"DBL80",head:"--- 8/0 DOUBLE DOORS ---",types:["DBL","T-AST"],items:dblSizes,suffix:"x8/0"},{id:"atws",head:"--- ATTIC WS DOORS ---",types:["LH","RH"],items:doorSizes,suffix:""},{id:"AS",head:"--- ATTIC STAIRS ---",types:["QTY"],items:["22x54","25x54","Scuttle"],suffix:""},{id:"HR",head:"--- HANDRAIL ---",types:["OPEN","WALL"],items:railLengths,suffix:""},{id:"ST",head:"--- STAIR HARDWARE ---",types:["QTY"],items:stairItems.filter(i=>i!=="Shoes"),suffix:""},{id:"STSH",head:"--- SHOES ---",types:["FLAT","ANGLE"],items:["Shoes"],suffix:""},{id:"hw",head:"--- 1/2 WALLS ---",types:["QTY"],items:halfWallItems,suffix:""}];
     gs.forEach(g=>{let gc='';g.items.forEach(item=>{g.types.forEach(t=>{const key=(g.id==='HR'||g.id==='ST'||g.id==='STSH')?`${g.id}_${item.replace(/[\/ ']/g,"-")}_${t}`:getSyncKey(g.id,item,t);if(state[key]>0){const fl=(g.id==='AS'&&state.fireRated)?' (FIRE RATED)':'',ct=(t==='QTY')?'':` ${t}`,note=state[`NOTE_${key}`]||'';gc+=`- ${item}${g.suffix}${ct}: ${state[key]}${fl}${note?' *'+note:''}\n`;}});});if(gc)r+=`${g.head}\n${gc}\n`;});
     // Include quick notes
     const qnt=getQNotesText('main');
@@ -1013,7 +1015,7 @@
   // ── ROLLOUT SETTINGS ──
   // The version shows on the Main Page and is sent with every problem report — change it each time you upload a new file.
   const APP_VERSION = "Beta 2.7";
-  const BUILD_ID = "7ebf6e4ac6";          // stamped automatically with a fingerprint of the whole file each time it is built — do not edit
+  const BUILD_ID = "44fade9542";          // stamped automatically with a fingerprint of the whole file each time it is built — do not edit
   const UPDATE_CHECK = true;       // true = the app checks for a newer copy of itself (the saved Home Screen app can hold on to an old one)
   // Where "Report a problem" emails go. Leave it empty ("") and the button copies the report so it can be pasted into an email.
   const REPORT_EMAIL = "miller.baynes@bldr.com";
@@ -1130,6 +1132,14 @@
           {id:"wood", hint:"wood floors are being sanded this week — we will come back after they cure",     label:"Wood flooring",           ok:"Wood flooring installed", help:"Check every area where shoe will be installed that gets wood flooring. If only some rooms are done, mark Not in and say which rooms."},
           {id:"tile", hint:"tile is grouted Thursday — we will set the shoe after",     label:"Tile",                    ok:"Tile installed",          help:"Check baths, laundry and any other tile areas where shoe will be installed."}
         ]},
+        {type:"checks", title:"🔥 Hood vent & fire caulk", items:[
+          {id:"hoodvent", label:"Ready for hood vent box (pipe connected to vent)", yes:"✅ Ready", no:"❌ Not ready", ok:"Ready for hood vent box (pipe connected to vent)", bad:"NOT ready for hood vent box (pipe not connected to vent)",
+           hint:"the vent pipe is being connected Thursday — we will come back for the hood vent box",
+           help:"Check that the vent pipe is connected to the vent so the hood vent box can be built. Skip this one if the house has no hood vent box. Not ready? Get a date from the super and tap what they tell you."},
+          {id:"firecaulk", label:"Fire caulk applied to ceiling", yes:"✅ Applied", no:"❌ Not applied", ok:"Fire caulk applied to ceiling", bad:"Fire caulk NOT applied to ceiling",
+           hint:"the fire caulk is being applied Wednesday — we will come back after",
+           help:"Check that the fire caulk is applied at the ceiling. Not applied? Get a date from the super and tap what they tell you."}
+        ]},
         {type:"quick", title:"🔎 Anything else you noticed?"},
         {type:"ready", title:"🚦 Ready?", label:"Ready", hints:"pre", whenOn:"no", whenLabel:"When will it be ready for install?", whenLine:"will be ready for install {when}", whenUnknown:"ready date unknown", whenNone:"no ready date yet", options:[
           {v:"yes",     icon:"✅", t:"Ready",                  s:"Everything needed is in",                                              line:"✅ YES"},
@@ -1213,6 +1223,7 @@
         "Reveals on the doors are good",
         "Check for any areas that are missing doors/trim/etc. and note those",
         "Make sure all stair parts are installed properly, epoxied/nailed",
+        "1/2 wall installed properly",
         "Make sure closet rods are installed, and take photos of them in case the painters take them off later",
         "No damaged material",
         "If material is missing — can this wait until 2nd trim, or do we need to set up a service for these items or a return trip?",
@@ -1246,8 +1257,14 @@
           {id:"stairparts", label:"Stair parts / railing installed properly", yes:"✅ Good", no:"❌ Problem", ask:"note",
            ok:"Stair parts / railing installed properly", bad:"Stair parts / railing NOT installed properly",
            lines:true, linesLabel:"Where? One line for each spot", linePh:"Where — what's wrong? (e.g. loose pickets upstairs)", addLabel:"+ Add another spot",
-           help:"Make sure all stair parts and the railing are installed properly — epoxied/nailed. If not, add a line for each spot."}
+           help:"Make sure all stair parts and the railing are installed properly — epoxied/nailed. If not, add a line for each spot."},
+          {id:"halfwall", label:"1/2 wall installed properly", yes:"✅ Good", no:"❌ Problem", ask:"note",
+           ok:"1/2 wall installed properly", bad:"1/2 wall NOT installed properly",
+           lines:true, linesLabel:"Where? One line for each spot", linePh:"Where — what's wrong? (e.g. cap loose on the upstairs 1/2 wall)", addLabel:"+ Add another spot",
+           help:"Check the 1/2 wall — cap, trim and everything around it installed properly. If anything is wrong, add a line for each spot. Skip this one if the house has no 1/2 wall."}
         ]},
+        {type:"choice", id:"hoodvent", title:"🔥 Will the house need a hood vent box at 2nd trim?", yes:"✅ Yes, needs one", no:"No hood vent box",
+         yesLine:"🔥 House WILL need a hood vent box at 2nd trim", noLine:"House will NOT need a hood vent box at 2nd trim"},
         {type:"quick", title:"🔎 Anything else you noticed?"},
         {type:"ready", title:"📋 Result", label:"Result", hints:"post", options:[
           {v:"complete",   icon:"✅", t:"Complete",   s:"Everything is done",           line:"✅ COMPLETE"},
